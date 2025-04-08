@@ -1,0 +1,26 @@
+import 'package:get/get.dart';
+
+class BottomController extends GetxController {
+  //TODO: Implement BottomController
+
+  final count = 0.obs;
+  var selectedIndex = 0.obs;
+
+  var selected = 0.obs;
+  @override
+  void onInit() {
+    super.onInit();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+  }
+
+  void increment() => count.value++;
+}
