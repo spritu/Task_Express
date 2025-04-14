@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../colors.dart';
 import '../../location/views/location_view.dart';
-import '../../signUp/views/sign_up_view.dart';
+import '../../otp/views/otp_view.dart';
+
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -29,21 +30,8 @@ class LoginView extends GetView<LoginController> {
             child: Column(
               // mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: [SizedBox(height: MediaQuery.of(context).size.height*0.1),
-                Row(mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    InkWell(onTap: (){Get.to(SignUpView());},
-                      child: Container(
-                        height: 27,
-                        width: 51,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(width: 1,color: Colors.black)
-                        ),child: Center(child: Text("skip",style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400),),),
-                      ),
-                    ),
-                  ],
-                ),SizedBox(height: MediaQuery.of(context).size.height*0.1),
+              children: [SizedBox(height: MediaQuery.of(context).size.height*0.2),
+
                 Text.rich(
                   TextSpan(
                     children: [
@@ -110,11 +98,11 @@ class LoginView extends GetView<LoginController> {
                             fontWeight: FontWeight.w400)),
                   ],
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 30),
                 TextField(
                   controller: controller.mobileController,
                   keyboardType: TextInputType.phone,
-                  maxLength: 10,
+                //  maxLength: 10,
                   decoration: InputDecoration(
                     labelText: 'Mobile Number',
                     prefixIcon: Padding(
@@ -141,12 +129,12 @@ class LoginView extends GetView<LoginController> {
                       horizontal: 12,
                     ),
                   ),
-                ),
+                ),SizedBox(height: 20),
                 InkWell(onTap: (){
-                  Get.to(LocationView());
+                  Get.to(OtpView());
                 },
                   child: Container(
-                    height: 42,
+                    height: 64,
                     width: MediaQuery.of(context).size.width*0.6,
                     decoration: BoxDecoration(
                       color: Color(0xff235CD7),

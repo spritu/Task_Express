@@ -19,6 +19,30 @@ abstract class Routes {
   static const LOCATION = _Paths.LOCATION;
   static const OTP = _Paths.OTP;
   static const PROFILE = _Paths.PROFILE;
+  static const TILE_FIXING_HELPER = _Paths.TILE_FIXING_HELPER;
+  static const CEMENT_HELPER = _Paths.CEMENT_HELPER;
+  static const PLASTERING_HELPER = _Paths.PLASTERING_HELPER;
+  static const BRICKLAYING_HELPER = _Paths.BRICKLAYING_HELPER;
+  static const SCAFFOLDING_HELPER = _Paths.SCAFFOLDING_HELPER;
+  static const ROAD_CONSTRUCTION_HELPER = _Paths.ROAD_CONSTRUCTION_HELPER;
+  static const PROFESSIONAL_PLUMBER = _Paths.PROFESSIONAL_PLUMBER;
+  static const PROFESSIONAL_PROFILE = _Paths.PROFESSIONAL_PROFILE;
+  static const HELPER_PROFILE = _Paths.HELPER_PROFILE;
+  static const EDIT_PROFILE = _Paths.EDIT_PROFILE;
+  static const ADD_ADDRESS = _Paths.ADD_ADDRESS;
+  static const VERIFICATION = _Paths.VERIFICATION;
+  static const CHAT_SCREEN = _Paths.CHAT_SCREEN;
+  static const BOOKING_CONFIRM = _Paths.BOOKING_CONFIRM;
+  static const SERVICE_COMPLETED = _Paths.SERVICE_COMPLETED;
+  static const SERVICE_COMPLETED_SUCCESSFULLY =
+      _Paths.SERVICE_COMPLETED_SUCCESSFULLY;
+  static const ADDRESS_SCREEN = _Paths.ADDRESS_SCREEN;
+  static const PROVIDER_LOGIN = _Paths.PROVIDER_LOGIN;
+  static const PROVIDER_OTP = _Paths.PROVIDER_OTP;
+  static const PROVIDER_LOCATION = _Paths.PROVIDER_LOCATION;
+  static const PROVIDER_PROFILE = _Paths.PROVIDER_PROFILE;
+  static const PROVIDER_HOME = _Paths.PROVIDER_HOME;
+  static const ACTIVEJOB_SCREEN = _Paths.ACTIVEJOB_SCREEN;
 }
 
 abstract class _Paths {
@@ -39,4 +63,28 @@ abstract class _Paths {
   static const LOCATION = '/location';
   static const OTP = '/otp';
   static const PROFILE = '/profile';
+  static const TILE_FIXING_HELPER = '/tile-fixing-helper';
+  static const CEMENT_HELPER = '/cement-helper';
+  static const PLASTERING_HELPER = '/plastering-helper';
+  static const BRICKLAYING_HELPER = '/bricklaying-helper';
+  static const SCAFFOLDING_HELPER = '/scaffolding-helper';
+  static const ROAD_CONSTRUCTION_HELPER = '/road-construction-helper';
+  static const PROFESSIONAL_PLUMBER = '/professional-plumber';
+  static const PROFESSIONAL_PROFILE = '/professional-profile';
+  static const HELPER_PROFILE = '/helper-profile';
+  static const EDIT_PROFILE = '/edit-profile';
+  static const ADD_ADDRESS = '/add-address';
+  static const VERIFICATION = '/verification';
+  static const CHAT_SCREEN = '/chat-screen';
+  static const BOOKING_CONFIRM = '/booking-confirm';
+  static const SERVICE_COMPLETED = '/service-completed';
+  static const SERVICE_COMPLETED_SUCCESSFULLY =
+      '/service-completed-successfully';
+  static const ADDRESS_SCREEN = '/address-screen';
+  static const PROVIDER_LOGIN = '/provider-login';
+  static const PROVIDER_OTP = '/provider-otp';
+  static const PROVIDER_LOCATION = '/provider-location';
+  static const PROVIDER_PROFILE = '/provider-profile';
+  static const PROVIDER_HOME = '/provider-home';
+  static const ACTIVEJOB_SCREEN = '/activejob-screen';
 }

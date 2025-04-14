@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:worknest/colors.dart';
 
 import '../../account/views/account_view.dart';
 import '../../booking/views/booking_view.dart';
 import '../../chat/views/chat_view.dart';
+import '../../chat_screen/views/chat_screen_view.dart';
 import '../../home/views/home_view.dart';
 import '../../setting/views/setting_view.dart';
 import '../../worknest/views/worknest_view.dart';
@@ -14,15 +16,14 @@ class BottomView extends GetView<BottomController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Obx(() => _buildBody(controller.selectedIndex.value)),
       bottomNavigationBar: Obx(
-        () => BottomNavigationBar(
+        () => BottomNavigationBar(backgroundColor: AppColors.white,
           currentIndex: controller.selectedIndex.value,
           onTap: (index) => controller.selectedIndex.value = index,
           selectedItemColor: Color(0xFF114BCA),
           unselectedItemColor: Color(0xFF9F9F9F),
-          type: BottomNavigationBarType.fixed,
+          type: BottomNavigationBarType.fixed,showUnselectedLabels: true,
           items: [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Bookings'),
@@ -48,7 +49,7 @@ Widget _buildBody(int index) {
     case 2:
       return SettingView();
     case 3:
-      return ChatView();
+      return ChatScreenView();
     case 4:
       return AccountView();
     default:

@@ -42,6 +42,12 @@ dependencies:
   intl: ^0.19.0
   http: ^1.2.2
   file_picker: ^10.0.0
+  flutter_rating_bar: ^4.0.0
+  flutter_switch: ^0.3.2
+  flutter_chat_ui: ^1.6.15
+  flutter_chat_types: ^3.6.2
+  uuid: ^4.2.1
+  image_picker: ^1.0.4
 
 
 
@@ -86,7 +92,7 @@ flutter:
   fonts:
     - family: Poppins
       fonts:
-        - asset: fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

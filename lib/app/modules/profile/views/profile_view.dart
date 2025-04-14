@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:worknest/colors.dart';
-
+import '../../location/views/location_view.dart';
 import '../controllers/profile_controller.dart';
 
 class ProfileView extends GetView<ProfileController> {
@@ -91,7 +90,6 @@ class ProfileView extends GetView<ProfileController> {
                 Row(
                   children: [
                     SizedBox(width: MediaQuery.of(context).size.width*0.5,
-
                         child: buildDropdown("City", "Select your City")),
                     const SizedBox(width: 10),
                     SizedBox (width: MediaQuery.of(context).size.width/3,
@@ -120,7 +118,9 @@ class ProfileView extends GetView<ProfileController> {
                     ],
                   ),
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.to(LocationView());
+                    },
                     child: const Text(
                       "Proceed",
                       style: TextStyle(color: Colors.white, fontSize: 16),

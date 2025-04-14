@@ -2,18 +2,66 @@ import 'package:get/get.dart';
 
 class HomeController extends GetxController {
   // TODO: Implement WorknestController
-  var expandedServiceType = ''.obs;
-  final count = 0.obs;
+  RxString expandedServiceType = ''.obs;
   RxBool showAllCategories = false.obs;
-  var selectedCategory = ''.obs;
-  var selectedIndex = 0.obs;
-  void toggleServiceExpansion(String title) {
-    if (expandedServiceType.value == title) {
-      expandedServiceType.value = ''; // Collapse if same is tapped
+
+  // Dummy data for each service type
+  List<Map<String, String>> visitingCategories = [
+    {'label': 'Construction', 'icon': 'assets/images/image.png'},
+    {'label': 'Plumber', 'icon': 'assets/images/image.png'},
+    {'label': 'Painter', 'icon': 'assets/images/image.png'},
+    {'label': 'Electrician', 'icon': 'assets/images/image.png'},
+    {'label': 'Carpenter', 'icon': 'assets/images/image.png'},
+    {'label': 'Welder', 'icon': 'assets/images/image.png'},
+    {'label': 'Gardener', 'icon': 'assets/images/image.png'},
+    {'label': 'Cleaner', 'icon': 'assets/images/image.png'},
+  ];
+
+  List<Map<String, String>> fixedChargeCategories = [
+    {'label': 'AC Service', 'icon': '❄️'},
+    {'label': 'Washing Machine', 'icon': '🧺'},
+    {'label': 'Fridge Repair', 'icon': '🧊'},
+    {'label': 'TV Repair', 'icon': '📺'},
+    {'label': 'Fan Repair', 'icon': '🌀'},
+    {'label': 'Geyser', 'icon': '🔥'},
+    {'label': 'Microwave', 'icon': '🍲'},
+    {'label': 'More', 'icon': '➕'},
+  ];
+
+  RxList<Map<String, String>> categories = <Map<String, String>>[].obs;
+
+  void toggleServiceExpansion(String selectedTitle) {
+    if (expandedServiceType.value == selectedTitle) {
+      expandedServiceType.value = '';
+      categories.clear();
     } else {
-      expandedServiceType.value = title; // Expand new one
+      expandedServiceType.value = selectedTitle;
+      showAllCategories.value = false;
+
+      // Update categories based on selection
+      if (selectedTitle == 'Visiting Professionals') {
+        categories.value = visitingCategories;
+      } else if (selectedTitle == 'Fixed charge Helpers') {
+        categories.value = fixedChargeCategories;
+      }
     }
   }
+
+  void toggleCategoryView() {
+    showAllCategories.value = !showAllCategories.value;
+  }
+//  var expandedServiceType = ''.obs;
+  final count = 0.obs;
+ // RxBool showAllCategories = false.obs;
+  var selectedCategory = ''.obs;
+  var selectedIndex = 0.obs;
+ // void toggleServiceExpansion(String title) {
+ //    if (expandedServiceType.value == title) {
+ //      expandedServiceType.value = ''; // Collapse if same is tapped
+ //    } else {
+ //      expandedServiceType.value = title; // Expand new one
+ //    }
+ //  }
   void selectItem(int index) {
     selectedIndex.value = index;
   }
@@ -30,16 +78,7 @@ class HomeController extends GetxController {
     {'title': 'Fixed charge Helpres', 'icon': '🤖'},
   ];
 
-  // final List<Map<String, String>> categories = [
-  //   {'label': 'Electrition', 'icon': '⚡'},
-  //   {'label': 'Plumber', 'icon': '🔧'},
-  //   {'label': 'Carpenter', 'icon': '🪚'},
-  //   {'label': 'Painter', 'icon': '🎨'},
-  //   {'label': 'AC/Fridge Repair', 'icon': '❄️'},
-  //   {'label': 'Pest Control', 'icon': '🪳'},
-  //   {'label': 'House Cleaning', 'icon': '🏠'},
-  //   {'label': 'More', 'icon': '➕'},
-  // ];
+
 
   final List<String> titles1 = [
     'Visiting Professionals',
@@ -74,24 +113,25 @@ class HomeController extends GetxController {
   ];
 
 
-  List<Map<String, String>> categories = [
-    {'icon': '🛠️', 'label': 'Repair'},
-    {'icon': '💡', 'label': 'Electrician'},
-    {'icon': '🚿', 'label': 'Plumber'},
-    {'icon': '🧹', 'label': 'Cleaning'},
-    {'icon': '📦', 'label': 'Moving'},
-    {'icon': '🧼', 'label': 'Laundry'},
-    {'icon': '🖌️', 'label': 'Painting'},
-    {'icon': '🪑', 'label': 'Furniture'},
-    {'icon': '🛏️', 'label': 'Carpentry'},
-    {'icon': '🧯', 'label': 'Fire Safety'},
-    {'icon': '🛠️', 'label': 'Repair'},
-    {'icon': '💡', 'label': 'Electrician'},
-    {'icon': '🚿', 'label': 'Plumber'},
-    {'icon': '🧹', 'label': 'Cleaning'},
-    {'icon': '🚿', 'label': 'Plumber'},
-    {'icon': '🧹', 'label': 'Cleaning'},
-  ];
+  // List<Map<String, String>> categories = [
+  //   {'icon': '🛠️', 'label': 'Construction & Masonry'},
+  //   {'icon': '💡', 'label': 'Electrician'},
+  //   {'icon': '🚿', 'label': 'Plumber'},
+  //   {'icon': '🧹', 'label': 'Cleaning'},
+  //   {'icon': '📦', 'label': 'Moving'},
+  //   {'icon': '🧼', 'label': 'Laundry'},
+  //   {'icon': '🖌️', 'label': 'Painting'},
+  //   {'icon': '🪑', 'label': 'Furniture'},
+  //   {'icon': '🛏️', 'label': 'Carpentry'},
+  //   {'icon': '🧯', 'label': 'Fire Safety'},
+  //   {'icon': '🛠️', 'label': 'Repair'},
+  //   {'icon': '💡', 'label': 'Electrician'},
+  //   {'icon': '🚿', 'label': 'Plumber'},
+  //   {'icon': '🧹', 'label': 'Cleaning'},
+  //   {'icon': '🚿', 'label': 'Plumber'},
+  //   {'icon': '🧹', 'label': 'Cleaning'},
+  // ];
+
   final services = [
     {
       'image': 'assets/images/plumber.png',
@@ -128,9 +168,9 @@ class HomeController extends GetxController {
     },
   ];
 
-  void toggleCategoryView() {
-    showAllCategories.value = !showAllCategories.value;
-  }
+  // void toggleCategoryView() {
+  //   showAllCategories.value = !showAllCategories.value;
+  // }
   @override
   void onInit() {
     super.onInit();

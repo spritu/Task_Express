@@ -1,10 +1,9 @@
-import 'package:flutter/gestures.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:worknest/app/modules/location/views/location_view.dart';
 import '../../../../colors.dart';
-
-import '../../otp/views/otp_view.dart';
-import '../.../../.././profile/views/profile_view.dart';
 import '../controllers/sign_up_controller.dart';
 
 class SignUpView extends GetView<SignUpController> {
@@ -12,297 +11,217 @@ class SignUpView extends GetView<SignUpController> {
 
   @override
   Widget build(BuildContext context) {
+    final SignUpController controller = Get.put(SignUpController());
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      Get.offAllNamed('/home'); // Navigate to Home or Dashboard
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.black, width: 1),
-                      ),
-                      child: Text("skip", style: TextStyle(fontSize: 15)),
-                    ),
-                  ),
-                ],
-              ),
-              //  SizedBox(height: 40),
-              // App Name
-              Text.rich(
-                TextSpan(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF87AAF6), Colors.white],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 10),
+                const Text("Your Profile", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 20),
+
+                /// Profile Image
+                Obx(() => Stack(
+                  alignment: Alignment.bottomRight,
                   children: [
-                    TextSpan(
-                      text: 'Task',
-                      style: TextStyle(
-                        color: AppColors.textColor,
-                        fontSize: 40,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    CircleAvatar(
+                      radius: 45,
+                      backgroundColor: Colors.white,
+                      backgroundImage: controller.imagePath.value.isNotEmpty
+                          ? FileImage(File(controller.imagePath.value))
+                          : null,
+                      child: controller.imagePath.value.isEmpty
+                          ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                          : null,
                     ),
-                    TextSpan(
-                      text: 'Express',
-                      style: TextStyle(
-                        color: Color(0xff235CD7),
-                        fontSize: 40,
-                        fontWeight: FontWeight.w600,
+                    Positioned(
+                      bottom: 0,
+                      right: 4,
+                      child: InkWell(
+                        onTap: () => _showImagePicker(context, controller),
+                        child: CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.white,
+                          child: Image.asset("assets/images/edit.png", height: 16),
+                        ),
                       ),
                     ),
                   ],
-                ),
-              ),
-              SizedBox(height: 5),
-              // Tagline
-              Text(
-                "Find Trusted Service Providers\n Instantly!",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xff3F3F3F),
-                ),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "Full Name",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 12,
-                      color: AppColors.textColor,
-                      fontFamily: "poppins",
-                    ),
-                  ),
-                ],
-              ),
-               TextField(
-                controller: controller.nameController,
-                decoration: InputDecoration(
-                //  labelText: "Full Name",
-                  hintText: "Enter full name",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      8,
-                    ), // Add rounded corners
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    // Default border when not focused
-                    borderSide: BorderSide(color: Colors.grey, width: 1.5),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    // Border when focused
-                    borderSide: BorderSide(color: Color(0xff235CD7), width: 2),
-                  ),
-                ),
-              ),
-              SizedBox(height: 15),
-              // Phone Number Field
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "Phone Number",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 12,
-                      color: AppColors.textColor,
-                      fontFamily: "poppins",
-                    ),
-                  ),
-                ],
-              ),
-              TextField(
-                controller: controller.phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                //  labelText: "Phone Number",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      8,
-                    ), // Add rounded corners
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    // Default border when not focused
-                    borderSide: BorderSide(color: Colors.grey, width: 1.5),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    // Border when focused
-                    borderSide: BorderSide(color: Color(0xff235CD7), width: 2),
-                  ),
-                ),
-              ),
-              SizedBox(height: 15),
-              // Email Field
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "Email",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 12,
-                      color: AppColors.textColor,
-                      fontFamily: "poppins",
-                    ),
-                  ),
-                ],
-              ),
-              TextField(
-                controller: controller.emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                 // labelText: "Email",
-                  hintText: "Enter email",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      8,
-                    ), // Add rounded corners
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    // Default border when not focused
-                    borderSide: BorderSide(color: Colors.grey, width: 1.5),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    // Border when focused
-                    borderSide: BorderSide(color: Color(0xff235CD7), width: 2),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "Gender",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 12,
-                      color: AppColors.textColor,
-                      fontFamily: "poppins",
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 5),
-              // Gender Selection
-              Obx(
-                () => Row(
-                  //  mainAxisAlignment: MainAxisAlignment.center,
+                )),
+                const SizedBox(height: 20),
+
+                /// Text Fields
+                buildTextField("First Name", "Enter first name", onChanged: (val) => controller.firstName.value = val),
+                const SizedBox(height: 12),
+                buildTextField("Last Name", "Enter last name", onChanged: (val) => controller.lastName.value = val),
+                const SizedBox(height: 20),
+
+                /// Gender Buttons
+                const Align(alignment: Alignment.centerLeft, child: Text("Gender", style: TextStyle(fontSize: 12))),
+                const SizedBox(height: 10),
+                Obx(() => Row(
+                  children: ["Female", "Male", "Other"].map((e) {
+                    final isSelected = controller.gender.value == e;
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: isSelected ? AppColors.blue : Colors.white,
+                            side: BorderSide(color: isSelected ? AppColors.blue : Colors.black26),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          onPressed: () => controller.gender.value = e,
+                          child: Text(
+                            e,
+                            style: TextStyle(color: isSelected ? Colors.white : Colors.black, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                )),
+                const SizedBox(height: 20),
+
+                /// DOB + Email
+                buildTextField("Date Of Birth", "DD/MM/YYYY", icon: Icons.calendar_today, onChanged: (val) => controller.dateOfBirth.value = val),
+                const SizedBox(height: 12),
+                buildTextField("Email", "Enter email", onChanged: (val) => controller.email.value = val),
+                const SizedBox(height: 12),
+
+                /// City + Pin Code
+                Row(
                   children: [
-                    GenderButton(controller, "Female"),
-                    SizedBox(width: 15),
-                    GenderButton(controller, "Male"),
+                    Expanded(child: buildDropdown("City", ["Rewa", "Bhopal", "Indore"], controller.city)),
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width / 3,
+                      child: buildTextField("Pin Code", "Enter pin code", onChanged: (val) => controller.pinCode.value = val),
+                    ),
                   ],
                 ),
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-              // Proceed Button
-              InkWell(
-                onTap: () {
-                 Get.to(ProfileView());
-                },
-                child: Container(
-                  // width: double.infinity,
-                  padding: EdgeInsets.symmetric(vertical: 12),
+                const SizedBox(height: 12),
+
+                /// State + Referral Code
+                buildDropdown("State", ["MP", "UP", "MH"], controller.state),
+                const SizedBox(height: 12),
+                buildTextField("Referral Code", "Enter referral code", onChanged: (val) => controller.referralCode.value = val),
+                const SizedBox(height: 30),
+
+                /// Proceed Button
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  height: 56,
                   decoration: BoxDecoration(
-                    color: Color(0xff235CD7),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(16),
+                    color: AppColors.blue,
                   ),
-                  child: Center(
-                    child: Text(
-                      "Proceed",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  child: TextButton(
+                    onPressed: () {controller.registerUser();Get.to(LocationView());},
+                    child: const Text("Proceed", style: TextStyle(color: Colors.white, fontSize: 16)),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
-              // Service Provider Sign-up Link
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(color: Colors.grey[700], fontSize: 14),
-                  children: [
-                    // TextSpan(text: "Click "),
-                    TextSpan(
-                      text: "Click here",
-                      style: TextStyle(
-                        color: Color(0xff235CD7),
-                        fontWeight: FontWeight.bold,
-                      ),
-                      recognizer:
-                          TapGestureRecognizer()
-                            ..onTap = () {
-                              print("Navigate to Service Provider Sign-up");
-                            },
-                    ),
-                    TextSpan(text: " for Service provider sign-up"),
-                  ],
-                ),
-              ),
-            ],
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-}
 
-// Gender Button Widget
-Widget GenderButton(SignUpController controller, String gender) {
-  return InkWell(
-    onTap: () {
-      controller.selectedGender.value = gender;
-    },
-    child: Container(
-      width: 100,
-      padding: EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color:
-            controller.selectedGender.value == gender
-                ? Color(0xff235CD7)
-                : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black),
-      ),
-      child: Center(
-        child: Text(
-          gender,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-            color:
-                controller.selectedGender.value == gender
-                    ? Colors.white
-                    : Colors.black,
+  Widget buildTextField(String label, String hint, {IconData? icon, Function(String)? onChanged}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
+        const SizedBox(height: 8),
+        TextField(
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            hintText: hint,
+            suffixIcon: icon != null ? Icon(icon) : null,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            filled: true,
+            fillColor: const Color(0xFFF4F8FF),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget buildDropdown(String label, List<String> items, RxString selectedValue) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
+        const SizedBox(height: 8),
+        Obx(() => Container(
+          height: 50,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF4F8FF),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.black26),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: DropdownButtonFormField<String>(
+            value: selectedValue.value.isNotEmpty ? selectedValue.value : null,
+            icon: const Icon(Icons.keyboard_arrow_down),
+            onChanged: (value) {
+              if (value != null) selectedValue.value = value;
+            },
+            items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            decoration: const InputDecoration.collapsed(hintText: "Select"),
+          ),
+        )),
+      ],
+    );
+  }
+
+  void _showImagePicker(BuildContext context, SignUpController controller) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        height: MediaQuery.of(context).size.height * 0.3,
+        child: Column(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera, color: Colors.blue),
+              title: const Text("Take Photo"),
+              onTap: () {
+                Navigator.pop(context);
+                controller.getImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.image, color: Colors.green),
+              title: const Text("Choose from Gallery"),
+              onTap: () {
+                Navigator.pop(context);
+                controller.getImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.cancel, color: Colors.red),
+              title: const Text("Cancel"),
+              onTap: () => Get.back(),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
