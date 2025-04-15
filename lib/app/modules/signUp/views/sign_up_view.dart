@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:worknest/app/modules/location/views/location_view.dart';
 import '../../../../colors.dart';
 import '../controllers/sign_up_controller.dart';
 
@@ -22,52 +21,53 @@ class SignUpView extends GetView<SignUpController> {
           ),
         ),
         child: SafeArea(
+          child: Column(
+        children: [
+        const SizedBox(height: 10),
+        const Text("Your Profile", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 20),
+
+        /// Fixed Profile Image
+        Obx(() => Stack(
+          alignment: Alignment.bottomRight,
+          children: [
+            CircleAvatar(
+              radius: 45,
+              backgroundColor: Colors.white,
+              backgroundImage: controller.imagePath.value.isNotEmpty
+                  ? FileImage(File(controller.imagePath.value))
+                  : null,
+              child: controller.imagePath.value.isEmpty
+                  ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                  : null,
+            ),
+            Positioned(
+              bottom: 0,
+              right: 4,
+              child: InkWell(
+                onTap: () => _showImagePicker(context, controller),
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Colors.white,
+                  child: Image.asset("assets/images/edit.png", height: 16),
+                ),
+              ),
+            ),
+          ],
+        )),
+        const SizedBox(height: 20),
+
+        /// Scrollable content
+        Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 10),
-                const Text("Your Profile", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 20),
-
-                /// Profile Image
-                Obx(() => Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    CircleAvatar(
-                      radius: 45,
-                      backgroundColor: Colors.white,
-                      backgroundImage: controller.imagePath.value.isNotEmpty
-                          ? FileImage(File(controller.imagePath.value))
-                          : null,
-                      child: controller.imagePath.value.isEmpty
-                          ? const Icon(Icons.person, size: 60, color: Colors.grey)
-                          : null,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 4,
-                      child: InkWell(
-                        onTap: () => _showImagePicker(context, controller),
-                        child: CircleAvatar(
-                          radius: 16,
-                          backgroundColor: Colors.white,
-                          child: Image.asset("assets/images/edit.png", height: 16),
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
-                const SizedBox(height: 20),
-
-                /// Text Fields
                 buildTextField("First Name", "Enter first name", onChanged: (val) => controller.firstName.value = val),
                 const SizedBox(height: 12),
                 buildTextField("Last Name", "Enter last name", onChanged: (val) => controller.lastName.value = val),
                 const SizedBox(height: 20),
 
-                /// Gender Buttons
                 const Align(alignment: Alignment.centerLeft, child: Text("Gender", style: TextStyle(fontSize: 12))),
                 const SizedBox(height: 10),
                 Obx(() => Row(
@@ -93,14 +93,10 @@ class SignUpView extends GetView<SignUpController> {
                   }).toList(),
                 )),
                 const SizedBox(height: 20),
-
-                /// DOB + Email
                 buildTextField("Date Of Birth", "DD/MM/YYYY", icon: Icons.calendar_today, onChanged: (val) => controller.dateOfBirth.value = val),
                 const SizedBox(height: 12),
                 buildTextField("Email", "Enter email", onChanged: (val) => controller.email.value = val),
                 const SizedBox(height: 12),
-
-                /// City + Pin Code
                 Row(
                   children: [
                     Expanded(child: buildDropdown("City", ["Rewa", "Bhopal", "Indore"], controller.city)),
@@ -112,14 +108,10 @@ class SignUpView extends GetView<SignUpController> {
                   ],
                 ),
                 const SizedBox(height: 12),
-
-                /// State + Referral Code
                 buildDropdown("State", ["MP", "UP", "MH"], controller.state),
                 const SizedBox(height: 12),
                 buildTextField("Referral Code", "Enter referral code", onChanged: (val) => controller.referralCode.value = val),
                 const SizedBox(height: 30),
-
-                /// Proceed Button
                 Container(
                   width: MediaQuery.of(context).size.width * 0.6,
                   height: 56,
@@ -128,7 +120,7 @@ class SignUpView extends GetView<SignUpController> {
                     color: AppColors.blue,
                   ),
                   child: TextButton(
-                    onPressed: () {controller.registerUser();Get.to(LocationView());},
+                    onPressed: () { controller.registerUser(); },
                     child: const Text("Proceed", style: TextStyle(color: Colors.white, fontSize: 16)),
                   ),
                 ),
@@ -137,6 +129,10 @@ class SignUpView extends GetView<SignUpController> {
             ),
           ),
         ),
+        ],
+      ),
+
+    ),
       ),
     );
   }
@@ -176,14 +172,16 @@ class SignUpView extends GetView<SignUpController> {
             border: Border.all(color: Colors.black26),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: DropdownButtonFormField<String>(
-            value: selectedValue.value.isNotEmpty ? selectedValue.value : null,
-            icon: const Icon(Icons.keyboard_arrow_down),
-            onChanged: (value) {
-              if (value != null) selectedValue.value = value;
-            },
-            items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-            decoration: const InputDecoration.collapsed(hintText: "Select"),
+          child: Center(
+            child: DropdownButtonFormField<String>(
+              value: selectedValue.value.isNotEmpty ? selectedValue.value : null,
+              icon: const Icon(Icons.keyboard_arrow_down),
+              onChanged: (value) {
+                if (value != null) selectedValue.value = value;
+              },
+              items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+              decoration: const InputDecoration.collapsed(hintText: "Select"),
+            ),
           ),
         )),
       ],

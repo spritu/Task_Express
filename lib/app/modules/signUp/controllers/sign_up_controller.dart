@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../location/views/location_view.dart';
 
 
 class SignUpController extends GetxController {
@@ -25,7 +25,39 @@ class SignUpController extends GetxController {
     }
   }
 
+  // Validation for the required fields
+  bool validateFields() {
+    if (firstName.value.isEmpty ||
+        lastName.value.isEmpty ||
+        gender.value.isEmpty ||
+        dateOfBirth.value.isEmpty ||
+        email.value.isEmpty ||
+        city.value.isEmpty ||
+        pinCode.value.isEmpty ||
+        state.value.isEmpty) {
+      Get.snackbar('Error', 'Please fill in all required fields');
+      return false;
+    }
+    return true;
+  }
+  void clearFields() {
+    firstName.value = '';
+    lastName.value = '';
+    gender.value = '';
+    dateOfBirth.value = '';
+    email.value = '';
+    city.value = '';
+    pinCode.value = '';
+    state.value = '';
+    referralCode.value = '';
+   // imagePath.value = '';
+  }
+
   Future<void> registerUser() async {
+    if (!validateFields()) {
+      return; // Stop if validation fails
+    }
+
     var request = http.MultipartRequest(
       'POST',
       Uri.parse('https://jdapi.youthadda.co/user/register'),
@@ -59,10 +91,8 @@ class SignUpController extends GetxController {
         final resBody = await response.stream.bytesToString();
         print('✅ Response: $resBody');
         Get.snackbar('Success', 'Registration Successful');
-
-        // ✅ Navigate to LocationView
-       // Get.to(() => LocationView());
-
+        clearFields();
+        Get.to(() => LocationView());
       } else {
         final resBody = await response.stream.bytesToString();
         print('❌ Server Error (${response.statusCode}): $resBody');
@@ -73,6 +103,5 @@ class SignUpController extends GetxController {
       Get.snackbar('Error', 'Could not register. Check your internet or server.');
     }
   }
-
-
 }
+

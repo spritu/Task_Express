@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:worknest/colors.dart';
-
 import '../../account/views/account_view.dart';
 import '../../booking/views/booking_view.dart';
 import '../../chat/views/chat_view.dart';

@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../otp/views/otp_view.dart';
 
 class LoginController extends GetxController {
   //TODO: Implement LoginController
@@ -10,9 +13,49 @@ class LoginController extends GetxController {
   void toggleCheck(bool value) {
     isChecked.value = value;
   }
+
+  Future<void> sendOtp() async {
+    final phone = mobileController.text.trim();
+
+    if (phone.isEmpty || phone.length != 10) {
+      Get.snackbar("Error", "Please enter a valid 10-digit mobile number");
+      return;
+    }
+
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+    final body = json.encode({"phone": phone});
+    final url = Uri.parse('https://jdapi.youthadda.co/user/sendotp');
+
+    try {
+      final request = http.Request('POST', url);
+      request.body = body;
+      request.headers.addAll(headers);
+
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        print("OTP sent successfully: $responseBody");
+
+        // Save the phone number in SharedPreferences for later use
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('mobileNumber', phone);
+
+        Get.to(OtpView()); // Navigate to OTP screen
+      } else {
+        print("Failed to send OTP: ${response.reasonPhrase}");
+        Get.snackbar("Error", "Failed to send OTP: ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("Exception: $e");
+      Get.snackbar("Error", "Something went wrong: $e");
+    }}
+
   void openTerms() {
     print('Terms & Conditions clicked');
-    // Aap yahan Get.toNamed('/terms') ya URL launch kar sakte hain
+
   }
   final String baseUrl = 'https://dg-sandbox.setu.co/api/okyc';
   final String clientId = 'test-client';

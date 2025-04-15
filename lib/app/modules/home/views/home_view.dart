@@ -280,7 +280,7 @@ class HomeView extends GetView<HomeController> {
                 ),
                 SizedBox(height: 10),
                 SizedBox(
-                  height: 180,
+                  height: MediaQuery.of(context).size.height*0.3,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: controller.services.length,
@@ -303,7 +303,7 @@ class HomeView extends GetView<HomeController> {
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                const Icon(Icons.star, color: Colors.red, size: 16),
+                                const Icon(Icons.star, color: Color(0xffC53F3F), size: 16),
                                 const SizedBox(width: 4),
                                 Text(
                                   '${service['rating']} (${service['reviews']})',

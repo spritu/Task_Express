@@ -55,13 +55,7 @@ class HomeController extends GetxController {
  // RxBool showAllCategories = false.obs;
   var selectedCategory = ''.obs;
   var selectedIndex = 0.obs;
- // void toggleServiceExpansion(String title) {
- //    if (expandedServiceType.value == title) {
- //      expandedServiceType.value = ''; // Collapse if same is tapped
- //    } else {
- //      expandedServiceType.value = title; // Expand new one
- //    }
- //  }
+
   void selectItem(int index) {
     selectedIndex.value = index;
   }
@@ -113,24 +107,6 @@ class HomeController extends GetxController {
   ];
 
 
-  // List<Map<String, String>> categories = [
-  //   {'icon': '🛠️', 'label': 'Construction & Masonry'},
-  //   {'icon': '💡', 'label': 'Electrician'},
-  //   {'icon': '🚿', 'label': 'Plumber'},
-  //   {'icon': '🧹', 'label': 'Cleaning'},
-  //   {'icon': '📦', 'label': 'Moving'},
-  //   {'icon': '🧼', 'label': 'Laundry'},
-  //   {'icon': '🖌️', 'label': 'Painting'},
-  //   {'icon': '🪑', 'label': 'Furniture'},
-  //   {'icon': '🛏️', 'label': 'Carpentry'},
-  //   {'icon': '🧯', 'label': 'Fire Safety'},
-  //   {'icon': '🛠️', 'label': 'Repair'},
-  //   {'icon': '💡', 'label': 'Electrician'},
-  //   {'icon': '🚿', 'label': 'Plumber'},
-  //   {'icon': '🧹', 'label': 'Cleaning'},
-  //   {'icon': '🚿', 'label': 'Plumber'},
-  //   {'icon': '🧹', 'label': 'Cleaning'},
-  // ];
 
   final services = [
     {

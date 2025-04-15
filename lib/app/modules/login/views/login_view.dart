@@ -131,7 +131,7 @@ class LoginView extends GetView<LoginController> {
                   ),
                 ),SizedBox(height: 20),
                 InkWell(onTap: (){
-                  Get.to(OtpView());
+                  controller.sendOtp();
                 },
                   child: Container(
                     height: 64,
