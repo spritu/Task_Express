@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:worknest/colors.dart';
-
 import '../../bottom/views/bottom_view.dart';
-import '../../join/views/join_view.dart';
 import '../controllers/location_controller.dart';
 
 class LocationView extends GetView<LocationController> {
@@ -47,13 +44,13 @@ class LocationView extends GetView<LocationController> {
                   height: 1.0,
                 ),
               ),
-              SizedBox(height: 20,),
+              SizedBox(height: 20),
               Image.asset(
                 "assets/images/Address.png",
                 height: 308,
                 width: 308,
               ),
-              SizedBox(height: 20,),
+              SizedBox(height: 20),
               SizedBox(height: 54,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -76,7 +73,7 @@ class LocationView extends GetView<LocationController> {
                   ),
                 ),
               ),
-              SizedBox(height: 20,),
+              SizedBox(height: 20),
               Text(
                 "or",
                 style: TextStyle(
@@ -86,7 +83,7 @@ class LocationView extends GetView<LocationController> {
                   color: Color(0xFF939393),
                 ),
               ),
-              SizedBox(height: 20,),
+              SizedBox(height: 20),
               SizedBox(height: 54,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(

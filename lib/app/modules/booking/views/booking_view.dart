@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:worknest/app/modules/chat/views/chat_view.dart';
 import 'package:worknest/app/modules/chat_screen/views/chat_screen_view.dart';
-
 import '../../../../colors.dart';
 import '../../../routes/app_pages.dart';
 import '../../ServiceCompleted/views/service_completed_view.dart';
-
 import '../../bottom/controllers/bottom_controller.dart';
 import '../../bottom/views/bottom_view.dart';
+import '../../user_help/views/user_help_view.dart';
 import '../controllers/booking_controller.dart';
 
 class BookingView extends GetView<BookingController> {
@@ -38,7 +36,6 @@ class BookingView extends GetView<BookingController> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     /// Top Bar
-
                     const SizedBox(width: 135),
                     const Text(
                       "Bookings",
@@ -48,11 +45,8 @@ class BookingView extends GetView<BookingController> {
                         fontFamily: "poppins",
                       ),
                     ),
-
-
                     /// Location Row
                     const SizedBox(height: 20),
-
                     /// Main Container
                     Container(
                       height: 377,
@@ -229,7 +223,7 @@ class BookingView extends GetView<BookingController> {
                               children: [
                                 SizedBox(
                                   height: 28,
-                                  width: 120,
+                                //  width: 120,
                                   child: ElevatedButton(
                                     onPressed: () {
                                       Get.to(ChatView());
@@ -254,7 +248,7 @@ class BookingView extends GetView<BookingController> {
                                 const SizedBox(width: 12),
                                 SizedBox(
                                   height: 28,
-                                  width: 120,
+                                //  width: 120,
                                   child: ElevatedButton(
                                     onPressed: () {
                                       Get.to(ServiceCompletedView());
@@ -272,6 +266,30 @@ class BookingView extends GetView<BookingController> {
                                         fontWeight: FontWeight.w500,
                                         fontFamily: "poppins",
                                         color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),   const SizedBox(width: 12),
+                                SizedBox(
+                                  height: 28,
+                                //  width: 120,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Get.to(UserHelpView());
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:AppColors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      "Help",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: "poppins",
+                                        color: Color(0xFF114BCA),
                                       ),
                                     ),
                                   ),
@@ -297,7 +315,7 @@ class BookingView extends GetView<BookingController> {
                               padding: const EdgeInsets.all(8.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                //mainAxisAlignment: MainAxisAlignment.start,
+
                                 children: [
                                   Text(
                                     "Task finished? Tap ‘Close Job’ to complete \nthe process and pay your worker.",
@@ -384,7 +402,6 @@ class BookingView extends GetView<BookingController> {
                             child: Container(
                               margin: const EdgeInsets.symmetric(vertical: 8),
                               padding: const EdgeInsets.all(12),
-
                               child: Column(
                                 children: [
                                   Row(
@@ -406,7 +423,6 @@ class BookingView extends GetView<BookingController> {
                                               ),
                                             ),
                                             const SizedBox(height: 4),
-
                                             /// Subtitle
                                             RichText(
                                               text: TextSpan(
@@ -433,9 +449,7 @@ class BookingView extends GetView<BookingController> {
                                                 ],
                                               ),
                                             ),
-
                                             const SizedBox(height: 15),
-
                                             /// Booked (optional additional line)
                                             const Text(
                                               "Booked: Today, 10:30 AM",
@@ -449,7 +463,6 @@ class BookingView extends GetView<BookingController> {
                                           ],
                                         ),
                                       ),
-
                                       /// Right Section - Buttons
                                       Column(
                                         children: [
@@ -483,7 +496,6 @@ class BookingView extends GetView<BookingController> {
                                             ),
                                           ),
                                           const SizedBox(height: 10),
-
                                           /// Rate Service
                                           SizedBox(
                                             height: 32,

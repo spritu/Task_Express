@@ -43,6 +43,18 @@ abstract class Routes {
   static const PROVIDER_PROFILE = _Paths.PROVIDER_PROFILE;
   static const PROVIDER_HOME = _Paths.PROVIDER_HOME;
   static const ACTIVEJOB_SCREEN = _Paths.ACTIVEJOB_SCREEN;
+  static const BOTTOM2 = _Paths.BOTTOM2;
+  static const JOBS = _Paths.JOBS;
+  static const PROVIDER_SETTING = _Paths.PROVIDER_SETTING;
+  static const PROVIDER_CHAT = _Paths.PROVIDER_CHAT;
+  static const PROVIDER_ACCOUNT = _Paths.PROVIDER_ACCOUNT;
+  static const PROVIDER_CHAT_SCREEN = _Paths.PROVIDER_CHAT_SCREEN;
+  static const PROVIDER_EDIT_PROFILE = _Paths.PROVIDER_EDIT_PROFILE;
+  static const JOB_DETAIL = _Paths.JOB_DETAIL;
+  static const YOUR_EARNING = _Paths.YOUR_EARNING;
+  static const JOBS_DETAILS = _Paths.JOBS_DETAILS;
+  static const HELP_SUPPORT = _Paths.HELP_SUPPORT;
+  static const USER_HELP = _Paths.USER_HELP;
 }
 
 abstract class _Paths {
@@ -87,4 +99,16 @@ abstract class _Paths {
   static const PROVIDER_PROFILE = '/provider-profile';
   static const PROVIDER_HOME = '/provider-home';
   static const ACTIVEJOB_SCREEN = '/activejob-screen';
+  static const BOTTOM2 = '/bottom2';
+  static const JOBS = '/jobs';
+  static const PROVIDER_SETTING = '/provider-setting';
+  static const PROVIDER_CHAT = '/provider-chat';
+  static const PROVIDER_ACCOUNT = '/provider-account';
+  static const PROVIDER_CHAT_SCREEN = '/provider-chat-screen';
+  static const PROVIDER_EDIT_PROFILE = '/provider-edit-profile';
+  static const JOB_DETAIL = '/job-detail';
+  static const YOUR_EARNING = '/your-earning';
+  static const JOBS_DETAILS = '/jobs-details';
+  static const HELP_SUPPORT = '/help-support';
+  static const USER_HELP = '/user-help';
 }

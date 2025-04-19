@@ -6,16 +6,22 @@ import '../modules/AddressScreen/bindings/address_screen_binding.dart';
 import '../modules/AddressScreen/views/address_screen_view.dart';
 import '../modules/BookingConfirm/bindings/booking_confirm_binding.dart';
 import '../modules/BookingConfirm/views/booking_confirm_view.dart';
+import '../modules/Bottom2/bindings/bottom2_binding.dart';
+import '../modules/Bottom2/views/bottom2_view.dart';
 import '../modules/BricklayingHelper/bindings/bricklaying_helper_binding.dart';
 import '../modules/BricklayingHelper/views/bricklaying_helper_view.dart';
 import '../modules/CementHelper/bindings/cement_helper_binding.dart';
 import '../modules/CementHelper/views/cement_helper_view.dart';
+import '../modules/HelpSupport/bindings/help_support_binding.dart';
+import '../modules/HelpSupport/views/help_support_view.dart';
 import '../modules/Scaffolding_helper/bindings/scaffolding_helper_binding.dart';
 import '../modules/Scaffolding_helper/views/scaffolding_helper_view.dart';
 import '../modules/ServiceCompleted/bindings/service_completed_binding.dart';
 import '../modules/ServiceCompleted/views/service_completed_view.dart';
 import '../modules/ServiceCompletedSuccessfully/bindings/service_completed_successfully_binding.dart';
 import '../modules/ServiceCompletedSuccessfully/views/service_completed_successfully_view.dart';
+import '../modules/YourEarning/bindings/your_earning_binding.dart';
+import '../modules/YourEarning/views/your_earning_view.dart';
 import '../modules/account/bindings/account_binding.dart';
 import '../modules/account/views/account_view.dart';
 import '../modules/add_address/bindings/add_address_binding.dart';
@@ -34,6 +40,12 @@ import '../modules/helper_profile/bindings/helper_profile_binding.dart';
 import '../modules/helper_profile/views/helper_profile_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/job_detail/bindings/job_detail_binding.dart';
+import '../modules/job_detail/views/job_detail_view.dart';
+import '../modules/jobs/bindings/jobs_binding.dart';
+import '../modules/jobs/views/jobs_view.dart';
+import '../modules/jobsDetails/bindings/jobs_details_binding.dart';
+import '../modules/jobsDetails/views/jobs_details_view.dart';
 import '../modules/join/bindings/join_binding.dart';
 import '../modules/join/views/join_view.dart';
 import '../modules/location/bindings/location_binding.dart';
@@ -50,6 +62,14 @@ import '../modules/professional_profile/bindings/professional_profile_binding.da
 import '../modules/professional_profile/views/professional_profile_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
+import '../modules/provider_ChatScreen/bindings/provider_chat_screen_binding.dart';
+import '../modules/provider_ChatScreen/views/provider_chat_screen_view.dart';
+import '../modules/provider_account/bindings/provider_account_binding.dart';
+import '../modules/provider_account/views/provider_account_view.dart';
+import '../modules/provider_chat/bindings/provider_chat_binding.dart';
+import '../modules/provider_chat/views/provider_chat_view.dart';
+import '../modules/provider_editProfile/bindings/provider_edit_profile_binding.dart';
+import '../modules/provider_editProfile/views/provider_edit_profile_view.dart';
 import '../modules/provider_home/bindings/provider_home_binding.dart';
 import '../modules/provider_home/views/provider_home_view.dart';
 import '../modules/provider_location/bindings/provider_location_binding.dart';
@@ -60,6 +80,8 @@ import '../modules/provider_otp/bindings/provider_otp_binding.dart';
 import '../modules/provider_otp/views/provider_otp_view.dart';
 import '../modules/provider_profile/bindings/provider_profile_binding.dart';
 import '../modules/provider_profile/views/provider_profile_view.dart';
+import '../modules/provider_setting/bindings/provider_setting_binding.dart';
+import '../modules/provider_setting/views/provider_setting_view.dart';
 import '../modules/road_construction_helper/bindings/road_construction_helper_binding.dart';
 import '../modules/road_construction_helper/views/road_construction_helper_view.dart';
 import '../modules/setting/bindings/setting_binding.dart';
@@ -74,6 +96,8 @@ import '../modules/splash3/bindings/splash3_binding.dart';
 import '../modules/splash3/views/splash3_view.dart';
 import '../modules/tile_fixing_helper/bindings/tile_fixing_helper_binding.dart';
 import '../modules/tile_fixing_helper/views/tile_fixing_helper_view.dart';
+import '../modules/user_help/bindings/user_help_binding.dart';
+import '../modules/user_help/views/user_help_view.dart';
 import '../modules/worknest/bindings/worknest_binding.dart';
 import '../modules/worknest/views/worknest_view.dart';
 
@@ -274,6 +298,66 @@ class AppPages {
       name: _Paths.ACTIVEJOB_SCREEN,
       page: () => const ActivejobScreenView(),
       binding: ActivejobScreenBinding(),
+    ),
+    GetPage(
+      name: _Paths.BOTTOM2,
+      page: () => const Bottom2View(),
+      binding: Bottom2Binding(),
+    ),
+    GetPage(
+      name: _Paths.JOBS,
+      page: () => const JobsView(),
+      binding: JobsBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROVIDER_SETTING,
+      page: () => const ProviderSettingView(),
+      binding: ProviderSettingBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROVIDER_CHAT,
+      page: () => const ProviderChatView(),
+      binding: ProviderChatBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROVIDER_ACCOUNT,
+      page: () => const ProviderAccountView(),
+      binding: ProviderAccountBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROVIDER_CHAT_SCREEN,
+      page: () => const ProviderChatScreenView(),
+      binding: ProviderChatScreenBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROVIDER_EDIT_PROFILE,
+      page: () => const ProviderEditProfileView(),
+      binding: ProviderEditProfileBinding(),
+    ),
+    GetPage(
+      name: _Paths.JOB_DETAIL,
+      page: () => const JobDetailView(),
+      binding: JobDetailBinding(),
+    ),
+    GetPage(
+      name: _Paths.YOUR_EARNING,
+      page: () => const YourEarningView(),
+      binding: YourEarningBinding(),
+    ),
+    GetPage(
+      name: _Paths.JOBS_DETAILS,
+      page: () => const JobsDetailsView(),
+      binding: JobsDetailsBinding(),
+    ),
+    GetPage(
+      name: _Paths.HELP_SUPPORT,
+      page: () => const HelpSupportView(),
+      binding: HelpSupportBinding(),
+    ),
+    GetPage(
+      name: _Paths.USER_HELP,
+      page: () => const UserHelpView(),
+      binding: UserHelpBinding(),
     ),
   ];
 }

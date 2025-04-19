@@ -1,7 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:worknest/colors.dart';
 import '../../BricklayingHelper/views/bricklaying_helper_view.dart';
 import '../../CementHelper/views/cement_helper_view.dart';
@@ -20,16 +19,17 @@ class HomeView extends GetView<HomeController> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
-      body: SingleChildScrollView(
-        child: Container(decoration: BoxDecoration( gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFF87AAF6),
-            Colors.white,
-          ],
-        ),),
-          child: SafeArea(
+      body: Container(height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration( gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color(0xFF87AAF6),
+          Colors.white,
+        ],
+      ),),
+        child: SafeArea(
+          child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -44,7 +44,7 @@ class HomeView extends GetView<HomeController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children:  [
                           Text('Scheme No 54', style: TextStyle(fontWeight: FontWeight.w600,fontSize: 12,color: AppColors.textColor)),
-                          Text('Fh-289, Vijaynagar,Indore',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12,color: AppColors.textColor)),
+                          Text('Fh-289, Vijay nagar,Indore',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12,color: AppColors.textColor)),
                         ],
                       ),
                       const Spacer(),
@@ -55,7 +55,9 @@ class HomeView extends GetView<HomeController> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: TextField(
+                  child: TextField(onTap: (){
+                    controller.fetchServiceProviders( "searchController");
+                  },
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
                       suffixIcon: const Icon(Icons.tune),
@@ -153,8 +155,6 @@ class HomeView extends GetView<HomeController> {
                                   ),
                                   itemBuilder: (context, index) {
                                     final totalCats = controller.categories.length;
-
-                                    // "More" button
                                     if (!isExpanded && index == 7 && totalCats > 7) {
                                       return GestureDetector(
                                         onTap: controller.toggleCategoryView,
@@ -170,7 +170,6 @@ class HomeView extends GetView<HomeController> {
                                         ),
                                       );
                                     }
-
                                     // "Close" button
                                     if (isExpanded && index == totalCats) {
                                       return GestureDetector(
@@ -186,9 +185,9 @@ class HomeView extends GetView<HomeController> {
                                         ),
                                       );
                                     }
-
+                  
                                     final cat = controller.categories[index];
-
+                  
                                     // First box (Construction & Masonry)
                                     if (index == 0) {
                                       return GestureDetector(
@@ -223,10 +222,8 @@ class HomeView extends GetView<HomeController> {
                                     if (index == 1) {
                                       return GestureDetector(
                                         onTap: () {
-
                                           Get.to(ProfessionalPlumberView());
-
-                                        },
+                                          },
                                         child: SizedBox(width: 150,height: 66,
                                           child: Card(color: AppColors.white,
                                             child: Padding(
@@ -244,7 +241,7 @@ class HomeView extends GetView<HomeController> {
                                         ),
                                       );
                                     }
-
+                  
                                     // Normal grid items
                                     return SizedBox(height: 80,width: 80,
                                       child: Card(color: AppColors.white,
@@ -327,7 +324,7 @@ class HomeView extends GetView<HomeController> {
                                     '₹${service['price']}',
                                     style: const TextStyle(
                                       fontSize: 10,
-
+                  
                                     ),
                                   ),
                                 ],
@@ -338,7 +335,7 @@ class HomeView extends GetView<HomeController> {
                     },
                   ),
                 ),
-
+                  
                 const SizedBox(height: 10),
               ],
             ),

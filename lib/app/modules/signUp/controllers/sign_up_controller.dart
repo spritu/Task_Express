@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +18,7 @@ class SignUpController extends GetxController {
   final RxString imagePath = ''.obs;
   final ImagePicker _picker = ImagePicker();
 
+  final TextEditingController dobController = TextEditingController();
   Future<void> getImage(ImageSource source) async {
     final XFile? image = await _picker.pickImage(source: source);
     if (image != null) {
@@ -102,6 +104,11 @@ class SignUpController extends GetxController {
       print('❌ Exception: $e');
       Get.snackbar('Error', 'Could not register. Check your internet or server.');
     }
+  }
+  @override
+  void onClose() {
+ dobController.dispose();
+    super.onClose();
   }
 }
 

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:worknest/colors.dart';
-
 import '../../login/views/login_view.dart';
 import '../../provider_login/views/provider_login_view.dart';
 import '../controllers/join_controller.dart';
@@ -35,7 +33,6 @@ class JoinView extends GetView<JoinController> {
                  SizedBox(
                    height: MediaQuery.of(context).size.height*0.1),
                 Image.asset("assets/images/icon.png"),
-
                 Text.rich(
                   TextSpan(
                     children: [

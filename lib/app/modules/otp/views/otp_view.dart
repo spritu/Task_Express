@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:worknest/colors.dart';  // Assuming you have a Colors file
+import 'package:worknest/colors.dart';
 import '../../signUp/views/sign_up_view.dart';
 import '../controllers/otp_controller.dart';
 
@@ -54,7 +54,7 @@ class OtpView extends GetView<OtpController> {
                     child: PinCodeTextField(
                       appContext: context,
                       length: 4,
-                      controller: controller.otpTextController,
+                      controller: controller.otpController,
                       autoDisposeControllers: false,
                       keyboardType: TextInputType.number,
                       animationType: AnimationType.fade,
@@ -95,31 +95,32 @@ class OtpView extends GetView<OtpController> {
                 const Spacer(),
                 ElevatedButton(
                   onPressed: () {
-                    String enteredOtp = controller.otpTextController.text.trim();
+                   // String enteredOtp = controller.otpController.text.trim();
 
-                    if (enteredOtp.isEmpty) {
-                      Get.snackbar(
-                        'Empty Field',
-                        'Please enter the 4-digit OTP code',
-                        backgroundColor: Colors.redAccent,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                      return;
-                    }
-
-                    if (enteredOtp.length != 4) {
-                      Get.snackbar(
-                        'Invalid OTP',
-                        'OTP must be exactly 4 digits',
-                        backgroundColor: Colors.redAccent,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                      return;
-                    }
-                    Get.to(SignUpView());
-                    controller.verifyOtp(enteredOtp); // This should handle actual verification and navigation
+                    // if (enteredOtp.isEmpty) {
+                    //   Get.snackbar(
+                    //     'Empty Field',
+                    //     'Please enter the 4-digit OTP code',
+                    //     backgroundColor: Colors.redAccent,
+                    //     colorText: Colors.white,
+                    //     snackPosition: SnackPosition.BOTTOM,
+                    //   );
+                    //   return;
+                    // }
+                    //
+                    // if (enteredOtp.length != 4) {
+                    //   Get.snackbar(
+                    //     'Invalid OTP',
+                    //     'OTP must be exactly 4 digits',
+                    //     backgroundColor: Colors.redAccent,
+                    //     colorText: Colors.white,
+                    //     snackPosition: SnackPosition.BOTTOM,
+                    //   );
+                    //   return;
+                    // }
+                    Get.to(() => SignUpView());
+                    String otp = controller.otpController.text.trim();
+                    controller.verifyOtp(otp); // No need to pass mobileNumber // This should handle actual verification and navigation
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF114BCA),

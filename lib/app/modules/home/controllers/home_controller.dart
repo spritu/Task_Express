@@ -1,10 +1,13 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {
   // TODO: Implement WorknestController
   RxString expandedServiceType = ''.obs;
   RxBool showAllCategories = false.obs;
-
+  var searchController = TextEditingController();
   // Dummy data for each service type
   List<Map<String, String>> visitingCategories = [
     {'label': 'Construction', 'icon': 'assets/images/image.png'},
@@ -27,7 +30,47 @@ class HomeController extends GetxController {
     {'label': 'Microwave', 'icon': '🍲'},
     {'label': 'More', 'icon': '➕'},
   ];
+// for UI binding
+  var searchResults = [].obs; // for storing fetched data
 
+  /// Fetch service providers from API
+  Future<void> fetchServiceProviders(String searchController) async {
+    try {
+      var request = http.Request(
+        'GET',
+        Uri.parse('https://jdapi.youthadda.co/user/searchServiceProviders?name=$searchController'),
+      );
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        String responseBody = await response.stream.bytesToString();
+        var jsonData = jsonDecode(responseBody);
+
+        // Safely check if 'data' is a list
+        if (jsonData['data'] is List) {
+          searchResults.value = jsonData['data'];
+          print("✅ Success: ${jsonData['data']}");
+        } else {
+          searchResults.clear();
+          print("⚠️ No data found in response.");
+        }
+      } else {
+        print("❌ Failed: ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("❗ Error: $e");
+    }
+  }
+
+  /// Called when search text changes
+  void onSearchChanged(String value) {
+    if (value.trim().isNotEmpty) {
+      fetchServiceProviders(value.trim());
+    } else {
+      searchResults.clear(); // Clear results if input is empty
+    }
+  }
   RxList<Map<String, String>> categories = <Map<String, String>>[].obs;
 
   void toggleServiceExpansion(String selectedTitle) {

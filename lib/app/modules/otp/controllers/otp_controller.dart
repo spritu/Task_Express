@@ -4,9 +4,11 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../../signUp/views/sign_up_view.dart';
+
 class OtpController extends GetxController {
-  String mobileNumber = '';
-  TextEditingController otpTextController = TextEditingController();
+  TextEditingController otpController = TextEditingController();
+  String? mobileNumber;
 
   List<TextEditingController> otpControllers =
   List.generate(4, (index) => TextEditingController());
@@ -14,15 +16,15 @@ class OtpController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadMobileNumber();
+    loadMobileNumber();
   }
 
-  Future<void> _loadMobileNumber() async {
+  Future<void> loadMobileNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    mobileNumber = prefs.getString('mobileNumber') ?? '';
-    update();
-  }
 
+      mobileNumber = prefs.getString('mobileNumber');
+
+  }
   // Move focus on pin code fields
   void moveToNext(int index, String value) {
     if (value.length == 1) {
@@ -36,11 +38,19 @@ class OtpController extends GetxController {
     }
   }
 
-  // Verify OTP
-  // Verify OTP
+
   Future<void> verifyOtp(String otp) async {
     if (otp.isEmpty || otp.length != 4) {
       Get.snackbar("Error", "Please enter a valid 4-digit OTP");
+      return;
+    }
+
+    // Get mobile number from SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? mobileNumber = prefs.getString('mobileNumber');
+
+    if (mobileNumber == null || mobileNumber.isEmpty) {
+      Get.snackbar("Error", "Mobile number not found. Please try again.");
       return;
     }
 
@@ -56,35 +66,43 @@ class OtpController extends GetxController {
     final url = Uri.parse('https://jdapi.youthadda.co/user/verifyotp');
 
     try {
-      final request = http.Request('POST', url);
-      request.body = body;
-      request.headers.addAll(headers);
-
-      final response = await request.send();
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: body,
+      );
 
       if (response.statusCode == 200) {
-        final responseBody = await response.stream.bytesToString();
-        print("OTP verified successfully: $responseBody");
-        Get.snackbar("Success", "OTP verified successfully");
-        // You may navigate to the next screen or perform any other actions
-        // Example: Get.to(NextScreen());
+        final responseData = json.decode(response.body);
+
+        print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
+
+        Get.snackbar("Success", responseData['msg']);
+
+        // Save important values
+        prefs.setString('token', responseData['token']);
+        prefs.setInt('userType', responseData['userType']);
+        prefs.setString('userId', responseData['id']);
+        prefs.setString('email', responseData['userData']['email']);
+
+        // Navigate to next screen or dashboard
+        Get.to(() => SignUpView());
+
       } else {
-        print("Failed to verify OTP: ${response.reasonPhrase}");
-        Get.snackbar("Error", "Failed to verify OTP: ${response.reasonPhrase}");
+        print("❌ Failed to verify OTP: ${response.body}");
+        Get.snackbar("Error", "Failed to verify OTP: ${response.body}");
       }
     } catch (e) {
-      print("Exception: $e");
+      print("❌ Exception: $e");
       Get.snackbar("Error", "Something went wrong: $e");
     }
   }
 
 
+
+
   // Resend OTP
   Future<void> resendOtp() async {
-    if (mobileNumber.isEmpty) {
-      Get.snackbar("Error", "No mobile number available for resend");
-      return;
-    }
 
     final headers = {
       'Content-Type': 'application/json',

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../colors.dart';
+import '../../location/views/location_view.dart';
 import '../controllers/sign_up_controller.dart';
 
 class SignUpView extends GetView<SignUpController> {
@@ -93,7 +94,15 @@ class SignUpView extends GetView<SignUpController> {
                   }).toList(),
                 )),
                 const SizedBox(height: 20),
-                buildTextField("Date Of Birth", "DD/MM/YYYY", icon: Icons.calendar_today, onChanged: (val) => controller.dateOfBirth.value = val),
+                buildTextField(
+                  "Date Of Birth",
+                  "DD/MM/YYYY",
+                  icon: Icons.calendar_month,
+                  isDate: true,
+                  controller: controller.dobController,
+                  onChanged: (val) => controller.dateOfBirth.value = val,
+                ),
+
                 const SizedBox(height: 12),
                 buildTextField("Email", "Enter email", onChanged: (val) => controller.email.value = val),
                 const SizedBox(height: 12),
@@ -120,7 +129,7 @@ class SignUpView extends GetView<SignUpController> {
                     color: AppColors.blue,
                   ),
                   child: TextButton(
-                    onPressed: () { controller.registerUser(); },
+                    onPressed: () { controller.registerUser();  },
                     child: const Text("Proceed", style: TextStyle(color: Colors.white, fontSize: 16)),
                   ),
                 ),
@@ -137,14 +146,42 @@ class SignUpView extends GetView<SignUpController> {
     );
   }
 
-  Widget buildTextField(String label, String hint, {IconData? icon, Function(String)? onChanged}) {
+  Widget buildTextField(
+      String label,
+      String hint, {
+        IconData? icon,
+        Function(String)? onChanged,
+        bool isDate = false,
+        TextEditingController? controller,
+      }) {
+
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
         const SizedBox(height: 8),
         TextField(
-          onChanged: onChanged,
+          controller: controller,
+          readOnly: isDate, // only make it readonly for date
+          onTap: isDate
+              ? () async {
+            DateTime? pickedDate = await showDatePicker(
+              context: Get.context!,
+              initialDate: DateTime.now(),
+              firstDate: DateTime(1900),
+              lastDate: DateTime(2100),
+            );
+            if (pickedDate != null) {
+              String formattedDate = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+              controller?.text = formattedDate;
+              if (onChanged != null) {
+                onChanged(formattedDate);
+              }
+            }
+          }
+              : null,
+          onChanged: isDate ? null : onChanged,
           decoration: InputDecoration(
             hintText: hint,
             suffixIcon: icon != null ? Icon(icon) : null,
@@ -157,6 +194,7 @@ class SignUpView extends GetView<SignUpController> {
       ],
     );
   }
+
 
   Widget buildDropdown(String label, List<String> items, RxString selectedValue) {
     return Column(

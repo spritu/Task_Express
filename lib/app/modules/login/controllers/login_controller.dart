@@ -25,6 +25,7 @@ class LoginController extends GetxController {
     final headers = {
       'Content-Type': 'application/json',
     };
+
     final body = json.encode({"phone": phone});
     final url = Uri.parse('https://jdapi.youthadda.co/user/sendotp');
 
@@ -37,21 +38,24 @@ class LoginController extends GetxController {
 
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
-        print("OTP sent successfully: $responseBody");
+        print("✅ OTP sent successfully: $responseBody");
 
-        // Save the phone number in SharedPreferences for later use
+        // Save phone number for OTP verification
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('mobileNumber', phone);
 
-        Get.to(OtpView()); // Navigate to OTP screen
+        Get.to(() => OtpView()); // Navigate to OTP screen
       } else {
-        print("Failed to send OTP: ${response.reasonPhrase}");
+        print("❌ Failed to send OTP: ${response.reasonPhrase}");
         Get.snackbar("Error", "Failed to send OTP: ${response.reasonPhrase}");
       }
     } catch (e) {
-      print("Exception: $e");
+      print("❌ Exception: $e");
       Get.snackbar("Error", "Something went wrong: $e");
-    }}
+    }
+  }
+
+
 
   void openTerms() {
     print('Terms & Conditions clicked');

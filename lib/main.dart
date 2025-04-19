@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'app/modules/Activejob_screen/controllers/activejob_screen_controller.dart';
+import 'app/modules/Bottom2/controllers/bottom2_controller.dart';
 import 'app/modules/BricklayingHelper/controllers/bricklaying_helper_controller.dart';
 import 'app/modules/Scaffolding_helper/controllers/scaffolding_helper_controller.dart';
 import 'app/modules/bottom/controllers/bottom_controller.dart';
 import 'app/modules/chat/controllers/chat_controller.dart';
 import 'app/modules/edit_profile/controllers/edit_profile_controller.dart';
 import 'app/modules/home/controllers/home_controller.dart';
+import 'app/modules/jobs/controllers/jobs_controller.dart';
+import 'app/modules/jobsDetails/controllers/jobs_details_controller.dart';
 import 'app/modules/join/views/join_view.dart';
-import 'app/modules/location/views/location_view.dart';
 import 'app/modules/login/controllers/login_controller.dart';
-import 'app/modules/login/views/login_view.dart';
 import 'app/modules/otp/controllers/otp_controller.dart';
 import 'app/modules/plastering_helper/controllers/plastering_helper_controller.dart';
 import 'app/modules/professional_plumber/controllers/professional_plumber_controller.dart';
+import 'app/modules/provider_ChatScreen/controllers/provider_chat_screen_controller.dart';
+import 'app/modules/provider_account/controllers/provider_account_controller.dart';
+import 'app/modules/provider_chat/controllers/provider_chat_controller.dart';
+import 'app/modules/provider_editProfile/controllers/provider_edit_profile_controller.dart';
 import 'app/modules/provider_home/controllers/provider_home_controller.dart';
 import 'app/modules/provider_login/controllers/provider_login_controller.dart';
 import 'app/modules/provider_otp/controllers/provider_otp_controller.dart';
+import 'app/modules/provider_setting/controllers/provider_setting_controller.dart';
 import 'app/modules/road_construction_helper/controllers/road_construction_helper_controller.dart';
 import 'app/modules/setting/controllers/setting_controller.dart';
 import 'app/modules/signUp/controllers/sign_up_controller.dart';
-import 'app/modules/signUp/views/sign_up_view.dart';
 import 'app/modules/splash1/views/splash1_view.dart';
 import 'app/modules/splash2/views/splash2_view.dart';
 import 'app/modules/splash3/views/splash3_view.dart';
@@ -38,15 +43,15 @@ void main() {
   Get.put(PlasteringHelperController());
   Get.put(BricklayingHelperController());
   Get.put(ScaffoldingHelperController());
-  Get.put(TileFixingHelperController());
+  Get.put(TileFixingHelperController());Get.put(JobsDetailsController());
   Get.put(RoadConstructionHelperController());
   Get.put(ProfessionalPlumberController());
   Get.put(SettingController());
-  Get.put(EditProfileController());
-  Get.put(ChatController());
-  Get.put(OtpController());Get.put(ProviderHomeController());
-  Get.put(ProviderLoginController());Get.put(ActivejobScreenController());
-  Get.put(ProviderOtpController());
+  Get.put(EditProfileController());Get.put(JobsController());
+  Get.put(ChatController());Get.put(ProviderSettingController());Get.put(ProviderChatController());
+  Get.put(OtpController());Get.put(ProviderHomeController());Get.put(ProviderEditProfileController());
+  Get.put(ProviderLoginController());Get.put(ActivejobScreenController());Get.put(ProviderChatScreenController());
+  Get.put(ProviderOtpController());Get.put(Bottom2Controller());Get.put(ProviderAccountController());
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
@@ -98,7 +103,6 @@ class _SplashScreenState extends State<SplashScreen> {
               Splash3View(),
             ],
           ),
-
           // Show nav buttons only on Splash2 & Splash3
           if (_currentPage != 0)
             Positioned(
@@ -122,14 +126,14 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                   Row(
                     children: List.generate(
-                      3,
+                      2,
                           (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: const EdgeInsets.symmetric(horizontal: 5),
                         height: 10,
                         width: 10,
                         decoration: BoxDecoration(
-                          color: _currentPage == index
+                          color: (_currentPage == 1 && index == 0) || (_currentPage == 2 && index == 1)
                               ? const Color(0xff235CD7)
                               : Colors.grey,
                           shape: BoxShape.circle,
@@ -149,7 +153,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       }
                     },
                     child: Text(
-                      _currentPage == 2 ? "Done" : "Next",
+                      _currentPage == 2 ? "Next" : "Next",
                       style: const TextStyle(
                         color: Color(0xff090F47),
                         fontSize: 16,

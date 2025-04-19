@@ -3,11 +3,9 @@ import 'package:get/get.dart';
 import 'package:worknest/colors.dart';
 import '../../account/views/account_view.dart';
 import '../../booking/views/booking_view.dart';
-import '../../chat/views/chat_view.dart';
 import '../../chat_screen/views/chat_screen_view.dart';
 import '../../home/views/home_view.dart';
 import '../../setting/views/setting_view.dart';
-import '../../worknest/views/worknest_view.dart';
 import '../controllers/bottom_controller.dart';
 
 class BottomView extends GetView<BottomController> {
