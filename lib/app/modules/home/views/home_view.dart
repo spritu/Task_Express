@@ -79,7 +79,7 @@ class HomeView extends GetView<HomeController> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Top Buttons
+                        // Top Buttons for different service types
                         Row(
                           children: controller.serviceTypes.map((type) {
                             bool isExpanded = controller.expandedServiceType.value == type['title'];
@@ -182,23 +182,113 @@ class HomeView extends GetView<HomeController> {
 
                                     final cat = categories[index];
 
-                                    return Card(
-                                      color: Colors.white,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Image.network(
-                                              cat.icon,
-                                              height: 30,
-                                              width: 30,
-                                              fit: BoxFit.contain,
-                                              errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+                                    return GestureDetector(
+                                      onTap: () {
+                                        if (cat.spType == '2') {
+                                          // Show bottom sheet with subcategories for spType 2
+                                          Get.bottomSheet(
+                                            Container(
+                                              padding: const EdgeInsets.all(16),
+                                              decoration: const BoxDecoration(
+                                                color: Color(0xFFD9E4FC), // Light blue background
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(20),
+                                                  topRight: Radius.circular(20),
+                                                ),
+                                              ),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  // Header row with title and close icon
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        cat.label,
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: () => Get.back(),
+                                                        child: const Icon(Icons.close),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 16),
+
+                                                  // Subcategory grid
+                                                  GridView.builder(
+                                                    shrinkWrap: true,
+                                                    physics: const NeverScrollableScrollPhysics(),
+                                                    itemCount: cat.subcategories.length,
+                                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                                      crossAxisCount: 3,
+                                                      crossAxisSpacing: 10,
+                                                      mainAxisSpacing: 10,
+                                                      childAspectRatio: 1.2,
+                                                    ),
+                                                    itemBuilder: (context, index) {
+                                                      final sub = cat.subcategories[index];
+                                                      return GestureDetector(
+                                                        onTap: () { controller.navigateToSubcategoryScreen(sub.name);
+                                                          // Handle subcategory tap
+                                                          print("Subcategory tapped: ${sub.name}");
+                                                          Get.back();
+                                                        },
+                                                        child: Container(
+                                                          alignment: Alignment.center,
+                                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.white,
+                                                            borderRadius: BorderRadius.circular(12),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors.black.withOpacity(0.05),
+                                                                blurRadius: 4,
+                                                                offset: const Offset(0, 2),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: Text(
+                                                            sub.name,
+                                                            textAlign: TextAlign.center,
+                                                            style: const TextStyle(
+                                                              fontSize: 12,
+                                                              fontWeight: FontWeight.w500,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                            const SizedBox(height: 4),
-                                            Center(child: Text(cat.label, style: const TextStyle(fontSize: 10))),
-                                          ],
+                                            isScrollControlled: true,
+                                          );
+
+                                        }
+                                      },
+                                      child: Card(
+                                        color: Colors.white,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Image.network(
+                                                cat.icon,
+                                                height: 30,
+                                                width: 30,
+                                                fit: BoxFit.contain,
+                                                errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Center(child: Text(cat.label, style: const TextStyle(fontSize: 10))),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     );
@@ -211,6 +301,8 @@ class HomeView extends GetView<HomeController> {
                     );
                   }),
                 ),
+
+
 
                 // Banner
                 SizedBox(height: 10),

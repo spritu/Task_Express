@@ -3,8 +3,13 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../BricklayingHelper/views/bricklaying_helper_view.dart';
+import '../../CementHelper/views/cement_helper_view.dart';
+import '../../Scaffolding_helper/views/scaffolding_helper_view.dart';
+
 class HomeController extends GetxController {
   // TODO: Implement WorknestController
+
   RxList<CategoryModel> allCategories = <CategoryModel>[].obs;
   RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
   RxList<CategoryModel> fixedChargeHelpers = <CategoryModel>[].obs;
@@ -26,18 +31,19 @@ class HomeController extends GetxController {
     return [];
   }
 
-  void toggleServiceExpansion(String title) {
-    if (expandedServiceType.value == title) {
-      expandedServiceType.value = '';
-    } else {
-      expandedServiceType.value = title;
-    }
-    showAllCategories.value = false;
-  }
+  // void toggleServiceExpansion(String title) {
+  //   if (expandedServiceType.value == title) {
+  //     expandedServiceType.value = '';
+  //   } else {
+  //     expandedServiceType.value = title;
+  //   }
+  //   showAllCategories.value = false;
+  // }
 
-  void toggleCategoryView() {
-    showAllCategories.value = !showAllCategories.value;
-  }
+  // void toggleCategoryView() {
+  //   showAllCategories.value = !showAllCategories.value;
+  // }
+
   void fetchCategories() async {
     try {
       var request = http.Request('GET', Uri.parse('https://jdapi.youthadda.co/category/getCategory'));
@@ -70,6 +76,20 @@ class HomeController extends GetxController {
 
 
 
+  // To toggle category view between expanded and collapsed
+  void toggleCategoryView() {
+    showAllCategories.value = !showAllCategories.value;
+  }
+
+  // To expand or collapse specific service type category
+  void toggleServiceExpansion(String serviceType) {
+    expandedServiceType.value = serviceType;
+  }
+
+
+
+
+
   @override
   void onInit() {
     fetchCategories();
@@ -77,42 +97,17 @@ class HomeController extends GetxController {
   }
 
   var searchController = TextEditingController();
-  // Dummy data for each service type
-  List<Map<String, String>> visitingCategories = [
-    {'label': 'Construction', 'icon': 'assets/images/image.png'},
-    {'label': 'Plumber', 'icon': 'assets/images/image.png'},
-    {'label': 'Painter', 'icon': 'assets/images/image.png'},
-    {'label': 'Electrician', 'icon': 'assets/images/image.png'},
-    {'label': 'Carpenter', 'icon': 'assets/images/image.png'},
-    {'label': 'Welder', 'icon': 'assets/images/image.png'},
-    {'label': 'Gardener', 'icon': 'assets/images/image.png'},
-    {'label': 'Cleaner', 'icon': 'assets/images/image.png'},
-  ];
-
-  List<Map<String, String>> fixedChargeCategories = [
-    {'label': 'AC Service', 'icon': '❄️'},
-    {'label': 'Washing Machine', 'icon': '🧺'},
-    {'label': 'Fridge Repair', 'icon': '🧊'},
-    {'label': 'TV Repair', 'icon': '📺'},
-    {'label': 'Fan Repair', 'icon': '🌀'},
-    {'label': 'Geyser', 'icon': '🔥'},
-    {'label': 'Microwave', 'icon': '🍲'},
-    {'label': 'More', 'icon': '➕'},
-  ];
-// for UI binding
-
-
-
 
   var searchResults = [].obs; // for storing fetched data
 
   /// Fetch service providers from API
   Future<void> fetchServiceProviders(String searchController) async {
-
     try {
       var request = http.Request(
         'GET',
-        Uri.parse('https://jdapi.youthadda.co/user/searchServiceProviders?name=$searchController'),
+        Uri.parse(
+          'https://jdapi.youthadda.co/user/searchServiceProviders?name=$searchController',
+        ),
       );
 
       http.StreamedResponse response = await request.send();
@@ -125,8 +120,6 @@ class HomeController extends GetxController {
         if (jsonData['data'] is List) {
           searchResults.value = jsonData['data'];
           print("✅ Success: ${jsonData['data']}");
-
-
         } else {
           searchResults.clear();
           print("⚠️ No data found in response.");
@@ -138,7 +131,22 @@ class HomeController extends GetxController {
       print("❗ Error: $e");
     }
   }
-
+  void navigateToSubcategoryScreen(String name) {
+    switch (name.toLowerCase()) {
+      case 'bricklaying helper':
+        Get.to(() => BricklayingHelperView());
+        break;
+      case 'cement mixing helper':
+        Get.to(() => CementHelperView());
+        break;
+      case 'scaffolding helper':
+        Get.to(() => ScaffoldingHelperView());
+        break;
+    // Add more cases for other subcategories
+      default:
+        Get.snackbar("Coming Soon", "This service is not available yet");
+    }
+  }
   /// Called when search text changes
   void onSearchChanged(String value) {
     if (value.trim().isNotEmpty) {
@@ -147,51 +155,26 @@ class HomeController extends GetxController {
       searchResults.clear(); // Clear results if input is empty
     }
   }
- // RxList<Map<String, String>> categories = <Map<String, String>>[].obs;
 
-  // void toggleServiceExpansion(String selectedTitle) {
-  //   if (expandedServiceType.value == selectedTitle) {
-  //     expandedServiceType.value = '';
-  //     categories.clear();
-  //   } else {
-  //     expandedServiceType.value = selectedTitle;
-  //     showAllCategories.value = false;
-  //
-  //     // Update categories based on selection
-  //     if (selectedTitle == 'Visiting Professionals') {
-  //       categories.value = visitingCategories;
-  //     } else if (selectedTitle == 'Fixed charge Helpers') {
-  //       categories.value = fixedChargeCategories;
-  //     }
-  //   }
-  // }
-  //
-  // void toggleCategoryView() {
-  //   showAllCategories.value = !showAllCategories.value;
-  // }
-//  var expandedServiceType = ''.obs;
   final count = 0.obs;
- // RxBool showAllCategories = false.obs;
+
+  // RxBool showAllCategories = false.obs;
   var selectedCategory = ''.obs;
   var selectedIndex = 0.obs;
 
   void selectItem(int index) {
     selectedIndex.value = index;
   }
+
   var selectedServiceType = 'Visiting Professionals'.obs;
 
   void selectService(String type) {
     selectedServiceType.value = type;
   }
+
   void selectCategory(String label) {
     selectedCategory.value = label;
   }
-  // final List<Map<String, String>> serviceTypes = [
-  //   {'title': 'Visiting Professionals', 'icon': '👷'},
-  //   {'title': 'Fixed charge Helpres', 'icon': '🤖'},
-  // ];
-
-
 
   final List<String> titles1 = [
     'Visiting Professionals',
@@ -214,17 +197,6 @@ class HomeController extends GetxController {
     'More',
   ];
 
-  final List<String> imagePaths = [
-    'assets/images/plumber.png',
-    'assets/images/plumber.png',
-    'assets/images/plumber.png',
-    'assets/images/plumber.png',
-    'assets/images/plumber.png',
-    'assets/images/plumber.png',
-    'assets/images/plumber.png',
-    'assets/images/plumber.png',
-  ];
-
 
 
   final services = [
@@ -233,37 +205,43 @@ class HomeController extends GetxController {
       'rating': '4.7',
       'reviews': '1.2k',
       'oldPrice': '1299',
-      'price':'600'
+      'price': '600',
     },
     {
       'image': 'assets/images/plumber.png',
       'rating': '4.8',
       'reviews': '7.1k',
-      'oldPrice': '1299', 'price':'600'
+      'oldPrice': '1299',
+      'price': '600',
     },
     {
       'image': 'assets/images/plumber.png',
       'rating': '4.2',
       'reviews': '2.4k',
-      'oldPrice': '1299', 'price':'600'
-    }, {
-      'image': 'assets/images/plumber.png',
-      'rating': '4.2',
-      'reviews': '2.4k', 'price':'600'
-    }, {
-      'image': 'assets/images/plumber.png',
-      'rating': '4.2',
-      'reviews': '2.4k',
-      'oldPrice': '1299', 'price':'600'
-    }, {
+      'oldPrice': '1299',
+      'price': '600',
+    },
+    {
       'image': 'assets/images/plumber.png',
       'rating': '4.2',
       'reviews': '2.4k',
-      'oldPrice': '1299', 'price':'600'
+      'price': '600',
+    },
+    {
+      'image': 'assets/images/plumber.png',
+      'rating': '4.2',
+      'reviews': '2.4k',
+      'oldPrice': '1299',
+      'price': '600',
+    },
+    {
+      'image': 'assets/images/plumber.png',
+      'rating': '4.2',
+      'reviews': '2.4k',
+      'oldPrice': '1299',
+      'price': '600',
     },
   ];
-
-
 
   @override
   void onReady() {
@@ -282,11 +260,13 @@ class CategoryModel {
   final String label;
   final String icon;
   final String spType;
+  final List<SubcategoryModel> subcategories; // Add a list of subcategories
 
   CategoryModel({
     required this.label,
     required this.icon,
     required this.spType,
+    required this.subcategories, // Initialize subcategories
   });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
@@ -295,13 +275,34 @@ class CategoryModel {
         ? rawIcon
         : 'https://jdapi.youthadda.co/${rawIcon.replaceFirst(RegExp(r'^/'), '')}';
 
+    var subcategoriesList = (json['subcategories'] as List)
+        .map((subItem) => SubcategoryModel.fromJson(subItem))
+        .toList();
+
     return CategoryModel(
       label: json['name'] ?? '',
       icon: iconUrl,
       spType: json['spType']?.toString() ?? '',
+      subcategories: subcategoriesList, // Initialize subcategories
     );
   }
+}
 
+class SubcategoryModel {
+  final String name;
+  final String description;
+
+  SubcategoryModel({
+    required this.name,
+    required this.description,
+  });
+
+  factory SubcategoryModel.fromJson(Map<String, dynamic> json) {
+    return SubcategoryModel(
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+    );
+  }
 }
 
 
