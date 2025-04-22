@@ -136,7 +136,7 @@ class HomeView extends GetView<HomeController> {
                                   : (categories.length > 7 ? 8 : categories.length);
 
                               return Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(5.0),
                                 child: GridView.builder(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
@@ -145,7 +145,7 @@ class HomeView extends GetView<HomeController> {
                                     crossAxisCount: 4,
                                     crossAxisSpacing: 10,
                                     mainAxisSpacing: 10,
-                                    childAspectRatio: 0.7,
+                                    childAspectRatio: 0.6,
                                   ),
                                   itemBuilder: (context, index) {
                                     if (!isExpanded && index == 7 && categories.length > 7) {
@@ -189,9 +189,15 @@ class HomeView extends GetView<HomeController> {
                                         child: Column(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            Image.asset(cat.icon, height: 30, width: 30),
+                                            Image.network(
+                                              cat.icon,
+                                              height: 30,
+                                              width: 30,
+                                              fit: BoxFit.contain,
+                                              errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+                                            ),
                                             const SizedBox(height: 4),
-                                            Text(cat.label, style: const TextStyle(fontSize: 10)),
+                                            Center(child: Text(cat.label, style: const TextStyle(fontSize: 10))),
                                           ],
                                         ),
                                       ),

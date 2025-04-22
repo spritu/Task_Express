@@ -38,7 +38,6 @@ class HomeController extends GetxController {
   void toggleCategoryView() {
     showAllCategories.value = !showAllCategories.value;
   }
-
   void fetchCategories() async {
     try {
       var request = http.Request('GET', Uri.parse('https://jdapi.youthadda.co/category/getCategory'));
@@ -50,7 +49,11 @@ class HomeController extends GetxController {
 
         if (jsonData['data'] != null) {
           var dataList = jsonData['data'] as List;
-          allCategories.value = dataList.map((item) => CategoryModel.fromJson(item)).toList();
+          allCategories.value = dataList.map((item) {
+            final category = CategoryModel.fromJson(item);
+            print('🖼️ Image URL: ${category.icon}'); // 🔍 Print here
+            return category;
+          }).toList();
 
           visitingProfessionals.value = allCategories.where((c) => c.spType == '1').toList();
           fixedChargeHelpers.value = allCategories.where((c) => c.spType == '2').toList();
@@ -64,6 +67,8 @@ class HomeController extends GetxController {
       print('❗ Error: $e');
     }
   }
+
+
 
   @override
   void onInit() {
@@ -103,6 +108,7 @@ class HomeController extends GetxController {
 
   /// Fetch service providers from API
   Future<void> fetchServiceProviders(String searchController) async {
+
     try {
       var request = http.Request(
         'GET',
@@ -119,6 +125,8 @@ class HomeController extends GetxController {
         if (jsonData['data'] is List) {
           searchResults.value = jsonData['data'];
           print("✅ Success: ${jsonData['data']}");
+
+
         } else {
           searchResults.clear();
           print("⚠️ No data found in response.");
@@ -255,13 +263,7 @@ class HomeController extends GetxController {
     },
   ];
 
-  // void toggleCategoryView() {
-  //   showAllCategories.value = !showAllCategories.value;
-  // }
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  // }
+
 
   @override
   void onReady() {
@@ -275,18 +277,32 @@ class HomeController extends GetxController {
 
   void increment() => count.value++;
 }
+
 class CategoryModel {
   final String label;
   final String icon;
   final String spType;
 
-  CategoryModel({required this.label, required this.icon, required this.spType});
+  CategoryModel({
+    required this.label,
+    required this.icon,
+    required this.spType,
+  });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    String rawIcon = json['categoryImg'] ?? '';
+    String iconUrl = rawIcon.startsWith('http')
+        ? rawIcon
+        : 'https://jdapi.youthadda.co/${rawIcon.replaceFirst(RegExp(r'^/'), '')}';
+
     return CategoryModel(
       label: json['name'] ?? '',
-      icon: json['categoryImg'] ?? 'assets/images/default_icon.png',
+      icon: iconUrl,
       spType: json['spType']?.toString() ?? '',
     );
   }
+
 }
+
+
+
