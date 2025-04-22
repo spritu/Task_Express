@@ -27,7 +27,6 @@ void ElecAndPlumbSheet(BuildContext context, List<String> categories) {
             ),
             SizedBox(height: 10),
             Divider(thickness: 1),
-
             SizedBox(
               height:
               MediaQuery.of(context).size.height *
@@ -443,7 +442,6 @@ void PetCareSheet(BuildContext context, List<String> petcategories) {
             ),
             SizedBox(height: 10),
             Divider(thickness: 1),
-
             SizedBox(
               height:
               MediaQuery.of(context).size.height *

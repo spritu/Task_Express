@@ -114,13 +114,13 @@ class OtpView extends GetView<OtpController> {
                     //     'OTP must be exactly 4 digits',
                     //     backgroundColor: Colors.redAccent,
                     //     colorText: Colors.white,
-                    //     snackPosition: SnackPosition.BOTTOM,
+                    //     snackPosition: SnackPosition.BOTTOM,E
                     //   );
                     //   return;
                     // }
                     Get.to(() => SignUpView());
-                    String otp = controller.otpController.text.trim();
-                    controller.verifyOtp(otp); // No need to pass mobileNumber // This should handle actual verification and navigation
+                  //  String otp = controller.otpController.text.trim();
+                    controller.verifyOtp("otp"); // No need to pass mobileNumber // This should handle actual verification and navigation
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF114BCA),

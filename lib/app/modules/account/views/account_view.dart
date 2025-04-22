@@ -32,7 +32,8 @@ class AccountView extends GetView<AccountController> {
                 child: Column(
                   children: [
                     SizedBox(height: 20),
-                    const Text(
+                    const
+                    Text(
                       "Account",
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
@@ -58,27 +59,30 @@ class AccountView extends GetView<AccountController> {
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8.0,
                                   vertical: 10,
+
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      "Akash Gupta",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontFamily: "poppins",
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    Text(
-                                      "+91 8784789040",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: "poppins",
-                                        fontSize: 12,
-                                        color: Color(0xFF746E6E),
-                                      ),
-                                    ),
+                                    Obx(() {
+                                      return Text(
+                                        ' ${controller.firstName.value} ${controller.lastName.value}',
+                                        style: TextStyle(fontSize: 14,  fontFamily: "poppins",
+                                          fontWeight: FontWeight.w500,),
+                                      );
+                                    }),
+                                    Obx(() {
+                                      return Text(
+                                        controller.mobileNumber.isEmpty
+                                            ? "Mobile number not found"
+                                            : "+91 ${controller.mobileNumber.value}",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontFamily: "poppins",
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      );
+                                    }),
                                   ],
                                 ),
                               ),
