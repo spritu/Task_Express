@@ -129,7 +129,8 @@ class SignUpView extends GetView<SignUpController> {
                     color: AppColors.blue,
                   ),
                   child: TextButton(
-                    onPressed: () { controller.registerUser();  },
+                    onPressed: () { controller.registerUser();
+                    Get.to(() => LocationView());},
                     child: const Text("Proceed", style: TextStyle(color: Colors.white, fontSize: 16)),
                   ),
                 ),

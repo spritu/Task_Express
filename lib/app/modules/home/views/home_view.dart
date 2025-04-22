@@ -75,11 +75,11 @@ class HomeView extends GetView<HomeController> {
                 // Service Type Buttons
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child:Obx(() {
+                  child: Obx(() {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Top service type buttons
+                        // Top Buttons
                         Row(
                           children: controller.serviceTypes.map((type) {
                             bool isExpanded = controller.expandedServiceType.value == type['title'];
@@ -92,27 +92,21 @@ class HomeView extends GetView<HomeController> {
                                     color: isExpanded ? const Color(0xFFD9E4FC) : Colors.transparent,
                                     borderRadius: const BorderRadius.only(
                                       topLeft: Radius.circular(20),
-                                      topRight: Radius.circular(20)
+                                      topRight: Radius.circular(20),
                                     ),
                                   ),
-                                  child:
-                                  Card(color: AppColors.white,
+                                  child: Card(
+                                    color: Colors.white,
                                     child: Padding(
                                       padding: const EdgeInsets.all(4.0),
                                       child: Column(
                                         children: [
-                                          Image.asset(
-                                            "assets/images/service_provider.png",
-                                            color: const Color(0xffF67C0A),
-                                          ),
+                                          Image.asset("assets/images/service_provider.png", color: const Color(0xffF67C0A)),
                                           const SizedBox(height: 4),
                                           Text(
                                             type['title']!,
                                             textAlign: TextAlign.center,
-                                            style: TextStyle(fontSize: 10,
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColors.textColor,
-                                            ),
+                                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
                                           ),
                                         ],
                                       ),
@@ -123,7 +117,8 @@ class HomeView extends GetView<HomeController> {
                             );
                           }).toList(),
                         ),
-                        // Grid below selected service
+
+                        // Category Grid
                         if (controller.expandedServiceType.value.isNotEmpty)
                           Container(
                             decoration: const BoxDecoration(
@@ -131,16 +126,15 @@ class HomeView extends GetView<HomeController> {
                               borderRadius: BorderRadius.only(
                                 bottomLeft: Radius.circular(20),
                                 bottomRight: Radius.circular(20),
-                               // topRight: Radius.circular(20)
                               ),
                             ),
                             child: Obx(() {
+                              final categories = controller.categories;
                               final isExpanded = controller.showAllCategories.value;
                               final itemCount = isExpanded
-                                  ? controller.categories.length + 1
-                                  : controller.categories.length > 7
-                                  ? 8
-                                  : controller.categories.length;
+                                  ? categories.length + 1
+                                  : (categories.length > 7 ? 8 : categories.length);
+
                               return Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: GridView.builder(
@@ -154,8 +148,7 @@ class HomeView extends GetView<HomeController> {
                                     childAspectRatio: 0.7,
                                   ),
                                   itemBuilder: (context, index) {
-                                    final totalCats = controller.categories.length;
-                                    if (!isExpanded && index == 7 && totalCats > 7) {
+                                    if (!isExpanded && index == 7 && categories.length > 7) {
                                       return GestureDetector(
                                         onTap: controller.toggleCategoryView,
                                         child: Card(
@@ -164,97 +157,42 @@ class HomeView extends GetView<HomeController> {
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: const [
                                               Icon(Icons.add),
-                                              Text('More', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColor)),
+                                              Text('More', style: TextStyle(fontWeight: FontWeight.bold)),
                                             ],
                                           ),
                                         ),
                                       );
                                     }
-                                    // "Close" button
-                                    if (isExpanded && index == totalCats) {
+
+                                    if (isExpanded && index == categories.length) {
                                       return GestureDetector(
                                         onTap: controller.toggleCategoryView,
                                         child: Card(
-                                          color: AppColors.white,
+                                          color: Colors.white,
                                           child: Column(
                                             mainAxisAlignment: MainAxisAlignment.center,
-                                            children: const [Icon(Icons.close),
-                                              Text('Close', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textColor)),
+                                            children: const [
+                                              Icon(Icons.close),
+                                              Text('Close', style: TextStyle(fontWeight: FontWeight.bold)),
                                             ],
                                           ),
                                         ),
                                       );
                                     }
-                  
-                                    final cat = controller.categories[index];
-                  
-                                    // First box (Construction & Masonry)
-                                    if (index == 0) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          showModalBottomSheet(
-                                            context: context,
-                                            isScrollControlled: true,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                            ),
-                                            builder: (context) => Padding(
-                                              padding: MediaQuery.of(context).viewInsets,
-                                              child: ConstructionHelperScreen(),
-                                            ),
-                                          );
-                                        },
-                                        child: Card(color: AppColors.white,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Image.asset(cat['icon']!, height: 30, width: 30),
-                                                const SizedBox(height: 4),
-                                                Text(cat['label']!, style: const TextStyle(fontSize: 10, color: AppColors.textColor)),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                    if (index == 1) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          Get.to(ProfessionalPlumberView());
-                                          },
-                                        child: SizedBox(width: 150,height: 66,
-                                          child: Card(color: AppColors.white,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Image.asset(cat['icon']!, height: 30, width: 30),
-                                                  const SizedBox(height: 4),
-                                                  Text(cat['label']!, style: const TextStyle(fontSize: 10, color: AppColors.textColor)),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }
-                  
-                                    // Normal grid items
-                                    return SizedBox(height: 80,width: 80,
-                                      child: Card(color: AppColors.white,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Image.asset(cat['icon']!, height: 30, width: 30),
-                                              const SizedBox(height: 4),
-                                              Text(cat['label']!, style: const TextStyle(fontSize: 10, color: AppColors.textColor)),
-                                            ],
-                                          ),
+
+                                    final cat = categories[index];
+
+                                    return Card(
+                                      color: Colors.white,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(cat.icon, height: 30, width: 30),
+                                            const SizedBox(height: 4),
+                                            Text(cat.label, style: const TextStyle(fontSize: 10)),
+                                          ],
                                         ),
                                       ),
                                     );
@@ -265,8 +203,9 @@ class HomeView extends GetView<HomeController> {
                           ),
                       ],
                     );
-                  })
+                  }),
                 ),
+
                 // Banner
                 SizedBox(height: 10),
                 DiscountBannerView(),
