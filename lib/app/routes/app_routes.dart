@@ -55,6 +55,7 @@ abstract class Routes {
   static const JOBS_DETAILS = _Paths.JOBS_DETAILS;
   static const HELP_SUPPORT = _Paths.HELP_SUPPORT;
   static const USER_HELP = _Paths.USER_HELP;
+  static const REQUEST_PANDDING = _Paths.REQUEST_PANDDING;
 }
 
 abstract class _Paths {
@@ -111,4 +112,5 @@ abstract class _Paths {
   static const JOBS_DETAILS = '/jobs-details';
   static const HELP_SUPPORT = '/help-support';
   static const USER_HELP = '/user-help';
+  static const REQUEST_PANDDING = '/request-pandding';
 }

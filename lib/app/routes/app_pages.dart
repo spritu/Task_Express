@@ -14,6 +14,8 @@ import '../modules/CementHelper/bindings/cement_helper_binding.dart';
 import '../modules/CementHelper/views/cement_helper_view.dart';
 import '../modules/HelpSupport/bindings/help_support_binding.dart';
 import '../modules/HelpSupport/views/help_support_view.dart';
+import '../modules/RequestPandding/bindings/request_pandding_binding.dart';
+import '../modules/RequestPandding/views/request_pandding_view.dart';
 import '../modules/Scaffolding_helper/bindings/scaffolding_helper_binding.dart';
 import '../modules/Scaffolding_helper/views/scaffolding_helper_view.dart';
 import '../modules/ServiceCompleted/bindings/service_completed_binding.dart';
@@ -358,6 +360,11 @@ class AppPages {
       name: _Paths.USER_HELP,
       page: () => const UserHelpView(),
       binding: UserHelpBinding(),
+    ),
+    GetPage(
+      name: _Paths.REQUEST_PANDDING,
+      page: () => const RequestPanddingView(),
+      binding: RequestPanddingBinding(),
     ),
   ];
 }

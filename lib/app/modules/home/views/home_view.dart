@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +12,7 @@ import '../../professional_plumber/views/professional_plumber_view.dart';
 import '../../road_construction_helper/views/road_construction_helper_view.dart';
 import '../../tile_fixing_helper/views/tile_fixing_helper_view.dart';
 import '../controllers/home_controller.dart';
-
+import 'package:http/http.dart' as http;
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -29,353 +31,358 @@ class HomeView extends GetView<HomeController> {
         ],
       ),),
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Location & Search Bar
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Location & Search Bar
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    const Icon(Icons.location_on, size: 30),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children:  [
+                        Text('Scheme No 54', style: TextStyle(fontWeight: FontWeight.w600,fontSize: 12,color: AppColors.textColor)),
+                        Text('Fh-289, Vijay nagar,Indore',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12,color: AppColors.textColor)),
+                      ],
+                    ),
+                    const Spacer(),
+                    Text('Task', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600,color: Color(0XFF114BCA))),
+                    Text('Express', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.orage)),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: TextField(onTap: (){
+                  controller.fetchServiceProviders( "searchController");
+                },
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: const Icon(Icons.tune),
+                    hintText: "Search for ‘Plumber’",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Service Type Buttons
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
                     children: [
-                      const Icon(Icons.location_on, size: 30),
-                      const SizedBox(width: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children:  [
-                          Text('Scheme No 54', style: TextStyle(fontWeight: FontWeight.w600,fontSize: 12,color: AppColors.textColor)),
-                          Text('Fh-289, Vijay nagar,Indore',style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12,color: AppColors.textColor)),
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Obx(() {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // Top Buttons for different service types
+                              Row(
+                                children: controller.serviceTypes.map((type) {
+                                  bool isExpanded = controller.expandedServiceType.value == type['title'];
+                                  return Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => controller.toggleServiceExpansion(type['title']!),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(14),
+                                        decoration: BoxDecoration(
+                                          color: isExpanded ? const Color(0xFFD9E4FC) : Colors.transparent,
+                                          borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(20),
+                                            topRight: Radius.circular(20),
+                                          ),
+                                        ),
+                                        child: Card(
+                                          color: Colors.white,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Column(
+                                              children: [
+                                                Image.asset("assets/images/service_provider.png", color: const Color(0xffF67C0A)),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  type['title']!,
+                                                  textAlign: TextAlign.center,
+                                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                
+                              // Category Grid
+                              if (controller.expandedServiceType.value.isNotEmpty)
+                                Container(
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFD9E4FC),
+                                    borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(20),
+                                      bottomRight: Radius.circular(20),
+                                    ),
+                                  ),
+                                  child: Obx(() {
+                                    final categories = controller.categories;
+                                    final isExpanded = controller.showAllCategories.value;
+                                    final itemCount = isExpanded
+                                        ? categories.length + 1
+                                        : (categories.length > 7 ? 8 : categories.length);
+                
+                                    return Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: GridView.builder(
+                                        shrinkWrap: true,
+                                        physics: const NeverScrollableScrollPhysics(),
+                                        itemCount: itemCount,
+                                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 4,
+                                          crossAxisSpacing: 10,
+                                          mainAxisSpacing: 10,
+                                          childAspectRatio: 0.6,
+                                        ),
+                                        itemBuilder: (context, index) {
+                                          if (!isExpanded && index == 7 && categories.length > 7) {
+                                            return GestureDetector(
+                                              onTap: controller.toggleCategoryView,
+                                              child: Card(
+                                                color: Colors.white,
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: const [
+                                                    Icon(Icons.add),
+                                                    Text('More', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          }
+                
+                                          if (isExpanded && index == categories.length) {
+                                            return GestureDetector(
+                                              onTap: controller.toggleCategoryView,
+                                              child: Card(
+                                                color: Colors.white,
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: const [
+                                                    Icon(Icons.close),
+                                                    Text('Close', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          }
+                
+                                          final cat = categories[index];
+                
+                                          return GestureDetector(
+                                            onTap: () {
+                                              if (cat.spType == '2') {
+                                                // Show bottom sheet with subcategories for spType 2
+                                                Get.bottomSheet(
+                                                  Container(
+                                                    padding: const EdgeInsets.all(16),
+                                                    decoration: const BoxDecoration(
+                                                      color: Color(0xFFD9E4FC), // Light blue background
+                                                      borderRadius: BorderRadius.only(
+                                                        topLeft: Radius.circular(20),
+                                                        topRight: Radius.circular(20),
+                                                      ),
+                                                    ),
+                                                    child: Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        // Header row with title and close icon
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                              cat.label,
+                                                              style: const TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight: FontWeight.bold,
+                                                              ),
+                                                            ),
+                                                            GestureDetector(
+                                                              onTap: () => Get.back(),
+                                                              child: const Icon(Icons.close),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 16),
+                
+                                                        // Subcategory grid
+                                                        GridView.builder(
+                                                          shrinkWrap: true,
+                                                          physics: const NeverScrollableScrollPhysics(),
+                                                          itemCount: cat.subcategories.length,
+                                                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                                            crossAxisCount: 3,
+                                                            crossAxisSpacing: 10,
+                                                            mainAxisSpacing: 10,
+                                                            childAspectRatio: 1.2,
+                                                          ),
+                                                          itemBuilder: (context, index) {
+                                                            final sub = cat.subcategories[index];
+                                                            return GestureDetector(
+                                                              onTap: () { controller.navigateToSubcategoryScreen(sub.name);
+                                                                // Handle subcategory tap
+                                                                print("Subcategory tapped: ${sub.name}");
+                                                                Get.back();
+                                                              },
+                                                              child: Container(
+                                                                alignment: Alignment.center,
+                                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                                                                decoration: BoxDecoration(
+                                                                  color: Colors.white,
+                                                                  borderRadius: BorderRadius.circular(12),
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                      color: Colors.black.withOpacity(0.05),
+                                                                      blurRadius: 4,
+                                                                      offset: const Offset(0, 2),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                child: Text(
+                                                                  sub.name,
+                                                                  textAlign: TextAlign.center,
+                                                                  style: const TextStyle(
+                                                                    fontSize: 12,
+                                                                    fontWeight: FontWeight.w500,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  isScrollControlled: true,
+                                                );
+                
+                                              }
+                                            },
+                                            child: Card(
+                                              color: Colors.white,
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Image.network(
+                                                      cat.icon,
+                                                      height: 30,
+                                                      width: 30,
+                                                      fit: BoxFit.contain,
+                                                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Center(child: Text(cat.label, style: const TextStyle(fontSize: 10))),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  }),
+                                ),
+                            ],
+                          );
+                        }),
+                      ), SizedBox(height: 10),
+                      DiscountBannerView(),
+                      // Most booked services
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text("Most booked services", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500,color: AppColors.textColor)),
+                          ],
+                        ),
                       ),
-                      const Spacer(),
-                      Text('Task', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600,color: Color(0XFF114BCA))),
-                      Text('Express', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.orage)),
+                      SizedBox(height: 10),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height*0.2,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: controller.services.length,
+                          itemBuilder: (context, index) {
+                            final service = controller.services[index]; // Corrected
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.asset(
+                                      service['image']!,
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.star, color: Color(0xffC53F3F), size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${service['rating']} (${service['reviews']})',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (service['oldPrice'] != null)
+                                    Row(
+                                      children: [
+                                        Text(
+                                          '₹${service['oldPrice']}',
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            decoration: TextDecoration.lineThrough,
+                                          ),
+                                        ),SizedBox(width: 5,),Text(
+                                          '₹${service['price']}',
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: TextField(onTap: (){
-                    controller.fetchServiceProviders( "searchController");
-                  },
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: const Icon(Icons.tune),
-                      hintText: "Search for ‘Plumber’",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Service Type Buttons
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Obx(() {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Top Buttons for different service types
-                        Row(
-                          children: controller.serviceTypes.map((type) {
-                            bool isExpanded = controller.expandedServiceType.value == type['title'];
-                            return Expanded(
-                              child: GestureDetector(
-                                onTap: () => controller.toggleServiceExpansion(type['title']!),
-                                child: Container(
-                                  padding: const EdgeInsets.all(14),
-                                  decoration: BoxDecoration(
-                                    color: isExpanded ? const Color(0xFFD9E4FC) : Colors.transparent,
-                                    borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(20),
-                                      topRight: Radius.circular(20),
-                                    ),
-                                  ),
-                                  child: Card(
-                                    color: Colors.white,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Column(
-                                        children: [
-                                          Image.asset("assets/images/service_provider.png", color: const Color(0xffF67C0A)),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            type['title']!,
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-
-                        // Category Grid
-                        if (controller.expandedServiceType.value.isNotEmpty)
-                          Container(
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFD9E4FC),
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(20),
-                                bottomRight: Radius.circular(20),
-                              ),
-                            ),
-                            child: Obx(() {
-                              final categories = controller.categories;
-                              final isExpanded = controller.showAllCategories.value;
-                              final itemCount = isExpanded
-                                  ? categories.length + 1
-                                  : (categories.length > 7 ? 8 : categories.length);
-
-                              return Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: itemCount,
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 4,
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                    childAspectRatio: 0.6,
-                                  ),
-                                  itemBuilder: (context, index) {
-                                    if (!isExpanded && index == 7 && categories.length > 7) {
-                                      return GestureDetector(
-                                        onTap: controller.toggleCategoryView,
-                                        child: Card(
-                                          color: Colors.white,
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: const [
-                                              Icon(Icons.add),
-                                              Text('More', style: TextStyle(fontWeight: FontWeight.bold)),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }
-
-                                    if (isExpanded && index == categories.length) {
-                                      return GestureDetector(
-                                        onTap: controller.toggleCategoryView,
-                                        child: Card(
-                                          color: Colors.white,
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: const [
-                                              Icon(Icons.close),
-                                              Text('Close', style: TextStyle(fontWeight: FontWeight.bold)),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }
-
-                                    final cat = categories[index];
-
-                                    return GestureDetector(
-                                      onTap: () {
-                                        if (cat.spType == '2') {
-                                          // Show bottom sheet with subcategories for spType 2
-                                          Get.bottomSheet(
-                                            Container(
-                                              padding: const EdgeInsets.all(16),
-                                              decoration: const BoxDecoration(
-                                                color: Color(0xFFD9E4FC), // Light blue background
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(20),
-                                                  topRight: Radius.circular(20),
-                                                ),
-                                              ),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  // Header row with title and close icon
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        cat.label,
-                                                        style: const TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                      GestureDetector(
-                                                        onTap: () => Get.back(),
-                                                        child: const Icon(Icons.close),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(height: 16),
-
-                                                  // Subcategory grid
-                                                  GridView.builder(
-                                                    shrinkWrap: true,
-                                                    physics: const NeverScrollableScrollPhysics(),
-                                                    itemCount: cat.subcategories.length,
-                                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                                      crossAxisCount: 3,
-                                                      crossAxisSpacing: 10,
-                                                      mainAxisSpacing: 10,
-                                                      childAspectRatio: 1.2,
-                                                    ),
-                                                    itemBuilder: (context, index) {
-                                                      final sub = cat.subcategories[index];
-                                                      return GestureDetector(
-                                                        onTap: () { controller.navigateToSubcategoryScreen(sub.name);
-                                                          // Handle subcategory tap
-                                                          print("Subcategory tapped: ${sub.name}");
-                                                          Get.back();
-                                                        },
-                                                        child: Container(
-                                                          alignment: Alignment.center,
-                                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.white,
-                                                            borderRadius: BorderRadius.circular(12),
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                color: Colors.black.withOpacity(0.05),
-                                                                blurRadius: 4,
-                                                                offset: const Offset(0, 2),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          child: Text(
-                                                            sub.name,
-                                                            textAlign: TextAlign.center,
-                                                            style: const TextStyle(
-                                                              fontSize: 12,
-                                                              fontWeight: FontWeight.w500,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            isScrollControlled: true,
-                                          );
-
-                                        }
-                                      },
-                                      child: Card(
-                                        color: Colors.white,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Image.network(
-                                                cat.icon,
-                                                height: 30,
-                                                width: 30,
-                                                fit: BoxFit.contain,
-                                                errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Center(child: Text(cat.label, style: const TextStyle(fontSize: 10))),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              );
-                            }),
-                          ),
-                      ],
-                    );
-                  }),
-                ),
-
-
-
-                // Banner
-                SizedBox(height: 10),
-                DiscountBannerView(),
-                // Most booked services
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Text("Most booked services", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500,color: AppColors.textColor)),
-                ),
-                SizedBox(height: 10),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height*0.3,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: controller.services.length,
-                    itemBuilder: (context, index) {
-                      final service = controller.services[index]; // Corrected
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.asset(
-                                service['image']!,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                const Icon(Icons.star, color: Color(0xffC53F3F), size: 16),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${service['rating']} (${service['reviews']})',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (service['oldPrice'] != null)
-                              Row(
-                                children: [
-                                  Text(
-                                    '₹${service['oldPrice']}',
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      decoration: TextDecoration.lineThrough,
-                                    ),
-                                  ),SizedBox(width: 5,),Text(
-                                    '₹${service['price']}',
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                  
-                                    ),
-                                  ),
-                                ],
-                              ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                  
-                const SizedBox(height: 10),
-              ],
-            ),
+              ),
+              // Banner
+              const SizedBox(height: 10),
+            ],
           ),
         ),
       ),
@@ -496,7 +503,7 @@ class DiscountBannerView extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                onPressed: () {},
+                                onPressed: (){},
                                 child: Text(
                                   "Book now",
                                   style: TextStyle(

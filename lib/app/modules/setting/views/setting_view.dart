@@ -39,7 +39,7 @@ class SettingView extends GetView<SettingController> {
               padding: const EdgeInsets.only(left: 12,right: 12),
               child: Card(color: Colors.white,
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 12,right: 12),
+                  padding: const EdgeInsets.only(left: 16,right: 16),
                   child: Column(
                     children: [
                       SizedBox(
@@ -177,24 +177,7 @@ class SettingView extends GetView<SettingController> {
                           ],
                         ),
                       ),
-                      SizedBox(
-                        height: 56,
-                        child: Row(
-                          children: [
-                            Image.asset("assets/images/delete.png"),
-                            SizedBox(width: 20),
-                            Text(
-                              "Delete account",
-                              style: TextStyle(
-                                fontFamily: "poppins",
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xff114BCA),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+
                     ],
                   ),
                 ),

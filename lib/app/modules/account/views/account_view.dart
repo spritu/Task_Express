@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-
 import '../../../../colors.dart';
 import '../../add_address/views/add_address_view.dart';
 import '../../bottom/controllers/bottom_controller.dart';
 import '../../bottom/views/bottom_view.dart';
 import '../../edit_profile/views/edit_profile_view.dart';
+import '../../provider_profile/views/provider_profile_view.dart';
 import '../controllers/account_controller.dart';
 
 class AccountView extends GetView<AccountController> {
   const AccountView({super.key});
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Get.find<BottomController>().selectedIndex.value = 0; // 👈 Home tab
+        Get.find<BottomController>().selectedIndex.value = 0;
         Get.offAll(() => BottomView());
         return false;
       },
@@ -99,6 +97,44 @@ class AccountView extends GetView<AccountController> {
                       ),
                     ),
                     Card(
+                      child: Container(
+                       // height: 80,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              Image.asset("assets/images/service_provider.png",color: AppColors.orage,height: 16,width: 16,),
+                              SizedBox(width: 5,),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                  vertical: 5,
+
+                                ),
+                                child: Text(
+                                        'Join as a Service provider',
+                                        style: TextStyle(fontSize: 13,  fontFamily: "poppins",
+                                          fontWeight: FontWeight.w400,color: AppColors.orage,),
+                                      ),
+                              ),
+                              Spacer(),
+                              InkWell(
+                                onTap: () {
+                                  Get.to(ProviderProfileView());
+                                },
+                                child: Icon(Icons.arrow_forward_ios, size: 16,color: AppColors.orage,),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -161,6 +197,14 @@ class AccountView extends GetView<AccountController> {
                                   ),
                                 ],
                               ),
+                            ),  Divider(thickness: 1),
+                            buildList(
+                              context,
+                              Icons.delete, // still required but ignored if image is passed
+                              "Delete Account",
+                              Icons.arrow_forward_ios,
+                              textColor: Color(0xffFB4621),
+                              leadingImagePath: 'assets/images/delete.png',
                             ),
                           ],
                         ),
@@ -178,39 +222,48 @@ class AccountView extends GetView<AccountController> {
 }
 
 Widget buildList(
-  BuildContext context,
-  IconData leadingIcon,
-  String name,
-  IconData trailingIcon, {
-  TextSpan? richText,
-}) {
+    BuildContext context,
+    IconData leadingIcon,
+    String name,
+    IconData trailingIcon, {
+      TextSpan? richText,
+      Color textColor = Colors.black,
+      String? leadingImagePath, // 👈 for image instead of icon
+    }) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14),
     child: Row(
       children: [
-        Icon(leadingIcon, color: Colors.black87, size: 20),
+        leadingImagePath != null
+            ? Image.asset(
+          leadingImagePath,
+          width: 20,
+          height: 20,
+          color: Colors.black87, // optional: match icon color
+        )
+            : Icon(leadingIcon, color: Colors.black87, size: 20),
         const SizedBox(width: 12),
         Expanded(
-          child:
-              richText != null
-                  ? RichText(
-                    text: TextSpan(
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontFamily: "Poppins",
-                        color: Colors.black,
-                      ),
-                      children: [TextSpan(text: name), richText],
-                    ),
-                  )
-                  : Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontFamily: "Poppins",
-                      color: Colors.black,
-                    ),
-                  ),
+          child: richText != null
+              ? RichText(
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: 14,
+                fontFamily: "Poppins",
+                color: textColor,
+              ),
+              children: [TextSpan(text: name), richText],
+            ),
+          )
+              : Text(
+            name,
+            style: TextStyle(
+              fontSize: 13,
+              fontFamily: "Poppins",
+              color: textColor,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
         Icon(trailingIcon, size: 16, color: Colors.black54),
       ],

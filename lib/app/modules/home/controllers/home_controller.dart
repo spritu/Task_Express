@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../BricklayingHelper/views/bricklaying_helper_view.dart';
 import '../../CementHelper/views/cement_helper_view.dart';
 import '../../Scaffolding_helper/views/scaffolding_helper_view.dart';
+import '../../plastering_helper/views/plastering_helper_view.dart';
+import '../../road_construction_helper/views/road_construction_helper_view.dart';
+import '../../tile_fixing_helper/views/tile_fixing_helper_view.dart';
 
 class HomeController extends GetxController {
   // TODO: Implement WorknestController
@@ -31,18 +33,7 @@ class HomeController extends GetxController {
     return [];
   }
 
-  // void toggleServiceExpansion(String title) {
-  //   if (expandedServiceType.value == title) {
-  //     expandedServiceType.value = '';
-  //   } else {
-  //     expandedServiceType.value = title;
-  //   }
-  //   showAllCategories.value = false;
-  // }
 
-  // void toggleCategoryView() {
-  //   showAllCategories.value = !showAllCategories.value;
-  // }
 
   void fetchCategories() async {
     try {
@@ -73,6 +64,7 @@ class HomeController extends GetxController {
       print('❗ Error: $e');
     }
   }
+
 
 
 
@@ -132,21 +124,37 @@ class HomeController extends GetxController {
     }
   }
   void navigateToSubcategoryScreen(String name) {
-    switch (name.toLowerCase()) {
-      case 'bricklaying helper':
-        Get.to(() => BricklayingHelperView());
-        break;
-      case 'cement mixing helper':
-        Get.to(() => CementHelperView());
-        break;
-      case 'scaffolding helper':
-        Get.to(() => ScaffoldingHelperView());
-        break;
-    // Add more cases for other subcategories
-      default:
-        Get.snackbar("Coming Soon", "This service is not available yet");
-    }
+    //Get.back(); // Close bottom sheet
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+      switch (name.toLowerCase()) {
+        case 'bricklaying helper':
+          Get.to(() => BricklayingHelperView());
+          break;
+        case 'cement mixing helper':
+          Get.to(() => CementHelperView());
+          break;
+        case 'scaffolding helper':
+          Get.to(() => ScaffoldingHelperView());
+          break;
+        case 'Plastering Helper':
+          Get.to(() => PlasteringHelperView());
+          break;
+        case 'Tile Fixing Helper':
+          Get.to(() => TileFixingHelperView());
+          break;
+        case 'Road Construction Helper':
+          Get.to(() => RoadConstructionHelperView());
+          break;
+        case 'Electrician Helper':
+          Get.to(() => RoadConstructionHelperView());
+          break;
+        default:
+          Get.snackbar("Coming Soon", "This service is not available yet");
+      }
+    });
   }
+
   /// Called when search text changes
   void onSearchChanged(String value) {
     if (value.trim().isNotEmpty) {

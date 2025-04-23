@@ -5,6 +5,7 @@ import 'app/modules/Bottom2/controllers/bottom2_controller.dart';
 import 'app/modules/BricklayingHelper/controllers/bricklaying_helper_controller.dart';
 import 'app/modules/Scaffolding_helper/controllers/scaffolding_helper_controller.dart';
 import 'app/modules/account/controllers/account_controller.dart';
+import 'app/modules/booking/controllers/booking_controller.dart';
 import 'app/modules/bottom/controllers/bottom_controller.dart';
 import 'app/modules/chat/controllers/chat_controller.dart';
 import 'app/modules/edit_profile/controllers/edit_profile_controller.dart';
@@ -42,7 +43,7 @@ void main() {
   Get.put(BottomController());
   Get.put(HomeController());
   Get.put(PlasteringHelperController());
-  Get.put(BricklayingHelperController());
+  Get.put(BricklayingHelperController());Get.put(BookingController());
   Get.put(ScaffoldingHelperController());Get.put(AccountController());
   Get.put(TileFixingHelperController());Get.put(JobsDetailsController());
   Get.put(RoadConstructionHelperController());

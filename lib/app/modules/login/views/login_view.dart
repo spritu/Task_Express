@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../colors.dart';
+import '../../../../google_map.dart';
 import '../../location/views/location_view.dart';
 import '../../otp/views/otp_view.dart';
 
@@ -130,8 +131,8 @@ class LoginView extends GetView<LoginController> {
                     ),
                   ),
                 ),SizedBox(height: 20),
-                InkWell(onTap: (){
-                  controller.sendOtp();
+                InkWell(onTap: (){Get.to(MyMapScreen ());
+                 // controller.sendOtp();
                 },
                   child: Container(
                     height: 64,
