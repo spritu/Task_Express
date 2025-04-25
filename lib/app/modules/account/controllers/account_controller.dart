@@ -14,6 +14,7 @@ class AccountController extends GetxController {
     super.onInit();
     loadMobileNumber();
     loadUserInfo();
+    loadUserInfo();
   }
   Future<void> loadMobileNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -26,7 +27,7 @@ class AccountController extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     firstName.value = prefs.getString('firstName') ?? '';
     lastName.value = prefs.getString('lastName') ?? '';
-    print("👤 Loaded from SharedPreferences: $firstName $lastName");
+    print("👤Loaded from SharedPreferences: $firstName $lastName");
   }
   @override
   void onReady() {

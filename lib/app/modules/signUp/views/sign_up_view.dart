@@ -130,7 +130,8 @@ class SignUpView extends GetView<SignUpController> {
                   ),
                   child: TextButton(
                     onPressed: () { controller.registerUser();
-                    Get.to(() => LocationView());},
+                    //Get.to(() => LocationView());
+                    },
                     child: const Text("Proceed", style: TextStyle(color: Colors.white, fontSize: 16)),
                   ),
                 ),

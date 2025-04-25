@@ -56,6 +56,8 @@ abstract class Routes {
   static const HELP_SUPPORT = _Paths.HELP_SUPPORT;
   static const USER_HELP = _Paths.USER_HELP;
   static const REQUEST_PANDDING = _Paths.REQUEST_PANDDING;
+  static const ABOUT_TASKEXPRESS = _Paths.ABOUT_TASKEXPRESS;
+  static const PRIVACYDATA_VIEW = _Paths.PRIVACYDATA_VIEW;
 }
 
 abstract class _Paths {
@@ -113,4 +115,6 @@ abstract class _Paths {
   static const HELP_SUPPORT = '/help-support';
   static const USER_HELP = '/user-help';
   static const REQUEST_PANDDING = '/request-pandding';
+  static const ABOUT_TASKEXPRESS = '/about-taskexpress';
+  static const PRIVACYDATA_VIEW = '/privacydata-view';
 }

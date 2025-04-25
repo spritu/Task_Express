@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/AboutTaskexpress/bindings/about_taskexpress_binding.dart';
+import '../modules/AboutTaskexpress/views/about_taskexpress_view.dart';
 import '../modules/Activejob_screen/bindings/activejob_screen_binding.dart';
 import '../modules/Activejob_screen/views/activejob_screen_view.dart';
 import '../modules/AddressScreen/bindings/address_screen_binding.dart';
@@ -14,6 +16,8 @@ import '../modules/CementHelper/bindings/cement_helper_binding.dart';
 import '../modules/CementHelper/views/cement_helper_view.dart';
 import '../modules/HelpSupport/bindings/help_support_binding.dart';
 import '../modules/HelpSupport/views/help_support_view.dart';
+import '../modules/PrivacydataView/bindings/privacydata_view_binding.dart';
+import '../modules/PrivacydataView/views/privacydata_view_view.dart';
 import '../modules/RequestPandding/bindings/request_pandding_binding.dart';
 import '../modules/RequestPandding/views/request_pandding_view.dart';
 import '../modules/Scaffolding_helper/bindings/scaffolding_helper_binding.dart';
@@ -365,6 +369,16 @@ class AppPages {
       name: _Paths.REQUEST_PANDDING,
       page: () => const RequestPanddingView(),
       binding: RequestPanddingBinding(),
+    ),
+    GetPage(
+      name: _Paths.ABOUT_TASKEXPRESS,
+      page: () => const AboutTaskexpressView(),
+      binding: AboutTaskexpressBinding(),
+    ),
+    GetPage(
+      name: _Paths.PRIVACYDATA_VIEW,
+      page: () => const PrivacydataViewView(),
+      binding: PrivacydataViewBinding(),
     ),
   ];
 }

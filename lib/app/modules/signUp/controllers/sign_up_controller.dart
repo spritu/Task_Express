@@ -61,7 +61,7 @@ class SignUpController extends GetxController {
     pinCode.value = '';
     state.value = '';
     referralCode.value = '';
-   // imagePath.value = '';
+    // imagePath.value = '';
   }
 
   Future<void> registerUser() async {
@@ -166,8 +166,7 @@ class SignUpController extends GetxController {
 
   @override
   void onClose() {
- dobController.dispose();
+    dobController.dispose();
     super.onClose();
   }
 }
-

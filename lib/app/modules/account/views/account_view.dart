@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../colors.dart';
+import '../../AboutTaskexpress/views/about_taskexpress_view.dart';
 import '../../add_address/views/add_address_view.dart';
 import '../../bottom/controllers/bottom_controller.dart';
 import '../../bottom/views/bottom_view.dart';
@@ -180,22 +181,26 @@ class AccountView extends GetView<AccountController> {
                               Icons.arrow_forward_ios,
                             ),
                             Divider(thickness: 1),
-                            buildList(
-                              context,
-                              Icons.info_outline,
-                              "About ",
-                              Icons.arrow_forward_ios,
-                              richText: const TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: 'Task',
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                  TextSpan(
-                                    text: 'Express',
-                                    style: TextStyle(color: Colors.orange),
-                                  ),
-                                ],
+                            InkWell(onTap: (){
+                              Get.to(AboutTaskexpressView());
+                            },
+                              child: buildList(
+                                context,
+                                Icons.info_outline,
+                                "About ",
+                                Icons.arrow_forward_ios,
+                                richText: const TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: 'Task',
+                                      style: TextStyle(color: Colors.blue),
+                                    ),
+                                    TextSpan(
+                                      text: 'Express',
+                                      style: TextStyle(color: Colors.orange),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),  Divider(thickness: 1),
                             buildList(

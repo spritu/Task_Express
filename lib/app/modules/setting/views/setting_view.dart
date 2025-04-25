@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:get/get.dart';
 import '../../../../colors.dart';
+import '../../PrivacydataView/views/privacydata_view_view.dart';
 import '../../bottom/controllers/bottom_controller.dart';
 import '../../bottom/views/bottom_view.dart';
 import '../controllers/setting_controller.dart';
@@ -160,24 +161,26 @@ class SettingView extends GetView<SettingController> {
                             ),
                             Spacer(),
                             Obx(
-                                 () => FlutterSwitch(
-                                    width: 33.0,
-                                    height: 18.0,
+                                  () => FlutterSwitch(
+                                width: 33.0,
+                                height: 18.0,
                                 toggleSize: 21.0,
                                 value: controller.isPrivacyData.value,
                                 borderRadius: 30.0,
                                 padding: 1.0,
-                                activeColor:Color(0xff114BCA),
+                                activeColor: Color(0xff114BCA),
                                 inactiveColor: AppColors.grey,
                                 onToggle: (val) {
-                                  controller.togglePrivacyData();
+                                  controller.togglePrivacyData(); // toggle value
+                                  if (val) {
+                                    Get.to(() => PrivacydataViewView()); // navigate if turned on
+                                  }
                                 },
                               ),
                             ),
                           ],
                         ),
                       ),
-
                     ],
                   ),
                 ),
@@ -188,3 +191,5 @@ class SettingView extends GetView<SettingController> {
     );
   }
 }
+
+
