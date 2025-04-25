@@ -159,25 +159,8 @@ class SettingView extends GetView<SettingController> {
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                            Spacer(),
-                            Obx(
-                                  () => FlutterSwitch(
-                                width: 33.0,
-                                height: 18.0,
-                                toggleSize: 21.0,
-                                value: controller.isPrivacyData.value,
-                                borderRadius: 30.0,
-                                padding: 1.0,
-                                activeColor: Color(0xff114BCA),
-                                inactiveColor: AppColors.grey,
-                                onToggle: (val) {
-                                  controller.togglePrivacyData(); // toggle value
-                                  if (val) {
-                                    Get.to(() => PrivacydataViewView()); // navigate if turned on
-                                  }
-                                },
-                              ),
-                            ),
+
+
                           ],
                         ),
                       ),

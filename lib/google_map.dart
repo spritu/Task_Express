@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -11,8 +12,12 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   Completer<GoogleMapController> _controller = Completer();
   LatLng? _currentLatLng;
+
+  // Default location (if current location fails)
   final LatLng _defaultLatLng = LatLng(22.7196, 75.8577); // Indore
-  StreamSubscription<Position>? _positionStreamSubscription;
+
+  // Hardcoded plumber location (example coordinates)
+  final LatLng _plumberLatLng = LatLng(22.7220, 75.8605); // Customize plumber location here
 
   @override
   void initState() {
@@ -20,22 +25,15 @@ class _MapScreenState extends State<MapScreen> {
     _getPermissionAndLocation();
   }
 
-  @override
-  void dispose() {
-    // Stop the location service when the screen is disposed
-    _positionStreamSubscription?.cancel();
-    super.dispose();
-  }
-
   Future<void> _getPermissionAndLocation() async {
-    // Check if location services are enabled
+    // Check location service
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       await Geolocator.openLocationSettings();
       return;
     }
 
-    // Check for permission to access the location
+    // Check permissions
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -45,66 +43,80 @@ class _MapScreenState extends State<MapScreen> {
       }
     }
 
-    // Get the current position
+    // Get current position
     try {
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
       setState(() {
         _currentLatLng = LatLng(position.latitude, position.longitude);
       });
 
-      // Move camera to the current location
-      final GoogleMapController mapController = await _controller.future;
-      mapController.animateCamera(
-        CameraUpdate.newLatLngZoom(_currentLatLng!, 16),
-      );
+      _moveCameraToFitBoth();
     } catch (e) {
-      print("Error fetching location: $e");
+      print("❗ Error fetching location: $e");
       setState(() {
         _currentLatLng = _defaultLatLng;
       });
+      _moveCameraToFitBoth();
     }
+  }
 
-    // Stream location updates continuously (optional)
-    _positionStreamSubscription = Geolocator.getPositionStream(
-      locationSettings: LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10,
+  Future<void> _moveCameraToFitBoth() async {
+    if (_currentLatLng == null || !_controller.isCompleted) return;
+
+    final GoogleMapController controller = await _controller.future;
+
+    // Calculate bounds to show both current location and plumber location
+    LatLngBounds bounds = LatLngBounds(
+      southwest: LatLng(
+        min(_currentLatLng!.latitude, _plumberLatLng.latitude),
+        min(_currentLatLng!.longitude, _plumberLatLng.longitude),
       ),
-    ).listen((Position position) async {
-      setState(() {
-        _currentLatLng = LatLng(position.latitude, position.longitude);
-      });
+      northeast: LatLng(
+        max(_currentLatLng!.latitude, _plumberLatLng.latitude),
+        max(_currentLatLng!.longitude, _plumberLatLng.longitude),
+      ),
+    );
 
-      final GoogleMapController mapController = await _controller.future;
-      mapController.animateCamera(
-        CameraUpdate.newLatLngZoom(_currentLatLng!, 16),
-      );
-    });
+    controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Google Map with Location")),
+      appBar: AppBar(title: const Text("Current Location & Plumber")),
       body: _currentLatLng == null
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : GoogleMap(
         initialCameraPosition: CameraPosition(
-          target: LatLng(22.7196, 75.8577), // Indore
+          target: _currentLatLng!,
           zoom: 14,
         ),
-        markers: {
-          Marker(
-            markerId: MarkerId("currentLocation"),
-            position: _currentLatLng ?? _defaultLatLng,
-          ),
-        },
+        myLocationEnabled: true,
+        myLocationButtonEnabled: true,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
         },
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
+        markers: {
+          Marker(
+            markerId: const MarkerId("currentLocation"),
+            position: _currentLatLng!,
+            infoWindow: const InfoWindow(title: "You are here"),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueAzure,
+            ),
+          ),
+          Marker(
+            markerId: const MarkerId("plumberLocation"),
+            position: _plumberLatLng,
+            infoWindow: const InfoWindow(title: "Plumber"),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueGreen,
+            ),
+          ),
+        },
       ),
     );
   }

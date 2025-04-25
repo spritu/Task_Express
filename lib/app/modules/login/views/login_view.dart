@@ -132,9 +132,9 @@ class LoginView extends GetView<LoginController> {
                   ),
                 ),SizedBox(height: 20),
                 InkWell(onTap: (){
-                  //Get.to(MapScreen ());
+                 // Get.to(MapScreen ());
                   controller.sendOtp();
-                },
+                  },
                   child: Container(
                     height: 64,
                     width: MediaQuery.of(context).size.width*0.6,

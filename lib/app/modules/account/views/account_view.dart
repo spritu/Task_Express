@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../colors.dart';
@@ -50,10 +52,19 @@ class AccountView extends GetView<AccountController> {
                           color: Colors.white,
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding:  EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              Image.asset("assets/images/account.png"),
+                              Obx(() => CircleAvatar(
+                                radius: 40,
+                                backgroundImage: FileImage(File(controller.imagePath.value)),
+
+
+
+                              ))
+                              ,
+
+                              // Image.asset("assets/images/account.png"),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8.0,

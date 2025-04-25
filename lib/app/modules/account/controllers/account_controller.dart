@@ -7,6 +7,7 @@ class AccountController extends GetxController {
   final count = 0.obs;
   final RxString firstName = ''.obs;
   final RxString lastName = ''.obs;
+  final RxString imagePath = ''.obs;
 
 
   @override
@@ -14,7 +15,8 @@ class AccountController extends GetxController {
     super.onInit();
     loadMobileNumber();
     loadUserInfo();
-    loadUserInfo();
+
+
   }
   Future<void> loadMobileNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -27,7 +29,10 @@ class AccountController extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     firstName.value = prefs.getString('firstName') ?? '';
     lastName.value = prefs.getString('lastName') ?? '';
+  imagePath.value = prefs.getString('userImg') ?? '';// ✅ Load image URL
+    print("👤 Loaded: $firstName $lastName, 📸 Image: ${imagePath.value}");
     print("👤Loaded from SharedPreferences: $firstName $lastName");
+
   }
   @override
   void onReady() {

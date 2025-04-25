@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
@@ -17,6 +17,7 @@ class SignUpController extends GetxController {
   final dateOfBirth = ''.obs;
   final email = ''.obs;
   final city = ''.obs;
+
   final pinCode = ''.obs;
   final state = ''.obs;
   final referralCode = ''.obs;
@@ -28,9 +29,10 @@ class SignUpController extends GetxController {
     final XFile? image = await _picker.pickImage(source: source);
     if (image != null) {
       imagePath.value = image.path;
-      update();
     }
   }
+  File getImageFile() => File(imagePath.value);
+
   void _loadUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
@@ -107,7 +109,7 @@ class SignUpController extends GetxController {
         String? userId;
         String? fName;
         String? lName;
-        String? dob;  String? email;String? gender;
+        String? dob;  String? email;String? gender;String? userImg;
         // 🧠 Find user data in the response
         Map<String, dynamic>? userData;
         if (decodedResponse.containsKey('data')) {
@@ -122,7 +124,7 @@ class SignUpController extends GetxController {
           userId = userData['_id'];
           fName = userData['firstName'];
           lName = userData['lastName'];  dob = userData['dateOfBirth'];  email = userData['email'];
-          gender = userData['gender'];
+          gender = userData['gender']; userImg = userData['userImg'];
         }
 
         if (userId != null && fName != null && lName != null && dob != null && email != null && gender != null) {
@@ -131,8 +133,10 @@ class SignUpController extends GetxController {
           await prefs.setString('firstName', fName);
           await prefs.setString('lastName', lName);  await prefs.setString('dob', dob);  await prefs.setString('email', email);
           await prefs.setString('gender', gender);
-          print("✅ Stored User ID: $userId, Name: $fName $lName $dob $email");
 
+          if (userImg != null) {
+            await prefs.setString('userImg', imagePath.value); // ✅ save image to SharedPreferences
+          }
           // Optional: Refresh controller if already in memory
           Get.delete<AccountController>();
           Get.put(AccountController());
@@ -145,6 +149,7 @@ class SignUpController extends GetxController {
         Get.snackbar('Success', 'Registration Successful');
         clearFields();
         Get.to(() => LocationView());
+        print("✅ Stored User ID: $userId, Name: $fName $lName $dob $email, Image: $userImg");
       } else {
         print('❌ Server Error (${response.statusCode}): $resBody');
         Get.snackbar('Error', 'Server returned ${response.statusCode}');
