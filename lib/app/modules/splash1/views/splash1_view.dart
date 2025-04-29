@@ -12,7 +12,7 @@ class Splash1View extends GetView<Splash1Controller> {
       backgroundColor: AppColors.white,
       body: Container(decoration: BoxDecoration( gradient: LinearGradient(
         begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
+        end: Alignment.center,
         colors: [
           Color(0xFF87AAF6),
           Colors.white,
@@ -25,40 +25,54 @@ class Splash1View extends GetView<Splash1Controller> {
               mainAxisSize: MainAxisSize.min, // shrink column to content size
               children: [
                 Image.asset("assets/images/icon.png"),
-                SizedBox(height: 20),
+              //  SizedBox(height: 10),
                 Text.rich(
                   TextSpan(
                     children: [
                       TextSpan(
                         text: 'Task',
                         style: TextStyle(
-                            color: Color(0xff114BCA),
-                            fontSize: 42,
-                            fontWeight: FontWeight.w800),
+                          fontFamily: 'Montserrat',
+                          color: Color(0xff114BCA),
+                          fontSize: 42,
+                          fontWeight: FontWeight.w800,
+                          height: 0.476, // equivalent to 20px line-height
+                          letterSpacing: 2.1, // 5% of 42
+                        ),
                       ),
                       TextSpan(
                         text: 'Express',
                         style: TextStyle(
-                            color: Color(0xffF67C0A),
-                            fontSize: 42,
-                            fontWeight: FontWeight.w800),
+                          fontFamily: 'Montserrat',
+                          color: Color(0xffF67C0A),
+                          fontSize: 42,
+                          fontWeight: FontWeight.w800,
+                          height: 0.476,
+                          letterSpacing: 2.1,
+                        ),
                       ),
                     ],
                   ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Find Trusted Service Providers\n Instantly!',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -1.0,
-                    height: 1.2,
-                    color: Color(0xff2D2D2D),
+                ),
+
+                SizedBox(height: 19),
+                Center(
+                  child: Text(
+                    'Find Trusted Service Providers\n Instantly!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                      height: 1.857, // line-height equivalent
+                      letterSpacing: 1.54, // 11% of 14px
+                      color: Color(0xff2D2D2D),
+                    ),
                   ),
                 ),
-                SizedBox(height: 20),
+
+                SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

@@ -42,11 +42,11 @@ class ChatView extends GetView<ChatController> {
                             ),
                           ),
                           const Spacer(),
-                          IconButton(
-                            icon: const Icon(Icons.call, color: Colors.black),
-                            onPressed: () {
-                              // Call logic
-                            },
+                          Row(
+                            children: [ Image.asset("assets/images/i.png"),SizedBox(width: 9),
+                            Image.asset("assets/images/person.png"),SizedBox(width: 9),
+                             Icon(Icons.call, color: Colors.black),
+                            ],
                           ),
                         ],
                       ),

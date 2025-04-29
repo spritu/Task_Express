@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:worknest/colors.dart';
+import '../../AddressScreen/views/address_screen_view.dart';
 import '../../bottom/views/bottom_view.dart';
 import '../controllers/location_controller.dart';
 
@@ -92,7 +93,9 @@ class LocationView extends GetView<LocationController> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.to(AddressScreenView());
+                  },
                   child: Text(
                     "Choose another Location",
                     style: TextStyle(

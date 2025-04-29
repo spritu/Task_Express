@@ -58,6 +58,7 @@ abstract class Routes {
   static const REQUEST_PANDDING = _Paths.REQUEST_PANDDING;
   static const ABOUT_TASKEXPRESS = _Paths.ABOUT_TASKEXPRESS;
   static const PRIVACYDATA_VIEW = _Paths.PRIVACYDATA_VIEW;
+  static const SPLASH_SCREEN = _Paths.SPLASH_SCREEN;
 }
 
 abstract class _Paths {
@@ -117,4 +118,5 @@ abstract class _Paths {
   static const REQUEST_PANDDING = '/request-pandding';
   static const ABOUT_TASKEXPRESS = '/about-taskexpress';
   static const PRIVACYDATA_VIEW = '/privacydata-view';
+  static const SPLASH_SCREEN = '/splash-screen';
 }

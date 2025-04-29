@@ -2,10 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../colors.dart';
-import '../../../../google_map.dart';
-import '../../location/views/location_view.dart';
 import '../../otp/views/otp_view.dart';
-
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -16,55 +13,65 @@ class LoginView extends GetView<LoginController> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SingleChildScrollView(
-        child: Container(decoration: BoxDecoration( gradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-        Color(0xFF87AAF6),
-    Colors.white,
-    ],
-    ),),
-        //  margin: EdgeInsets.only(left: 16, right: 16),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.center,
+              colors: [Color(0xFF87AAF6), Colors.white],
+            ),
+          ),
           alignment: Alignment.center,
           child: Padding(
-            padding: const EdgeInsets.only(left: 16,right: 16),
+            padding: const EdgeInsets.only(left: 16, right: 16),
             child: Column(
-              // mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: [SizedBox(height: MediaQuery.of(context).size.height*0.2),
-
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.2),
                 Text.rich(
                   TextSpan(
                     children: [
                       TextSpan(
                         text: 'Task',
                         style: TextStyle(
-                            color: Color(0xff114BCA),
-                            fontSize: 42,
-                            fontWeight: FontWeight.w800),
+                          fontFamily: 'Montserrat',
+                          color: Color(0xff114BCA),
+                          fontSize: 42,
+                          fontWeight: FontWeight.w800,
+                          height: 0.476, // equivalent to 20px line-height
+                          letterSpacing: 2.1, // 5% of 42
+                        ),
                       ),
                       TextSpan(
                         text: 'Express',
                         style: TextStyle(
-                            color: Color(0xffF67C0A),
-                            fontSize: 42,
-                            fontWeight: FontWeight.w800),
+                          fontFamily: 'Montserrat',
+                          color: Color(0xffF67C0A),
+                          fontSize: 42,
+                          fontWeight: FontWeight.w800,
+                          height: 0.476,
+                          letterSpacing: 2.1,
+                        ),
                       ),
                     ],
                   ),
+                  textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 10),
+
+                SizedBox(height: 14),
                 Text(
                   'Find Trusted Service Providers\n Instantly!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontFamily: 'Poppins',
                     fontWeight: FontWeight.w600,
-                    letterSpacing: -1.0,
-                    height: 1.2,
+                    fontSize: 12,
+                    height: 1.857, // line-height equivalent
+                    letterSpacing: 1.54, // 11% of 14px
                     color: Color(0xff2D2D2D),
                   ),
                 ),
+
                 SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -99,50 +106,44 @@ class LoginView extends GetView<LoginController> {
                             fontWeight: FontWeight.w400)),
                   ],
                 ),
-                SizedBox(height: 30),
+                 SizedBox(height: MediaQuery.of(context).size.height*0.1),
                 TextField(
                   controller: controller.mobileController,
                   keyboardType: TextInputType.phone,
-                //  maxLength: 10,
                   decoration: InputDecoration(
                     labelText: 'Mobile Number',
-                    prefixIcon: Padding(
+                    prefixIcon: const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                      child: Text(
-                        "+91",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
+                      child: Text("+91", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12), // Rounded border
-                      borderSide: BorderSide(color: Colors.blue, width: 1.5),
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.blue, width: 1.5),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey, width: 1.5),
+                      borderSide: const BorderSide(color: Colors.grey, width: 1.5),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.blue, width: 2),
+                      borderSide: const BorderSide(color: Colors.blue, width: 2),
                     ),
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 12,
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
                   ),
-                ),SizedBox(height: 20),
-                InkWell(onTap: (){
-                 // Get.to(MapScreen ());
-                  controller.sendOtp();
+                ),
+                const SizedBox(height: 20),
+                InkWell(
+                  onTap: () {
+                    controller.sendOtp(); // ✅ Already updated
                   },
                   child: Container(
                     height: 64,
-                    width: MediaQuery.of(context).size.width*0.6,
+                    width: MediaQuery.of(context).size.width * 0.6,
                     decoration: BoxDecoration(
-                      color: Color(0xff235CD7),
+                      color: const Color(0xff235CD7),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Text(
                         "Get Verification Code",
                         style: TextStyle(
@@ -154,33 +155,30 @@ class LoginView extends GetView<LoginController> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
-
+                const SizedBox(height: 20),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.2),
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    style: TextStyle(color: Colors.black, fontSize: 14),
+                    style: const TextStyle(color: Colors.black, fontSize: 14),
                     children: [
-                      TextSpan(text: 'By continuing, you agree to our'),
+                      const TextSpan(text: 'By continuing, you agree to our'),
                       TextSpan(
                         text: '\nTerms & Conditions',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xff235CD7),
                           fontWeight: FontWeight.bold,
                         ),
-                        recognizer:
-                        TapGestureRecognizer()..onTap = controller.openTerms,
+                        recognizer: TapGestureRecognizer()..onTap = controller.openTerms,
                       ),
-                      TextSpan(text: ' and '),
+                      const TextSpan(text: ' and '),
                       TextSpan(
                         text: 'Privacy Policy',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xff235CD7),
                           fontWeight: FontWeight.bold,
                         ),
-                        recognizer:
-                        TapGestureRecognizer()..onTap = controller.openPrivacy,
+                        recognizer: TapGestureRecognizer()..onTap = controller.openPrivacy,
                       ),
                     ],
                   ),

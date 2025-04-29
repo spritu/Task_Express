@@ -1,15 +1,16 @@
 import 'dart:convert';
+import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../otp/views/otp_view.dart';
 
 class LoginController extends GetxController {
-  //TODO: Implement LoginController
   final TextEditingController mobileController = TextEditingController();
   var isChecked = false.obs; // Observable state
+  final box = GetStorage(); // <<<< ADDED GetStorage box
+
   void toggleCheck(bool value) {
     isChecked.value = value;
   }
@@ -40,11 +41,17 @@ class LoginController extends GetxController {
         final responseBody = await response.stream.bytesToString();
         print("✅ OTP sent successfully: $responseBody");
 
-        // Save phone number for OTP verification
+        // ✅ Save phone number for OTP verification
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('mobileNumber', phone);
 
-        Get.to(() => OtpView()); // Navigate to OTP screen
+        // ✅ Save Login State TRUE using GetStorage
+        await box.write('isLoggedIn', true);
+        await box.write('mobile', phone); // (optional) mobile bhi save karlo if needed
+        mobileController.clear();
+        // ✅ Navigate to OTP Screen
+        Get.to(() => OtpView());
+
       } else {
         print("❌ Failed to send OTP: ${response.reasonPhrase}");
         Get.snackbar("Error", "Failed to send OTP: ${response.reasonPhrase}");
@@ -55,12 +62,10 @@ class LoginController extends GetxController {
     }
   }
 
-
-
   void openTerms() {
     print('Terms & Conditions clicked');
-
   }
+
   final String baseUrl = 'https://dg-sandbox.setu.co/api/okyc';
   final String clientId = 'test-client';
   final String clientSecret = 'YOUR_CLIENT_SECRET';
@@ -90,11 +95,13 @@ class LoginController extends GetxController {
       throw Exception('Failed to verify Aadhaar card: ${response.reasonPhrase}');
     }
   }
+
   void openPrivacy() {
     print('Privacy Policy clicked');
-    // Aap yahan Get.toNamed('/privacy') ya URL launch kar sakte hain
   }
+
   final count = 0.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -108,6 +115,7 @@ class LoginController extends GetxController {
   @override
   void onClose() {
     super.onClose();
+    mobileController.dispose(); // controller dispose karna zaroori hai
   }
 
   void increment() => count.value++;

@@ -87,6 +87,8 @@ class ProfileView extends GetView<ProfileController> {
                 const SizedBox(height: 12),
                 buildTextField("Email", "Enter email"),
                 const SizedBox(height: 12),
+                buildDropdown("State", "Select your State"),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     SizedBox(width: MediaQuery.of(context).size.width*0.5,
@@ -96,8 +98,7 @@ class ProfileView extends GetView<ProfileController> {
                         child: buildTextField("Pin Code", "Enter pin code")),
                   ],
                 ),
-                const SizedBox(height: 12),
-                buildDropdown("State", "Select your State"),
+
                 const SizedBox(height: 12),
                 buildTextField("Referral Code", "Enter referral code"),
                 const SizedBox(height: 30),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../BricklayingHelper/views/bricklaying_helper_view.dart';
 import '../../CementHelper/views/cement_helper_view.dart';
 import '../../Scaffolding_helper/views/scaffolding_helper_view.dart';
@@ -11,19 +12,21 @@ import '../../tile_fixing_helper/views/tile_fixing_helper_view.dart';
 
 class HomeController extends GetxController {
   // TODO: Implement WorknestController
-
+  final houseNo = Rx<String>('');
+  final landMark = Rx<String>('');
+  final addressType = Rx<String>('');
+  final contactNo = Rx<String>('');
   RxList<CategoryModel> allCategories = <CategoryModel>[].obs;
   RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
   RxList<CategoryModel> fixedChargeHelpers = <CategoryModel>[].obs;
 
-  RxString expandedServiceType = ''.obs;
+  var expandedServiceType = ''.obs;
   RxBool showAllCategories = false.obs;
 
-  List<Map<String, String>> serviceTypes = [
-    {'title': 'Visiting Professionals', 'icon': '👷'},
-    {'title': 'Fixed charge Helpers', 'icon': '🤖'},
-  ];
-
+  var serviceTypes = [
+    {'title': 'Visiting Professionals'},
+    {'title': 'Fixed charge Helpers'},
+  ].obs;
   List<CategoryModel> get categories {
     if (expandedServiceType.value == 'Visiting Professionals') {
       return visitingProfessionals;
@@ -33,6 +36,67 @@ class HomeController extends GetxController {
     return [];
   }
 
+  Future<void> fetchAddress() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString('userId');  // Retrieve the userId from SharedPreferences
+
+      if (userId == null) {
+        print("User ID not found");
+        return;
+      }
+
+      var headers = {'Content-Type': 'application/json'};
+      var request = http.Request('POST', Uri.parse('https://jdapi.youthadda.co/user/getmyaddress'));
+      request.body = json.encode({
+        "userId": userId,  // Use the dynamic userId
+      });
+      request.headers.addAll(headers);
+
+      print("Sending request...");
+
+      http.StreamedResponse response = await request.send();
+
+      print("Response received, status code: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        var responseString = await response.stream.bytesToString();
+        print("Raw Response: $responseString");
+
+        var jsonResponse = json.decode(responseString);
+
+        if (jsonResponse['data'] != null && jsonResponse['data'].isNotEmpty) {
+          var addressesList = jsonResponse['data'];  // List of addresses
+
+          // Clear any previous address data
+          houseNo.value = '';
+          landMark.value = '';
+          addressType.value = '';
+          contactNo.value = '';
+
+          // Select the last address from the list
+          var lastAddress = addressesList.last;  // Using the last address in the list
+
+          // Storing the fetched address fields (using the last one here)
+          houseNo.value = lastAddress['houseNo'] ?? '';
+          landMark.value = lastAddress['landMark'] ?? '';
+          addressType.value = lastAddress['addressType'] ?? '';
+          contactNo.value = lastAddress['contactNo'] ?? '';
+
+          print("Fetched houseNo: ${houseNo.value}");
+          print("Fetched landMark: ${landMark.value}");
+          print("Fetched addressType: ${addressType.value}");
+          print("Fetched contactNo: ${contactNo.value}");
+        } else {
+          print("Data empty or not found in response");
+        }
+      } else {
+        print("Request failed: ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("Exception occurred: $e");
+    }
+  }
 
 
   void fetchCategories() async {
@@ -74,8 +138,12 @@ class HomeController extends GetxController {
   }
 
   // To expand or collapse specific service type category
-  void toggleServiceExpansion(String serviceType) {
-    expandedServiceType.value = serviceType;
+  void toggleServiceExpansion(String title) {
+    if (expandedServiceType.value == title) {
+      expandedServiceType.value = ''; // Collapse if already selected
+    } else {
+      expandedServiceType.value = title; // Expand the clicked one
+    }
   }
 
 
@@ -85,6 +153,10 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     fetchCategories();
+    if (serviceTypes.isNotEmpty) {
+      expandedServiceType.value = serviceTypes.first['title']!;
+      fetchAddress();
+    }
     super.onInit();
   }
 
@@ -210,41 +282,41 @@ class HomeController extends GetxController {
   final services = [
     {
       'image': 'assets/images/plumber.png',
-      'rating': '4.7',
+      'Name': 'Plumber',
       'reviews': '1.2k',
       'oldPrice': '1299',
       'price': '600',
     },
     {
       'image': 'assets/images/plumber.png',
-      'rating': '4.8',
+      'Name': 'Electretion',
       'reviews': '7.1k',
       'oldPrice': '1299',
       'price': '600',
     },
     {
       'image': 'assets/images/plumber.png',
-      'rating': '4.2',
+      'Name': 'House Cleaning',
       'reviews': '2.4k',
       'oldPrice': '1299',
       'price': '600',
     },
     {
       'image': 'assets/images/plumber.png',
-      'rating': '4.2',
+      'Name': 'Laundry',
       'reviews': '2.4k',
       'price': '600',
     },
     {
       'image': 'assets/images/plumber.png',
-      'rating': '4.2',
+      'Name': 'Carpenter',
       'reviews': '2.4k',
       'oldPrice': '1299',
       'price': '600',
     },
     {
       'image': 'assets/images/plumber.png',
-      'rating': '4.2',
+      'Name': 'Pest Control',
       'reviews': '2.4k',
       'oldPrice': '1299',
       'price': '600',

@@ -100,6 +100,8 @@ import '../modules/splash2/bindings/splash2_binding.dart';
 import '../modules/splash2/views/splash2_view.dart';
 import '../modules/splash3/bindings/splash3_binding.dart';
 import '../modules/splash3/views/splash3_view.dart';
+import '../modules/splash_screen/bindings/splash_screen_binding.dart';
+import '../modules/splash_screen/views/splash_screen_view.dart';
 import '../modules/tile_fixing_helper/bindings/tile_fixing_helper_binding.dart';
 import '../modules/tile_fixing_helper/views/tile_fixing_helper_view.dart';
 import '../modules/user_help/bindings/user_help_binding.dart';
@@ -172,7 +174,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.SIGN_UP,
-      page: () => const SignUpView(),
+      page: () =>  SignUpView(),
       binding: SignUpBinding(),
     ),
     GetPage(
@@ -379,6 +381,11 @@ class AppPages {
       name: _Paths.PRIVACYDATA_VIEW,
       page: () => const PrivacydataViewView(),
       binding: PrivacydataViewBinding(),
+    ),
+    GetPage(
+      name: _Paths.SPLASH_SCREEN,
+      page: () => const SplashScreenView(),
+      binding: SplashScreenBinding(),
     ),
   ];
 }

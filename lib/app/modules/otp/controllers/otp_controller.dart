@@ -41,7 +41,7 @@ class OtpController extends GetxController {
 
   Future<void> verifyOtp(String otp) async {
     if (otp.isEmpty || otp.length != 4) {
-      Get.snackbar("Error", "Please enter a valid 4-digit OTP");
+    //  Get.snackbar("Error", "Please enter a valid 4-digit OTP");
       return;
     }
 
@@ -77,24 +77,24 @@ class OtpController extends GetxController {
 
         print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
 
-        Get.snackbar("Success", responseData['msg']);
+        Get.snackbar("✅ Success", responseData['msg'],colorText: Colors.green);
 
         // Save important values
         prefs.setString('token', responseData['token']);
         prefs.setInt('userType', responseData['userType']);
         prefs.setString('userId', responseData['id']);
         prefs.setString('email', responseData['userData']['email']);
-
+        otpController.clear();
         // Navigate to next screen or dashboard
         Get.to(() => SignUpView());
 
       } else {
         print("❌ Failed to verify OTP: ${response.body}");
-        Get.snackbar("Error", "Failed to verify OTP: ${response.body}");
+        Get.snackbar("", "❌ Failed to verify OTP: ${response.body}",colorText: Colors.red);
       }
     } catch (e) {
       print("❌ Exception: $e");
-      Get.snackbar("Error", "Something went wrong: $e");
+     Get.snackbar("", "❌ Something went wrong: $e",colorText: Colors.red);
     }
   }
 

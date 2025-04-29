@@ -1,5 +1,9 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../join/views/join_view.dart';
+import '../../login/views/login_view.dart';
 
 class AccountController extends GetxController {
   //TODO: Implement AccountController
@@ -15,9 +19,19 @@ class AccountController extends GetxController {
     super.onInit();
     loadMobileNumber();
     loadUserInfo();
-
-
   }
+
+  Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    Get.offAllNamed('/login'
+        '');
+    final box = GetStorage();
+    box.erase();
+
+   // Get.offAll(() => LoginView());
+  }
+
   Future<void> loadMobileNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final number = prefs.getString('mobileNumber') ?? '';

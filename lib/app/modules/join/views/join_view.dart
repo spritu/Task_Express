@@ -16,7 +16,7 @@ class JoinView extends GetView<JoinController> {
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration( gradient: LinearGradient(
             begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            end: Alignment.center,
             colors: [
               Color(0xFF87AAF6),
               Colors.white,
@@ -39,32 +39,44 @@ class JoinView extends GetView<JoinController> {
                       TextSpan(
                         text: 'Task',
                         style: TextStyle(
-                            color: Color(0xff114BCA),
-                            fontSize: 42,
-                            fontWeight: FontWeight.w800),
+                          fontFamily: 'Montserrat',
+                          color: Color(0xff114BCA),
+                          fontSize: 42,
+                          fontWeight: FontWeight.w800,
+                          height: 0.476, // equivalent to 20px line-height
+                          letterSpacing: 2.1, // 5% of 42
+                        ),
                       ),
                       TextSpan(
                         text: 'Express',
                         style: TextStyle(
-                            color: Color(0xffF67C0A),
-                            fontSize: 42,
-                            fontWeight: FontWeight.w800),
+                          fontFamily: 'Montserrat',
+                          color: Color(0xffF67C0A),
+                          fontSize: 42,
+                          fontWeight: FontWeight.w800,
+                          height: 0.476,
+                          letterSpacing: 2.1,
+                        ),
                       ),
                     ],
                   ),
+                  textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 10),
+
+                SizedBox(height: 14),
                 Text(
                   'Find Trusted Service Providers\n Instantly!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontFamily: 'Poppins',
                     fontWeight: FontWeight.w600,
-                    letterSpacing: -1.0,
-                    height: 1.2,
+                    fontSize: 12,
+                    height: 1.857, // line-height equivalent
+                    letterSpacing: 1.54, // 11% of 14px
                     color: Color(0xff2D2D2D),
                   ),
                 ),
+
                 SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -99,101 +111,124 @@ class JoinView extends GetView<JoinController> {
                             fontWeight: FontWeight.w400)),
                   ],
                 ),
-                SizedBox(height: 40),
-                SizedBox(width: MediaQuery.of(context).size.width*0.7,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Find & book services easily",
-                        style: TextStyle(
-                          color: AppColors.textColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),SizedBox(height: 5),
-                Container(
-                  height: 63,width: MediaQuery.of(context).size.width*0.7,
-                  decoration: BoxDecoration(
-                    color: Color(0xFF0047FF), // Deep blue
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 12,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: TextButton.icon(
-                    onPressed: () {Get.to(LoginView());},
-                    icon: Icon(
-                      Icons.person,size: 24,
-                      color: Colors.white,
-                    ),
-                    label: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        "Join as a User",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 30),
-                SizedBox(width: MediaQuery.of(context).size.width*0.7,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Offer your skills & start earning",
-                        style: TextStyle(
-                          color: AppColors.textColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),SizedBox(height: 5),
-                Container(
-                  height: 63,width: MediaQuery.of(context).size.width*0.7,
-                  decoration: BoxDecoration(
-                    color: Color(0xffF67C0A), // Deep blue
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 12,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: TextButton.icon(
-                    onPressed: () {
-                      Get.to(ProviderLoginView());
-                    },
-                    icon:
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.1),
 
-                    Image.asset("assets/images/service_provider.png",height: 24,width: 24,color: Colors.white,),
-                    label: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        "Join as a Provider",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                    // Top info text
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Find & book services easily",
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: 'Poppins',
+                            color: AppColors.textColor,
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                    SizedBox(height: 8),
+
+                    // User Button
+                    Container(
+                      height: 55,
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF0047FF),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: TextButton.icon(
+                        onPressed: () => Get.to(LoginView()),
+                        icon: Icon(Icons.person, color: Colors.white, size: 20),
+                        label: Text(
+                          "Join as a User",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'Poppins',
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 30),
+
+                    // Bottom info text
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "Offer your skills & start earning",
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: 'Poppins',
+                            color: AppColors.textColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+
+                    // Provider Button
+                    Container(
+                      height: 55,
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      decoration: BoxDecoration(
+                        color: Color(0xffF67C0A),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: TextButton.icon(
+                        onPressed: () => Get.to(ProviderLoginView()),
+                        icon: Image.asset(
+                          "assets/images/service_provider.png",
+                          height: 20,
+                          width: 20,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          "Join as a Provider",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'Poppins',
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+
                 SizedBox(height: 20),
 
               ],

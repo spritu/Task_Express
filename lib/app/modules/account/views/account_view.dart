@@ -13,6 +13,7 @@ import '../controllers/account_controller.dart';
 
 class AccountView extends GetView<AccountController> {
   const AccountView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -33,8 +34,7 @@ class AccountView extends GetView<AccountController> {
                 child: Column(
                   children: [
                     SizedBox(height: 20),
-                    const
-                    Text(
+                    const Text(
                       "Account",
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
@@ -52,24 +52,23 @@ class AccountView extends GetView<AccountController> {
                           color: Colors.white,
                         ),
                         child: Padding(
-                          padding:  EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              Obx(() => CircleAvatar(
-                                radius: 40,
-                                backgroundImage: FileImage(File(controller.imagePath.value)),
-
-
-
-                              ))
-                              ,
+                              Obx(
+                                () => CircleAvatar(
+                                  radius: 40,
+                                  backgroundImage: FileImage(
+                                    File(controller.imagePath.value),
+                                  ),
+                                ),
+                              ),
 
                               // Image.asset("assets/images/account.png"),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8.0,
                                   vertical: 10,
-
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -77,8 +76,11 @@ class AccountView extends GetView<AccountController> {
                                     Obx(() {
                                       return Text(
                                         ' ${controller.firstName.value} ${controller.lastName.value}',
-                                        style: TextStyle(fontSize: 14,  fontFamily: "poppins",
-                                          fontWeight: FontWeight.w500,),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontFamily: "poppins",
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       );
                                     }),
                                     Obx(() {
@@ -110,7 +112,7 @@ class AccountView extends GetView<AccountController> {
                     ),
                     Card(
                       child: Container(
-                       // height: 80,
+                        // height: 80,
                         width: double.infinity,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -120,26 +122,38 @@ class AccountView extends GetView<AccountController> {
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
                             children: [
-                              Image.asset("assets/images/service_provider.png",color: AppColors.orage,height: 16,width: 16,),
-                              SizedBox(width: 5,),
+                              Image.asset(
+                                "assets/images/service_provider.png",
+                                color: AppColors.orage,
+                                height: 16,
+                                width: 16,
+                              ),
+                              SizedBox(width: 5),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8.0,
                                   vertical: 5,
-
                                 ),
                                 child: Text(
-                                        'Join as a Service provider',
-                                        style: TextStyle(fontSize: 13,  fontFamily: "poppins",
-                                          fontWeight: FontWeight.w400,color: AppColors.orage,),
-                                      ),
+                                  'Join as a Service provider',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontFamily: "poppins",
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.orage,
+                                  ),
+                                ),
                               ),
                               Spacer(),
                               InkWell(
                                 onTap: () {
                                   Get.to(ProviderProfileView());
                                 },
-                                child: Icon(Icons.arrow_forward_ios, size: 16,color: AppColors.orage,),
+                                child: Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 16,
+                                  color: AppColors.orage,
+                                ),
                               ),
                             ],
                           ),
@@ -192,9 +206,10 @@ class AccountView extends GetView<AccountController> {
                               Icons.arrow_forward_ios,
                             ),
                             Divider(thickness: 1),
-                            InkWell(onTap: (){
-                              Get.to(AboutTaskexpressView());
-                            },
+                            InkWell(
+                              onTap: () {
+                                Get.to(AboutTaskexpressView());
+                              },
                               child: buildList(
                                 context,
                                 Icons.info_outline,
@@ -213,16 +228,42 @@ class AccountView extends GetView<AccountController> {
                                   ],
                                 ),
                               ),
-                            ),  Divider(thickness: 1),
+                            ),
+                            Divider(thickness: 1),
                             buildList(
                               context,
-                              Icons.delete, // still required but ignored if image is passed
+                              Icons.delete,
+                              // still required but ignored if image is passed
                               "Delete Account",
                               Icons.arrow_forward_ios,
                               textColor: Color(0xffFB4621),
                               leadingImagePath: 'assets/images/delete.png',
                             ),
                           ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    InkWell(onTap: (){
+                      controller. logout();
+                    },
+                      child: Container(
+                        height: 28,
+                        width: 75,
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          border: Border.all(color: AppColors.blue),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Logout",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: "poppins",
+                              fontWeight: FontWeight.w500,
+                            color: Color(0xff114BCA)),
+                          ),
                         ),
                       ),
                     ),
@@ -238,48 +279,49 @@ class AccountView extends GetView<AccountController> {
 }
 
 Widget buildList(
-    BuildContext context,
-    IconData leadingIcon,
-    String name,
-    IconData trailingIcon, {
-      TextSpan? richText,
-      Color textColor = Colors.black,
-      String? leadingImagePath, // 👈 for image instead of icon
-    }) {
+  BuildContext context,
+  IconData leadingIcon,
+  String name,
+  IconData trailingIcon, {
+  TextSpan? richText,
+  Color textColor = Colors.black,
+  String? leadingImagePath, // 👈 for image instead of icon
+}) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14),
     child: Row(
       children: [
         leadingImagePath != null
             ? Image.asset(
-          leadingImagePath,
-          width: 20,
-          height: 20,
-          color: Colors.black87, // optional: match icon color
-        )
+              leadingImagePath,
+              width: 20,
+              height: 20,
+              color: Colors.black87, // optional: match icon color
+            )
             : Icon(leadingIcon, color: Colors.black87, size: 20),
         const SizedBox(width: 12),
         Expanded(
-          child: richText != null
-              ? RichText(
-            text: TextSpan(
-              style: TextStyle(
-                fontSize: 14,
-                fontFamily: "Poppins",
-                color: textColor,
-              ),
-              children: [TextSpan(text: name), richText],
-            ),
-          )
-              : Text(
-            name,
-            style: TextStyle(
-              fontSize: 13,
-              fontFamily: "Poppins",
-              color: textColor,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          child:
+              richText != null
+                  ? RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: "Poppins",
+                        color: textColor,
+                      ),
+                      children: [TextSpan(text: name), richText],
+                    ),
+                  )
+                  : Text(
+                    name,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontFamily: "Poppins",
+                      color: textColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
         ),
         Icon(trailingIcon, size: 16, color: Colors.black54),
       ],

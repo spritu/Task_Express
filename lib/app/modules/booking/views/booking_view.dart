@@ -53,7 +53,7 @@ class BookingView extends GetView<BookingController> {
                       child: Column(mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Container(
-                            height: MediaQuery.of(context).size.height*0.5,
+                           // height: MediaQuery.of(context).size.height*0.5,
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10,
@@ -251,7 +251,7 @@ class BookingView extends GetView<BookingController> {
                                                 ),
                                               ),
                                               child: const Text(
-                                                "Cancle Booking",
+                                                "Cancel Booking",
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w500,
@@ -402,18 +402,19 @@ class BookingView extends GetView<BookingController> {
                               borderRadius: BorderRadius.circular(12),
                               color: Color(0xFFD9E4FC),
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "Past Bookings",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                  fontFamily: "poppins",
+                            child: Row(crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [SizedBox(width: 10),
+                                Text(
+                                  "Past Bookings",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                    fontFamily: "poppins",
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ),
+                          ),SizedBox(height: 10),
                           ListView.builder(
                             itemCount: 3,shrinkWrap: true,
                             itemBuilder: (context, index) {
@@ -421,11 +422,11 @@ class BookingView extends GetView<BookingController> {
                                 onTap: () {},
                                 child: Container(
                                   margin: const EdgeInsets.symmetric(vertical: 8),
-                                  padding: const EdgeInsets.all(12),
+                                 // padding: const EdgeInsets.all(12),
                                   child: Column(
                                     children: [
-                                      Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                       // crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           /// Left Section - Text
                                           Column(
@@ -459,7 +460,8 @@ class BookingView extends GetView<BookingController> {
                                                     TextSpan(
                                                       text: "Electrician",
                                                       style: TextStyle(
-                                                        fontWeight: FontWeight.w500,
+                                                        fontWeight: FontWeight.w400,
+                                                        fontSize: 12,
                                                         color: Color(
                                                           0xFF114BCA,
                                                         ), // Blue color

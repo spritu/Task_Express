@@ -37,14 +37,15 @@ class SettingView extends GetView<SettingController> {
           ),
            SizedBox(height: 30),
             Padding(
-              padding: const EdgeInsets.only(left: 12,right: 12),
-              child: Card(color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16,right: 16),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 56,
+              padding: const EdgeInsets.only(left: 12, right: 12),
+              child: Card(
+                color: Colors.white,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 56,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 12, right: 12),
                         child: Row(
                           children: [
                             Image.asset(
@@ -63,13 +64,13 @@ class SettingView extends GetView<SettingController> {
                             Spacer(),
                             Obx(
                                   () => FlutterSwitch(
-                                    width: 33.0,
-                                    height: 18.0,
+                                width: 33.0,
+                                height: 18.0,
                                 toggleSize: 21.0,
                                 value: controller.isDarkMode.value,
                                 borderRadius: 30.0,
                                 padding: 1,
-                                activeColor: Color(0xff114BCA),
+                                activeColor: AppColors.blue,
                                 inactiveColor: AppColors.grey,
                                 onToggle: (val) {
                                   controller.toggleTheme();
@@ -78,8 +79,13 @@ class SettingView extends GetView<SettingController> {
                             ),
                           ],
                         ),
-                      ), SizedBox(
-                        height: 56,
+                      ),
+                    ),
+                    Divider(thickness: 1),
+                    SizedBox(
+                      height: 56,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 12, right: 12),
                         child: Row(
                           children: [
                             Image.asset("assets/images/msg.png"),
@@ -95,13 +101,13 @@ class SettingView extends GetView<SettingController> {
                             Spacer(),
                             Obx(
                                   () => FlutterSwitch(
-                                    width: 33.0,
-                                    height: 18.0,
+                                width: 33.0,
+                                height: 18.0,
                                 toggleSize: 21.0,
                                 value: controller.isSmsUpdates.value,
                                 borderRadius: 30.0,
                                 padding: 1.0,
-                                activeColor: Color(0xff114BCA),
+                                activeColor: AppColors.blue,
                                 inactiveColor: AppColors.grey,
                                 onToggle: (val) {
                                   controller.toggleSmsUpdates();
@@ -111,8 +117,12 @@ class SettingView extends GetView<SettingController> {
                           ],
                         ),
                       ),
-                      SizedBox(
-                        height: 56,
+                    ),
+                    Divider(thickness: 1),
+                    SizedBox(
+                      height: 56,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 12, right: 12),
                         child: Row(
                           children: [
                             Image.asset("assets/images/whatapp.png"),
@@ -128,13 +138,13 @@ class SettingView extends GetView<SettingController> {
                             Spacer(),
                             Obx(
                                   () => FlutterSwitch(
-                                    width: 33.0,
-                                    height: 18.0,
+                                width: 33.0,
+                                height: 18.0,
                                 toggleSize: 21.0,
                                 value: controller.isWhatsappUpdates.value,
                                 borderRadius: 30.0,
                                 padding: 1.0,
-                                activeColor: Color(0xff114BCA),
+                                activeColor: AppColors.blue,
                                 inactiveColor: AppColors.grey,
                                 onToggle: (val) {
                                   controller.toggleWhatsappUpdates();
@@ -145,8 +155,12 @@ class SettingView extends GetView<SettingController> {
                           ],
                         ),
                       ),
-                      SizedBox(
-                        height: 56,
+                    ),
+                    Divider(thickness: 1),
+                    SizedBox(
+                      height: 56,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 12, right: 12),
                         child: Row(
                           children: [
                             Image.asset("assets/images/privacy.png"),
@@ -159,13 +173,33 @@ class SettingView extends GetView<SettingController> {
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-
-
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    Divider(thickness: 1),
+                    SizedBox(
+                      height: 56,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 12, right: 12),
+                        child: Row(
+                          children: [
+                            Image.asset("assets/images/delete.png"),
+                            SizedBox(width: 20),
+                            Text(
+                              "Delete account",
+                              style: TextStyle(
+                                fontFamily: "poppins",
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.blue,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

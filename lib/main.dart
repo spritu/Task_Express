@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart'; // <-- ADD THIS
+
+// All your imports
 import 'app/modules/Activejob_screen/controllers/activejob_screen_controller.dart';
 import 'app/modules/Bottom2/controllers/bottom2_controller.dart';
 import 'app/modules/BricklayingHelper/controllers/bricklaying_helper_controller.dart';
 import 'app/modules/Scaffolding_helper/controllers/scaffolding_helper_controller.dart';
 import 'app/modules/account/controllers/account_controller.dart';
+import 'app/modules/add_address/controllers/add_address_controller.dart';
 import 'app/modules/booking/controllers/booking_controller.dart';
 import 'app/modules/bottom/controllers/bottom_controller.dart';
+import 'app/modules/bottom/views/bottom_view.dart';
 import 'app/modules/chat/controllers/chat_controller.dart';
 import 'app/modules/edit_profile/controllers/edit_profile_controller.dart';
 import 'app/modules/home/controllers/home_controller.dart';
@@ -35,25 +40,41 @@ import 'app/modules/tile_fixing_helper/controllers/tile_fixing_helper_controller
 import 'app/modules/worknest/controllers/worknest_controller.dart';
 import 'app/routes/app_pages.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init(); // <-- ADD THIS
+
   Get.put(LoginController());
   Get.put(WorknestController());
   Get.put(SignUpController());
   Get.put(BottomController());
   Get.put(HomeController());
   Get.put(PlasteringHelperController());
-  Get.put(BricklayingHelperController());Get.put(BookingController());
-  Get.put(ScaffoldingHelperController());Get.put(AccountController());
-  Get.put(TileFixingHelperController());Get.put(JobsDetailsController());
+  Get.put(BricklayingHelperController());
+  Get.put(BookingController());
+  Get.put(ScaffoldingHelperController());
+  Get.put(AccountController());
+  Get.put(TileFixingHelperController());
+  Get.put(JobsDetailsController());
   Get.put(RoadConstructionHelperController());
   Get.put(ProfessionalPlumberController());
   Get.put(SettingController());
-  Get.put(EditProfileController());Get.put(JobsController());
-  Get.put(ChatController());Get.put(ProviderSettingController());Get.put(ProviderChatController());
-  Get.put(OtpController());Get.put(ProviderHomeController());Get.put(ProviderEditProfileController());
-  Get.put(ProviderLoginController());Get.put(ActivejobScreenController());Get.put(ProviderChatScreenController());
-  Get.put(ProviderOtpController());Get.put(Bottom2Controller());Get.put(ProviderAccountController());
+  Get.put(EditProfileController());
+  Get.put(JobsController());
+  Get.put(ChatController());
+  Get.put(ProviderSettingController());
+  Get.put(ProviderChatController());
+  Get.put(OtpController());
+  Get.put(ProviderHomeController());
+  Get.put(ProviderEditProfileController());
+  Get.put(ProviderLoginController());
+  Get.put(ActivejobScreenController());
+  Get.put(ProviderChatScreenController());
+  Get.put(ProviderOtpController());
+  Get.put(Bottom2Controller());
+  Get.put(ProviderAccountController());
+  Get.put(AddAddressController());
+
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
@@ -72,21 +93,38 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
+  final box = GetStorage();
+
   @override
   void initState() {
     super.initState();
 
-    // Automatically jump from Splash1 to Splash2 after 5 seconds
-    Future.delayed(const Duration(seconds: 5), () {
-      if (_controller.hasClients && _currentPage == 0) {
-        _controller.animateToPage(
-          1,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
+    bool isLoggedIn = box.read('isLoggedIn') ?? false;
+
+    if (isLoggedIn) {
+
+      Future.delayed(const Duration(seconds: 2), () {
+        Get.offAllNamed('/bottom');
+      });
+    } else {
+
+      autoNavigateSplash();
+    }
   }
+
+  void autoNavigateSplash() async {
+    await Future.delayed(const Duration(seconds: 60));
+    if (_controller.hasClients) _controller.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
+
+    await Future.delayed(const Duration(seconds: 60));
+    if (_controller.hasClients) _controller.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
+
+    await Future.delayed(const Duration(seconds: 60));
+    if (mounted) {
+      Get.offAll(() => JoinView());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,18 +143,17 @@ class _SplashScreenState extends State<SplashScreen> {
               Splash3View(),
             ],
           ),
-          // Show nav buttons only on Splash2 & Splash3
           if (_currentPage != 0)
             Positioned(
-              bottom: 50,
+              bottom: 20,
               left: 20,
               right: 20,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed: () {
-                      _controller.jumpToPage(2);
+                    onPressed: () {Get.to(JoinView());
+                    _controller.jumpToPage(2);
                     },
                     child: const Text(
                       "Skip",
@@ -154,9 +191,9 @@ class _SplashScreenState extends State<SplashScreen> {
                         Get.to(() => JoinView());
                       }
                     },
-                    child: Text(
-                      _currentPage == 2 ? "Next" : "Next",
-                      style: const TextStyle(
+                    child: const Text(
+                      "Next",
+                      style: TextStyle(
                         color: Color(0xff090F47),
                         fontSize: 16,
                       ),
