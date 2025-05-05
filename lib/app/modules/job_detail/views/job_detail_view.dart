@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-
 import '../../../../colors.dart';
 import '../controllers/job_detail_controller.dart';
 
@@ -30,7 +28,6 @@ class JobDetailView extends GetView<JobDetailController> {
                   Text(""),
                   const Text(
                     '',
-
                   ),
                   InkWell(
                       onTap: () {
@@ -41,10 +38,8 @@ class JobDetailView extends GetView<JobDetailController> {
                 // DONE Image (you can replace this with actual asset)
                 Image.asset(
                   'assets/images/job_done.png',
-
                 ),
                 const SizedBox(height: 16),
-
                 // Done Text
                 Card(
                  color: AppColors.white,
@@ -75,7 +70,6 @@ class JobDetailView extends GetView<JobDetailController> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 // Work Summary
                 Card(
                  color: AppColors.white,

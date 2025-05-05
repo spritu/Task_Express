@@ -6,12 +6,16 @@ import '../modules/Activejob_screen/bindings/activejob_screen_binding.dart';
 import '../modules/Activejob_screen/views/activejob_screen_view.dart';
 import '../modules/AddressScreen/bindings/address_screen_binding.dart';
 import '../modules/AddressScreen/views/address_screen_view.dart';
+import '../modules/BookingCancelled/bindings/booking_cancelled_binding.dart';
+import '../modules/BookingCancelled/views/booking_cancelled_view.dart';
 import '../modules/BookingConfirm/bindings/booking_confirm_binding.dart';
 import '../modules/BookingConfirm/views/booking_confirm_view.dart';
 import '../modules/Bottom2/bindings/bottom2_binding.dart';
 import '../modules/Bottom2/views/bottom2_view.dart';
 import '../modules/BricklayingHelper/bindings/bricklaying_helper_binding.dart';
 import '../modules/BricklayingHelper/views/bricklaying_helper_view.dart';
+import '../modules/CancelBooking/bindings/cancel_booking_binding.dart';
+import '../modules/CancelBooking/views/cancel_booking_view.dart';
 import '../modules/CementHelper/bindings/cement_helper_binding.dart';
 import '../modules/CementHelper/views/cement_helper_view.dart';
 import '../modules/HelpSupport/bindings/help_support_binding.dart';
@@ -174,7 +178,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.SIGN_UP,
-      page: () =>  SignUpView(),
+      page: () => SignUpView(),
       binding: SignUpBinding(),
     ),
     GetPage(
@@ -386,6 +390,16 @@ class AppPages {
       name: _Paths.SPLASH_SCREEN,
       page: () => const SplashScreenView(),
       binding: SplashScreenBinding(),
+    ),
+    GetPage(
+      name: _Paths.CANCEL_BOOKING,
+      page: () => const CancelBookingView(),
+      binding: CancelBookingBinding(),
+    ),
+    GetPage(
+      name: _Paths.BOOKING_CANCELLED,
+      page: () => const BookingCancelledView(),
+      binding: BookingCancelledBinding(),
     ),
   ];
 }

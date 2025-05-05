@@ -71,7 +71,6 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                       ],
                     ),
                   ),
-
                   buildTextField(
                     "First Name",
                     "Enter first name",
@@ -95,6 +94,35 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                       return null;
                     },
                     onChanged: (val) => controller.lastName.value = val,
+                  ),SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("Gender", style: TextStyle(fontSize: 12)),
+                  ),
+                 // const SizedBox(height: 10),
+                  Obx(
+                        () => Row(
+                      children: ["Female", "Male", "Other"].map((e) {
+                        final isSelected = controller.gender.value == e;
+                        return Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: isSelected ? AppColors.orage : Colors.white,
+                                side: BorderSide(color: isSelected ? AppColors.orage : Colors.black26),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              onPressed: () => controller.gender.value = e,
+                              child: Text(
+                                e,
+                                style: TextStyle(color: isSelected ? Colors.white : Colors.black, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
                   const SizedBox(height: 20),
 
@@ -138,7 +166,6 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                     onChanged: controller.onStateChanged, // 👈 triggers city reset
                   ),
                   const SizedBox(height: 12),
-
                   Row(
                     children: [
                       Expanded(
@@ -162,11 +189,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                       ),
                     ],
                   ),
-
-
-
                   const SizedBox(height: 12),
-
                   buildTextField(
                     "Referral Code",
                     "Enter referral code",
@@ -191,75 +214,194 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                     child: Column(mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
-
-                        buildDropdown2(
-                          label: "Profession",
-                          hint: "Select your Profession",
-                          items: controller.professionList,
-                          selectedValue: controller.selectedProfession,
-                          onChanged: (value) {
-                            controller.setSelectedProfession(value!);
-                          },
-                        ),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5),
-                          child: Text("category",style: TextStyle(fontSize: 14,fontWeight: FontWeight.w400),),
-                        ),
-                        Obx(() {
-                          if (controller.categoryList.isEmpty) {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                          return Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100, // Background light grey
-                              borderRadius: BorderRadius.circular(12), // Rounded corners
-                              border: Border.all(color: Colors.grey.shade300), // Light border
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                isExpanded: true,
-                                hint: Text(
-                                  "Select your Category",
-                                  //  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [SizedBox(height: 10,),
+                            // ── Profession Dropdown ──
+                            Obx(() => Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Profession",
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,fontFamily: "poppins",color: AppColors.textColor),
                                 ),
-                                value: controller.selectedCategory.value.isNotEmpty
-                                    ? controller.selectedCategory.value
-                                    : null,
-                                icon: Icon(
-                                  Icons.keyboard_arrow_down_rounded,
-                                  color: Colors.grey.shade600,
-                                  size: 24,
-                                ),
-                                items: controller.categoryList.map((String category) {
-                                  return DropdownMenuItem<String>(
-                                    value: category,
-                                    child: Text(
-                                      category,
-                                      style: TextStyle(color: Colors.black, fontSize: 14,fontWeight: FontWeight.w400),
+
+                                Container(
+                                  height: 42,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF4F8FF),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.black26),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      isExpanded: true,
+                                      value: controller.selectedProfession.value.isNotEmpty
+                                          ? controller.selectedProfession.value
+                                          : null,
+                                      hint: Text("Select your Profession",style: TextStyle(color: Color(0xff333333),fontSize: 10),),
+                                      icon: const Icon(Icons.keyboard_arrow_down),
+                                      items: controller.serviceTypes.map((e) {
+                                        return DropdownMenuItem<String>(
+                                          value: e['title'],
+                                          child: Text(e['title']!),
+                                        );
+                                      }).toList(),
+                                      onChanged: (v) {
+                                        if (v != null) controller.setSelectedProfession(v);
+                                      },
                                     ),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  if (newValue != null) {
-                                    controller.setSelectedCategory(newValue);
-                                  }
-                                },
-                              ),
-                            ),
-                          );
-                        }),
-                        buildDropdown2(
-                          label: "Work Experience",
-                          hint: "Select your Work Experience",
-                          items: controller.workExperienceList,
-                          selectedValue: controller.selectedWorkExperience,
-                          onChanged: (value) {
-                            controller.setSelectedWorkExperience(value!);
-                          },
+                                  ),
+                                ),
+                              ],
+                            )),
+
+                           // const SizedBox(height: 16),
+
+                            // ── Category Dropdown ──
+                            Obx(() {
+                              final cats = controller.categories;
+                              if (cats.isEmpty) return const Text("No categories.");
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [const SizedBox(height: 8),
+                                  Text("Category", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,fontFamily: "poppins",color: AppColors.textColor),
+                                  ),
+                                  Container(
+                                    height: 42,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF4F8FF),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.black26),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                        isExpanded: true,
+                                        value: controller.selectedCategoryId.value.isNotEmpty
+                                            ? controller.selectedCategoryId.value
+                                            : null,
+                                        hint: const Text("Select a category",style: TextStyle(color: Color(0xff333333),fontSize: 10),),
+                                        icon: const Icon(Icons.keyboard_arrow_down),
+                                        items: cats.map((cat) {
+                                          return DropdownMenuItem<String>(
+                                            value: cat.id,
+                                            child: Text(cat.name),
+                                          );
+                                        }).toList(),
+                                        onChanged: (id) {
+                                          if (id != null) controller.setSelectedCategoryById(id);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
+
+                            // ── Subcategory Dropdown ──
+                            Obx(() {
+                              if (!controller.isSubCategoryVisible.value || controller.subCategories.isEmpty) {
+                                return const SizedBox(); // Don't show if not required
+                              }
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "Subcategory",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      fontFamily: "poppins",
+                                      color: AppColors.textColor,
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 42,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF4F8FF),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.black26),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                        isExpanded: true,
+                                        value: controller.selectedSubCategoryId.value.isNotEmpty
+                                            ? controller.selectedSubCategoryId.value
+                                            : null,
+                                        hint: const Text(
+                                          "Select a subcategory",
+                                          style: TextStyle(color: Color(0xff333333), fontSize: 10),
+                                        ),
+                                        icon: const Icon(Icons.keyboard_arrow_down),
+                                        items: controller.subCategories.map((subcat) {
+                                          return DropdownMenuItem<String>(
+                                            value: subcat.name,
+                                            child: Text(subcat.name),
+                                          );
+                                        }).toList(),
+                                        onChanged: (id) {
+                                          if (id != null) controller.selectedSubCategoryId.value = id;
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
+                          ],
                         ),
+
+
+                        Obx(() {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [   const SizedBox(height: 8),
+                              Text(
+                                "Work Experience",
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,fontFamily: "poppins",color: AppColors.textColor),
+                              ),
+
+                              Container(
+                                height: 42,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF4F8FF),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.black26),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    isExpanded: true,
+                                    value: controller.selectedWorkExperience.value.isNotEmpty
+                                        ? controller.selectedWorkExperience.value
+                                        : null,
+                                    hint: const Text("Select your Work Experience",style: TextStyle(color: Colors.grey,fontSize: 10),),
+                                    icon: const Icon(Icons.keyboard_arrow_down),
+                                    items: controller.workExperienceList.map((exp) {
+                                      return DropdownMenuItem<String>(
+                                        value: exp,
+                                        child: Text(exp),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      if (value != null) {
+                                        controller.setSelectedWorkExperience(value);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        })
+
+
                       ],
                     ),
                   ),
@@ -392,6 +534,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                       onPressed: () {
                         if (controller.formKey.currentState!.validate()) {
                           controller.submitForm();
+                          controller.registerServiceProvider();
                           Get.to(() => ProviderLocationView());
                         }
                       },
@@ -569,10 +712,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
-        ),
+        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
         const SizedBox(height: 8),
         Container(
           height: 42,
@@ -582,30 +722,21 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
             border: Border.all(color: Colors.black26),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Obx(
-            () => DropdownButtonFormField<String>(
-              value:
-                  selectedValue.value.isNotEmpty ? selectedValue.value : null,
-              icon: const Icon(Icons.keyboard_arrow_down),
-              onChanged: (value) {
-                onChanged(value);
-              },
-              items:
-                  items.map((item) {
-                    return DropdownMenuItem<String>(
-                      value: item,
-                      child: Text(item),
-                    );
-                  }).toList(),
-              decoration: const InputDecoration.collapsed(hintText: ""),
-              hint: Text(hint),
-            ),
-          ),
+          child: Obx(() => DropdownButtonFormField<String>(
+            value: selectedValue.value.isNotEmpty ? selectedValue.value : null,
+            icon: const Icon(Icons.keyboard_arrow_down),
+            onChanged: onChanged,
+            items: items.map((item) => DropdownMenuItem<String>(
+              value: item,
+              child: Text(item),
+            )).toList(),
+            decoration: const InputDecoration.collapsed(hintText: ""),
+            hint: Text(hint),
+          )),
         ),
       ],
     );
-  }
-}
+  }}
 
 void _showImagePicker(
   BuildContext context,

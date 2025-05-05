@@ -100,19 +100,27 @@ class EditProfileController extends GetxController {
 
     try {
       http.StreamedResponse response = await request.send();
-      final result = await response.stream.bytesToString();
+      final responseBody = await response.stream.bytesToString();
 
-      if (response.statusCode == 200) {
-        Get.snackbar("Success", "Profile updated successfully");
+      print("🔁 Response Status: ${response.statusCode}");
+      print("🔁 Raw Response Body: $responseBody");
+
+      final responseJson = jsonDecode(responseBody);
+
+      if (response.statusCode == 200 && responseJson['code'] == 200) {
+        Get.snackbar("Success", responseJson['msg'] ?? "Profile updated successfully");
+
         final accountController = Get.find<AccountController>();
-        accountController.loadUserInfo();
-        accountController.loadMobileNumber();
+        await accountController.loadUserInfo();
+        await accountController.loadMobileNumber();
       } else {
-        Get.snackbar("Error", "Failed to update profile");
+        print("❌ Error from API: ${responseJson['msg']}");
+        Get.snackbar("Error", responseJson['msg'] ?? "Failed to update profile");
       }
     } catch (e) {
-      print("❌ Exception: $e");
-      Get.snackbar("Error", "Something went wrong. Try again.");
+      print("❌ Exception caught: $e");
+      Get.snackbar("Error", "Something went wrong. Please try again.");
     }
+
   }
 }

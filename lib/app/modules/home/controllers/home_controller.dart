@@ -12,17 +12,19 @@ import '../../tile_fixing_helper/views/tile_fixing_helper_view.dart';
 
 class HomeController extends GetxController {
   // TODO: Implement WorknestController
-  final houseNo = Rx<String>('');
-  final landMark = Rx<String>('');
-  final addressType = Rx<String>('');
-  final contactNo = Rx<String>('');
+  RxList<UserModel> usersByCategory = <UserModel>[].obs;
   RxList<CategoryModel> allCategories = <CategoryModel>[].obs;
   RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
   RxList<CategoryModel> fixedChargeHelpers = <CategoryModel>[].obs;
-
+  var users = <UserModel>[].obs;
+  final houseNo = Rx<String>('');var isLoading = false.obs;
+  final landMark = Rx<String>('');
+  final addressType = Rx<String>('');
+  final contactNo = Rx<String>('');
+  RxList<dynamic> searchResults = RxList([]);
   var expandedServiceType = ''.obs;
   RxBool showAllCategories = false.obs;
-
+  final TextEditingController searchTextController = TextEditingController();
   var serviceTypes = [
     {'title': 'Visiting Professionals'},
     {'title': 'Fixed charge Helpers'},
@@ -130,7 +132,34 @@ class HomeController extends GetxController {
   }
 
 
+  void fetchUsersByCategory(String categoryId) async {
+    isLoading.value = true;
+    try {
+      final uri = Uri.parse(
+          'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$categoryId');
 
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        if (jsonData['data'] != null) {
+          final dataList = jsonData['data'] as List;
+          usersByCategory.value =
+              dataList.map((e) => UserModel.fromJson(e)).toList();
+          print("✅ Users fetched for category $categoryId");
+        } else {
+          usersByCategory.clear();
+          print("⚠️ No data found for category");
+        }
+      } else {
+        print('❌ API error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❗ Exception: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   // To toggle category view between expanded and collapsed
   void toggleCategoryView() {
@@ -162,37 +191,36 @@ class HomeController extends GetxController {
 
   var searchController = TextEditingController();
 
-  var searchResults = [].obs; // for storing fetched data
 
   /// Fetch service providers from API
-  Future<void> fetchServiceProviders(String searchController) async {
+  Future<void> fetchServiceProviders(String keyword) async {
     try {
-      var request = http.Request(
-        'GET',
-        Uri.parse(
-          'https://jdapi.youthadda.co/user/searchServiceProviders?name=$searchController',
-        ),
-      );
+      // Constructing the URL with the search keyword
+      var url = Uri.parse('https://jdapi.youthadda.co/user/searchServiceProviders?name=$keyword');
+      var request = http.Request('GET', url);
 
+      // Sending the HTTP request
       http.StreamedResponse response = await request.send();
 
+      // Checking if the response status code is 200 (OK)
       if (response.statusCode == 200) {
+        // Converting the response body to a string
         String responseBody = await response.stream.bytesToString();
+
+        // Decoding the response body (JSON)
         var jsonData = jsonDecode(responseBody);
 
-        // Safely check if 'data' is a list
+        // Checking if 'data' is a list and updating the searchResults
         if (jsonData['data'] is List) {
-          searchResults.value = jsonData['data'];
-          print("✅ Success: ${jsonData['data']}");
+          searchResults.value = jsonData['data'];  // Update the observable list with data
         } else {
-          searchResults.clear();
-          print("⚠️ No data found in response.");
+          searchResults.clear();  // Clear results if data is not in the expected format
         }
       } else {
-        print("❌ Failed: ${response.reasonPhrase}");
+        print("❌ Failed: ${response.reasonPhrase}");  // Log failure if status code isn't 200
       }
     } catch (e) {
-      print("❗ Error: $e");
+      print("❗ Error: $e");  // Catch and log any errors
     }
   }
   void navigateToSubcategoryScreen(String name) {
@@ -337,12 +365,13 @@ class HomeController extends GetxController {
 }
 
 class CategoryModel {
+  final String id;
   final String label;
   final String icon;
   final String spType;
   final List<SubcategoryModel> subcategories; // Add a list of subcategories
 
-  CategoryModel({
+  CategoryModel({ required this.id,
     required this.label,
     required this.icon,
     required this.spType,
@@ -359,7 +388,7 @@ class CategoryModel {
         .map((subItem) => SubcategoryModel.fromJson(subItem))
         .toList();
 
-    return CategoryModel(
+    return CategoryModel(id:json['_id'] ?? '',
       label: json['name'] ?? '',
       icon: iconUrl,
       spType: json['spType']?.toString() ?? '',
@@ -382,6 +411,32 @@ class SubcategoryModel {
       name: json['name'] ?? '',
       description: json['description'] ?? '',
     );
+  }
+}
+
+
+// user_model.dart
+class UserModel {
+  final String? name;
+  final String? mobile;
+  final String? image;
+
+  UserModel({this.name, this.mobile, this.image});
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      name: json['firstName'],
+      mobile: json['mobile'],
+      image: json['image'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'mobile': mobile,
+      'image': image,
+    };
   }
 }
 

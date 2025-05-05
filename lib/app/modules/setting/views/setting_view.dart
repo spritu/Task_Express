@@ -157,23 +157,27 @@ class SettingView extends GetView<SettingController> {
                       ),
                     ),
                     Divider(thickness: 1),
-                    SizedBox(
-                      height: 56,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 12, right: 12),
-                        child: Row(
-                          children: [
-                            Image.asset("assets/images/privacy.png"),
-                            SizedBox(width: 20),
-                            Text(
-                              "Privacy & Data",
-                              style: TextStyle(
-                                fontFamily: "poppins",
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
+                    InkWell(onTap: (){
+                      Get.to(PrivacydataViewView());
+                    },
+                      child: SizedBox(
+                        height: 56,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 12, right: 12),
+                          child: Row(
+                            children: [
+                              Image.asset("assets/images/privacy.png"),
+                              SizedBox(width: 20),
+                              Text(
+                                "Privacy & Data",
+                                style: TextStyle(
+                                  fontFamily: "poppins",
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),

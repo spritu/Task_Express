@@ -75,35 +75,30 @@ class UserHelpView extends GetView<UserHelpController> {
                           Divider(thickness: 1),
                           buildList(
                             context,
-
                             "Rude or unsafe behavior",
                             Icons.arrow_forward_ios,
                           ),
                           Divider(thickness: 1),
                           buildList(
                             context,
-
                             "i want to reschedule my job",
                             Icons.arrow_forward_ios,
                           ),
                           Divider(thickness: 1),
                           buildList(
                             context,
-
                             "Payment or billing issue",
                             Icons.arrow_forward_ios,
                           ),
                           Divider(thickness: 1),
                           buildList(
                             context,
-
                             "I want to cancel my booking",
                             Icons.arrow_forward_ios,
                           ),
                           Divider(thickness: 1),
                           buildList(
                             context,
-
                             "Need help with using the app",
                             Icons.arrow_forward_ios,
                           ),
@@ -171,9 +166,7 @@ class UserHelpView extends GetView<UserHelpController> {
                                 ),
                               ),
                             ),
-
-
-                            Container(
+                            SizedBox(
                               height: 40,
                               width: 130,
 

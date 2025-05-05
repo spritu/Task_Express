@@ -6,6 +6,7 @@ import 'package:get_storage/get_storage.dart'; // <-- ADD THIS
 import 'app/modules/Activejob_screen/controllers/activejob_screen_controller.dart';
 import 'app/modules/Bottom2/controllers/bottom2_controller.dart';
 import 'app/modules/BricklayingHelper/controllers/bricklaying_helper_controller.dart';
+import 'app/modules/CancelBooking/controllers/cancel_booking_controller.dart';
 import 'app/modules/Scaffolding_helper/controllers/scaffolding_helper_controller.dart';
 import 'app/modules/account/controllers/account_controller.dart';
 import 'app/modules/add_address/controllers/add_address_controller.dart';
@@ -48,7 +49,7 @@ void main() async {
   Get.put(WorknestController());
   Get.put(SignUpController());
   Get.put(BottomController());
-  Get.put(HomeController());
+  Get.put(HomeController());Get.put(CancelBookingController());
   Get.put(PlasteringHelperController());
   Get.put(BricklayingHelperController());
   Get.put(BookingController());

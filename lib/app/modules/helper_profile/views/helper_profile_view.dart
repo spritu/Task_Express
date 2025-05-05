@@ -48,13 +48,12 @@ class HelperProfileView extends GetView<HelperProfileController> {
                 child: ClipRRect(
                   // borderRadius: BorderRadius.circular(20),
                   child: Image.asset(
-                    'assets/images/rajesh.png',
+                    'assets/images/suraj.png',
                     fit: BoxFit.fill,
                   ),
                 ),
               ),
               const SizedBox(height: 10),
-
               // Name, Distance, Status
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -156,7 +155,6 @@ class HelperProfileView extends GetView<HelperProfileController> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 4),
               Row(
                 children: const [
@@ -185,33 +183,35 @@ class HelperProfileView extends GetView<HelperProfileController> {
 
               const SizedBox(height: 10),
               Center(
-                child: Container(
-                  padding: const EdgeInsets.all(10),
+                child: Container(height: 36,width: 193,
+
                   decoration: BoxDecoration(
                     color: const Color(0xFFD9E4FC),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Charge: ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13,
-                            color: Colors.grey,
+                  child: Center(
+                    child: const Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: "Charge: ",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                              color: Colors.grey,
+                            ),
                           ),
-                        ),
-                        TextSpan(
-                          text: "₹ 50+ per day",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13,
+                          TextSpan(
+                            text: "₹ 50+ per day",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                            ),
                           ),
-                        ),
 
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -236,16 +236,16 @@ class HelperProfileView extends GetView<HelperProfileController> {
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
-                        fontSize: 11,
+                        fontSize: 12,
                       ),
                     ),
                     TextSpan(
                       text:
                       "Install and fix pipes, faucets, sinks, toilets, water heaters, and other plumbing systems.",
                       style: TextStyle(
-                        color: Colors.grey[700],
-                        fontWeight: FontWeight.w500,
-                        fontSize: 11,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -260,16 +260,16 @@ class HelperProfileView extends GetView<HelperProfileController> {
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
-                        fontSize: 11,
+                        fontSize: 12,
                       ),
                     ),
                     TextSpan(
                       text:
                       "Identify and repair leaks, unclog drains, and ensure smooth water flow.",
                       style: TextStyle(
-                        color: Colors.grey[700],
-                        fontWeight: FontWeight.w500,
-                        fontSize: 11,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -284,16 +284,16 @@ class HelperProfileView extends GetView<HelperProfileController> {
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
-                        fontSize: 11,
+                        fontSize: 12,
                       ),
                     ),
                     TextSpan(
                       text:
                       "Provide scheduled maintenance and handle urgent plumbing issues efficiently.",
                       style: TextStyle(
-                        color: Colors.grey[700],
-                        fontWeight: FontWeight.w500,
-                        fontSize: 11,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -301,19 +301,15 @@ class HelperProfileView extends GetView<HelperProfileController> {
               ),
 
               const SizedBox(height: 20),
-              Row(
+              Row(mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
+                  SizedBox(height: 30,width: 120,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xff114BCA),
                         // 🔵 change this to your desired color
                         foregroundColor: Colors.white,
-                        // optional: text/icon color
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
-                        ),
+
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -323,17 +319,12 @@ class HelperProfileView extends GetView<HelperProfileController> {
                     ),
                   ),
                   const SizedBox(width: 20),
-                  Expanded(
+                  SizedBox(height: 30,width: 120,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xff114BCA),
                         // 🔵 change this to your desired color
                         foregroundColor: Colors.white,
-                        // optional: text/icon color
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
-                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -510,7 +501,7 @@ class HelperProfileView extends GetView<HelperProfileController> {
         .map(
           (r) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [SizedBox(height: 20,),
+        children: [
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(
@@ -543,16 +534,14 @@ class HelperProfileView extends GetView<HelperProfileController> {
                 ),
               ],
             ),
-            trailing: Container(decoration: BoxDecoration(border: Border.all(width: 0.5,color: AppColors.grey)),
-              child: Padding(
-                padding: const EdgeInsets.all(3.0),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text("5", style: TextStyle(fontWeight: FontWeight.bold)),SizedBox(width: 3),
-                    Icon(Icons.star, color: Colors.amber),
-                  ],
-                ),
+            trailing: Container(width: 33,height: 19,
+              decoration: BoxDecoration(border: Border.all(width: 0.5,color: AppColors.grey)),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("5", style: TextStyle(fontWeight: FontWeight.bold)),SizedBox(width: 3),
+                  Icon(Icons.star, color: Colors.amber,size: 12,),
+                ],
               ),
             ),
           ),
@@ -560,8 +549,7 @@ class HelperProfileView extends GetView<HelperProfileController> {
 
         ],
       ),
-    )
-        .toList();
+    ).toList();
   }
 }
 

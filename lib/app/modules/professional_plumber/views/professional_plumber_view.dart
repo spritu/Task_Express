@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../colors.dart';
+import '../../home/controllers/home_controller.dart';
 import '../../professional_profile/views/professional_profile_view.dart';
 import '../controllers/professional_plumber_controller.dart';
 
@@ -10,6 +11,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
   const ProfessionalPlumberView({super.key});
   @override
   Widget build(BuildContext context) {
+    final UserModel user = Get.arguments;
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(
@@ -119,7 +121,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                               Row(
                                 children: [
                                   Text(
-                                    worker['name'],
+                                    "${user.name ?? 'N/A'}",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 14,

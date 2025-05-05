@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart' show canLaunchUrl, launchUrl;
 
+import '../../CancelBooking/views/cancel_booking_view.dart';
+
 class BookingController extends GetxController {
   //TODO: Implement BookingController
   var currentBooking = {}.obs;
@@ -66,6 +68,7 @@ class BookingController extends GetxController {
     if (response.statusCode == 200) {
       String result = await response.stream.bytesToString();
       print(result);
+      Get.to(CancelBookingView());
       Get.snackbar("Success", "Booking rejected");
     } else {
       print(response.reasonPhrase);

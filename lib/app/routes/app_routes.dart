@@ -59,6 +59,8 @@ abstract class Routes {
   static const ABOUT_TASKEXPRESS = _Paths.ABOUT_TASKEXPRESS;
   static const PRIVACYDATA_VIEW = _Paths.PRIVACYDATA_VIEW;
   static const SPLASH_SCREEN = _Paths.SPLASH_SCREEN;
+  static const CANCEL_BOOKING = _Paths.CANCEL_BOOKING;
+  static const BOOKING_CANCELLED = _Paths.BOOKING_CANCELLED;
 }
 
 abstract class _Paths {
@@ -119,4 +121,6 @@ abstract class _Paths {
   static const ABOUT_TASKEXPRESS = '/about-taskexpress';
   static const PRIVACYDATA_VIEW = '/privacydata-view';
   static const SPLASH_SCREEN = '/splash-screen';
+  static const CANCEL_BOOKING = '/cancel-booking';
+  static const BOOKING_CANCELLED = '/booking-cancelled';
 }

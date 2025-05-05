@@ -103,7 +103,7 @@ class ProviderLoginView extends GetView<ProviderLoginController> {
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height*0.1),
                 TextField(
-                  controller: controller.mobileController,
+                  controller: controller.mobileeController,
                   keyboardType: TextInputType.phone,
                   //  maxLength: 10,
                   decoration: InputDecoration(
