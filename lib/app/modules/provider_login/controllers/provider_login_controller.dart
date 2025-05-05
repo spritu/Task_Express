@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,10 +10,12 @@ import '../../provider_otp/views/provider_otp_view.dart';
 class ProviderLoginController extends GetxController {
   //TODO: Implement ProviderLoginController
 
-  final TextEditingController mobileController = TextEditingController();
-  var isChecked = false.obs; // Observable state
+  final TextEditingController mobileeController = TextEditingController();
+  var isChecked = false.obs; // Observable
+  final box = GetStorage();
+
   Future<void> sendOtp() async {
-    final phone = mobileController.text.trim();
+    final phone = mobileeController.text.trim();
 
     if (phone.isEmpty || phone.length != 10) {
       Get.snackbar("Error", "Please enter a valid 10-digit mobile number");
@@ -22,6 +25,7 @@ class ProviderLoginController extends GetxController {
     final headers = {
       'Content-Type': 'application/json',
     };
+
     final body = json.encode({"phone": phone});
     final url = Uri.parse('https://jdapi.youthadda.co/user/sendotp');
 
@@ -34,26 +38,25 @@ class ProviderLoginController extends GetxController {
 
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
-        print("OTP sent successfully: $responseBody");
+        print("✅ OTP sent successfully: $responseBody");
 
-        // Save phone number in SharedPreferences
+        // ✅ Save phone number for OTP verification
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('mobileNumber', phone);
 
-        // Clear the text field
-        mobileController.clear();
-
-        // Navigate to OTP screen or Bottom2View directly
-        Get.to(() => ProviderOtpView()); // If you want to go to OTP view
-        // OR
-        // Get.offAll(() => Bottom2View()); // If you want to go directly to Bottom2View
+        // ✅ Save Login State TRUE using GetStorage
+        await box.write('isLoggedIn', true);
+        await box.write('mobile', phone); // (optional) mobile bhi save karlo if needed
+        mobileeController.clear();
+        // ✅ Navigate to OTP Screen
+        Get.to(() => ProviderOtpView());
 
       } else {
-        print("Failed to send OTP: ${response.reasonPhrase}");
+        print("❌ Failed to send OTP: ${response.reasonPhrase}");
         Get.snackbar("Error", "Failed to send OTP: ${response.reasonPhrase}");
       }
     } catch (e) {
-      print("Exception: $e");
+      print("❌ Exception: $e");
       Get.snackbar("Error", "Something went wrong: $e");
     }
   }
