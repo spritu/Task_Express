@@ -27,104 +27,108 @@ class HomeView extends GetView<HomeController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Location & Search Bar
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xad87AAF6), Colors.white],
+              InkWell(onTap: (){
+                controller.showSignupSheet(context);
+              },
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xad87AAF6), Colors.white],
+                    ),
                   ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on, size: 30),
-                          const SizedBox(width: 8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${controller.houseNo.value}',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
-                                  color: AppColors.textColor,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.location_on, size: 30),
+                            const SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${controller.houseNo.value}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                    color: AppColors.textColor,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                '${controller.landMark.value}',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 12,
-                                  color: AppColors.textColor,
+                                Text(
+                                  '${controller.landMark.value}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 12,
+                                    color: AppColors.textColor,
+                                  ),
                                 ),
+                              ],
+                            ),
+                            const Spacer(),
+                            Text(
+                              'Task',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0XFF114BCA),
                               ),
-                            ],
-                          ),
-                          const Spacer(),
-                          Text(
-                            'Task',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0XFF114BCA),
                             ),
-                          ),
-                          Text(
-                            'Express',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.orage,
+                            Text(
+                              'Express',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.orage,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      TextField(
-                        controller: controller.searchController,
-                        onChanged: (value) {
-                          if (value.isEmpty) {
-                            controller.searchResults.clear();  // Clear the results when the field is empty
-                          } else {
-                            controller.fetchServiceProviders(value);  // Call API when text is entered
-                          }
-                        },
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.search),
-                          hintText: "Search for ‘Plumber’",
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(25),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Search Results
-                      Obx(() {
-                        return controller.searchResults.isEmpty
-                            ? SizedBox()  // If no results, show nothing
-                            : ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: controller.searchResults.length,
-                          itemBuilder: (context, index) {
-                            final item = controller.searchResults[index];
-                            return ListTile(
-                              title: Text(item['firstName'] ?? 'No Name'),
-                              subtitle: Text(item['city'] ?? 'No City'),
-                            );
+                        SizedBox(height: 20),
+                        TextField(
+                          controller: controller.searchController,
+                          onChanged: (value) {
+                            if (value.isEmpty) {
+                              controller.searchResults.clear();  // Clear the results when the field is empty
+                            } else {
+                              controller.fetchServiceProviders(value);  // Call API when text is entered
+                            }
                           },
-                        );
-                      }),
-                    ]))),
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.search),
+                            hintText: "Search for ‘Plumber’",
+                            isDense: true,
+                            contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25),
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        // Search Results
+                        Obx(() {
+                          return controller.searchResults.isEmpty
+                              ? SizedBox()  // If no results, show nothing
+                              : ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: controller.searchResults.length,
+                            itemBuilder: (context, index) {
+                              final item = controller.searchResults[index];
+                              return ListTile(
+                                title: Text(item['firstName'] ?? 'No Name'),
+                                subtitle: Text(item['city'] ?? 'No City'),
+                              );
+                            },
+                          );
+                        }),
+                      ]))),
+              ),
               // Service Type Buttons
               Expanded(
                 child: SingleChildScrollView(
@@ -418,48 +422,6 @@ class HomeView extends GetView<HomeController> {
                                 ),
 
                               // 🔽 User List Section
-                              const SizedBox(height: 16),
-                              Obx(() {
-                                if (controller.isLoading.value) {
-                                  return const Center(child: CircularProgressIndicator());
-                                } else if (controller.usersByCategory.isNotEmpty) {
-                                  return Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        "Available Users",
-                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      ListView.builder(
-                                        shrinkWrap: true,
-                                        physics: const NeverScrollableScrollPhysics(),
-                                        itemCount: controller.usersByCategory.length,
-                                        itemBuilder: (context, index) {
-                                          final user = controller.usersByCategory[index];
-                                          return Card(
-                                            margin: const EdgeInsets.symmetric(vertical: 4),
-                                            child: ListTile(
-                                              onTap: () {
-                                                Get.to(() => ProfessionalPlumberView(), arguments: user);
-                                              },
-                                              leading: user.image != null && user.image!.isNotEmpty
-                                                  ? CircleAvatar(
-                                                backgroundImage: NetworkImage(user.image!),
-                                              )
-                                                  : const CircleAvatar(child: Icon(Icons.person)),
-                                              title: Text(user.name ?? 'No Name'),
-                                              subtitle: Text(user.mobile ?? ''),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                } else {
-                                  return const Center(child: Text("No users found for this category."));
-                                }
-                              })
 
 
 

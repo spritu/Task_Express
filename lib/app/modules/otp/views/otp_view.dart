@@ -119,7 +119,7 @@ class OtpView extends GetView<OtpController> {
                       //   );
                       //   return;
                       // }
-                      Get.to(() => SignUpView());
+                     // Get.to(() => SignUpView());
                     //  String otp = controller.otpController.text.trim();
                       controller.verifyOtp("otp"); // No need to pass mobileNumber // This should handle actual verification and navigation
                     },

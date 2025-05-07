@@ -10,12 +10,19 @@ import '../../provider_location/views/provider_location_view.dart';
 
 class ProviderProfileController extends GetxController {
   //TODO: Implement ProviderProfileController
-  final isCategoryLoading = false.obs;
+  var subCategories = <SubCategory>[].obs;
   final selectedCategoryId = ''.obs;
-  final selectedSubCategoryId = ''.obs;
+  final selectedCategoryIds = <String>[].obs;
+
+  var filteredSubCategories = <SubCategory>[].obs;
+  var selectedSubCategoryId = ''.obs;
+  final isCategoryLoading = false.obs;
+
+ // final selectedSubCategoryId = ''.obs;
   final selectedCategoryName = ''.obs;
-  final subCategories = <SubcategoryModel>[].obs;
+  //final subCategories = <SubcategoryModel>[].obs;
   final isSubCategoryVisible = false.obs;
+
 
   void setSelectedCategoryById(String id) {
     selectedCategoryId.value = id;
@@ -32,7 +39,7 @@ class ProviderProfileController extends GetxController {
 
   final visitingProfessionals = <CategoryModel>[].obs;
   final fixedChargeHelpers = <CategoryModel>[].obs;
-
+  var selectedSubCategory = Rxn<SubCategory>();
   final selectedProfession = ''.obs;
   final selectedCategory = ''.obs;
 
@@ -48,34 +55,62 @@ class ProviderProfileController extends GetxController {
   var isLoading = false.obs;
   RxList<UserModel> usersByCategory = <UserModel>[].obs;
 
-  void fetchUsersByCategory(String categoryId) async {
-    isLoading.value = true;
+  void fetchSubCategories(String categoryId) async {
     try {
-      final uri = Uri.parse(
-          'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$categoryId');
+      final url = Uri.parse('https://jdapi.youthadda.co/category/getsubcategorybyid');
 
-      final response = await http.get(uri);
+      var headers = {
+        'Content-Type': 'application/json',
+      };
+
+      var request = http.Request('POST', url);
+      request.body = json.encode({
+        "categoryIds": [categoryId],
+      });
+      request.headers.addAll(headers);
+
+      http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        if (jsonData['data'] != null) {
-          final dataList = jsonData['data'] as List;
-          usersByCategory.value =
-              dataList.map((e) => UserModel.fromJson(e)).toList();
-          print("✅ Users fetched for category $categoryId");
+        final responseBody = await response.stream.bytesToString();
+        print("🔁 Raw response: $responseBody"); // 👈 Print raw response
+
+        final data = jsonDecode(responseBody);
+
+        if (data['data'] != null) {
+          subCategories.value = List<SubCategory>.from(
+            data['data'].map((item) => SubCategory.fromJson(item)),
+          );
+          //filterSubCategories(); // Optional if you're filtering
+          print("✅ Subcategories loaded: ${subCategories.length}");
         } else {
-          usersByCategory.clear();
-          print("⚠️ No data found for category");
+          Get.snackbar("", "No subcategories found for this category");
         }
       } else {
-        print('❌ API error: ${response.statusCode}');
+        Get.snackbar("", response.reasonPhrase ?? "Failed to load subcategories");
       }
     } catch (e) {
-      print('❗ Exception: $e');
-    } finally {
-      isLoading.value = false;
+      Get.snackbar("", e.toString());
     }
   }
+
+
+
+  void toggleCategorySelection(String catId) {
+    if (selectedCategoryIds.contains(catId)) {
+      selectedCategoryIds.remove(catId);
+    } else {
+      selectedCategoryIds.add(catId);
+    }
+    //filterSubCategories(); // update on selection change
+  }
+
+
+
+  void setSelectedSubCategory(SubCategory? value) {
+    selectedSubCategory.value = value;
+  }
+
 
   // final isCategoryLoading = false.obs;
   // RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
@@ -119,9 +154,15 @@ class ProviderProfileController extends GetxController {
     }
   }
 
+
   // void setSelectedProfession(String prof) {
   //   selectedProfession.value = prof;
   //   selectedCategory.value   = '';
+  // }
+  
+  // void filterSubCategories() {
+  //   final selectedIds = selectedCategoryIds; // your selected category id list
+  //   filteredSubCategories.value = subCategories.where((sub) => selectedIds.contains(sub.categoryId)).toList();
   // }
 
   void setSelectedCategory(String cat) {
@@ -136,7 +177,7 @@ class ProviderProfileController extends GetxController {
 
   var expandedServiceType = ''.obs;
   final categoryList = <String>[].obs;
-
+  final isProfessionValid = true.obs;
   final TextEditingController aadharNo = TextEditingController();
   final firstName = ''.obs;
   final formKey = GlobalKey<FormState>();
@@ -241,13 +282,17 @@ class ProviderProfileController extends GetxController {
         dateOfBirth.value.isEmpty ||
         email.value.isEmpty ||
         city.value.isEmpty ||
-        pinCode.value.isEmpty ||
-        state.value.isEmpty) {
-      Get.snackbar('Error', 'Please fill in all required fields');
+
+        state.value.isEmpty ||
+        selectedProfession.value.isEmpty ||
+     selectedCategoryId.value.isEmpty ||
+        selectedSubCategoryId.value.isEmpty) {
+      Get.snackbar('', 'Please fill in all required fields including Profession, Category, and Subcategory');
       return false;
     }
     return true;
   }
+
 
   void clearFields() {
     firstName.value = '';
@@ -268,7 +313,7 @@ class ProviderProfileController extends GetxController {
     final userId = prefs.getString('userId') ?? '';
 
     if (userId.isEmpty) {
-      Get.snackbar('Error', 'No user ID found, please login again.');
+      Get.snackbar('', 'No user ID found, please login again.');
       return;
     }
 
@@ -289,8 +334,8 @@ class ProviderProfileController extends GetxController {
       'pinCode': pinCode.value,
       'state': state.value,
       'referralCode': referralCode.value,
-      'categoryId': "67fcf1ee51de04c85e6a9ef3", // Replace with dynamic ID if needed
-      'subcategoryId': "67fcf1ee51de04c85e6a9ef3", // Replace with dynamic ID
+      'categoryId': selectedCategoryId.value,
+      'subcategoryId': selectedSubCategoryId.value, // Replace with dynamic ID
       'aadharNo': aadharNo.text,
     });
 
@@ -311,12 +356,12 @@ class ProviderProfileController extends GetxController {
         clearFields();
         Get.to(() => ProviderLocationView()); // Proceed to next step
       } else {
-        print('❌ Error ${streamed.statusCode}: $body');
-        Get.snackbar('Error', 'Server returned ${streamed.statusCode}');
+        print('❌  ${streamed.statusCode}: $body');
+        Get.snackbar('', 'Server returned ${streamed.statusCode}');
       }
     } catch (e) {
       print('❗ Exception: $e');
-      Get.snackbar('Error', 'Could not register. Check your internet.');
+      Get.snackbar('', 'Could not register. Check your internet.');
     }
   }
 
@@ -337,12 +382,14 @@ class ProviderProfileController extends GetxController {
     super.onInit();
     loadUserId();
     fetchCategories();
+//    fetchSubCategories();
+
   }
 
   @override
   void onClose() {
-  //  dobController.dispose();
-   // categoryTextController.dispose();
+    //  dobController.dispose();
+    // categoryTextController.dispose();
 
 
     super.onClose();
@@ -373,23 +420,23 @@ class CategoryModel {
 }
 
 
-
-class SubcategoryModel {
+class SubCategory {
+  final String id;
   final String name;
-  final String description;
 
-  SubcategoryModel({
-    required this.name,
-    required this.description,
-  });
+  SubCategory({required this.id, required this.name});
 
-  factory SubcategoryModel.fromJson(Map<String, dynamic> json) {
-    return SubcategoryModel(
+  factory SubCategory.fromJson(Map<String, dynamic> json) {
+    return SubCategory(
+      id: json['_id'] ?? '',
       name: json['name'] ?? '',
-      description: json['description'] ?? '',
     );
   }
 }
+
+
+
+
 class UserModel {
   final String? name;
   final String? mobile;
@@ -399,7 +446,7 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      name: json['firstName'],
+      name: json['name'],
       mobile: json['mobile'],
       image: json['image'],
     );

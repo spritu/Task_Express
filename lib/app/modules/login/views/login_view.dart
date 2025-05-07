@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../colors.dart';
+import '../../bottom/views/bottom_view.dart';
 import '../../otp/views/otp_view.dart';
 import '../controllers/login_controller.dart';
 
@@ -14,7 +15,7 @@ class LoginView extends GetView<LoginController> {
       backgroundColor: AppColors.white,
       body: SingleChildScrollView(
         child: Container(
-          decoration: const BoxDecoration(
+          decoration:  BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.center,
@@ -23,11 +24,19 @@ class LoginView extends GetView<LoginController> {
           ),
           alignment: Alignment.center,
           child: Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16),
+            padding:  EdgeInsets.only(left: 16, right: 16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+            //  crossAxisAlignment: CrossAxisAlignment.center,
+
+              children: [SizedBox(height: 40), InkWell(onTap: (){
+                Get.to(BottomView());
+              },
+                  child: Row(mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text("Skip for now",style: TextStyle(fontSize: 12,fontFamily: "Poppins",fontWeight: FontWeight.w500,color: AppColors.blue),),
+                    ],
+                  )),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                 Text.rich(
                   TextSpan(
                     children: [

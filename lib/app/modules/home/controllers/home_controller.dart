@@ -177,7 +177,130 @@ class HomeController extends GetxController {
 
 
 
+  void showSignupSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.8,
+          child: Container(
+            decoration: BoxDecoration(
+            color:Color(0xffD9E4FC),
+              boxShadow: [BoxShadow(blurRadius: 4, color: Color(0xFFD9E4FC))],
 
+
+              borderRadius: const BorderRadius.only(
+                topRight: Radius.circular(20),
+                topLeft: Radius.circular(20),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+               // horizontal: 16.0,
+                vertical: 16.0,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [Text("  "),SizedBox(width: 30,),
+                        Row(
+                          children: [
+                            Text(
+                              "Sign Up Required ",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),  Icon(Icons.arrow_downward),
+                          ],
+                        ),
+
+
+                        IconButton(
+                          onPressed: () => Get.back(),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    Image.asset(
+                      "assets/images/Signupbro.png",
+                      height: 293,
+                      width: 393,
+                    ),
+                    const SizedBox(height: 20),
+
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Please verify your mobile number to continue \nusing TaskExpress.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    Container(
+                      height: 36.93,
+                      width: 170,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF114BCA),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () {},
+                        child: Text(
+                          "Continue",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15,
+                            color: Colors.white,
+                            fontFamily: "poppins",
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Text(
+                        'This helps us personalize your experience and keep your data secure.',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Poppins',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   void onInit() {
@@ -360,7 +483,6 @@ class HomeController extends GetxController {
   void onClose() {
     super.onClose();
   }
-
   void increment() => count.value++;
 }
 

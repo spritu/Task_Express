@@ -33,24 +33,24 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                   const SizedBox(height: 20),
 
                   Obx(
-                    () => Stack(
+                        () => Stack(
                       alignment: Alignment.bottomRight,
                       children: [
                         CircleAvatar(
                           radius: 45,
                           backgroundColor: Colors.white,
                           backgroundImage:
-                              controller.imagePath.value.isNotEmpty
-                                  ? FileImage(File(controller.imagePath.value))
-                                  : null,
+                          controller.imagePath.value.isNotEmpty
+                              ? FileImage(File(controller.imagePath.value))
+                              : null,
                           child:
-                              controller.imagePath.value.isEmpty
-                                  ? const Icon(
-                                    Icons.person,
-                                    size: 60,
-                                    color: Colors.grey,
-                                  )
-                                  : null,
+                          controller.imagePath.value.isEmpty
+                              ? const Icon(
+                            Icons.person,
+                            size: 60,
+                            color: Colors.grey,
+                          )
+                              : null,
                         ),
                         Positioned(
                           bottom: 0,
@@ -99,7 +99,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                     alignment: Alignment.centerLeft,
                     child: Text("Gender", style: TextStyle(fontSize: 12)),
                   ),
-                 // const SizedBox(height: 10),
+                  // const SizedBox(height: 10),
                   Obx(
                         () => Row(
                       children: ["Female", "Male", "Other"].map((e) {
@@ -204,7 +204,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                   // You can add validation on them too if needed
                   const SizedBox(height: 12),
                   Container(
-                    height: MediaQuery.of(context).size.height*0.3,
+                    height: MediaQuery.of(context).size.height*0.4,
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
@@ -216,16 +216,22 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [SizedBox(height: 10,),
+                          children: [
+                            SizedBox(height: 10),
+
                             // ── Profession Dropdown ──
                             Obx(() => Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   "Profession",
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,fontFamily: "poppins",color: AppColors.textColor),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: "poppins",
+                                    color: AppColors.textColor,
+                                  ),
                                 ),
-
                                 Container(
                                   height: 42,
                                   decoration: BoxDecoration(
@@ -240,7 +246,10 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                       value: controller.selectedProfession.value.isNotEmpty
                                           ? controller.selectedProfession.value
                                           : null,
-                                      hint: Text("Select your Profession",style: TextStyle(color: Color(0xff333333),fontSize: 10),),
+                                      hint: Text(
+                                        "Select your Profession",
+                                        style: TextStyle(color: Color(0xff333333), fontSize: 12),
+                                      ),
                                       icon: const Icon(Icons.keyboard_arrow_down),
                                       items: controller.serviceTypes.map((e) {
                                         return DropdownMenuItem<String>(
@@ -254,65 +263,28 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                     ),
                                   ),
                                 ),
+                                if (!controller.isProfessionValid.value)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4, left: 8),
+                                    child: Text(
+                                      "Profession is required",
+                                      style: TextStyle(color: Colors.red, fontSize: 11),
+                                    ),
+                                  ),
                               ],
                             )),
 
-                           // const SizedBox(height: 16),
 
                             // ── Category Dropdown ──
                             Obx(() {
                               final cats = controller.categories;
-                              if (cats.isEmpty) return const Text("No categories.");
-
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [const SizedBox(height: 8),
-                                  Text("Category", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,fontFamily: "poppins",color: AppColors.textColor),
-                                  ),
-                                  Container(
-                                    height: 42,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF4F8FF),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.black26),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton<String>(
-                                        isExpanded: true,
-                                        value: controller.selectedCategoryId.value.isNotEmpty
-                                            ? controller.selectedCategoryId.value
-                                            : null,
-                                        hint: const Text("Select a category",style: TextStyle(color: Color(0xff333333),fontSize: 10),),
-                                        icon: const Icon(Icons.keyboard_arrow_down),
-                                        items: cats.map((cat) {
-                                          return DropdownMenuItem<String>(
-                                            value: cat.id,
-                                            child: Text(cat.name),
-                                          );
-                                        }).toList(),
-                                        onChanged: (id) {
-                                          if (id != null) controller.setSelectedCategoryById(id);
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }),
-
-                            // ── Subcategory Dropdown ──
-                            Obx(() {
-                              if (!controller.isSubCategoryVisible.value || controller.subCategories.isEmpty) {
-                                return const SizedBox(); // Don't show if not required
-                              }
 
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const SizedBox(height: 8),
                                   Text(
-                                    "Subcategory",
+                                    "Category",
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
@@ -331,22 +303,25 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                     child: DropdownButtonHideUnderline(
                                       child: DropdownButton<String>(
                                         isExpanded: true,
-                                        value: controller.selectedSubCategoryId.value.isNotEmpty
-                                            ? controller.selectedSubCategoryId.value
+                                        value: controller.selectedCategoryId.value.isNotEmpty
+                                            ? controller.selectedCategoryId.value
                                             : null,
                                         hint: const Text(
-                                          "Select a subcategory",
-                                          style: TextStyle(color: Color(0xff333333), fontSize: 10),
+                                          "Select a category",
+                                          style: TextStyle(color: Color(0xff333333), fontSize: 12),
                                         ),
                                         icon: const Icon(Icons.keyboard_arrow_down),
-                                        items: controller.subCategories.map((subcat) {
+                                        items: cats.map((cat) {
                                           return DropdownMenuItem<String>(
-                                            value: subcat.name,
-                                            child: Text(subcat.name),
+                                            value: cat.id,
+                                            child: Text(cat.name),
                                           );
                                         }).toList(),
                                         onChanged: (id) {
-                                          if (id != null) controller.selectedSubCategoryId.value = id;
+                                          if (id != null) {
+                                            controller.setSelectedCategoryById(id);
+                                            controller.fetchSubCategories(id); // Fetch subcategories when category is selected
+                                          }
                                         },
                                       ),
                                     ),
@@ -354,10 +329,63 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                 ],
                               );
                             }),
+
+                            // ── Subcategory Dropdown ──
+                            Obx(() {
+
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 16),
+                                  const Text(
+                                    "Subcategory",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      fontFamily: "poppins",
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 42,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF4F8FF),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Colors.black26),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                        isExpanded: true,
+                                        value: controller.selectedSubCategoryId.value.isNotEmpty
+                                            ? controller.selectedSubCategoryId.value
+                                            : null,
+                                        hint: const Text(
+                                          "Select a subcategory",
+                                          style: TextStyle(color: Color(0xff333333), fontSize: 12),
+                                        ),
+                                        icon: const Icon(Icons.keyboard_arrow_down),
+                                        items: controller.subCategories.map((sub) {
+                                          return DropdownMenuItem<String>(
+                                            value: sub.id,
+                                            child: Text(sub.name),
+                                          );
+                                        }).toList(),
+                                        onChanged: (id) {
+                                          if (id != null) {
+                                            controller.selectedSubCategoryId.value = id;
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
+
                           ],
                         ),
-
-
                         Obx(() {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,7 +409,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                     value: controller.selectedWorkExperience.value.isNotEmpty
                                         ? controller.selectedWorkExperience.value
                                         : null,
-                                    hint: const Text("Select your Work Experience",style: TextStyle(color: Colors.grey,fontSize: 10),),
+                                    hint: const Text("Select your Work Experience",style: TextStyle(color: Colors.grey,fontSize: 12),),
                                     icon: const Icon(Icons.keyboard_arrow_down),
                                     items: controller.workExperienceList.map((exp) {
                                       return DropdownMenuItem<String>(
@@ -535,7 +563,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                         if (controller.formKey.currentState!.validate()) {
                           controller.submitForm();
                           controller.registerServiceProvider();
-                          Get.to(() => ProviderLocationView());
+                        //  Get.to(() => ProviderLocationView());
                         }
                       },
                       child: const Text(
@@ -555,15 +583,15 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
   }
 
   Widget buildTextField(
-    String label,
-    String hint, {
-    IconData? icon,
-    Function(String)? onChanged,
-    bool isDate = false,
-    TextEditingController? controller,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator, // <<=== ADD this line
-  }) {
+      String label,
+      String hint, {
+        IconData? icon,
+        Function(String)? onChanged,
+        bool isDate = false,
+        TextEditingController? controller,
+        TextInputType? keyboardType,
+        String? Function(String?)? validator, // <<=== ADD this line
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -579,24 +607,24 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
           validator: validator,
           // <<=== ADD validator here
           onTap:
-              isDate
-                  ? () async {
-                    DateTime? pickedDate = await showDatePicker(
-                      context: Get.context!,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime(2100),
-                    );
-                    if (pickedDate != null) {
-                      String formattedDate =
-                          "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
-                      controller?.text = formattedDate;
-                      if (onChanged != null) {
-                        onChanged(formattedDate);
-                      }
-                    }
-                  }
-                  : null,
+          isDate
+              ? () async {
+            DateTime? pickedDate = await showDatePicker(
+              context: Get.context!,
+              initialDate: DateTime.now(),
+              firstDate: DateTime(1900),
+              lastDate: DateTime(2100),
+            );
+            if (pickedDate != null) {
+              String formattedDate =
+                  "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+              controller?.text = formattedDate;
+              if (onChanged != null) {
+                onChanged(formattedDate);
+              }
+            }
+          }
+              : null,
           onChanged: isDate ? null : onChanged,
           keyboardType: keyboardType,
           decoration: InputDecoration(
@@ -656,10 +684,10 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
 
 
   Widget stateDropdown(
-    String label,
-    String hint, {
-    String? Function(String?)? validator, // <<=== Validator parameter add kiya
-  }) {
+      String label,
+      String hint, {
+        String? Function(String?)? validator, // <<=== Validator parameter add kiya
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -669,22 +697,22 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
         ),
         const SizedBox(height: 8),
         Obx(
-          () => DropdownButtonFormField<String>(
+              () => DropdownButtonFormField<String>(
             value:
-                controller.selectState.value.isNotEmpty
-                    ? controller.selectState.value
-                    : null,
+            controller.selectState.value.isNotEmpty
+                ? controller.selectState.value
+                : null,
             icon: const Icon(Icons.keyboard_arrow_down),
             onChanged: (value) {
               controller.selectState.value = value ?? '';
             },
             items:
-                controller.states.map((state) {
-                  return DropdownMenuItem<String>(
-                    value: state,
-                    child: Text(state),
-                  );
-                }).toList(),
+            controller.states.map((state) {
+              return DropdownMenuItem<String>(
+                value: state,
+                child: Text(state),
+              );
+            }).toList(),
             decoration: InputDecoration(
               hintText: hint,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16),
@@ -739,49 +767,49 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
   }}
 
 void _showImagePicker(
-  BuildContext context,
-  ProviderProfileController controller,
-) {
+    BuildContext context,
+    ProviderProfileController controller,
+    ) {
   showModalBottomSheet(
     context: context,
     builder:
         (context) => Container(
-          padding: const EdgeInsets.all(20),
-          height: MediaQuery.of(context).size.height * 0.3,
-          child: Column(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera, color: Colors.blue),
-                title: const Text(
-                  "Take Photo",
-                  style: TextStyle(fontFamily: "poppins"),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  controller.getImage(ImageSource.camera);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.image, color: Colors.green),
-                title: const Text(
-                  "Choose from Gallery",
-                  style: TextStyle(fontFamily: "poppins"),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  controller.getImage(ImageSource.gallery);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.cancel, color: Colors.red),
-                title: Text("Cancel", style: TextStyle(fontFamily: "poppins")),
-                onTap: () {
-                  Get.back();
-                },
-              ),
-            ],
+      padding: const EdgeInsets.all(20),
+      height: MediaQuery.of(context).size.height * 0.3,
+      child: Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.camera, color: Colors.blue),
+            title: const Text(
+              "Take Photo",
+              style: TextStyle(fontFamily: "poppins"),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              controller.getImage(ImageSource.camera);
+            },
           ),
-        ),
+          ListTile(
+            leading: const Icon(Icons.image, color: Colors.green),
+            title: const Text(
+              "Choose from Gallery",
+              style: TextStyle(fontFamily: "poppins"),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              controller.getImage(ImageSource.gallery);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.cancel, color: Colors.red),
+            title: Text("Cancel", style: TextStyle(fontFamily: "poppins")),
+            onTap: () {
+              Get.back();
+            },
+          ),
+        ],
+      ),
+    ),
   );
 }
 
@@ -795,7 +823,7 @@ void ShowmodelAdhar(BuildContext context) {
     builder: (context) {
       return Padding(
         padding:
-            MediaQuery.of(context).viewInsets, // to handle keyboard overlap
+        MediaQuery.of(context).viewInsets, // to handle keyboard overlap
         child: Container(
           height: MediaQuery.of(context).size.height * 0.3,
           padding: const EdgeInsets.all(16),
@@ -837,7 +865,7 @@ void ShowmodelAdhar(BuildContext context) {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(
                   6,
-                  (index) => Container(
+                      (index) => Container(
                     width: 40,
                     height: 48,
                     alignment: Alignment.center,
@@ -937,7 +965,7 @@ void ShowmodelAdhar2(BuildContext context) {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: List.generate(
                 6,
-                (index) => Container(
+                    (index) => Container(
                   width: 40,
                   height: 48,
                   alignment: Alignment.center,

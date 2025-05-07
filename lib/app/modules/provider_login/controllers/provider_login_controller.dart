@@ -6,13 +6,23 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../provider_home/views/provider_home_view.dart';
 import '../../provider_otp/views/provider_otp_view.dart';
+import '../views/provider_login_view.dart';
 class ProviderLoginController extends GetxController {
   //TODO: Implement ProviderLoginController
 
   final TextEditingController mobileeController = TextEditingController();
   var isChecked = false.obs; // Observable
   final box = GetStorage();
+  void main() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await GetStorage.init();
+    final box = GetStorage();
+
+
+
+  }
 
   Future<void> sendOtp() async {
     final phone = mobileeController.text.trim();
@@ -45,8 +55,8 @@ class ProviderLoginController extends GetxController {
         await prefs.setString('mobileNumber', phone);
 
         // ✅ Save Login State TRUE using GetStorage
-        await box.write('isLoggedIn', true);
-        await box.write('mobile', phone); // (optional) mobile bhi save karlo if needed
+        // await box.write('isLoggedIn', true);
+        // await box.write('mobile', phone); // (optional) mobile bhi save karlo if needed
         mobileeController.clear();
         // ✅ Navigate to OTP Screen
         Get.to(() => ProviderOtpView());
@@ -100,7 +110,7 @@ class ProviderLoginController extends GetxController {
   }
   void openPrivacy() {
     print('Privacy Policy clicked');
-    // Aap yahan Get.toNamed('/privacy') ya URL launch kar sakte hain
+
   }
   final count = 0.obs;
   @override

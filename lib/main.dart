@@ -114,13 +114,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void autoNavigateSplash() async {
-    await Future.delayed(const Duration(seconds: 60));
+    await Future.delayed(const Duration(seconds: 2));
     if (_controller.hasClients) _controller.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
 
-    await Future.delayed(const Duration(seconds: 60));
+    await Future.delayed(const Duration(seconds: 2));
     if (_controller.hasClients) _controller.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
 
-    await Future.delayed(const Duration(seconds: 60));
+    await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
       Get.offAll(() => JoinView());
     }
