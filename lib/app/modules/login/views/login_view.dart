@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../auth_controller.dart';
 import '../../../../colors.dart';
 import '../../bottom/views/bottom_view.dart';
 import '../../otp/views/otp_view.dart';
@@ -28,14 +29,33 @@ class LoginView extends GetView<LoginController> {
             child: Column(
             //  crossAxisAlignment: CrossAxisAlignment.center,
 
-              children: [SizedBox(height: 40), InkWell(onTap: (){
-                Get.to(BottomView());
-              },
-                  child: Row(mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text("Skip for now",style: TextStyle(fontSize: 12,fontFamily: "Poppins",fontWeight: FontWeight.w500,color: AppColors.blue),),
-                    ],
-                  )),
+              children: [SizedBox(height: 40),InkWell(
+                onTap: () {
+                  final authController = Get.find<AuthController>();
+
+                  // Update GetStorage and observable state
+                  authController.box.write('isLoggedIn', false);
+                  authController.isLoggedIn.value = false;
+
+                  // Navigate to BottomView
+                  Get.to(() => BottomView());
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      "Skip for now",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontFamily: "Poppins",
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.blue,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
                 SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                 Text.rich(
                   TextSpan(

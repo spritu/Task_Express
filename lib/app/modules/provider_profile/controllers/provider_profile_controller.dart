@@ -18,16 +18,15 @@ class ProviderProfileController extends GetxController {
   var selectedSubCategoryId = ''.obs;
   final isCategoryLoading = false.obs;
 
- // final selectedSubCategoryId = ''.obs;
+  // final selectedSubCategoryId = ''.obs;
   final selectedCategoryName = ''.obs;
   //final subCategories = <SubcategoryModel>[].obs;
   final isSubCategoryVisible = false.obs;
 
-
   void setSelectedCategoryById(String id) {
     selectedCategoryId.value = id;
     // also store the name so you can display or submit it later
-    final cat = categories.firstWhere((c) => c.id == id,);
+    final cat = categories.firstWhere((c) => c.id == id);
     selectedCategoryName.value = cat?.name ?? '';
   }
 
@@ -57,11 +56,11 @@ class ProviderProfileController extends GetxController {
 
   void fetchSubCategories(String categoryId) async {
     try {
-      final url = Uri.parse('https://jdapi.youthadda.co/category/getsubcategorybyid');
+      final url = Uri.parse(
+        'https://jdapi.youthadda.co/category/getsubcategorybyid',
+      );
 
-      var headers = {
-        'Content-Type': 'application/json',
-      };
+      var headers = {'Content-Type': 'application/json'};
 
       var request = http.Request('POST', url);
       request.body = json.encode({
@@ -87,14 +86,15 @@ class ProviderProfileController extends GetxController {
           Get.snackbar("", "No subcategories found for this category");
         }
       } else {
-        Get.snackbar("", response.reasonPhrase ?? "Failed to load subcategories");
+        Get.snackbar(
+          "",
+          response.reasonPhrase ?? "Failed to load subcategories",
+        );
       }
     } catch (e) {
       Get.snackbar("", e.toString());
     }
   }
-
-
 
   void toggleCategorySelection(String catId) {
     if (selectedCategoryIds.contains(catId)) {
@@ -105,12 +105,9 @@ class ProviderProfileController extends GetxController {
     //filterSubCategories(); // update on selection change
   }
 
-
-
   void setSelectedSubCategory(SubCategory? value) {
     selectedSubCategory.value = value;
   }
-
 
   // final isCategoryLoading = false.obs;
   // RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
@@ -128,22 +125,23 @@ class ProviderProfileController extends GetxController {
   //   return [];
   // }
 
-
   void fetchCategories() async {
     isCategoryLoading.value = true;
     try {
-      var req = http.Request('GET',
-          Uri.parse('https://jdapi.youthadda.co/category/getCategory'));
+      var req = http.Request(
+        'GET',
+        Uri.parse('https://jdapi.youthadda.co/category/getCategory'),
+      );
       var res = await req.send();
       if (res.statusCode == 200) {
         var body = await res.stream.bytesToString();
-        var list = (jsonDecode(body)['data'] as List)
+        var list =
+        (jsonDecode(body)['data'] as List)
             .map((m) => CategoryModel.fromJson(m))
             .toList();
         visitingProfessionals.value =
             list.where((c) => c.spType == '1').toList();
-        fixedChargeHelpers.value =
-            list.where((c) => c.spType == '2').toList();
+        fixedChargeHelpers.value = list.where((c) => c.spType == '2').toList();
       } else {
         print('❌ ${res.reasonPhrase}');
       }
@@ -154,12 +152,11 @@ class ProviderProfileController extends GetxController {
     }
   }
 
-
   // void setSelectedProfession(String prof) {
   //   selectedProfession.value = prof;
   //   selectedCategory.value   = '';
   // }
-  
+
   // void filterSubCategories() {
   //   final selectedIds = selectedCategoryIds; // your selected category id list
   //   filteredSubCategories.value = subCategories.where((sub) => selectedIds.contains(sub.categoryId)).toList();
@@ -169,10 +166,11 @@ class ProviderProfileController extends GetxController {
     selectedCategory.value = cat;
   }
 
-  final serviceTypes = [
-    {'title': 'Visiting Professionals'},
-    {'title': 'Fixed charge Helpers'},
-  ].obs;
+  final serviceTypes =
+      [
+        {'title': 'Visiting Professionals'},
+        {'title': 'Fixed charge Helpers'},
+      ].obs;
   RxList<CategoryModel> allCategories = <CategoryModel>[].obs;
 
   var expandedServiceType = ''.obs;
@@ -200,9 +198,6 @@ class ProviderProfileController extends GetxController {
     selectedWorkExperience.value = value;
   }
 
-
-
-
   RxString selectedServiceType = ''.obs;
 
   final Map<String, List<String>> stateCityMap = {
@@ -210,7 +205,6 @@ class ProviderProfileController extends GetxController {
     'UP': ['Lucknow', 'Kanpur', 'Varanasi'],
     'MH': ['Mumbai', 'Pune', 'Nagpur'],
   };
-
 
   List<String> get citiesForSelectedState {
     return stateCityMap[state.value] ?? [];
@@ -222,22 +216,22 @@ class ProviderProfileController extends GetxController {
     city.value = ''; // reset city
   }
 
-
-  var workExperienceList = <String>[
-    "Less than 1 year",
-    "1-3 years",
-    "3-5 years",
-    "More than 5 years",
-  ].obs;
+  var workExperienceList =
+      <String>[
+        "Less than 1 year",
+        "1-3 years",
+        "3-5 years",
+        "More than 5 years",
+      ].obs;
   RxString selectState = ''.obs;
-  RxList<String> states = <String>[
-    'Maharashtra',
-    'Karnataka',
-    'Tamil Nadu',
-    'Telangana',
-    'Delhi'
-  ].obs;
-
+  RxList<String> states =
+      <String>[
+        'Maharashtra',
+        'Karnataka',
+        'Tamil Nadu',
+        'Telangana',
+        'Delhi',
+      ].obs;
 
   void submitForm() {
     if (aadharNo.text.isEmpty) {
@@ -282,17 +276,17 @@ class ProviderProfileController extends GetxController {
         dateOfBirth.value.isEmpty ||
         email.value.isEmpty ||
         city.value.isEmpty ||
-
         state.value.isEmpty ||
         selectedProfession.value.isEmpty ||
-     selectedCategoryId.value.isEmpty ||
-        selectedSubCategoryId.value.isEmpty) {
-      Get.snackbar('', 'Please fill in all required fields including Profession, Category, and Subcategory');
+        selectedCategoryId.value.isEmpty) {
+      Get.snackbar(
+        '',
+        'Please fill in all required fields including Profession, Category, and Subcategory',
+      );
       return false;
     }
     return true;
   }
-
 
   void clearFields() {
     firstName.value = '';
@@ -313,7 +307,7 @@ class ProviderProfileController extends GetxController {
     final userId = prefs.getString('userId') ?? '';
 
     if (userId.isEmpty) {
-      Get.snackbar('', 'No user ID found, please login again.');
+      Get.snackbar('Error', 'No user ID found, please login again.');
       return;
     }
 
@@ -322,6 +316,7 @@ class ProviderProfileController extends GetxController {
       Uri.parse('https://jdapi.youthadda.co/user/serviceproviderregister'),
     );
 
+    // Add all required form fields
     request.fields.addAll({
       '_id': userId,
       'userType': '2',
@@ -330,60 +325,127 @@ class ProviderProfileController extends GetxController {
       'gender': gender.value,
       'dateOfBirth': dateOfBirth.value,
       'email': email.value,
+      //  'mobile': mobile.value, // 🔹 Make sure mobile is declared and filled
       'city': city.value,
       'pinCode': pinCode.value,
       'state': state.value,
       'referralCode': referralCode.value,
       'categoryId': selectedCategoryId.value,
-      'subcategoryId': selectedSubCategoryId.value, // Replace with dynamic ID
+      'subcategoryId': selectedSubCategoryId.value,
       'aadharNo': aadharNo.text,
     });
 
-    // Attach profile image if available
     if (imagePath.value.isNotEmpty) {
-      request.files.add(await http.MultipartFile.fromPath('userImg', imagePath.value));
+      File imageFile = File(imagePath.value);
+
+      if (await imageFile.exists()) {
+        request.files.add(
+          await http.MultipartFile.fromPath('userImg', imagePath.value),
+        );
+
+        final bytes = await imageFile.readAsBytes();
+        final base64Image = base64Encode(bytes);
+
+        await prefs.setString('userImgBase64', base64Image); // for backup
+        await prefs.setString('userImg', imagePath.value); // ✅ save path
+        print('✅ Image saved to SharedPreferences');
+      } else {
+        print('❗ Image file not found: ${imagePath.value}');
+      }
     }
 
     try {
       final streamed = await request.send();
       final body = await streamed.stream.bytesToString();
 
-      print('🔄 Register Response: $body');
+      print('🔄 Raw Response Body: $body');
 
       if (streamed.statusCode == 200 || streamed.statusCode == 201) {
         final jsonRes = json.decode(body);
-        Get.snackbar('Success', 'Service provider registered');
+        print('✅ JSON Response: $jsonRes');
+
+        final message = jsonRes['msg'] ?? 'Service provider registered';
+        Get.snackbar('Success', message);
+
+        // Save all values to SharedPreferences
+
+        await prefs.setString('firstName', firstName.value);
+        await prefs.setString('lastName', lastName.value);
+        await prefs.setString('gender', gender.value);
+        await prefs.setString('dob', dateOfBirth.value);
+        await prefs.setString('email', email.value);
+        await prefs.setString('city', city.value);
+        await prefs.setString('pinCode', pinCode.value);
+        await prefs.setString('state', state.value);
+        await prefs.setString('referralCode', referralCode.value);
+        await prefs.setString('categoryId', selectedCategoryId.value);
+        await prefs.setString('subcategoryId', selectedSubCategoryId.value);
+        await prefs.setString('aadharNo', aadharNo.text);
+
+        print('📦 SAVED DATA FROM SharedPreferences:');
+        print('📦 userId: ${prefs.getString('userId')}');
+        print('📦 firstName: ${prefs.getString('firstName')}');
+        print('📦 lastName: ${prefs.getString('lastName')}');
+        print('📦 gender: ${prefs.getString('gender')}');
+        print('📦 dob: ${prefs.getString('dob')}');
+        print('📦 email: ${prefs.getString('email')}');
+        print('📦 city: ${prefs.getString('city')}');
+        print('📦 pinCode: ${prefs.getString('pinCode')}');
+        print('📦 state: ${prefs.getString('state')}');
+        print('📦 referralCode: ${prefs.getString('referralCode')}');
+        print('📦 categoryId: ${prefs.getString('categoryId')}');
+        print('📦 subcategoryId: ${prefs.getString('subcategoryId')}');
+        print('📦 aadharNo: ${prefs.getString('aadharNo')}');
+        print(
+          '📦 userImgBase64: ${prefs.getString('userImgBase64')?.substring(0, 30)}...',
+        ); // Truncated for readability
+
+        await prefs.reload();
+
+
+
+        // Force reload to ensure updated data is available
+        await prefs.reload();
+        // ✅ Immediately update UI values by reloading controller values
+        final accountController = Get.find<ProviderAccountController>();
+        await accountController.loadUserInfo(); // 🔄 refresh name + image
+        await accountController.loadMobileNumber();
+
+        // Confirm values are saved
+        print('📦 First Name: ${prefs.getString('firstName')}');
+        print('📦 Last Name: ${prefs.getString('lastName')}');
+        print('📦 Mobile: ${prefs.getString('mobile')}');
+        print(
+          '📦 Image: ${prefs.getString('userImgBase64')?.substring(0, 50)}...',
+        );
+
         clearFields();
-        Get.to(() => ProviderLocationView()); // Proceed to next step
+        Get.to(() => ProviderLocationView());
       } else {
-        print('❌  ${streamed.statusCode}: $body');
-        Get.snackbar('', 'Server returned ${streamed.statusCode}');
+        print('❌ ${streamed.statusCode}: $body');
+        Get.snackbar('Error', 'Server returned ${streamed.statusCode}');
       }
     } catch (e) {
       print('❗ Exception: $e');
-      Get.snackbar('', 'Could not register. Check your internet.');
+      Get.snackbar(
+        'Error',
+        'Could not register. Check your internet connection.',
+      );
     }
   }
 
-
-
-// helper to load your stored userId
+  // helper to load your stored userId
   Future<String> _getUserIdFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('userId') ?? '';
   }
-
-
-
-
 
   @override
   void onInit() {
     super.onInit();
     loadUserId();
     fetchCategories();
-//    fetchSubCategories();
-
+    //    fetchSubCategories();
   }
 
   @override
@@ -391,10 +453,10 @@ class ProviderProfileController extends GetxController {
     //  dobController.dispose();
     // categoryTextController.dispose();
 
-
     super.onClose();
   }
 }
+
 class CategoryModel {
   final String id;
   final String name;
@@ -412,13 +474,12 @@ class CategoryModel {
     // API returns spType, not sp_type
     return CategoryModel(
       id: json['_id']?.toString() ?? '',
-      name: json['name']     ?? 'Unknown',
+      name: json['name'] ?? 'Unknown',
       icon: json['categoryImg'] ?? '',
       spType: json['spType']?.toString() ?? '',
     );
   }
 }
-
 
 class SubCategory {
   final String id;
@@ -427,15 +488,9 @@ class SubCategory {
   SubCategory({required this.id, required this.name});
 
   factory SubCategory.fromJson(Map<String, dynamic> json) {
-    return SubCategory(
-      id: json['_id'] ?? '',
-      name: json['name'] ?? '',
-    );
+    return SubCategory(id: json['_id'] ?? '', name: json['name'] ?? '');
   }
 }
-
-
-
 
 class UserModel {
   final String? name;
@@ -453,10 +508,6 @@ class UserModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'mobile': mobile,
-      'image': image,
-    };
+    return {'name': name, 'mobile': mobile, 'image': image};
   }
 }

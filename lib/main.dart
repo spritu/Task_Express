@@ -40,21 +40,24 @@ import 'app/modules/splash3/views/splash3_view.dart';
 import 'app/modules/tile_fixing_helper/controllers/tile_fixing_helper_controller.dart';
 import 'app/modules/worknest/controllers/worknest_controller.dart';
 import 'app/routes/app_pages.dart';
+import 'auth_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init(); // <-- ADD THIS
+  final box = GetStorage();
 
+  final isLoggedIn = box.read('isLoggedIn') ?? false;
   Get.put(LoginController());
   Get.put(WorknestController());
   Get.put(SignUpController());
   Get.put(BottomController());
   Get.put(HomeController());Get.put(CancelBookingController());
-  Get.put(PlasteringHelperController());
+  Get.put(PlasteringHelperController());Get.put(AccountController());
   Get.put(BricklayingHelperController());
   Get.put(BookingController());
   Get.put(ScaffoldingHelperController());
-  Get.put(AccountController());
+  Get.put(AccountController()); Get.put(AuthController());
   Get.put(TileFixingHelperController());
   Get.put(JobsDetailsController());
   Get.put(RoadConstructionHelperController());
@@ -101,15 +104,24 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     bool isLoggedIn = box.read('isLoggedIn') ?? false;
-
+    bool isLoggedIn2 = box.read('isLoggedIn2') ?? false;
     if (isLoggedIn) {
 
-      Future.delayed(const Duration(seconds: 2), () {
-        Get.offAllNamed('/bottom');
+      Future.delayed(const Duration(seconds: 0), () {
+        Get.offAllNamed('/bottom'); 
       });
     } else {
 
       autoNavigateSplash();
+    }
+    if (isLoggedIn2) {
+
+      Future.delayed(const Duration(seconds: 0), () {
+        Get.offAllNamed('/bottom2');
+      });
+    } else {
+
+    //  autoNavigateSplash();
     }
   }
 

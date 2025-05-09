@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../auth_controller.dart';
 import '../../otp/views/otp_view.dart';
 
 class LoginController extends GetxController {
@@ -41,15 +42,17 @@ class LoginController extends GetxController {
         final responseBody = await response.stream.bytesToString();
         print("✅ OTP sent successfully: $responseBody");
 
-        // ✅ Save phone number for OTP verification
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('mobileNumber', phone);
 
-        // ✅ Save Login State TRUE using GetStorage
         await box.write('isLoggedIn', true);
-        await box.write('mobile', phone); // (optional) mobile bhi save karlo if needed
+        await box.write('mobile', phone);
+
+        // ✅ Update the observable in AuthController
+        final authController = Get.find<AuthController>();
+        authController.isLoggedIn.value = true;
+
         mobileController.clear();
-        // ✅ Navigate to OTP Screen
         Get.to(() => OtpView());
 
       } else {
@@ -58,9 +61,10 @@ class LoginController extends GetxController {
       }
     } catch (e) {
       print("❌ Exception: $e");
-      Get.snackbar("Error", "Something went wrong: $e");
+      Get.snackbar("Error", "Exception occurred while sending OTP");
     }
   }
+
 
   void openTerms() {
     print('Terms & Conditions clicked');

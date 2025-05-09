@@ -55,8 +55,8 @@ class ProviderLoginController extends GetxController {
         await prefs.setString('mobileNumber', phone);
 
         // ✅ Save Login State TRUE using GetStorage
-        // await box.write('isLoggedIn', true);
-        // await box.write('mobile', phone); // (optional) mobile bhi save karlo if needed
+        await box.write('isLoggedIn2', true);
+        await box.write('mobile', phone);
         mobileeController.clear();
         // ✅ Navigate to OTP Screen
         Get.to(() => ProviderOtpView());

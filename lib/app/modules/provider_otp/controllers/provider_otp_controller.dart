@@ -85,7 +85,7 @@ class ProviderOtpController extends GetxController {
         // Save important values
         prefs.setString('token', responseData['token']);
         prefs.setInt('userType', responseData['userType']);
-        prefs.setString('userId', responseData['id']);
+            prefs.setString('userId', responseData['id']);
         prefs.setString('email', responseData['userData']['email']);
         otpTextController.clear();
         // Navigate to next screen or dashboard

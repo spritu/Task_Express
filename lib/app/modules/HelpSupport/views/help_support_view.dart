@@ -20,7 +20,10 @@ class HelpSupportView extends GetView<HelpSupportController> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Icon(Icons.arrow_back),
+                      InkWell(onTap: (){
+                        Get.back();
+                      },
+                          child: Icon(Icons.arrow_back)),
                       Text(
                         'Help & Support',
                         style: TextStyle(
@@ -32,7 +35,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
                       Text(" "),
                     ],
                   ),
-                  SizedBox(height: 40),
+                  SizedBox(height: 20),
                   Card(
                     elevation: 2,
                     shape: RoundedRectangleBorder(
@@ -48,7 +51,6 @@ class HelpSupportView extends GetView<HelpSupportController> {
                         children: [
                           buildList(
                             context,
-
                             "Job location is incorrect",
                             Icons.arrow_forward_ios,
                           ),

@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:worknest/colors.dart';
+import '../../../../auth_controller.dart';
 import '../../BricklayingHelper/views/bricklaying_helper_view.dart';
 import '../../CementHelper/views/cement_helper_view.dart';
 import '../../Scaffolding_helper/views/scaffolding_helper_view.dart';
@@ -18,6 +20,7 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    final AuthController authController = Get.find<AuthController>();
     return Scaffold(
       backgroundColor: Colors.white,
       body: SizedBox(
@@ -27,8 +30,12 @@ class HomeView extends GetView<HomeController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Location & Search Bar
-              InkWell(onTap: (){
+              InkWell(onTap: (){   if (!authController.isLoggedIn.value) {
                 controller.showSignupSheet(context);
+              } else {
+                // Normal action
+                print('Navigate to service');
+              }
               },
                 child: Container(
                   decoration: BoxDecoration(
@@ -48,21 +55,19 @@ class HomeView extends GetView<HomeController> {
                             const SizedBox(width: 8),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${controller.houseNo.value}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                    color: AppColors.textColor,
-                                  ),
-                                ),
-                                Text(
-                                  '${controller.landMark.value}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12,
-                                    color: AppColors.textColor,
+                              children: [Obx(() => Text("${controller.houseNo.value}",style:TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        color: AppColors.textColor,
+                      ), )),
+                Obx(() =>
+                                  Text(
+                                    '${controller.landMark.value}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12,
+                                      color: AppColors.textColor,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -90,6 +95,11 @@ class HomeView extends GetView<HomeController> {
                         TextField(
                           controller: controller.searchController,
                           onChanged: (value) {
+                            if (!authController.isLoggedIn.value) {
+                              // User not logged in, show bottom sheet
+                              controller.showSignupSheet(context);
+                              return;
+                            }
                             if (value.isEmpty) {
                               controller.searchResults.clear();  // Clear the results when the field is empty
                             } else {
@@ -145,11 +155,19 @@ class HomeView extends GetView<HomeController> {
                                   // Visiting Professionals Button
                                   Expanded(
                                     child: InkWell(
-                                      onTap: () {
-                                        final selectedCategory = controller.visitingProfessionals.first;
-                                        controller.fetchUsersByCategory(selectedCategory.id);
-                                        controller.toggleServiceExpansion('Visiting Professionals');
-                                      },
+                              onTap: () {
+                            if (!authController.isLoggedIn.value) {
+                              // User not logged in, show bottom sheet
+                             controller.showSignupSheet(context);
+                              return;
+                            }
+
+                            // ✅ User is logged in, proceed
+                            final selectedCategory = controller.visitingProfessionals.first;
+                            controller.fetchUsersByCategory(selectedCategory.id);
+                            controller.toggleServiceExpansion('Visiting Professionals');
+                          },
+
                                       child: Container(
                                         padding: const EdgeInsets.all(14),
                                         decoration: BoxDecoration(
@@ -197,7 +215,18 @@ class HomeView extends GetView<HomeController> {
                                   // Fixed Charge Helpers Button
                                   Expanded(
                                     child: InkWell(
-                                      onTap: () => controller.toggleServiceExpansion('Fixed charge Helpers'),
+                                      onTap: () {
+                                        if (!authController.isLoggedIn.value) {
+
+                                          controller.showSignupSheet(context);
+                                          return;
+                                        }
+
+                                        // ✅ User is logged in, proceed
+                                        final selectedCategory = controller.fixedChargeHelpers.first;
+                                        controller.fetchUsersByCategory(selectedCategory.id);
+                                        controller.toggleServiceExpansion('Fixed charge Helpers');
+                                      },
                                       child: Container(
                                         padding: const EdgeInsets.all(14),
                                         decoration: BoxDecoration(

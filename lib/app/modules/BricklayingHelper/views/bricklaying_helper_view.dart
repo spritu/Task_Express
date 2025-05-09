@@ -89,7 +89,7 @@ class BricklayingHelperView extends GetView<BricklayingHelperController> {
                                       width: 94,
                                       fit: BoxFit.contain,
                                     ),
-                                  ),
+                                  ),SizedBox(height: 3),
                                   Row(
                                     children: [
                                       const Icon(
@@ -99,13 +99,13 @@ class BricklayingHelperView extends GetView<BricklayingHelperController> {
                                       ),
                                       Text(
                                         "${worker['rating']} (${worker['reviews']} reviews)",
-                                        style: const TextStyle(color: Colors.grey,fontSize: 11,fontFamily: "poppins",fontWeight: FontWeight.w400),
+                                        style: const TextStyle(color: Colors.black,fontSize: 11,fontFamily: "poppins",fontWeight: FontWeight.w400),
                                       ),
                                     ],
                                   ),
                                   Text(
                                     "${worker['experience']} year Experience",
-                                    style: const TextStyle(color: Color(0xff7C7C7C),fontSize: 10,fontFamily: "poppins",fontWeight: FontWeight.w400),
+                                    style: const TextStyle(color: Colors.black,fontSize: 10,fontFamily: "poppins",fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
@@ -283,7 +283,6 @@ class BricklayingHelperView extends GetView<BricklayingHelperController> {
           ),
         ],
       ),
-
     );
   }
 }

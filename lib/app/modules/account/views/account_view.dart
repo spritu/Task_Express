@@ -54,20 +54,12 @@ class AccountView extends GetView<AccountController> {
                           padding: EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              Obx(() {
-                                final imagePath = controller.imagePath.value;
-                                return CircleAvatar(
-                                  radius: 35,
-                                  backgroundImage: imagePath.startsWith("http")
-                                      ? NetworkImage(imagePath)
-                                      : FileImage(File(imagePath)) as ImageProvider,
-                                  backgroundColor: Colors.grey[200],
-                                );
-                              }),
-
-
-
-                              // Image.asset("assets/images/account.png"),
+                              Obx(() => CircleAvatar(
+                                radius: 40,
+                                backgroundImage: controller.imagePath.value.isNotEmpty
+                                    ? FileImage(File(controller.imagePath.value)) as ImageProvider
+                                    : AssetImage('assets/images/account.png'),
+                              )),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8.0,
@@ -112,7 +104,7 @@ class AccountView extends GetView<AccountController> {
                           ),
                         ),
                       ),
-                    ),
+                    ),SizedBox(height: 20),
                     Card(
                       child: Container(
                         // height: 80,
@@ -162,7 +154,7 @@ class AccountView extends GetView<AccountController> {
                           ),
                         ),
                       ),
-                    ),
+                    ),SizedBox(height: 20),
                     Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(
@@ -176,20 +168,20 @@ class AccountView extends GetView<AccountController> {
                         ),
                         child: Column(
                           children: [
-                            buildList(
-                              context,
-                              Icons.view_list_outlined,
-                              "My plans",
-                              Icons.arrow_forward_ios,
-                            ),
-                            Divider(thickness: 1),
-                            buildList(
-                              context,
-                              Icons.account_balance_wallet_outlined,
-                              "Wallet",
-                              Icons.arrow_forward_ios,
-                            ),
-                            Divider(thickness: 1),
+                            // buildList(
+                            //   context,
+                            //   Icons.view_list_outlined,
+                            //   "My plans",
+                            //   Icons.arrow_forward_ios,
+                            // ),
+
+                            // buildList(
+                            //   context,
+                            //   Icons.account_balance_wallet_outlined,
+                            //   "Wallet",
+                            //   Icons.arrow_forward_ios,
+                            // ),
+                         //   Divider(thickness: 1),
                             InkWell(
                               onTap: () {
                                 Get.to(AddAddressView());
@@ -201,13 +193,13 @@ class AccountView extends GetView<AccountController> {
                                 Icons.arrow_forward_ios,
                               ),
                             ),
-                            Divider(thickness: 1),
-                            buildList(
-                              context,
-                              Icons.attach_money_outlined,
-                              "Manage payment options",
-                              Icons.arrow_forward_ios,
-                            ),
+                            // Divider(thickness: 1),
+                            // buildList(
+                            //   context,
+                            //   Icons.attach_money_outlined,
+                            //   "Manage payment options",
+                            //   Icons.arrow_forward_ios,
+                            // ),
                             Divider(thickness: 1),
                             InkWell(
                               onTap: () {
@@ -246,7 +238,7 @@ class AccountView extends GetView<AccountController> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 30),
+                    SizedBox(height: MediaQuery.of(context).size.height*0.2),
                     InkWell(onTap: (){
                       controller. logout();
                     },

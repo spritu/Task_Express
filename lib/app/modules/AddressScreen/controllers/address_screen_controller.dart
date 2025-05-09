@@ -184,7 +184,7 @@ class AddressScreenController extends GetxController {
   Future<void> saveAddress() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? userId = prefs.getString('userId');  // Retrieve the userId from SharedPreferences
+      String? userId = prefs.getString('userId');
 
       if (userId == null) {
         print("User ID not found");
@@ -194,7 +194,7 @@ class AddressScreenController extends GetxController {
       var headers = {'Content-Type': 'application/json'};
       var request = http.Request('POST', Uri.parse('https://jdapi.youthadda.co/user/addeditaddress'));
       request.body = json.encode({
-        "userId": userId,  // Use the dynamic userId
+        "userId": userId,
         "houseNo": houseController.text,
         "landMark": landmarkController.text,
         "addressType": selectedAddressType.value.toLowerCase(),
@@ -208,7 +208,11 @@ class AddressScreenController extends GetxController {
         final result = await response.stream.bytesToString();
         print('Success: $result');
         Get.snackbar("Success", "Address saved successfully");
+
         clear();
+
+        /// 👇 Automatically fetch updated address
+        await fetchAddress();
       } else {
         print('Error: ${response.reasonPhrase}');
         Get.snackbar("Error", "Failed to save address");
@@ -218,7 +222,8 @@ class AddressScreenController extends GetxController {
       Get.snackbar("Error", "Something went wrong");
     }
   }
-clear(){
+
+  clear(){
   houseController.clear();
   landmarkController.clear();
   phoneController.clear();

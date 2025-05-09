@@ -1,8 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-
 import '../../../../colors.dart';
+import '../../Bottom2/controllers/bottom2_controller.dart';
+import '../../Bottom2/views/bottom2_view.dart';
 import '../../YourEarning/views/your_earning_view.dart';
 import '../../provider_editProfile/views/provider_edit_profile_view.dart';
 import '../controllers/provider_account_controller.dart';
@@ -12,245 +13,268 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(gradient: AppColors.appGradient2),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  SizedBox(height: 20),
-                  const Text(
-                    "Account",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                      fontFamily: "poppins",
-                    ),
-                  ),
-                  SizedBox(height: 20),
-
-                  /// Profile Card
-                  Card(
-                    child: Container(
-                      height: 80,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
+    return WillPopScope(
+      onWillPop: () async {
+        Get.find<Bottom2Controller>().selectedIndex.value = 0;
+        Get.offAll(() => Bottom2View());
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(gradient: AppColors.appGradient2),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  children: [
+                    SizedBox(height: 20),
+                    const Text(
+                      "Account",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                        fontFamily: "poppins",
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 40,
-                              child: ClipOval(
-                                child: Image.asset(
-                                  "assets/images/rajesh.png",
-                                  fit: BoxFit.cover,
-                                  width: 60,
-                                  height: 60,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                    ),
+                    SizedBox(height: 20),
+
+                    /// Profile Card
+                    Card(
+                      child: Container(
+                        height: 80,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Obx(() => CircleAvatar(
+                                radius: 40,
+                                backgroundImage: controller.imagePath.value.isNotEmpty
+                                    ? FileImage(File(controller.imagePath.value))
+                                    : AssetImage('assets/images/account.png') as ImageProvider,
+                              )),
+                              SizedBox(width: 8),
+                              Obx(() => Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Akash Gupta",
+                                    '${controller.firstName.value} ${controller.lastName.value}',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontFamily: "poppins",
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
+                                  SizedBox(height: 4),
                                   Text(
-                                    "+91 8784789040",
+                                    controller.mobileNumber.value.isEmpty
+                                        ? "Mobile number not found"
+                                        : "+91 ${controller.mobileNumber.value}",
                                     style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontFamily: "poppins",
                                       fontSize: 12,
-                                      color: Color(0xFF746E6E),
+                                      fontFamily: "poppins",
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ],
+                              )),
+                              Spacer(),
+                              InkWell(
+                                onTap: () {
+                                  Get.to(() => ProviderEditProfileView());
+                                },
+                                child: Icon(Icons.arrow_forward_ios, size: 16),
                               ),
-                            ),
-                            Spacer(),
-                            InkWell(
-                              onTap: () {
-                              Get.to(ProviderEditProfileView());
-                              },
-                              child: Icon(Icons.arrow_forward_ios, size: 16),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+
+                    SizedBox(height: 10),
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white,
+                        ),
+                        child: Column(
+                          children: [
+                            _buildRow("Profession", "Fixed Charge Helper", isDropdown: true),
+                            Divider(thickness: 1),
+                            _buildRow("Category", "Construction & Masonary", isDropdown: true),
+                            Divider(thickness: 1),
+                            _buildRow("Sub Category", "Bricklaying Helper", isDropdown: true),
+                            Divider(thickness: 1),
+                            _buildRow("Charge", "₹ 250", isEditable: true),
+                          ],
+                        ),
+                      ),
+                    ),SizedBox(height: 20,),
+                    /// Toggleable Service Card
+                    Obx(() => controller.showServiceCard.value
+                        ? Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white,
+                        ),
+                        child: Column(
+                          children: [
+                            Obx(() => _buildRow1(
+                        context,
+                        "Profession",
+                        controller.selectedProfession.value,
+                        isDropdown: true,
+                        options: ["Visiting Professional", "Fixed Charge Helper"],
+                        onOptionSelected: (value) => controller.setProfession(value),
+                      )
+                            ),Divider(thickness: 1),Obx(() => _buildRow1(
+                      context,
+                      "Category",
+                      controller.selectCategory.value,
+                      isDropdown: true,
+                      options: ["Construction & Masonry", "Electrical and Plumbing", "Household & Cleaning","Transport & Loading","Mechanic & Garage",
+                      "Office & Business","Event & Function","Pet care & Animal","Specialty Construction","Home Improvement","Farming & Agriculture"],
+                      onOptionSelected: (value) => controller.setCategory(value),
+                    )),Divider(thickness: 1),Obx(() => _buildRow1(
+                      context,
+                      "Sub Category",
+                      controller.selectSubCategory.value,
+                      isDropdown: true,
+                      options: ["Bricklaying Helper", "Cement Mixing Helper", "Scaffolding Helper","Tile Fixing Helper","Road Construction Helper",
+                        "Plastering Helper"],
+                      onOptionSelected: (value) => controller.selectSubCategory(value),
+                    )),Divider(thickness: 1),Obx(() => _buildRow1(
+                              context,
+                              "Charge",
+                             controller.selectCharge.value,
+                              isEditable: true,
+                              onOptionSelected: (value) => controller.setCharge(value),
+                            ))
+
+                          ],
+                        ),
+                      ),
+                    )
+                        : SizedBox.shrink()),
+
+                    SizedBox(height: 10),
+
+                    /// Add Service Button
+                    InkWell(
+                      onTap: () {
+                        controller.toggleServiceCard();
+                      },
+                      child: Container(
+                        height: 34,
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.add, color: Colors.white, size: 18),
+                            SizedBox(width: 5),
+                            Text(
+                              "Add Service",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontFamily: "poppins",
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white,
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ),
 
-                  SizedBox(height: 10),
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
+                    SizedBox(height: 20),
+
+                    /// Other options card
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        color: Colors.white,
                       ),
-                      child: Column(
-                        children: [
-                          _buildRow("Profession", "Fixed Charge Helper", isDropdown: true),
-                          Divider(thickness: 1),
-                          _buildRow("Category", "Construction & Masonary", isDropdown: true),
-                          Divider(thickness: 1),
-                          _buildRow("Sub Category", "Bricklaying Helper", isDropdown: true),
-                          Divider(thickness: 1),
-                          _buildRow("Charge", "₹ 250", isEditable: true),
-                        ],
-                      ),
-                    ),
-                  ),SizedBox(height: 20,),
-                  /// Toggleable Service Card
-                  Obx(() => controller.showServiceCard.value
-                      ? Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.white,
-                      ),
-                      child: Column(
-                        children: [
-                          Obx(() => _buildRow1(
-                      context,
-                      "Profession",
-                      controller.selectedProfession.value,
-                      isDropdown: true,
-                      options: ["Visiting Professional", "Fixed Charge Helper"],
-                      onOptionSelected: (value) => controller.setProfession(value),
-                    )
-                          ),Divider(thickness: 1),Obx(() => _buildRow1(
-                    context,
-                    "Category",
-                    controller.selectCategory.value,
-                    isDropdown: true,
-                    options: ["Construction & Masonry", "Electrical and Plumbing", "Household & Cleaning","Transport & Loading","Mechanic & Garage",
-                    "Office & Business","Event & Function","Pet care & Animal","Specialty Construction","Home Improvement","Farming & Agriculture"],
-                    onOptionSelected: (value) => controller.setCategory(value),
-                  )),Divider(thickness: 1),Obx(() => _buildRow1(
-                    context,
-                    "Sub Category",
-                    controller.selectSubCategory.value,
-                    isDropdown: true,
-                    options: ["Bricklaying Helper", "Cement Mixing Helper", "Scaffolding Helper","Tile Fixing Helper","Road Construction Helper",
-                      "Plastering Helper"],
-                    onOptionSelected: (value) => controller.selectSubCategory(value),
-                  )),Divider(thickness: 1),Obx(() => _buildRow1(
-                            context,
-                            "Charge",
-                           controller.selectCharge.value,
-                            isEditable: true,
-                            onOptionSelected: (value) => controller.setCharge(value),
-                          ))
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white,
+                        ),
+                        child: Column(
+                          children: [
+                            InkWell(onTap: (){
+                              Get.to(YourEarningView());
+                            },
+                                child: buildList(context, Icons.money, "Your Earnings", Icons.arrow_forward_ios)),
 
-                        ],
+                            Divider(thickness: 1),
+                            buildList(
+                              context,
+                              Icons.info_outline,
+                              "About ",
+                              Icons.arrow_forward_ios,
+                              richText: const TextSpan(
+                                children: [
+                                  TextSpan(text: 'Task', style: TextStyle(color: Colors.blue)),
+                                  TextSpan(text: 'Express', style: TextStyle(color: Colors.orange)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  )
-                      : SizedBox.shrink()),
-
-                  SizedBox(height: 10),
-
-                  /// Add Service Button
-                  InkWell(
-                    onTap: () {
-                      controller.toggleServiceCard();
+                    ),SizedBox(height: 30), InkWell(onTap: (){
+                      controller. logout();
                     },
-                    child: Container(
-                      height: 34,
-                      width: MediaQuery.of(context).size.width * 0.4,
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add, color: Colors.white, size: 18),
-                          SizedBox(width: 5),
-                          Text(
-                            "Add Service",
+                      child: Container(
+                        height: 28,
+                        width: 75,
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          border: Border.all(color: AppColors.orage),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Logout",
                             style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: "poppins",
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white,
-                            ),
+                                fontSize: 12,
+                                fontFamily: "poppins",
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.orage),
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-
-                  SizedBox(height: 20),
-
-                  /// Other options card
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.white,
-                      ),
-                      child: Column(
-                        children: [
-                          InkWell(onTap: (){
-                            Get.to(YourEarningView());
-                          },
-                              child: buildList(context, Icons.money, "Your Earnings", Icons.arrow_forward_ios)),
-                          Divider(thickness: 1),
-                          buildList(context, Icons.location_on_outlined, "Manage addresses", Icons.arrow_forward_ios),
-                          Divider(thickness: 1),
-                          buildList(context, Icons.monetization_on_outlined, "Manage payment options", Icons.arrow_forward_ios),
-                          Divider(thickness: 1),
-                          buildList(
-                            context,
-                            Icons.info_outline,
-                            "About ",
-                            Icons.arrow_forward_ios,
-                            richText: const TextSpan(
-                              children: [
-                                TextSpan(text: 'Task', style: TextStyle(color: Colors.blue)),
-                                TextSpan(text: 'Express', style: TextStyle(color: Colors.orange)),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

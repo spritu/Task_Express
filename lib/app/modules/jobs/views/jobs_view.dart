@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../colors.dart';
+import '../../Bottom2/controllers/bottom2_controller.dart';
+import '../../Bottom2/views/bottom2_view.dart';
 import '../../HelpSupport/views/help_support_view.dart';
 import '../../job_detail/views/job_detail_view.dart';
 import '../../jobsDetails/views/jobs_details_view.dart';
@@ -11,81 +13,83 @@ class JobsView extends GetView<JobsController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFF5ED), // light background
+    return WillPopScope(
+      onWillPop: () async {
+        Get.find<Bottom2Controller>().selectedIndex.value = 0;
+        Get.offAll(() => Bottom2View());
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFFFF5ED), // light background
 
-      body: Container(
-        decoration: BoxDecoration(gradient: AppColors.appGradient2),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 30),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Get.back();
-                      },
-                      child: Icon(Icons.arrow_back),
-                    ),
-                    const Text(
-                      'Jobs',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontFamily: "poppins",
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+        body: Container(
+          decoration: BoxDecoration(gradient: AppColors.appGradient2),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+
+                      const Text(
+                        'Jobs',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: "poppins",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    Text(""),
-                  ],
+
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              _buildCurrentJobCard(),
-              const SizedBox(height: 16),
-              const Text(
-                'Past Jobs',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'poppins',
+                SizedBox(height: 20),
+                _buildCurrentJobCard(),
+                const SizedBox(height: 16),
+                const Text(
+                  'Past Jobs',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'poppins',
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              _buildPastJob(
-                name: 'Sourabh m..',
-                location: 'Saket Nagar, Indore',
-                amount: '450',
-                date: '12/12/2024',
-                status: 'Job Done',
-                statusColor: Colors.green,
-                icon: Icons.check_circle,
-              ),
-              _buildPastJob(
-                name: 'Aneesha Sin..',
-                location: 'Old Palasia, Indore',
-                amount: '700',
-                date: '11/12/2024',
-                status: 'Job Done',
-                statusColor: Colors.green,
-                icon: Icons.check_circle,
-              ),
-              _buildPastJob(
-                name: 'Smita patd..',
-                location: 'Rau square, Indore',
-                amount: '700',
-                date: '11/12/2024',
-                status: 'Reject',
-                statusColor: Colors.grey,
-                icon: Icons.cancel,
-              ),
-            ],
+                const SizedBox(height: 12),
+                _buildPastJob(
+                  name: 'Sourabh m..',
+                  location: 'Saket Nagar, Indore',
+                  amount: '450',
+                  date: '12/12/2024',
+                  status: 'Job Done',
+                  statusColor: Colors.green,
+                  icon: Icons.check_circle,
+                ),
+                _buildPastJob(
+                  name: 'Aneesha Sin..',
+                  location: 'Old Palasia, Indore',
+                  amount: '700',
+                  date: '11/12/2024',
+                  status: 'Job Done',
+                  statusColor: Colors.green,
+                  icon: Icons.check_circle,
+                ),
+                _buildPastJob(
+                  name: 'Smita patd..',
+                  location: 'Rau square, Indore',
+                  amount: '700',
+                  date: '11/12/2024',
+                  status: 'Reject',
+                  statusColor: Colors.grey,
+                  icon: Icons.cancel,
+                ),
+              ],
+            ),
           ),
         ),
       ),

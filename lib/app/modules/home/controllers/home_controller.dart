@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../BricklayingHelper/views/bricklaying_helper_view.dart';
 import '../../CementHelper/views/cement_helper_view.dart';
 import '../../Scaffolding_helper/views/scaffolding_helper_view.dart';
+import '../../login/views/login_view.dart';
 import '../../plastering_helper/views/plastering_helper_view.dart';
 import '../../road_construction_helper/views/road_construction_helper_view.dart';
 import '../../tile_fixing_helper/views/tile_fixing_helper_view.dart';
@@ -255,8 +256,7 @@ class HomeController extends GetxController {
                     ),
 
                     const SizedBox(height: 20),
-
-                    Container(
+                    SizedBox(
                       height: 36.93,
                       width: 170,
                       child: ElevatedButton(
@@ -266,7 +266,9 @@ class HomeController extends GetxController {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(LoginView());
+                        },
                         child: Text(
                           "Continue",
                           style: TextStyle(

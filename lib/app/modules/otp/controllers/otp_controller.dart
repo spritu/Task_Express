@@ -50,7 +50,7 @@ class OtpController extends GetxController {
     String? mobileNumber = prefs.getString('mobileNumber');
 
     if (mobileNumber == null || mobileNumber.isEmpty) {
-      Get.snackbar("Error", "Mobile number not found. Please try again.");
+      Get.snackbar("", "Mobile number not found. Please try again.");
       return;
     }
 
@@ -76,7 +76,7 @@ class OtpController extends GetxController {
         final responseData = json.decode(response.body);
 
         print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
-
+        Get.off(() => SignUpView());
         Get.snackbar("✅ Success", responseData['msg'],colorText: Colors.green);
 
         // Save important values
@@ -86,15 +86,15 @@ class OtpController extends GetxController {
         prefs.setString('email', responseData['userData']['email']);
         otpController.clear();
         // Navigate to next screen or dashboard
-        Get.to(() => SignUpView());
+
 
       } else {
         print("❌ Failed to verify OTP: ${response.body}");
-        Get.snackbar("", "❌ Failed to verify OTP: ${response.body}",colorText: Colors.red);
+        Get.snackbar("", "❌ Invalid OTP",colorText: Colors.red);
       }
     } catch (e) {
       print("❌ Exception: $e");
-     Get.snackbar("", "❌ Something went wrong: $e",colorText: Colors.red);
+    // Get.snackbar("", "❌ Something went wrong: $e",colorText: Colors.red);
     }
   }
 
@@ -123,11 +123,11 @@ class OtpController extends GetxController {
         Get.snackbar("Success", "OTP resent successfully to +91 $mobileNumber");
       } else {
         print("Failed to resend OTP: ${response.reasonPhrase}");
-        Get.snackbar("Error", "Failed to resend OTP: ${response.reasonPhrase}");
+        Get.snackbar("", "please fill the Correct OTP");
       }
     } catch (e) {
       print("Exception: $e");
-      Get.snackbar("Error", "Something went wrong: $e");
+
     }
   }
 
