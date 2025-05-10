@@ -42,19 +42,34 @@ class LoginController extends GetxController {
         final responseBody = await response.stream.bytesToString();
         print("✅ OTP sent successfully: $responseBody");
 
+        final data = json.decode(responseBody);
+        final otp = data['otp'] ?? '';
+
+        // ✅ Save mobile number
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('mobileNumber', phone);
 
         await box.write('isLoggedIn', true);
         await box.write('mobile', phone);
 
-        // ✅ Update the observable in AuthController
         final authController = Get.find<AuthController>();
         authController.isLoggedIn.value = true;
 
         mobileController.clear();
-        Get.to(() => OtpView());
 
+        // ✅ Show OTP in snackbar for 10 seconds
+        if (otp.isNotEmpty) {
+          Get.snackbar(
+            "🔐 OTP Received",
+            "Your OTP is: $otp",
+            duration: Duration(seconds: 10),
+            backgroundColor: Colors.black87,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+
+        Get.to(() => OtpView());
       } else {
         print("❌ Failed to send OTP: ${response.reasonPhrase}");
         Get.snackbar("Error", "Failed to send OTP: ${response.reasonPhrase}");
@@ -64,6 +79,7 @@ class LoginController extends GetxController {
       Get.snackbar("Error", "Exception occurred while sending OTP");
     }
   }
+
 
 
   void openTerms() {

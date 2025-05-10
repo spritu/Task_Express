@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart'; // <-- ADD THIS
+import 'package:shared_preferences/shared_preferences.dart';
 
 // All your imports
 import 'app/modules/Activejob_screen/controllers/activejob_screen_controller.dart';
@@ -44,9 +45,11 @@ import 'auth_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GetStorage.init(); // <-- ADD THIS
-  final box = GetStorage();
-
+  await GetStorage.init();
+  //
+  // SharedPreferences prefs = await SharedPreferences.getInstance();// <-- ADD THIS
+   final box = GetStorage();
+  // await prefs.clear();
   final isLoggedIn = box.read('isLoggedIn') ?? false;
   Get.put(LoginController());
   Get.put(WorknestController());

@@ -4,7 +4,8 @@ import 'package:worknest/colors.dart';
 import '../controllers/professional_profile_controller.dart';
 
 class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
-  const ProfessionalProfileView({super.key});
+  final String catId;
+  const ProfessionalProfileView({super.key, required this.catId});
 
   @override
   Widget build(BuildContext context) {

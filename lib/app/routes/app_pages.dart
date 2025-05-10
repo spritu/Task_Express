@@ -233,12 +233,12 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PROFESSIONAL_PLUMBER,
-      page: () => const ProfessionalPlumberView(),
+      page: () =>  ProfessionalPlumberView(),
       binding: ProfessionalPlumberBinding(),
     ),
     GetPage(
       name: _Paths.PROFESSIONAL_PROFILE,
-      page: () => const ProfessionalProfileView(),
+      page: () =>  ProfessionalProfileView( catId: '',),
       binding: ProfessionalProfileBinding(),
     ),
     GetPage(

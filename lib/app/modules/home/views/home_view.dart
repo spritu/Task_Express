@@ -305,7 +305,10 @@ class HomeView extends GetView<HomeController> {
                                         itemBuilder: (context, index) {
                                           if (!isExpanded && index == 7 && categories.length > 7) {
                                             return InkWell(
-                                              onTap: controller.toggleCategoryView,
+                                              onTap:() {
+                                                controller.toggleCategoryView();
+
+                                              },
                                               child: const Card(
                                                 color: Colors.white,
                                                 child: Center(
@@ -383,6 +386,7 @@ class HomeView extends GetView<HomeController> {
                                                             return InkWell(
                                                               onTap: () {
                                                                 controller.navigateToSubcategoryScreen(sub.name);
+                                                                controller.fetchUsersListByCategory(sub.id);
                                                                 Get.back();
                                                               },
                                                               child: Container(
@@ -413,6 +417,9 @@ class HomeView extends GetView<HomeController> {
                                                   ),
                                                   isScrollControlled: true,
                                                 );
+                                              }else if (cat.spType == '1') {
+                                                // 🔥 Call API for Visiting Professionals
+                                                controller.fetchUsersListByCategory(cat.id);
                                               }
                                             },
                                             child: Card(

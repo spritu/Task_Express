@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -8,10 +10,11 @@ import '../../professional_profile/views/professional_profile_view.dart';
 import '../controllers/professional_plumber_controller.dart';
 
 class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
-  const ProfessionalPlumberView({super.key});
+  final List<dynamic> users = Get.arguments;
+   ProfessionalPlumberView({super.key});
   @override
   Widget build(BuildContext context) {
-    final UserModel user = Get.arguments;
+
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(
@@ -62,9 +65,11 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
           Expanded(
             child: Obx(
                   () => ListView.builder(
-                itemCount: controller.workers.length,
+                    itemCount: users.length,
                 itemBuilder: (context, index) {
-                  final worker = controller.workers[index];
+                  final user = users[index];
+                  final imagePath = user['userImg'] ?? '';
+                  final imageUrl = 'https://jdapi.youthadda.co/$imagePath';
                   return Container(
                     margin: const EdgeInsets.symmetric(
                       horizontal: 10,
@@ -82,14 +87,13 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                             padding: const EdgeInsets.all(12.0),
                             child: Column(
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.asset(
-                                    worker['image'],
-                                    height: 80,
-                                    width: 94,
-                                    fit: BoxFit.contain,
-                                  ),
+
+                                Image.network(
+                                  imageUrl,
+                                  height: 60,
+                                  width: 60,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
                                 ),
                                 Row(
                                   children: [
@@ -98,14 +102,14 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                       color: Colors.amber,
                                       size: 16,
                                     ),
-                                    Text(
-                                      "${worker['rating']} (${worker['reviews']} reviews)",
-                                      style: const TextStyle(color: Colors.grey,fontSize: 11,fontFamily: "poppins",fontWeight: FontWeight.w400),
-                                    ),
+                                    // Text(
+                                    //   "${worker['rating']} (${worker['reviews']} reviews)",
+                                    //   style: const TextStyle(color: Colors.grey,fontSize: 11,fontFamily: "poppins",fontWeight: FontWeight.w400),
+                                    // ),
                                   ],
                                 ),
                                 Text(
-                                  "${worker['experience']} year Experience",
+                                  "${user['expiresAt']} year Experience",
                                   style: const TextStyle(color: Color(0xff7C7C7C),fontSize: 10,fontFamily: "poppins",fontWeight: FontWeight.w400),
                                 ),
                               ],
@@ -120,8 +124,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                             children: [
                               Row(
                                 children: [
-                                  Text(
-                                    "${user.name ?? 'N/A'}",
+                                  Text(user['firstName'] ?? 'No Name',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 14,
@@ -132,7 +135,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                   const Spacer(),
                                   TextButton(
                                     onPressed: () {
-                                      Get.to(ProfessionalProfileView());
+                                      Get.to(ProfessionalProfileView(catId: '',));
                                     },
                                     child: Container(
                                       height: 19,
@@ -156,7 +159,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                   ),
                                 ],
                               ),
-                              if (worker['available'])
+                              // if (worker['available'])
                                 Row(
                                   children: [
                                     Container(
@@ -199,18 +202,18 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                             color: Colors.grey,
                                           ),
                                         ),
-                                          Text(
-                                            "${worker['distance']} "
-                                            ,
-                                            style: const TextStyle(color: Colors.grey,fontSize: 12,fontWeight: FontWeight.w500,fontFamily: "poppins"),
-                                          ),
+                                          // Text(
+                                          //   "${worker['distance']} "
+                                          //   ,
+                                          //   style: const TextStyle(color: Colors.grey,fontSize: 12,fontWeight: FontWeight.w500,fontFamily: "poppins"),
+                                          // ),
                                         ],
                                       ), Row(
                                         children: [Icon(Icons.access_time,size: 10,color: AppColors.grey,),
-                                          Text(
-                                            "${worker['time']} away",
-                                            style: const TextStyle(color: Colors.grey,fontSize: 12,fontWeight: FontWeight.w500,fontFamily: "poppins"),
-                                          ),
+                                          // Text(
+                                          //   "${worker['time']} away",
+                                          //   style: const TextStyle(color: Colors.grey,fontSize: 12,fontWeight: FontWeight.w500,fontFamily: "poppins"),
+                                          // ),
                                         ],
                                       ),
                                     ],
@@ -248,8 +251,6 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
 
                                 ],
                               ),
-
-
                               const SizedBox(height: 8),
                               Row(
                                 children: [

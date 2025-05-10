@@ -47,11 +47,25 @@ class SignUpController extends GetxController {
 
   File getImageFile() => File(imagePath.value);
 
-  void _loadUserId() async {
+  var userId = ''.obs;
+
+  Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userId');
-    print("🧾 Loaded User ID: $userId");
+
+    String? userId2 = prefs.getString('userId2');
+    String? token = prefs.getString('token');
+    String? email = prefs.getString('email');
+
+    // Use the loaded data as needed
+    print("🔑 Loaded userId2: $userId2");
+    print("🔑 Loaded token: $token");
+    print("🔑 Loaded email: $email");
+
+    // You can also update the UI or variables as needed here
   }
+
+
+
 
   bool validateFields() {
     if (firstName.value.isEmpty ||
@@ -86,6 +100,8 @@ class SignUpController extends GetxController {
     if (!validateFields()) {
       return; // Stop if validation fails
     }
+    final prefs = await SharedPreferences.getInstance();
+    String userId2 = userId.value;
 
     var request = http.MultipartRequest(
       'POST',
@@ -93,6 +109,7 @@ class SignUpController extends GetxController {
     );
 
     request.fields.addAll({
+      '_id':  userId2,
       'firstName': firstName.value,
       'lastName': lastName.value,
       'gender': gender.value,
@@ -161,7 +178,6 @@ class SignUpController extends GetxController {
         } else {
           print("❗ Missing data in response");
         }
-
         Get.snackbar('Success', 'Registration Successful');
         clearFields();
         Get.to(() => LocationView());
@@ -179,8 +195,9 @@ class SignUpController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadUserId();
+    _loadUserData();
   }
+
 
   @override
   void onClose() {

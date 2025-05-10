@@ -9,7 +9,9 @@ import '../../signUp/views/sign_up_view.dart';
 class OtpController extends GetxController {
   TextEditingController otpController = TextEditingController();
   String? mobileNumber;
-
+  var userId = ''.obs;
+  var token = ''.obs;
+  var email = ''.obs;
   List<TextEditingController> otpControllers =
   List.generate(4, (index) => TextEditingController());
 
@@ -18,7 +20,20 @@ class OtpController extends GetxController {
     super.onInit();
     loadMobileNumber();
   }
+  Future<void> _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.reload();
+    String? userId2 = prefs.getString('userId2');
+    String? token = prefs.getString('token');
+    String? email = prefs.getString('email');
 
+    // Use the loaded data as needed
+    print("🔑 Loaded userId2: $userId2");
+    print("🔑 Loaded token: $token");
+    print("🔑 Loaded email: $email");
+
+    // You can also update the UI or variables as needed here
+  }
   Future<void> loadMobileNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -41,16 +56,18 @@ class OtpController extends GetxController {
 
   Future<void> verifyOtp(String otp) async {
     if (otp.isEmpty || otp.length != 4) {
-    //  Get.snackbar("Error", "Please enter a valid 4-digit OTP");
+      Get.snackbar("Error", "Please enter a valid 4-digit OTP", colorText: Colors.red);
       return;
     }
 
-    // Get mobile number from SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? mobileNumber = prefs.getString('mobileNumber');
 
+    // Print all shared preferences data for debugging
+
+
     if (mobileNumber == null || mobileNumber.isEmpty) {
-      Get.snackbar("", "Mobile number not found. Please try again.");
+      Get.snackbar("Error", "Mobile number not found. Please try again.", colorText: Colors.red);
       return;
     }
 
@@ -76,27 +93,47 @@ class OtpController extends GetxController {
         final responseData = json.decode(response.body);
 
         print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
-        Get.off(() => SignUpView());
-        Get.snackbar("✅ Success", responseData['msg'],colorText: Colors.green);
 
-        // Save important values
-        prefs.setString('token', responseData['token']);
-        prefs.setInt('userType', responseData['userType']);
-        prefs.setString('userId', responseData['id']);
-        prefs.setString('email', responseData['userData']['email']);
+        // Save the token and user data
+        prefs.setString('token', responseData['token'] ?? '');
+        prefs.setInt('userType', responseData['userType'] ?? 0);
+
+        final userId = responseData['id'];
+        await prefs.setString('userId2', userId ?? ''); // Ensure userId is saved properly
+        final email = responseData['userData']?['email'] ?? '';
+        if (email.isNotEmpty) {
+          await prefs.setString('email', email);
+        }
+
+        // Reload preferences after saving
+        await prefs.reload();
+
         otpController.clear();
-        // Navigate to next screen or dashboard
+        Get.snackbar("✅ Success", responseData['msg'], colorText: Colors.green);
 
-
-      } else {
+        // Navigate after successful OTP verification
+        Get.to(() {
+          _loadUserData();  // Load data before navigation
+          return SignUpView();
+        });
+      }
+      else {
         print("❌ Failed to verify OTP: ${response.body}");
-        Get.snackbar("", "❌ Invalid OTP",colorText: Colors.red);
+        Get.snackbar("Error", "❌ Invalid OTP", colorText: Colors.red);
       }
     } catch (e) {
       print("❌ Exception: $e");
-    // Get.snackbar("", "❌ Something went wrong: $e",colorText: Colors.red);
+      Get.snackbar("Error", "❌ Something went wrong", colorText: Colors.red);
     }
   }
+
+
+
+
+
+
+
+
 
 
 

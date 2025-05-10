@@ -8,6 +8,8 @@ import '../../CementHelper/views/cement_helper_view.dart';
 import '../../Scaffolding_helper/views/scaffolding_helper_view.dart';
 import '../../login/views/login_view.dart';
 import '../../plastering_helper/views/plastering_helper_view.dart';
+import '../../professional_plumber/views/professional_plumber_view.dart';
+import '../../professional_profile/views/professional_profile_view.dart';
 import '../../road_construction_helper/views/road_construction_helper_view.dart';
 import '../../tile_fixing_helper/views/tile_fixing_helper_view.dart';
 
@@ -23,6 +25,7 @@ class HomeController extends GetxController {
   final addressType = Rx<String>('');
   final contactNo = Rx<String>('');
   RxList<dynamic> searchResults = RxList([]);
+  RxList<dynamic> results = RxList([]);
   var expandedServiceType = ''.obs;
   RxBool showAllCategories = false.obs;
   final TextEditingController searchTextController = TextEditingController();
@@ -38,6 +41,61 @@ class HomeController extends GetxController {
     }
     return [];
   }
+  RxList<dynamic> usersList = <dynamic>[].obs;
+
+  void fetchUsersListBySubcategory(String subcategoryId) async {
+    isLoading.value = true;
+    try {
+      final response = await http.get(Uri.parse(
+        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$subcategoryId',
+      ));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        usersList.assignAll(data); // Make sure `usersList` is an RxList
+        Get.to(() => SubcategoryUserListScreen(subcategoryName: subcategoryId)); // Navigate to screen
+      } else {
+        Get.snackbar("Error", "Failed to load users");
+      }
+    } catch (e) {
+      Get.snackbar("Error", e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void fetchUsersListByCategory(String catId) async {
+    results.clear();
+    isLoading.value = true;
+    try {
+      var url = Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId');
+      var request = http.Request('GET', url);
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        final jsonString = await response.stream.bytesToString();
+        final jsonData = json.decode(jsonString);
+
+        results.assignAll(jsonData['data']); // assuming API gives {data: [...]}
+
+        // ✅ Navigate to ProfessionalProfileView with the results
+        if (results.isNotEmpty) {
+          Get.to(() => ProfessionalPlumberView(), arguments: results);
+        } else {
+          Get.snackbar("No Users", "No professionals found for this category.");
+        }
+      } else {
+        print("Error: ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("Exception: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
+
 
   Future<void> fetchAddress() async {
     try {
@@ -311,6 +369,7 @@ class HomeController extends GetxController {
       expandedServiceType.value = serviceTypes.first['title']!;
       fetchAddress();
     }
+  //  fetchUsersListByCategory("catId");
     super.onInit();
   }
 
@@ -520,23 +579,29 @@ class CategoryModel {
     );
   }
 }
-
 class SubcategoryModel {
+  final String subId;
   final String name;
   final String description;
 
   SubcategoryModel({
+    required this.subId,
     required this.name,
     required this.description,
   });
 
   factory SubcategoryModel.fromJson(Map<String, dynamic> json) {
     return SubcategoryModel(
+      subId: json['_id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
     );
   }
+
+  // Optional: If you want to access `subId` as `id`
+  String get id => subId;
 }
+
 
 
 // user_model.dart
@@ -566,3 +631,39 @@ class UserModel {
 
 
 
+class SubcategoryUserListScreen extends StatelessWidget {
+  final String subcategoryName;
+  const SubcategoryUserListScreen({super.key, required this.subcategoryName});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<HomeController>();
+
+    return Scaffold(
+      appBar: AppBar(title: Text(subcategoryName)),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (controller.usersList.isEmpty) {
+          return const Center(child: Text("No users found"));
+        }
+
+        return ListView.builder(
+          itemCount: controller.usersList.length,
+          itemBuilder: (context, index) {
+            final user = controller.usersList[index];
+            return Card(
+              margin: const EdgeInsets.all(8),
+              child: ListTile(
+                title: Text(user['name'] ?? 'No Name'),
+                subtitle: Text(user['phone'] ?? 'No Phone'),
+              ),
+            );
+          },
+        );
+      }),
+    );
+  }
+}

@@ -53,14 +53,18 @@ class ProviderLoginController extends GetxController {
         // ✅ Save phone number for OTP verification
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('mobileNumber', phone);
-
+        await prefs.reload(); // 🔄 Force reload to avoid stale data
         // ✅ Save Login State TRUE using GetStorage
+        String? savedPhone = prefs.getString('mobileNumber');
+        print("📞 Saved Mobile Number: $savedPhone");
+
+// ✅ Save Login State TRUE using GetStorage
         await box.write('isLoggedIn2', true);
         await box.write('mobile', phone);
         mobileeController.clear();
-        // ✅ Navigate to OTP Screen
-        Get.to(() => ProviderOtpView());
 
+// ✅ Navigate to OTP Screen
+        Get.to(() => ProviderOtpView());
       } else {
         print("❌ Failed to send OTP: ${response.reasonPhrase}");
         Get.snackbar("Error", "Failed to send OTP: ${response.reasonPhrase}");

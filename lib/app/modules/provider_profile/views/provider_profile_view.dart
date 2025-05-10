@@ -125,7 +125,6 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
                   // Gender selection (No validation needed for now)
                   buildTextField(
                     "Date Of Birth",
@@ -329,11 +328,8 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                 ],
                               );
                             }),
-
                             // ── Subcategory Dropdown ──
                             Obx(() {
-
-
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -561,7 +557,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                     child: TextButton(
                       onPressed: () {
                         if (controller.formKey.currentState!.validate()) {
-                          controller.submitForm();
+                        //  controller.submitForm();
                           controller.registerServiceProvider();
                         //  Get.to(() => ProviderLocationView());
                         }
