@@ -238,14 +238,15 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        "Hello Suraj,",
+                      Obx(() => Text(
+                        "Hello ${controller.firstName.value}",
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
                           fontFamily: "Poppins",
                         ),
-                      ),
+                      )),
+
                       const SizedBox(height: 2),
                       RichText(
                         text: TextSpan(

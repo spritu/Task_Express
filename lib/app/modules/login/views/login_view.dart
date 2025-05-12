@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../auth_controller.dart';
 import '../../../../colors.dart';
 import '../../bottom/views/bottom_view.dart';
@@ -30,13 +31,14 @@ class LoginView extends GetView<LoginController> {
             //  crossAxisAlignment: CrossAxisAlignment.center,
 
               children: [SizedBox(height: 40),InkWell(
-                onTap: () {
+                onTap: () async {
                   final authController = Get.find<AuthController>();
 
                   // Update GetStorage and observable state
                   authController.box.write('isLoggedIn', false);
                   authController.isLoggedIn.value = false;
-
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  await prefs.clear();
                   // Navigate to BottomView
                   Get.to(() => BottomView());
                 },

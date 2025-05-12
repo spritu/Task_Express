@@ -1,11 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 class ProviderHomeController extends GetxController {
   //TODO: Implement ProviderHomeController
   RxBool isAvailable2 = false.obs;
-
+  var firstName = ''.obs;
   Future<void> updateAvailability(bool status) async {
     try {
       final headers = {'Content-Type': 'application/json'};
@@ -45,9 +47,14 @@ class ProviderHomeController extends GetxController {
       "date": "10 Apr 2025",
     },
   );
+  void fetchUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    firstName.value = prefs.getString('firstName') ?? '';
+  }
   @override
   void onInit() {
     super.onInit();
+    fetchUserName();
   }
 
   @override

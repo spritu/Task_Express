@@ -9,27 +9,43 @@ import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
 class ChatController extends GetxController {
-  final RxList<types.Message> messages = <types.Message>[].obs;
-  final RxList lastMessages = [].obs;
+  var messages = <types.Message>[].obs;
   final RxString firstName = ''.obs;
   final RxString lastName = ''.obs;
   final RxString imagePath = ''.obs;
   final RxString userId = ''.obs;
-  late types.User currentUser;final RxString receiverName = 'Helper Name'.obs; // you can update it dynamically later
+
+  late types.User currentUser;
+
+  final RxBool isReady = false.obs;
+  final RxString receiverName = 'Helper Name'.obs;
   final RxString receiverImage = ''.obs;
 
   late IO.Socket socket;
 
-  String receiverId = '6800d9e2764d14e5400cc38e'; // hardcoded for demo
+  String receiverId = '6800d9e2764d14e5400cc38e'; // Replace with actual
 
   @override
   void onInit() {
     super.onInit();
+    connectSocket();
+    fetchChatFromApi();
     loadUserInfo();
   }
+  void fetchChatFromApi() async {
+    final response = await http.get(Uri.parse("https://yourapi.com/chat"));
+    final data = jsonDecode(response.body);
+    final fetchedMessages = (data as List).map((msg) {
+      return types.TextMessage(
+        author: types.User(id: msg['sender']['_id']),
+        createdAt: DateTime.parse(msg['timestamp']).millisecondsSinceEpoch,
+        id: msg['_id'],
+        text: msg['message'],
+      );
+    }).toList();
 
-  final RxBool isReady = false.obs;
-
+    messages.assignAll(fetchedMessages.reversed.toList());
+  }
   Future<void> loadUserInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     firstName.value = prefs.getString('firstName') ?? '';
@@ -44,25 +60,7 @@ class ChatController extends GetxController {
         imageUrl: imagePath.value,
       );
       connectSocket();
-      fetchLastMessages();
-      isReady.value = true; // ✅ mark ready
-    }
-  }
-
-
-  Future<void> fetchLastMessages() async {
-    try {
-      var url = Uri.parse("https://jdapi.youthadda.co/conversationlastmessages?userId=${userId.value}");
-      var response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        lastMessages.value = data['data'] ?? [];
-      } else {
-        print("❌ API Error: ${response.reasonPhrase}");
-      }
-    } catch (e) {
-      print("❗ Exception: $e");
+      isReady.value = true;
     }
   }
 
@@ -84,7 +82,6 @@ class ChatController extends GetxController {
     socket.onConnect((_) => print("✅ Socket connected"));
 
     socket.on('message', (data) {
-      print("📩 New message: $data");
       final incoming = types.TextMessage(
         author: types.User(
           id: data['sender']['_id'],

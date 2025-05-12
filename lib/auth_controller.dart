@@ -14,6 +14,7 @@ class AuthController extends GetxController {
     _loadUserData();
     // ✅ Load login state from storage
     isLoggedIn.value = box.read('isLoggedIn') ?? false;
+
     print("Login status onInit: ${isLoggedIn.value}");
   }
 

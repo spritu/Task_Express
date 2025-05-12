@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfessionalPlumberController extends GetxController {
   //TODO: Implement ProfessionalPlumberController
@@ -72,6 +73,15 @@ class ProfessionalPlumberController extends GetxController {
       },
       // Add more if needed
     ];
+  }
+
+  void makePhoneCall(String phoneNumber) async {
+    final Uri callUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(callUri)) {
+      await launchUrl(callUri);
+    } else {
+      throw 'Could not launch $callUri';
+    }
   }
   final count = 0.obs;
   @override

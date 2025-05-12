@@ -1,12 +1,20 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfessionalProfileController extends GetxController {
   RxBool isLoading = false.obs;
   RxList users = [].obs;
   RxInt selectedIndex = (-1).obs;
-
+  void makePhoneCall(String phoneNumber) async {
+    final Uri callUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(callUri)) {
+      await launchUrl(callUri);
+    } else {
+      throw 'Could not launch $callUri';
+    }
+  }
   void fetchUsersListByCategory(String catId) async {
     isLoading.value = true;
     try {

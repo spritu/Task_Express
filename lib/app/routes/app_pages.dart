@@ -238,7 +238,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PROFESSIONAL_PROFILE,
-      page: () =>  ProfessionalProfileView( catId: '',),
+      page: () =>  ProfessionalProfileView(),
       binding: ProfessionalProfileBinding(),
     ),
     GetPage(

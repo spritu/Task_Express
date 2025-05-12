@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../colors.dart';
 import '../../AboutTaskexpress/views/about_taskexpress_view.dart';
 import '../../add_address/views/add_address_view.dart';
@@ -127,7 +128,7 @@ class AccountView extends GetView<AccountController> {
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8.0,
-                                  vertical: 5,
+                                  vertical: 3,
                                 ),
                                 child: Text(
                                   'Join as a Service provider',
@@ -141,9 +142,18 @@ class AccountView extends GetView<AccountController> {
                               ),
                               Spacer(),
                               InkWell(
-                                onTap: () {
-                                  Get.to(ProviderProfileView());
+                                onTap: () async {
+                                  final prefs = await SharedPreferences.getInstance();
+                                  final userId = prefs.getString('user_id') ?? '';
+
+                                  Get.to(
+                                        () => ProviderProfileView(),
+                                    arguments: {
+                                      'userId': userId,
+                                    },
+                                  );
                                 },
+
                                 child: Icon(
                                   Icons.arrow_forward_ios,
                                   size: 16,
@@ -168,20 +178,7 @@ class AccountView extends GetView<AccountController> {
                         ),
                         child: Column(
                           children: [
-                            // buildList(
-                            //   context,
-                            //   Icons.view_list_outlined,
-                            //   "My plans",
-                            //   Icons.arrow_forward_ios,
-                            // ),
 
-                            // buildList(
-                            //   context,
-                            //   Icons.account_balance_wallet_outlined,
-                            //   "Wallet",
-                            //   Icons.arrow_forward_ios,
-                            // ),
-                         //   Divider(thickness: 1),
                             InkWell(
                               onTap: () {
                                 Get.to(AddAddressView());
@@ -193,13 +190,7 @@ class AccountView extends GetView<AccountController> {
                                 Icons.arrow_forward_ios,
                               ),
                             ),
-                            // Divider(thickness: 1),
-                            // buildList(
-                            //   context,
-                            //   Icons.attach_money_outlined,
-                            //   "Manage payment options",
-                            //   Icons.arrow_forward_ios,
-                            // ),
+
                             Divider(thickness: 1),
                             InkWell(
                               onTap: () {

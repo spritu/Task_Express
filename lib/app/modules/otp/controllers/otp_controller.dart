@@ -37,7 +37,7 @@ class OtpController extends GetxController {
   Future<void> loadMobileNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      mobileNumber = prefs.getString('mobileNumber');
+    mobileNumber = prefs.getString('mobileNumber');
 
   }
   // Move focus on pin code fields
@@ -126,17 +126,6 @@ class OtpController extends GetxController {
       Get.snackbar("Error", "❌ Something went wrong", colorText: Colors.red);
     }
   }
-
-
-
-
-
-
-
-
-
-
-
 
   // Resend OTP
   Future<void> resendOtp() async {

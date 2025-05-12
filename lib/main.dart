@@ -24,6 +24,7 @@ import 'app/modules/login/controllers/login_controller.dart';
 import 'app/modules/otp/controllers/otp_controller.dart';
 import 'app/modules/plastering_helper/controllers/plastering_helper_controller.dart';
 import 'app/modules/professional_plumber/controllers/professional_plumber_controller.dart';
+import 'app/modules/professional_profile/controllers/professional_profile_controller.dart';
 import 'app/modules/provider_ChatScreen/controllers/provider_chat_screen_controller.dart';
 import 'app/modules/provider_account/controllers/provider_account_controller.dart';
 import 'app/modules/provider_chat/controllers/provider_chat_controller.dart';
@@ -80,7 +81,7 @@ void main() async {
   Get.put(ProviderOtpController());
   Get.put(Bottom2Controller());
   Get.put(ProviderAccountController());
-  Get.put(AddAddressController());
+  Get.put(AddAddressController());Get.put(ProfessionalProfileController());
 
   runApp(
     GetMaterialApp(

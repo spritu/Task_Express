@@ -97,23 +97,34 @@ class SignUpController extends GetxController {
   }
 
   Future<void> registerUser() async {
-    if (!validateFields()) {
-      return; // Stop if validation fails
-    }
     final prefs = await SharedPreferences.getInstance();
-    String userId2 = userId.value;
+
+    // ✅ Get userId2 from OTP verification step
+    String? userId2 = prefs.getString('userId2');
+
+    if (userId2 == null || userId2.isEmpty) {
+      Get.snackbar('Error', 'User ID not found. Please verify OTP again.');
+      return;
+    }
+
+    // ✅ Validate required fields (optional check)
+    if (firstName.value.isEmpty || lastName.value.isEmpty || gender.value.isEmpty || dateOfBirth.value.isEmpty || email.value.isEmpty) {
+      Get.snackbar('Error', 'Please fill all the fields');
+      return;
+    }
 
     var request = http.MultipartRequest(
       'POST',
       Uri.parse('https://jdapi.youthadda.co/user/register'),
     );
 
+    // ✅ Add form fields
     request.fields.addAll({
-      '_id':  userId2,
+      '_id': userId2,
       'firstName': firstName.value,
       'lastName': lastName.value,
       'gender': gender.value,
-      'dateOfBirth': dateOfBirth.value,
+      'dateOfBirth': dateOfBirth.value, // Use format yyyy-mm-dd
       'email': email.value,
       'city': city.value,
       'pinCode': pinCode.value,
@@ -121,8 +132,11 @@ class SignUpController extends GetxController {
       'referralCode': referralCode.value,
     });
 
-    if (imagePath.value.isNotEmpty) {
+    // ✅ Optional: Add image if exists
+    if (imagePath.value.isNotEmpty && await File(imagePath.value).exists()) {
       request.files.add(await http.MultipartFile.fromPath('userImg', imagePath.value));
+    } else {
+      print('⚠️ Skipping image upload: No image selected or file not found.');
     }
 
     try {
@@ -130,6 +144,7 @@ class SignUpController extends GetxController {
         'Accept': 'application/json',
       });
 
+      print('📤 Sending request with fields: ${request.fields}');
       http.StreamedResponse response = await request.send();
       final resBody = await response.stream.bytesToString();
 
@@ -139,59 +154,45 @@ class SignUpController extends GetxController {
         final decodedResponse = json.decode(resBody);
         print('🔍 Decoded Response: $decodedResponse');
 
-        String? userId;
-        String? fName;
-        String? lName;
-        String? dob;  String? email;String? gender;String? userImg;
-        // 🧠 Find user data in the response
-        Map<String, dynamic>? userData;
-        if (decodedResponse.containsKey('data')) {
-          userData = decodedResponse['data'];
-        } else if (decodedResponse.containsKey('user')) {
-          userData = decodedResponse['user'];
-        } else if (decodedResponse.containsKey('_id')) {
-          userData = decodedResponse;
-        }
+        final userData = decodedResponse['data'] ?? decodedResponse['user'] ?? decodedResponse;
 
         if (userData != null) {
-          userId = userData['_id'];
-          fName = userData['firstName'];
-          lName = userData['lastName'];  dob = userData['dateOfBirth'];  email = userData['email'];
-          gender = userData['gender']; userImg = userData['userImg'];
-        }
+          await prefs.setString('userId', userData['_id'] ?? '');
+          await prefs.setString('firstName', userData['firstName'] ?? '');
+          await prefs.setString('lastName', userData['lastName'] ?? '');
+          await prefs.setString('dob', userData['dateOfBirth'] ?? '');
+          await prefs.setString('email', userData['email'] ?? '');
+          await prefs.setString('gender', userData['gender'] ?? '');
 
-        if (userId != null && fName != null && lName != null && dob != null && email != null && gender != null) {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('userId', userId);
-          await prefs.setString('firstName', fName);
-          await prefs.setString('lastName', lName);  await prefs.setString('dob', dob);  await prefs.setString('email', email);
-          await prefs.setString('gender', gender);
-
-          if (userImg != null) {
-            await prefs.setString('userImg', imagePath.value); // ✅ save image to SharedPreferences
+          if (userData['userImg'] != null) {
+            await prefs.setString('userImg', userData['userImg']);
           }
-          // Optional: Refresh controller if already in memory
+
+          // Optional: Reset controllers
           Get.delete<AccountController>();
           Get.put(AccountController());
           Get.delete<EditProfileController>();
           Get.put(EditProfileController());
+
+          Get.snackbar('Success', 'Registration Successful');
+          clearFields();
+          Get.to(() => LocationView());
         } else {
-          print("❗ Missing data in response");
+          print("❗ Missing 'data' in response");
+          Get.snackbar('Error', 'Invalid response from server.');
         }
-        Get.snackbar('Success', 'Registration Successful');
-        clearFields();
-        Get.to(() => LocationView());
-        print("✅ Stored User ID: $userId, Name: $fName $lName $dob $email, Image: $userImg");
       } else {
         print('❌ Server Error (${response.statusCode}): $resBody');
-        Get.snackbar('Error', 'Server returned ${response.statusCode}');
+        Get.snackbar('Error', 'Server Error: ${response.statusCode}');
       }
     } catch (e) {
       print('❌ Exception: $e');
-      Get.snackbar('Error', 'Could not register. Check your internet or server.');
+      Get.snackbar('Error', 'Something went wrong. Try again later.');
     }
   }
 
+
+  //682189e078ab2a5c1939a503
   @override
   void onInit() {
     super.onInit();

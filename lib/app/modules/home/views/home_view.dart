@@ -161,13 +161,11 @@ class HomeView extends GetView<HomeController> {
                              controller.showSignupSheet(context);
                               return;
                             }
-
                             // ✅ User is logged in, proceed
                             final selectedCategory = controller.visitingProfessionals.first;
                             controller.fetchUsersByCategory(selectedCategory.id);
                             controller.toggleServiceExpansion('Visiting Professionals');
                           },
-
                                       child: Container(
                                         padding: const EdgeInsets.all(14),
                                         decoration: BoxDecoration(
@@ -211,17 +209,14 @@ class HomeView extends GetView<HomeController> {
                                       ),
                                     ),
                                   ),
-
                                   // Fixed Charge Helpers Button
                                   Expanded(
                                     child: InkWell(
                                       onTap: () {
                                         if (!authController.isLoggedIn.value) {
-
                                           controller.showSignupSheet(context);
                                           return;
                                         }
-
                                         // ✅ User is logged in, proceed
                                         final selectedCategory = controller.fixedChargeHelpers.first;
                                         controller.fetchUsersByCategory(selectedCategory.id);
@@ -272,7 +267,6 @@ class HomeView extends GetView<HomeController> {
                                   ),
                                 ],
                               ),
-
                               // Category Grid
                               if (controller.expandedServiceType.value.isNotEmpty)
                                 Container(
@@ -289,7 +283,6 @@ class HomeView extends GetView<HomeController> {
                                     final itemCount = isExpanded
                                         ? categories.length + 1
                                         : (categories.length > 7 ? 8 : categories.length);
-
                                     return Padding(
                                       padding: const EdgeInsets.all(5.0),
                                       child: GridView.builder(
@@ -386,7 +379,7 @@ class HomeView extends GetView<HomeController> {
                                                             return InkWell(
                                                               onTap: () {
                                                                 controller.navigateToSubcategoryScreen(sub.name);
-                                                                controller.fetchUsersListByCategory(sub.id);
+                                                                controller.fetchUsersListByCategory(sub.id, categoryName: sub.name);
                                                                 Get.back();
                                                               },
                                                               child: Container(
@@ -419,7 +412,7 @@ class HomeView extends GetView<HomeController> {
                                                 );
                                               }else if (cat.spType == '1') {
                                                 // 🔥 Call API for Visiting Professionals
-                                                controller.fetchUsersListByCategory(cat.id);
+                                                controller.fetchUsersListByCategory(cat.id, categoryName: cat.label);
                                               }
                                             },
                                             child: Card(

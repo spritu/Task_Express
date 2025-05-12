@@ -28,7 +28,7 @@ class ChatView extends GetView<ChatController> {
                     ),
                     const SizedBox(width: 20),
                     Obx(() => Text(
-                      'Chat with ${controller.firstName.value}',
+                      'Chat with ${controller.receiverName.value}',
                       style: const TextStyle(
                         fontSize: 16,
                         fontFamily: 'Poppins',
@@ -50,42 +50,48 @@ class ChatView extends GetView<ChatController> {
               ),
               const SizedBox(height: 10),
               Expanded(
-                child: Obx(() => Chat(
-                  messages: controller.messages.toList(),
-                  onSendPressed: controller.handleSendPressed,
-                  user:   controller.currentUser,
-                  onAttachmentPressed: controller.handleImagePick,
-                  showUserAvatars: true,
-                  showUserNames: true,
-                  avatarBuilder: (user) {
-                    if (user.imageUrl != null && user.imageUrl!.isNotEmpty) {
-                      return CircleAvatar(
-                        radius: 16,
-                        backgroundImage: FileImage(File(user.imageUrl!)),
-                      );
-                    } else {
-                      return CircleAvatar(
-                        radius: 16,
-                        backgroundColor: Colors.grey.shade400,
-                        child: Text(
-                          user.firstName?.isNotEmpty == true
-                              ? user.firstName![0].toUpperCase()
-                              : '?',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      );
-                    }
-                  },
-                  theme: const DefaultChatTheme(
-                    inputBackgroundColor: Colors.white,
-                    inputTextColor: Colors.black,
-                    inputTextStyle: TextStyle(fontFamily: 'Poppins'),
-                    backgroundColor: Colors.transparent,
-                    primaryColor: Color(0xFF114BCA),
-                    secondaryColor: Colors.white,
-                    messageBorderRadius: 16,
-                  ),
-                )),
+                child: Obx(() {
+                  if (!controller.isReady.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  return Chat(
+                    messages: controller.messages.toList(),
+                    onSendPressed: controller.handleSendPressed,
+                    user: controller.currentUser,
+                    onAttachmentPressed: controller.handleImagePick,
+                    showUserAvatars: true,
+                    showUserNames: true,
+                    avatarBuilder: (user) {
+                      if (user.imageUrl != null && user.imageUrl!.isNotEmpty) {
+                        return CircleAvatar(
+                          radius: 16,
+                          backgroundImage: FileImage(File(user.imageUrl!)),
+                        );
+                      } else {
+                        return CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.grey.shade400,
+                          child: Text(
+                            user.firstName?.isNotEmpty == true
+                                ? user.firstName![0].toUpperCase()
+                                : '?',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }
+                    },
+                    theme: const DefaultChatTheme(
+                      inputBackgroundColor: Colors.white,
+                      inputTextColor: Colors.black,
+                      inputTextStyle: TextStyle(fontFamily: 'Poppins'),
+                      backgroundColor: Colors.transparent,
+                      primaryColor: Color(0xFF114BCA),
+                      secondaryColor: Colors.white,
+                      messageBorderRadius: 16,
+                    ),
+                  );
+                }),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
@@ -111,7 +117,7 @@ class ChatView extends GetView<ChatController> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          // Add booking logic
+                          // TODO: Add booking logic here
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.blue,

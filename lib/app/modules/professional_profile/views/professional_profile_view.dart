@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:worknest/colors.dart';
+import '../../chat/views/chat_view.dart';
 import '../controllers/professional_profile_controller.dart';
 
 class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
-  final String catId;
-  const ProfessionalProfileView({super.key, required this.catId});
+
+  const ProfessionalProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final args = Get.arguments as Map<String, dynamic>;
+    final arguments = Get.arguments as Map<String, dynamic>;
+    final String appBarTitle = arguments['title'] ?? 'Professional Profile';
+
+    final String name = args['name'] ?? '';
+    final imagePath = arguments['image'] ?? '';
+    final imageUrl = 'https://jdapi.youthadda.co/$imagePath';
+    final String experience = args['experience']?.toString() ?? '';
+    final String phone = args['phone'] ?? '';
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -32,7 +42,7 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
                     onPressed: () => Navigator.pop(context),
                   ),
                   Text(
-                    "Profile",
+                    appBarTitle,
                     style: TextStyle(
                       color: Colors.black,
                       fontFamily: "poppins",
@@ -48,20 +58,25 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
                 width: MediaQuery.of(context).size.width,
                 child: ClipRRect(
                   // borderRadius: BorderRadius.circular(20),
-                  child: Image.asset(
-                    'assets/images/professional_profile.png',
-                    fit: BoxFit.fill,
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/account.png',
+                        fit: BoxFit.contain,
+                      );
+                    },
                   ),
                 ),
               ),
               const SizedBox(height: 10),
-
               // Name, Distance, Status
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Amit Sharma",
+                   Text(
+                    name,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -138,8 +153,8 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "7 year Experience",
+                   Text(
+                    experience+" year Experience",
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 11,
@@ -348,7 +363,20 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+
+                          final phoneNumber = phone ?? '';
+                          if (phoneNumber.isNotEmpty) {
+                            controller.makePhoneCall(phoneNumber);
+                          } else {
+                            Get.snackbar('Error', 'Phone number not available',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
+                          }
+
+                      },
                       child: const Text("Call"),
                     ),
                   ),
@@ -368,7 +396,9 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {},
+            onPressed: () {
+              Get.to(ChatView());
+                     },
                       child: const Text("Chat"),
                     ),
                   ),

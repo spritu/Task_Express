@@ -55,16 +55,16 @@ class HomeController extends GetxController {
         usersList.assignAll(data); // Make sure `usersList` is an RxList
         Get.to(() => SubcategoryUserListScreen(subcategoryName: subcategoryId)); // Navigate to screen
       } else {
-        Get.snackbar("Error", "Failed to load users");
+      //  Get.snackbar("", "Failed to load users");
       }
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+     // Get.snackbar("Error", e.toString());
     } finally {
       isLoading.value = false;
     }
   }
 
-  void fetchUsersListByCategory(String catId) async {
+  void fetchUsersListByCategory(String catId, {String? categoryName}) async {
     results.clear();
     isLoading.value = true;
     try {
@@ -76,13 +76,15 @@ class HomeController extends GetxController {
         final jsonString = await response.stream.bytesToString();
         final jsonData = json.decode(jsonString);
 
-        results.assignAll(jsonData['data']); // assuming API gives {data: [...]}
+        results.assignAll(jsonData['data']);
 
-        // ✅ Navigate to ProfessionalProfileView with the results
         if (results.isNotEmpty) {
-          Get.to(() => ProfessionalPlumberView(), arguments: results);
+          Get.to(() => ProfessionalPlumberView(), arguments: {
+            'users': results,
+            'title': categoryName ?? 'Professionals',
+          });
         } else {
-          Get.snackbar("No Users", "No professionals found for this category.");
+        //  Get.snackbar("No Users", "No professionals found for this category.");
         }
       } else {
         print("Error: ${response.reasonPhrase}");
@@ -93,6 +95,7 @@ class HomeController extends GetxController {
       isLoading.value = false;
     }
   }
+
 
 
 
@@ -144,10 +147,6 @@ class HomeController extends GetxController {
           addressType.value = lastAddress['addressType'] ?? '';
           contactNo.value = lastAddress['contactNo'] ?? '';
 
-          print("Fetched houseNo: ${houseNo.value}");
-          print("Fetched landMark: ${landMark.value}");
-          print("Fetched addressType: ${addressType.value}");
-          print("Fetched contactNo: ${contactNo.value}");
         } else {
           print("Data empty or not found in response");
         }
@@ -283,8 +282,6 @@ class HomeController extends GetxController {
                             ),  Icon(Icons.arrow_downward),
                           ],
                         ),
-
-
                         IconButton(
                           onPressed: () => Get.back(),
                           icon: const Icon(Icons.close),
@@ -434,7 +431,7 @@ class HomeController extends GetxController {
           Get.to(() => RoadConstructionHelperView());
           break;
         default:
-          Get.snackbar("Coming Soon", "This service is not available yet");
+       //   Get.snackbar("Coming Soon", "This service is not available yet");
       }
     });
   }
