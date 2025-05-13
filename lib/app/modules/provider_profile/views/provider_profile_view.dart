@@ -183,7 +183,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                           "Enter pin code",
                           keyboardType: TextInputType.number,
                           onChanged: (val) => controller.pinCode.value = val,
-                          validator: (val) => val?.isEmpty ?? true ? 'Pin code is required' : null,
+                        //  validator: (val) => val?.isEmpty ?? true ? 'Pin code is required' : null,
                         ),
                       ),
                     ],
@@ -193,9 +193,9 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                     "Referral Code",
                     "Enter referral code",
                     keyboardType: TextInputType.number,
-                    validator: (value) {
-                      return null; // optional
-                    },
+                    // validator: (value) {
+                    //   return null; // optional
+                    // },
                     onChanged: (val) => controller.referralCode.value = val,
                   ),
 
@@ -203,7 +203,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                   // You can add validation on them too if needed
                   const SizedBox(height: 12),
                   Container(
-                    height: MediaQuery.of(context).size.height*0.4,
+                    height: MediaQuery.of(context).size.height*0.5,
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
@@ -368,11 +368,20 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                             child: Text(sub.name),
                                           );
                                         }).toList(),
-                                        onChanged: (id) {
-                                          if (id != null) {
-                                            controller.selectedSubCategoryId.value = id;
-                                          }
-                                        },
+                              onChanged: (id) {
+                              if (id != null) {
+                              controller.selectedSubCategoryId.value = id;
+
+                              final selectedSub = controller.subCategories.firstWhere(
+                              (sub) => sub.id == id,
+                              orElse: () => SubCategory(id: '', name: ''),
+                              );
+
+                              controller.selectedSubCategoryName.value = selectedSub.name;
+                              }
+                              },
+
+
                                       ),
                                     ),
                                   ),
@@ -423,7 +432,33 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                               ),
                             ],
                           );
-                        })
+                        }),SizedBox(height: 5),
+                        Text(
+                          "Charges",
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,fontFamily: "poppins",color: AppColors.textColor),
+                        ),
+                        TextField(
+                          controller: controller.chargesController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                           // labelText: 'Service Charge (₹)',
+                            filled: true,
+                            fillColor: Color(0xFFF4F8FF),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 6), // smaller height
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12), // rounded corners
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey.shade400),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey.shade400),
+                            ),
+                          ),
+                          style: TextStyle(fontSize: 14),
+                        ),
 
 
                       ],

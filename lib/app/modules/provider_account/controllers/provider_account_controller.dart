@@ -7,21 +7,64 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../auth_controller.dart';
 import 'package:http/http.dart' as http;
-class ProviderAccountController extends GetxController with WidgetsBindingObserver{
+class ProviderAccountController extends GetxController with WidgetsBindingObserver {
   //TODO: Implement ProviderAccountController
-  RxBool showServiceCard = false.obs;
+  var serviceCards = <ServiceModel>[].obs;
 
-  RxString selectCategory = "Choose Category".obs;
-  RxString selectSubCategory = "Choose Sub-category".obs;
-  RxString selectCharge = "₹ ".obs;
+  void addServiceCard() {
+    serviceCards.add(ServiceModel()); // adds an empty service card
+  }
+
+  final RxString selectedProfession = ''.obs;
+  final RxString selectedCategoryName = ''.obs;
+  final RxString selectedSubCategoryName = ''.obs;
+  final RxString selectedProfessionName = ''.obs;
+  RxBool showServiceCard = false.obs;
+  RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
+  RxList<CategoryModel> fixedChargeHelpers = <CategoryModel>[].obs;
+  bool isEditable = false;
+  RxString selectCategory = "".obs;
+ // var addedServices = <ServiceModel>[].obs; // List to hold added services
+  var addedServices = <Service>[].obs;
+
+  // Add a service
+  void addService() {
+    // Add a new service object to the list
+    addedServices.add(Service(
+      profession: "Plumbing",
+      category: "Repair",
+      subCategory: "Pipe Repair",
+      charge: "₹500",
+    ));
+  }
+
+  TextEditingController chargeController = TextEditingController();
+  RxString selectSubCategory = "".obs;
+  RxString selectCharge = "₹ ".obs;RxString selectCharge1 = "₹ ".obs;
   final RxString mobileNumber = ''.obs;
   final count = 0.obs;
+  var selectedCategoryId = ''.obs;
+
   final RxString firstName = ''.obs;
   final RxString lastName = ''.obs;
   final RxString imagePath = ''.obs;
   RxList<CategoryModel> allCategories = <CategoryModel>[].obs;
-  RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
-  RxList<CategoryModel> fixedChargeHelpers = <CategoryModel>[].obs;
+
+  List<CategoryModel> get filteredCategories {
+    if (selectedProfession.value == 'Visiting Professional') {
+      return visitingProfessionals;
+    } else if (selectedProfession.value == 'Fixed Charge Helper') {
+      return fixedChargeHelpers;
+    }
+    return [];
+  }
+  void toggleServiceCard1() {
+    showServiceCard.value = !showServiceCard.value;
+  }
+
+  // void addService(ServiceModel service) {
+  //   addedServices.add(service); // Add a new service to the list
+  // }
   Future<void> logout() async {
     // Clear SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -38,21 +81,39 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     // Navigate to login screen
     Get.offAllNamed('/provider-login');
   }
-  var selectedProfession = ''.obs;
+
   var categoryOptions = <CategoryModel>[].obs;
   var subCategoryOptions = <SubcategoryModel>[].obs;
 
 
+  var isLoading = true.obs;
 
+  Future<void> loadUserInfo1() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    selectedProfessionName.value = prefs.getString('profession') ?? '';
+    selectedCategoryName.value = prefs.getString('category') ?? '';
+    selectedSubCategoryName.value = prefs.getString('subcategory') ?? '';
+    charge.value = prefs.getString('charge') ?? '';
+    isLoading.value = false;
+  }
 
-
+  void toggleEditState() {
+    isEditable = !isEditable;
+    if (!isEditable) {
+      charge.value = chargeController.text; // Save the new value when editing is done
+    }
+    update(); // Update the UI
+  }
 
   void toggleServiceCard() {
     showServiceCard.value = !showServiceCard.value;
   }
-  var charge = "250".obs;
+  var charge = "250".obs;var charge1 = "250".obs;
   void setCharge(String charge) {
     selectCharge.value = charge;
+  }
+  void saveCharge1(String charge1) {
+    selectCharge1.value = charge1;
   }
   void setProfession(String profession) {
     selectedProfession.value = profession;
@@ -61,7 +122,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     selectSubCategory.value = SubCategory;
   }
   void setCategory(String category) {
-    selectCategory.value = category;
+    selectedCategoryId.value = category;
   }
   Future<void> loadMobileNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -117,6 +178,35 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
       print('❗ Error: $e');
     }
   }
+  Future<void> deleteUserSkill(String userId, String categoryId, String subCategoryId, int index) async {
+    var headers = {
+      'Content-Type': 'application/json',
+    };
+
+    var request = http.Request(
+      'POST',
+      Uri.parse('https://jdapi.youthadda.co/user/deleteuserskill'),
+    );
+
+    request.body = json.encode({
+      "userId": userId,
+      "categoryId": categoryId,
+      "sucategoryId": subCategoryId, // Typo in API? Should be "subcategoryId"
+    });
+
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      serviceCards.removeAt(index);
+      Get.snackbar("Success", "Service deleted successfully");
+    } else {
+      print(await response.stream.bytesToString());
+      Get.snackbar("Error", "Failed to delete service");
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -126,6 +216,9 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   @override
   void onInit()  {
     super.onInit();
+    fetchCategories();
+    chargeController.text = charge.value;
+    loadUserInfo1();
     WidgetsBinding.instance.addObserver(this);
     loadMobileNumber();
      loadUserInfo();
@@ -197,5 +290,37 @@ class SubcategoryModel {
 
   // Optional: If you want to access `subId` as `id`
   String get id => subId;
+}
+
+
+class Service {
+  String profession;
+  String category;
+  String subCategory;
+  String charge;
+
+  Service({
+    required this.profession,
+    required this.category,
+    required this.subCategory,
+    required this.charge,
+  });
+}
+class ServiceModel {
+  String profession;
+  String category;
+  String subCategory;
+  String charge;
+  String categoryId;
+  String subCategoryId;
+
+  ServiceModel({
+    this.profession = '',
+    this.category = '',
+    this.subCategory = '',
+    this.charge = '',
+    this.categoryId = '',
+    this.subCategoryId = '',
+  });
 }
 

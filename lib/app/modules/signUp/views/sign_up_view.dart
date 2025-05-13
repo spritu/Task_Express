@@ -140,7 +140,7 @@ class SignUpView extends GetView<SignUpController> {
                                 "Enter pin code",
                                 keyboardType: TextInputType.number,
                                 onChanged: (val) => controller.pinCode.value = val,
-                                validator: (val) => val?.isEmpty ?? true ? 'Pin code is required' : null,
+                             //   validator: (val) => val?.isEmpty ?? true ? 'Pin code is required' : null,
                               ),
                             ),
                           ],
@@ -150,7 +150,9 @@ class SignUpView extends GetView<SignUpController> {
                         const SizedBox(height: 12),
                         buildTextField("Referral Code", "Enter referral code",
                             keyboardType: TextInputType.number,
-                            onChanged: (val) => controller.referralCode.value = val, validator: (val) => val?.isEmpty ?? true ? 'Referral code is required' : null),
+                            onChanged: (val) => controller.referralCode.value = val,
+                            //validator: (val) => val?.isEmpty ?? true ? 'Referral code is required' : null
+                          ),
                         const SizedBox(height: 30),
                         Container(
                           width: MediaQuery.of(context).size.width * 0.6,

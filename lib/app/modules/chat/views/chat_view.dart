@@ -51,9 +51,6 @@ class ChatView extends GetView<ChatController> {
               const SizedBox(height: 10),
               Expanded(
                 child: Obx(() {
-                  if (!controller.isReady.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
 
                   return Chat(
                     messages: controller.messages.toList(),

@@ -13,6 +13,7 @@ class ProviderProfileController extends GetxController {
   var subCategories = <SubCategory>[].obs;
   final selectedCategoryId = ''.obs;
   final selectedCategoryIds = <String>[].obs;
+  final TextEditingController chargesController = TextEditingController();
 
   var filteredSubCategories = <SubCategory>[].obs;
   var selectedSubCategoryId = ''.obs;
@@ -20,6 +21,7 @@ class ProviderProfileController extends GetxController {
 
   // final selectedSubCategoryId = ''.obs;
   final selectedCategoryName = ''.obs;
+  final selectedSubCategoryName = ''.obs;
   //final subCategories = <SubcategoryModel>[].obs;
   final isSubCategoryVisible = false.obs;
 
@@ -317,7 +319,6 @@ class ProviderProfileController extends GetxController {
       Uri.parse('https://jdapi.youthadda.co/user/serviceproviderregister'),
     );
 
-    // Print all form field values before sending
     print('📤 Sending registration data:');
     print('UserId: $userId');
     print('First Name: ${firstName.value}');
@@ -330,9 +331,19 @@ class ProviderProfileController extends GetxController {
     print('Pin Code: ${pinCode.value}');
     print('State: ${state.value}');
     print('Referral Code: ${referralCode.value}');
-    print('Category ID: ${selectedCategoryId.value}');
-    print('Subcategory ID: ${selectedSubCategoryId.value}');
+    print('CategoryId: ${selectedCategoryId.value}');
+    print('SubcategoryId: ${selectedSubCategoryId.value}');
+    print('Charge: ${chargesController.text}'); // Assume charge is selected somewhere
     print('Aadhar No: ${aadharNo.text}');
+
+    // Construct skills JSON list
+    List<Map<String, dynamic>> skills = [
+      {
+        "categoryId": selectedCategoryId.value,
+        "sucategoryId": selectedSubCategoryId.value,
+        "charge": chargesController.text, // Make sure this is available
+      }
+    ];
 
     // Add all required form fields
     request.fields.addAll({
@@ -348,18 +359,17 @@ class ProviderProfileController extends GetxController {
       'pinCode': pinCode.value,
       'state': state.value,
       'referralCode': referralCode.value,
-      'categoryId': selectedCategoryId.value,
-      'sucategoryId': selectedSubCategoryId.value,
+      'skills': jsonEncode(skills), // Send skills as JSON string
       'aadharNo': aadharNo.text,
     });
 
-    // Add image file
+    // Add image
     if (imagePath.value.isNotEmpty) {
       File imageFile = File(imagePath.value);
 
       if (await imageFile.exists()) {
         request.files.add(
-          await http.MultipartFile.fromPath('userImg', imagePath.value),
+          await http.MultipartFile.fromPath('Img', imagePath.value),
         );
 
         final bytes = await imageFile.readAsBytes();
@@ -385,10 +395,20 @@ class ProviderProfileController extends GetxController {
 
         final message = jsonRes['msg'] ?? 'Service provider registered';
         Get.snackbar('Success', message);
+        await prefs.setString('categoryId', selectedCategoryId.value);
+        await prefs.setString('category', selectedCategoryName.value); // ✅ Save name
+        await prefs.setString('subcategoryId', selectedSubCategoryId.value);
+        await prefs.setString('subcategory', selectedSubCategoryName.value);
+        print("✅ Selected Subcategory ID: ${selectedSubCategoryId.value}");
+        print("✅ Selected Subcategory Name: ${selectedSubCategoryName.value}");
 
-        // Save to SharedPreferences
+
+        // Save data to SharedPreferences
         await prefs.setString('firstName', firstName.value);
         await prefs.setString('lastName', lastName.value);
+        await prefs.setString('profession', selectedProfession.value);
+        await prefs.setString('categoryId', selectedCategoryId.value);
+        await prefs.setString('subcategoryId', selectedSubCategoryId.value);
         await prefs.setString('gender', gender.value);
         await prefs.setString('dob', dateOfBirth.value);
         await prefs.setString('email', email.value);
@@ -397,21 +417,14 @@ class ProviderProfileController extends GetxController {
         await prefs.setString('pinCode', pinCode.value);
         await prefs.setString('state', state.value);
         await prefs.setString('referralCode', referralCode.value);
-        await prefs.setString('categoryId', selectedCategoryId.value);
-        await prefs.setString('subcategoryId', selectedSubCategoryId.value);
         await prefs.setString('aadharNo', aadharNo.text);
-
-        print('\n📦 SAVED DATA:');
-        prefs.getKeys().forEach((key) {
-          print('📦 $key: ${prefs.getString(key)}');
-        });
+        await prefs.setString('charge',chargesController.text.toString());
 
         await prefs.reload();
 
         final accountController = Get.find<ProviderAccountController>();
         await accountController.loadUserInfo();
         await accountController.loadMobileNumber();
-        print('🔎 Selected Subcategory ID: ${selectedSubCategoryId.value}');
 
         clearFields();
         Get.to(() => ProviderLocationView());
@@ -433,6 +446,8 @@ class ProviderProfileController extends GetxController {
     }
   }
 
+
+
   // helper to load your stored userId
   Future<String> _getUserIdFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
@@ -443,6 +458,7 @@ class ProviderProfileController extends GetxController {
   void onInit() {
     super.onInit();
     loadUserId();
+
     fetchCategories();
 
   }

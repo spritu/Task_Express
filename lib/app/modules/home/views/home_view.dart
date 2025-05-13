@@ -451,9 +451,6 @@ class HomeView extends GetView<HomeController> {
                                 ),
 
                               // 🔽 User List Section
-
-
-
                               // else if (controller.expandedServiceType.value == 'Visiting Professionals')
                               //     const Center(child: Text("No users found.")),
                             ],

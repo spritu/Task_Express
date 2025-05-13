@@ -50,20 +50,29 @@ class ProviderLoginController extends GetxController {
         final responseBody = await response.stream.bytesToString();
         print("✅ OTP sent successfully: $responseBody");
 
-        // ✅ Save phone number for OTP verification
+        final jsonResponse = json.decode(responseBody);
+
+        // 👇 Extract and show OTP in snackbar for 10 seconds
+        final otp = jsonResponse['otp']?.toString() ?? 'N/A';
+        Get.snackbar(
+          "OTP Sent",
+          "Your OTP is: $otp",
+          duration: const Duration(seconds: 10),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.withOpacity(0.8),
+          colorText: Colors.white,
+        );
+
+        // ✅ Save phone number
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('mobileNumber', phone);
-        await prefs.reload(); // 🔄 Force reload to avoid stale data
-        // ✅ Save Login State TRUE using GetStorage
-        String? savedPhone = prefs.getString('mobileNumber');
-        print("📞 Saved Mobile Number: $savedPhone");
+        await prefs.reload();
 
-// ✅ Save Login State TRUE using GetStorage
         await box.write('isLoggedIn2', true);
         await box.write('mobile', phone);
         mobileeController.clear();
 
-// ✅ Navigate to OTP Screen
+        // ✅ Navigate to OTP screen
         Get.to(() => ProviderOtpView());
       } else {
         print("❌ Failed to send OTP: ${response.reasonPhrase}");
