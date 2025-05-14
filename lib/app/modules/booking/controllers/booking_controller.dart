@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart' show canLaunchUrl, launchUrl;
 
 import '../../CancelBooking/views/cancel_booking_view.dart';
@@ -8,10 +9,17 @@ import '../../CancelBooking/views/cancel_booking_view.dart';
 class BookingController extends GetxController {
   //TODO: Implement BookingController
   var currentBooking = {}.obs;
-  var isLoading = false.obs;
-  Future<void> fetchCurrentBooking(String serviceProId) async {
+  var isLoading = false.obs;var
+  hasBooking = true.obs; // Or false if no booking
+  var booking = Rxn<Booking>();
+  Future<void> fetchCurrentBooking() async {
     isLoading.value = true;
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString('userId');
+
+      print("📦 Service Provider userId: $userId"); // 👈 PRINT USER ID HERE
+
       var headers = {
         'Content-Type': 'application/json'
       };
@@ -20,7 +28,7 @@ class BookingController extends GetxController {
         Uri.parse('https://jdapi.youthadda.co/getserprocurrentbooking'),
       );
       request.body = json.encode({
-        "serviceProId": serviceProId,
+        "serviceProId": userId,
       });
       request.headers.addAll(headers);
 
@@ -28,6 +36,7 @@ class BookingController extends GetxController {
 
       if (response.statusCode == 200) {
         String res = await response.stream.bytesToString();
+        print("📥 Raw Response: $res"); // 👈 RAW RESPONSE
         currentBooking.value = json.decode(res);
       } else {
         Get.snackbar("Error", "Failed to fetch booking");
@@ -39,6 +48,10 @@ class BookingController extends GetxController {
     }
   }
 
+
+
+
+}
   void makePhoneCall(String phoneNumber) async {
     final Uri callUri = Uri(scheme: 'tel', path: phoneNumber);
     if (await canLaunchUrl(callUri)) {
@@ -79,18 +92,78 @@ class BookingController extends GetxController {
   final count = 0.obs;
   @override
   void onInit() {
-    super.onInit();
+
   }
 
   @override
   void onReady() {
-    super.onReady();
+
   }
 
   @override
   void onClose() {
-    super.onClose();
-  }
+
 
   void increment() => count.value++;
 }
+class Booking {
+  final String id;
+  final User bookedBy;
+  final User bookedFor;
+  final int completeJob;
+  final DateTime createdAt;
+
+  Booking({
+    required this.id,
+    required this.bookedBy,
+    required this.bookedFor,
+    required this.completeJob,
+    required this.createdAt,
+  });
+
+  factory Booking.fromJson(Map<String, dynamic> json) {
+    return Booking(
+      id: json['_id'],
+      bookedBy: User.fromJson(json['bookedBy']),
+      bookedFor: User.fromJson(json['bookedFor']),
+      completeJob: json['completeJob'] ?? 0,
+      createdAt: DateTime.parse(json['createdAt']),
+    );
+  }
+}
+
+class User {
+  final String id;
+  final String firstName;
+  final String lastName;
+  final String email;
+  final String phone;
+  final String gender;
+  final String city;
+  final String state;
+
+  User({
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.phone,
+    required this.gender,
+    required this.city,
+    required this.state,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['_id'],
+      firstName: json['firstName'] ?? '',
+      lastName: json['lastName'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'] ?? '',
+      gender: json['gender'] ?? '',
+      city: json['city'] ?? '',
+      state: json['state'] ?? '',
+    );
+  }
+}
+

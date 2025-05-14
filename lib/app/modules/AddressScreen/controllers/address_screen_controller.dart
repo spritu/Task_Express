@@ -7,17 +7,19 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../bottom/views/bottom_view.dart';
+
 class AddressScreenController extends GetxController {
   Completer<GoogleMapController> mapControllerCompleter = Completer();
 
   final LatLng plumberLatLng = const LatLng(22.7220, 75.8605);
   LatLng? currentLatLng;
-
+  var houseNo = ''.obs;
+  var landMark = ''.obs;
   RxDouble distanceInKm = 0.0.obs;
   RxString selectedAddressType = 'Home'.obs;
   var address = ''.obs; // Observable address
-  final houseNo = Rx<String>('');
-  final landMark = Rx<String>('');
+
   final addressType = Rx<String>('');
   final contactNo = Rx<String>('');
   TextEditingController phoneController = TextEditingController();
@@ -25,12 +27,17 @@ class AddressScreenController extends GetxController {
   TextEditingController landmarkController = TextEditingController();
 
  // String phoneNumber = "+91 9836747398";
-
+  void _loadSavedAddress() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    houseNo.value = prefs.getString('savedHouseNo') ?? '';
+    landMark.value = prefs.getString('savedLandMark') ?? '';
+  }
   @override
   void onInit() {
     super.onInit();
     _getCurrentLocation();
     fetchAddress();
+    _loadSavedAddress();
    // phoneController.text = phoneNumber;
   }
 
@@ -86,7 +93,13 @@ class AddressScreenController extends GetxController {
           landMark.value = lastAddress['landMark'] ?? '';
           addressType.value = lastAddress['addressType'] ?? '';
           contactNo.value = lastAddress['contactNo'] ?? '';
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('savedHouseNo', houseNo.value);
+          prefs.setString('savedLandMark', landMark.value);
 
+          // Update the reactive variables
+          houseNo.value = houseNo.value;
+          landMark.value = landMark.value;
           print("Fetched houseNo: ${houseNo.value}");
           print("Fetched landMark: ${landMark.value}");
           print("Fetched addressType: ${addressType.value}");
@@ -210,10 +223,12 @@ class AddressScreenController extends GetxController {
         Get.snackbar("Success", "Address saved successfully");
 
         clear();
-
-        /// 👇 Automatically fetch updated address
         await fetchAddress();
-      } else {
+
+        /// ✅ Navigate to BottomView (Home)
+        Get.offAll(() => BottomView(), arguments: {'refreshHome': true});
+      }
+      else {
         print('Error: ${response.reasonPhrase}');
         Get.snackbar("Error", "Failed to save address");
       }

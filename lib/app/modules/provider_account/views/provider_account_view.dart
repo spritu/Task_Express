@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../colors.dart';
 import '../../Bottom2/controllers/bottom2_controller.dart';
 import '../../Bottom2/views/bottom2_view.dart';
@@ -118,9 +119,18 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                             child: Row(mainAxisAlignment: MainAxisAlignment.end,
                               children: [Container(height: 21,width: 57,decoration: BoxDecoration(color: Color(0xffF67C0A),
                               borderRadius: BorderRadius.circular(6)),
-                              child: Row(mainAxisAlignment: MainAxisAlignment.center,
-                                children: [Image.asset("assets/images/delete.png",height: 12,color: Colors.white,),SizedBox(width: 3,),
-                              Text("Delete",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 10,color: AppColors.white),)],),)],),
+                              child: InkWell( onTap: () {
+                                controller.deleteUserSkill(
+                               // make sure userId is available in your controller
+                                 "categoryId",
+                                "subCategoryId",
+                                  1
+                                );
+                              },
+                                child: Row(mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [Image.asset("assets/images/delete.png",height: 12,color: Colors.white,),SizedBox(width: 3,),
+                                Text("Delete",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 10,color: AppColors.white),)],),
+                              ),)],),
                           ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -183,104 +193,151 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
 
                     SizedBox(height: 20),
                     /// Toggleable Service Card
-                    Obx(() {
-                      return Column(
-                        children: controller.serviceCards.asMap().entries.map((entry) {
-                          int index = entry.key;
-                          ServiceModel model = entry.value;
+                  Obx(() {
+                    return Column(
+                      children: controller.serviceCards.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        ServiceModel model = entry.value;
 
-                          return Card(color: Color(0xffFCD8B7),
-                            child: Column(
-                              children: [Padding(
-                                padding: const EdgeInsets.only(top: 5,right: 5),
-                                child: Row(mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [Container(height: 21,width: 57,decoration: BoxDecoration(color: Color(0xffF67C0A),
-                                      borderRadius: BorderRadius.circular(6)),
-                                    child: Row(mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [Image.asset("assets/images/delete.png",height: 12,color: Colors.white,),SizedBox(width: 3,),
-                                        Text("Delete",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 10,color: AppColors.white),)],),)],),
+                        // Filter categories based on selected profession
+                        final selectedProfession = model.profession;
+                        final categories = selectedProfession == "Visiting Professional"
+                            ? controller.visitingProfessionals
+                            : controller.fixedChargeHelpers;
+
+                        // Find selected category object
+                        final selectedCategory = categories.firstWhereOrNull(
+                              (cat) => cat.label == model.category,
+                        );
+
+                        final subcategories = selectedCategory?.subcategories ?? [];
+
+                        return Card(
+                          color: const Color(0xffFCD8B7),
+                          child: Column(
+                            children: [
+                              // Delete button
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5, right: 5),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    InkWell(
+                                      onTap: () async {
+                                        controller.serviceCards.removeAt(index); // Remove the card at the given index
+                                        controller.serviceCards.refresh();
+                                      },
+
+                                      child: Container(
+                                        height: 21,
+                                        width: 57,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xffF67C0A),
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset("assets/images/delete.png", height: 12, color: Colors.white),
+                                            const SizedBox(width: 3),
+                                            const Text("Delete", style: TextStyle(fontSize: 10, color: Colors.white)),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
-                                Padding(
-                                  padding: const EdgeInsets.all(6.0),
-                                  child: Card(
-                                    elevation: 2,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                    child: Container(
-                                      width: double.infinity,
-                                      padding: EdgeInsets.symmetric(vertical: 12),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        color: Colors.white,
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          _buildRow1(
-                                            context,
-                                            "Profession",
-                                            model.profession,
-                                            isDropdown: true,
-                                            options: ["Visiting Professional", "Fixed Charge Helper"],
-                                            onOptionSelected: (value) {
-                                              model.profession = value;
-                                              controller.serviceCards.refresh(); // update UI
-                                            },
-                                          ),
-                                          Divider(thickness: 1),
-                                          _buildRow1(
-                                            context,
-                                            "Category",
-                                            model.category,
-                                            isDropdown: true,
-                                            options: controller.filteredCategories.map((cat) => cat.label).toList(),
-                                            onOptionSelected: (value) {
-                                              model.category = value;
-                                              model.subCategory = ''; // reset subcategory
-                                              controller.serviceCards.refresh();
-                                            },
-                                          ),
-                                          Divider(thickness: 1),
-                                          _buildRow1(
-                                            context,
-                                            "Sub Category",
-                                            model.subCategory,
-                                            isDropdown: true,
-                                            options: controller
-                                                .filteredCategories
-                                                .firstWhereOrNull((cat) => cat.label == model.category)
-                                                ?.subcategories
-                                                .map((e) => e.name)
-                                                .toList() ??
-                                                [],
-                                            onOptionSelected: (value) {
-                                              model.subCategory = value;
-                                              controller.serviceCards.refresh();
-                                            },
-                                          ),
-                                          Divider(thickness: 1),
-                                          _buildRow1(
-                                            context,
-                                            "Charge",
-                                            model.charge,
-                                            isEditable: true,
-                                            onOptionSelected: (value) {
-                                              model.charge = value;
-                                              controller.serviceCards.refresh();
-                                            },
-                                          ),
-                                        ],
-                                      ),
+
+                              // Editable Card
+                              Padding(
+                                padding: const EdgeInsets.all(6.0),
+                                child: Card(
+                                  elevation: 2,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: Colors.white,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        // 🔸 Profession
+                                        _buildRow1(
+                                          context,
+                                          "Profession",
+                                          model.profession,
+                                          isDropdown: true,
+                                          options: ["Visiting Professional", "Fixed Charge Helper"],
+                                          onOptionSelected: (value) {
+                                            model.profession = value;
+                                            model.category = ''; // reset category
+                                            model.subcategory = ''; // reset subcategory
+                                            controller.serviceCards.refresh();
+                                          },
+                                        ),
+
+                                        const Divider(thickness: 1),
+
+                                        // 🔸 Category - dynamic based on profession
+                                        _buildRow1(
+                                          context,
+                                          "Category",
+                                          model.category,
+                                          isDropdown: true,
+                                          options: categories.map((cat) => cat.label).toList(),
+                                          onOptionSelected: (value) {
+                                            model.category = value;
+                                            model.subcategory = ''; // reset subcategory
+                                            controller.serviceCards.refresh();
+                                          },
+                                        ),
+
+                                        const Divider(thickness: 1),
+
+                                        // 🔸 Subcategory - dynamic based on selected category
+                                        _buildRow1(
+                                          context,
+                                          "Sub Category",
+                                          model.subcategory,
+                                          isDropdown: true,
+                                          options: subcategories.map((sub) => sub.name).toList(),
+                                          onOptionSelected: (value) {
+                                            model.subcategory = value;
+                                            controller.serviceCards.refresh();
+                                          },
+                                        ),
+
+                                        const Divider(thickness: 1),
+
+                                        // 🔸 Charge - editable
+                                        _buildRow1(
+                                          context,
+                                          "Charge",
+                                          model.charge,
+                                          isEditable: true,
+                                          onOptionSelected: (value) {
+                                            model.charge = value;
+                                            controller.serviceCards.refresh();
+                                          },
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    }),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  }),
 
 
-                    SizedBox(height: 10),
+
+                  SizedBox(height: 10),
 
                     /// Add Service Button
                     InkWell(
@@ -447,19 +504,16 @@ Widget _buildRow(
     ),
   );
 }
-
 Widget _buildRow1(
-  BuildContext context,
-  String title,
-  String value, {
-  bool isDropdown = false,
-  bool isEditable = false,
-  List<String> options = const [],
-  required Function(String) onOptionSelected,
-}) {
-  final TextEditingController textController = TextEditingController(
-    text: value,
-  );
+    BuildContext context,
+    String title,
+    String value, {
+      bool isDropdown = false,
+      bool isEditable = false,
+      List<String> options = const [],
+      required Function(String) onOptionSelected,
+    }) {
+  final TextEditingController textController = TextEditingController(text: value);
 
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 12),
@@ -493,9 +547,7 @@ Widget _buildRow1(
                   showModalBottomSheet(
                     context: context,
                     shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                     ),
                     builder: (_) {
                       return Container(
@@ -508,37 +560,28 @@ Widget _buildRow1(
                             const SizedBox(height: 12),
                             Text(
                               "Choose $title",
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
                             ),
                             const Divider(),
                             Expanded(
                               child: SingleChildScrollView(
                                 child: Column(
-                                  children:
-                                      options.map((option) {
-                                        return Column(
-                                          children: [
-                                            ListTile(
-                                              title: Center(
-                                                child: Text(
-                                                  option,
-                                                  style: const TextStyle(
-                                                    color: Colors.orange,
-                                                  ),
-                                                ),
-                                              ),
-                                              onTap: () {
-                                                onOptionSelected(option);
-                                                Get.back();
-                                              },
-                                            ),
-                                            const Divider(),
-                                          ],
-                                        );
-                                      }).toList(),
+                                  children: options.map((option) {
+                                    return Column(
+                                      children: [
+                                        ListTile(
+                                          title: Center(
+                                            child: Text(option, style: const TextStyle(color: Colors.orange)),
+                                          ),
+                                          onTap: () {
+                                            onOptionSelected(option);
+                                            Get.back();
+                                          },
+                                        ),
+                                        const Divider(),
+                                      ],
+                                    );
+                                  }).toList(),
                                 ),
                               ),
                             ),
@@ -548,10 +591,7 @@ Widget _buildRow1(
                     },
                   );
                 },
-                child: const Icon(
-                  Icons.keyboard_arrow_down,
-                  color: Colors.black54,
-                ),
+                child: const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
               ),
             if (isEditable)
               InkWell(
@@ -563,9 +603,7 @@ Widget _buildRow1(
                         title: Text("Edit $title"),
                         content: TextField(
                           controller: textController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                          ),
+                          decoration: const InputDecoration(border: OutlineInputBorder()),
                         ),
                         actions: [
                           TextButton(
@@ -573,9 +611,7 @@ Widget _buildRow1(
                             child: const Text("Cancel"),
                           ),
                           TextButton(
-                            onPressed:
-                                () =>
-                                    Navigator.pop(context, textController.text),
+                            onPressed: () => Navigator.pop(context, textController.text),
                             child: const Text("Save"),
                           ),
                         ],
@@ -598,6 +634,7 @@ Widget _buildRow1(
     ),
   );
 }
+
 
 Widget _buildRow2(BuildContext context, String title) {
   final controller = Get.find<ProviderAccountController>();

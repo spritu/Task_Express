@@ -8,6 +8,7 @@ import '../../../../auth_controller.dart';
 import '../../BricklayingHelper/views/bricklaying_helper_view.dart';
 import '../../CementHelper/views/cement_helper_view.dart';
 import '../../Scaffolding_helper/views/scaffolding_helper_view.dart';
+import '../../location/controllers/location_controller.dart';
 import '../../plastering_helper/views/plastering_helper_view.dart';
 import '../../professional_plumber/views/professional_plumber_view.dart';
 import '../../road_construction_helper/views/road_construction_helper_view.dart';
@@ -20,6 +21,7 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    final locationController = Get.find<LocationController>();
     final AuthController authController = Get.find<AuthController>();
     return Scaffold(
       backgroundColor: Colors.white,
@@ -55,21 +57,38 @@ class HomeView extends GetView<HomeController> {
                             const SizedBox(width: 8),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [Obx(() => Text("${controller.houseNo.value}",style:TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                        color: AppColors.textColor,
-                      ), )),
-                Obx(() =>
-                                  Text(
-                                    '${controller.landMark.value}',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12,
-                                      color: AppColors.textColor,
-                                    ),
-                                  ),
+                              children: [Obx(() => Text(
+                                controller.landMark.value.isNotEmpty
+                                    ? '${controller.houseNo.value}, ${controller.landMark.value}'
+                                    : locationController.currentAddress.value.isNotEmpty
+                                    ? locationController.currentAddress.value
+                                    : "Fetching current location...",
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  color: AppColors.textColor,
                                 ),
+                              ))
+
+
+
+                                //                 Obx(() => Text("${controller.houseNo.value}",style:TextStyle(
+                //         fontWeight: FontWeight.w600,
+                //         fontSize: 12,
+                //         color: AppColors.textColor,
+                //       ), )),
+                // Obx(() =>
+                //                   Text(
+                //                     '${controller.landMark.value}',
+                //                     style: TextStyle(
+                //                       fontWeight: FontWeight.w400,
+                //                       fontSize: 12,
+                //                       color: AppColors.textColor,
+                //                     ),
+                //                   ),
+                //                 ),
                               ],
                             ),
                             const Spacer(),
@@ -378,7 +397,7 @@ class HomeView extends GetView<HomeController> {
                                                             final sub = cat.subcategories[index];
                                                             return InkWell(
                                                               onTap: () {
-                                                                controller.navigateToSubcategoryScreen(sub.name);
+
                                                                 controller.fetchUsersListByCategory(sub.id, categoryName: sub.name);
                                                                 Get.back();
                                                               },

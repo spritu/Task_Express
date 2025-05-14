@@ -66,8 +66,13 @@ class ProviderLocationView extends GetView<ProviderLocationController> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {
-                      Get.to(Bottom2View());
+                  
+                      onPressed: () async {
+                        await controller.determinePosition();
+                        if (controller.currentAddress.value.isNotEmpty) {
+                          Get.to(Bottom2View());
+                        }
+
                     },
                     child: Text(
                       "Use  your current location",

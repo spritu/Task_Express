@@ -1,79 +1,64 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:convert';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../RequestPandding/views/request_pandding_view.dart';
 
 class ProfessionalPlumberController extends GetxController {
   //TODO: Implement ProfessionalPlumberController
 
   var workers = <Map<String, dynamic>>[].obs;
-  void fetchWorkers() {
-    workers.value = [
-      {
-        'name': 'Amit Sharma',
-        'image': 'assets/images/professional_profile.png', // your local image asset
-        'rating': 4.7,
-        'reviews': 69,
-        'available': true,
-        'experience': 7,
-        'distance': '3.5 km',
-        'time': '20 mins',
-        'charge': 250
-      },
-      {
-        'name': 'Amit Sharma',
-        'image': 'assets/images/professional_profile.png',
-        'rating': 4.7,
-        'reviews': 69,
-        'available': true,
-        'experience': 7,
-        'distance': '3.5 km',
-        'time': '20 mins',
-        'charge': 250
-      },  {
-        'name': 'Amit Sharma',
-        'image': 'assets/images/professional_profile.png', // your local image asset
-        'rating': 4.7,
-        'reviews': 69,
-        'available': true,
-        'experience': 7,
-        'distance': '3.5 km',
-        'time': '20 mins',
-        'charge': 250
-      },
-      {
-        'name': 'Amit Sharma',
-        'image': 'assets/images/professional_profile.png',
-        'rating': 4.7,
-        'reviews': 69,
-        'available': true,
-        'experience': 7,
-        'distance': '3.5 km',
-        'time': '20 mins',
-        'charge': 250
-      },  {
-        'name': 'Suraj sen',
-        'image': 'assets/images/professional_profile.png', // your local image asset
-        'rating': 4.7,
-        'reviews': 69,
-        'available': true,
-        'experience': 7,
-        'distance': '3.5 km',
-        'time': '20 mins',
-        'charge': 250
-      },
-      {
-        'name': 'Rajesh kumar',
-        'image': 'assets/images/professional_profile.png',
-        'rating': 4.7,
-        'reviews': 69,
-        'available': true,
-        'experience': 7,
-        'distance': '3.5 km',
-        'time': '20 mins',
-        'charge': 250
-      },
-      // Add more if needed
-    ];
+
+  Future<void> bookServiceProvider(String bookedForId) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId2 = prefs.getString('userId2');
+
+      if (userId2 == null) {
+        Get.snackbar("Error", "User ID not found in SharedPreferences");
+        return;
+      }
+
+      var headers = {
+        'Content-Type': 'application/json',
+      };
+
+      var request = http.Request(
+        'POST',
+        Uri.parse('https://jdapi.youthadda.co/bookserviceprovider'),
+      );
+
+      request.body = json.encode({
+        "bookedBy": userId2,
+        "bookedFor": bookedForId,
+      });
+
+      request.headers.addAll(headers);
+
+      http.StreamedResponse response = await request.send();
+
+      final resBody = await response.stream.bytesToString();
+      print("📦 Response: $resBody");
+
+      if (response.statusCode == 200) {
+        Get.snackbar("Success", "Service provider booked successfully");
+        Get.to(RequestPanddingView());
+      } else {
+        print("❌ Error: ${response.reasonPhrase}");
+        Get.snackbar("Error", "Booking failed: ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("❌ Exception during booking: $e");
+      Get.snackbar("Error", "Something went wrong during booking.");
+    }
   }
+
+
+
 
   void makePhoneCall(String phoneNumber) async {
     final Uri callUri = Uri(scheme: 'tel', path: phoneNumber);
@@ -87,7 +72,7 @@ class ProfessionalPlumberController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchWorkers();
+
   }
 
 

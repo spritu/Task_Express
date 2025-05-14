@@ -20,6 +20,7 @@ import 'app/modules/home/controllers/home_controller.dart';
 import 'app/modules/jobs/controllers/jobs_controller.dart';
 import 'app/modules/jobsDetails/controllers/jobs_details_controller.dart';
 import 'app/modules/join/views/join_view.dart';
+import 'app/modules/location/controllers/location_controller.dart';
 import 'app/modules/login/controllers/login_controller.dart';
 import 'app/modules/otp/controllers/otp_controller.dart';
 import 'app/modules/plastering_helper/controllers/plastering_helper_controller.dart';
@@ -30,6 +31,7 @@ import 'app/modules/provider_account/controllers/provider_account_controller.dar
 import 'app/modules/provider_chat/controllers/provider_chat_controller.dart';
 import 'app/modules/provider_editProfile/controllers/provider_edit_profile_controller.dart';
 import 'app/modules/provider_home/controllers/provider_home_controller.dart';
+import 'app/modules/provider_location/controllers/provider_location_controller.dart';
 import 'app/modules/provider_login/controllers/provider_login_controller.dart';
 import 'app/modules/provider_otp/controllers/provider_otp_controller.dart';
 import 'app/modules/provider_setting/controllers/provider_setting_controller.dart';
@@ -57,7 +59,7 @@ void main() async {
   Get.put(SignUpController());
   Get.put(BottomController());
   Get.put(HomeController());Get.put(CancelBookingController());
-  Get.put(PlasteringHelperController());Get.put(AccountController());
+  Get.put(PlasteringHelperController());
   Get.put(BricklayingHelperController());
   Get.put(BookingController());
   Get.put(ScaffoldingHelperController());
@@ -82,7 +84,7 @@ void main() async {
   Get.put(Bottom2Controller());
   Get.put(ProviderAccountController());
   Get.put(AddAddressController());Get.put(ProfessionalProfileController());
-
+  Get.put(LocationController());Get.put(ProviderLocationController());
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,

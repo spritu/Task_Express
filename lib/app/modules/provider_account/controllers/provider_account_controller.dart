@@ -11,8 +11,10 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   //TODO: Implement ProviderAccountController
   var serviceCards = <ServiceModel>[].obs;
 
+  RxList<CategoryModel> filteredCategories = <CategoryModel>[].obs;
+
   void addServiceCard() {
-    serviceCards.add(ServiceModel()); // adds an empty service card
+    serviceCards.add(ServiceModel(profession: '', category: '', charge: '', subcategory: '', categoryId: '', subCategoryId: '')); // adds an empty service card
   }
 
   final RxString selectedProfession = ''.obs;
@@ -40,6 +42,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
 
   TextEditingController chargeController = TextEditingController();
   RxString selectSubCategory = "".obs;
+
   RxString selectCharge = "₹ ".obs;RxString selectCharge1 = "₹ ".obs;
   final RxString mobileNumber = ''.obs;
   final count = 0.obs;
@@ -50,14 +53,14 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   final RxString imagePath = ''.obs;
   RxList<CategoryModel> allCategories = <CategoryModel>[].obs;
 
-  List<CategoryModel> get filteredCategories {
-    if (selectedProfession.value == 'Visiting Professional') {
-      return visitingProfessionals;
-    } else if (selectedProfession.value == 'Fixed Charge Helper') {
-      return fixedChargeHelpers;
-    }
-    return [];
-  }
+  // List<CategoryModel> get filteredCategories {
+  //   if (selectedProfession.value == 'Visiting Professional') {
+  //     return visitingProfessionals;
+  //   } else if (selectedProfession.value == 'Fixed Charge Helper') {
+  //     return fixedChargeHelpers;
+  //   }
+  //   return [];
+  // }
   void toggleServiceCard1() {
     showServiceCard.value = !showServiceCard.value;
   }
@@ -90,12 +93,20 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
 
   Future<void> loadUserInfo1() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
     selectedProfessionName.value = prefs.getString('profession') ?? '';
     selectedCategoryName.value = prefs.getString('category') ?? '';
     selectedSubCategoryName.value = prefs.getString('subcategory') ?? '';
     charge.value = prefs.getString('charge') ?? '';
     isLoading.value = false;
+
+    print("🔄 Loaded User Info:");
+    print("🧑‍💼 Profession: ${selectedProfessionName.value}");
+    print("📂 Category: ${selectedCategoryName.value}");
+    print("📁 Subcategory: ${selectedSubCategoryName.value}");
+    print("💰 Charge: ${charge.value}");
   }
+
 
   void toggleEditState() {
     isEditable = !isEditable;
@@ -178,34 +189,93 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
       print('❗ Error: $e');
     }
   }
-  Future<void> deleteUserSkill(String userId, String categoryId, String subCategoryId, int index) async {
-    var headers = {
-      'Content-Type': 'application/json',
-    };
 
-    var request = http.Request(
-      'POST',
-      Uri.parse('https://jdapi.youthadda.co/user/deleteuserskill'),
+  // void confirmDelete(int index, ServiceModel service) {
+  //   Get.defaultDialog(
+  //     title: "Delete Service",
+  //     middleText:
+  //     "Are you sure you want to delete the service for:\n\nCategory: ${service.category}\nSubcategory: ${service.subCategory}?",
+  //     textCancel: "Cancel",
+  //     textConfirm: "Delete",
+  //     confirmTextColor: Colors.white,
+  //     onConfirm: () {
+  //       final userId = Get.find<AuthController>().userId.value;
+  //      deleteUserSkill(userId, service.categoryId, service.subCategoryId, index);
+  //       Get.back();
+  //     },
+  //   );
+  // }
+
+  Future<void> deleteUserSkill(String categoryId, String subCategoryId, int index) async {
+    Get.dialog(
+      AlertDialog(
+        title: const Text("Delete Service"),
+        content: const Text("Are you sure you want to delete this service?"),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(), // Cancel
+            child: const Text("No"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Get.back(); // Close the dialog
+              try {
+                var headers = {'Content-Type': 'application/json'};
+                var request = http.Request(
+                  'POST',
+                  Uri.parse('https://jdapi.youthadda.co/user/deleteuserskill'),
+                );
+
+                // Get the userId from SharedPreferences
+                final prefs = await SharedPreferences.getInstance();
+                final userId = prefs.getString('userId') ?? '';
+                print("User ID: $userId"); // Debugging
+
+                // Prepare the request body
+                request.body = json.encode({
+                  "userId": userId,
+                  "categoryId": categoryId,
+                  "subcategoryId": subCategoryId, // Ensure correct key
+                });
+
+                // Add headers to the request
+                request.headers.addAll(headers);
+
+                // Send the request
+                http.StreamedResponse response = await request.send();
+
+                // Log the response for debugging
+                print("Response status: ${response.statusCode}");
+                print("Response body: ${await response.stream.bytesToString()}");
+
+                if (response.statusCode == 200) {
+                  // If the API call is successful, remove the item from the list
+                  serviceCards.removeAt(index); // Remove the card at the given index
+              serviceCards.refresh(); // Refresh the list to update UI
+
+                  // Show success message
+                  Get.snackbar("Deleted", "Service deleted successfully");
+                } else {
+                  // Do not remove the card if the API fails
+                  Get.snackbar("Error", "Failed to delete: ${response.reasonPhrase}");
+                }
+              } catch (e) {
+                // Handle any exceptions and print to debug
+                print("Error: $e");
+                Get.snackbar("Error", "Something went wrong");
+              }
+            },
+            child: const Text("Yes"),
+          ),
+        ],
+      ),
     );
-
-    request.body = json.encode({
-      "userId": userId,
-      "categoryId": categoryId,
-      "sucategoryId": subCategoryId, // Typo in API? Should be "subcategoryId"
-    });
-
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      serviceCards.removeAt(index);
-      Get.snackbar("Success", "Service deleted successfully");
-    } else {
-      print(await response.stream.bytesToString());
-      Get.snackbar("Error", "Failed to delete service");
-    }
   }
+
+
+
+
+
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -223,6 +293,15 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     loadMobileNumber();
      loadUserInfo();
   }
+  void updateFilteredCategories(String profession) {
+    if (profession == "Visiting Professional") {
+      filteredCategories.value = visitingProfessionals;
+    } else if (profession == "Fixed Charge Helper") {
+      filteredCategories.value = fixedChargeHelpers;
+    } else {
+      filteredCategories.clear();
+    }
+  }
 
   @override
   void onReady() {
@@ -237,6 +316,38 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
 
   void increment() => count.value++;
 }
+// class CategoryModel {
+//   final String id;
+//   final String label;
+//   final String icon;
+//   final String spType;
+//   final List<SubcategoryModel> subcategories; // Add a list of subcategories
+//
+//   CategoryModel({ required this.id,
+//     required this.label,
+//     required this.icon,
+//     required this.spType,
+//     required this.subcategories, // Initialize subcategories
+//   });
+//
+//   factory CategoryModel.fromJson(Map<String, dynamic> json) {
+//     String rawIcon = json['categoryImg'] ?? '';
+//     String iconUrl = rawIcon.startsWith('http')
+//         ? rawIcon
+//         : 'https://jdapi.youthadda.co/${rawIcon.replaceFirst(RegExp(r'^/'), '')}';
+//
+//     var subcategoriesList = (json['subcategories'] as List)
+//         .map((subItem) => SubcategoryModel.fromJson(subItem))
+//         .toList();
+//
+//     return CategoryModel(id:json['_id'] ?? '',
+//       label: json['name'] ?? '',
+//       icon: iconUrl,
+//       spType: json['spType']?.toString() ?? '',
+//       subcategories: subcategoriesList, // Initialize subcategories
+//     );
+//   }
+// }
 class CategoryModel {
   final String id;
   final String label;
@@ -292,6 +403,10 @@ class SubcategoryModel {
   String get id => subId;
 }
 
+  // Optional: If you want to access `subId` as `id`
+
+
+
 
 class Service {
   String profession;
@@ -309,18 +424,40 @@ class Service {
 class ServiceModel {
   String profession;
   String category;
-  String subCategory;
+  String subcategory;
   String charge;
   String categoryId;
   String subCategoryId;
 
   ServiceModel({
-    this.profession = '',
-    this.category = '',
-    this.subCategory = '',
-    this.charge = '',
-    this.categoryId = '',
-    this.subCategoryId = '',
+    required this.profession,
+    required this.category,
+    required this.subcategory,
+    required this.charge,
+    required this.categoryId,
+    required this.subCategoryId,
   });
 }
 
+
+
+
+class UserSkillModel {
+  final String userId;
+  final String categoryId;
+  final String subCategoryId;
+  final String profession;
+  final String category;
+  final String subCategory;
+  final String charge;
+
+  UserSkillModel({
+    required this.userId,
+    required this.categoryId,
+    required this.subCategoryId,
+    required this.profession,
+    required this.category,
+    required this.subCategory,
+    required this.charge,
+  });
+}

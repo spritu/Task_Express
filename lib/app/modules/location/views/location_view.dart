@@ -60,9 +60,13 @@ class LocationView extends GetView<LocationController> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: () {
-                    Get.to(BottomView());
+                  onPressed: () async {
+                    await controller.determinePosition();
+                    if (controller.currentAddress.value.isNotEmpty) {
+                      Get.to(BottomView());
+                    }
                   },
+
                   child: Text(
                     "Use  your current location",
                     style: TextStyle(

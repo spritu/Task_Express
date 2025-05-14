@@ -68,36 +68,48 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
           Expanded(
             child: Obx(
                   () => ListView.builder(
-                    itemCount: users.length,
+                itemCount: users.length,
                 itemBuilder: (context, index) {
                   final user = users[index];
+
                   final imagePath = user['userImg'] ?? '';
                   final imageUrl = 'https://jdapi.youthadda.co/$imagePath';
-                  return InkWell(onTap: () {
-                    Get.to(() => ProfessionalProfileView(), arguments: {
-                      'name': user['firstName'],
-                      'image': user['userImg'],
-                      'experience': user['experience'],
-                      'phone': user['phone'],
-                      'id': user['id'],
-                      'title': title, // ✅ pass title here
-                    });
 
-                  },
+                  final charge = user['skills'] != null && user['skills'].isNotEmpty
+                      ? user['skills'][0]['charge']
+                      : 0;
+                  print("Opening bottom sheet for ${user['firstName']}");
 
-                    child: Container(
+                  return InkWell(
+                    onTap: () {
+                      // Passing only the relevant data to the bottom sheet
+                      Get.bottomSheet(
+                      showAfterCallSheet(
+                      context,
+                      name: user['firstName'] ?? 'No Name',
+    imageUrl: user['userImg'] ?? '',
+    experience: user['experience'] ?? '',
+    phone: user['phone'] ?? '',
+    userId: user['_id'],
+    title: title,
+    ),
+    isScrollControlled: true,
+    );
+
+                    },
+                    child: Container(width: MediaQuery.of(context).size.width,
                       margin: const EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 7,
                       ),
-                      //  padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          Card(color: Colors.white,
+                          Card(
+                            color: Colors.white,
                             child: Padding(
                               padding: const EdgeInsets.all(12.0),
                               child: Column(
@@ -107,11 +119,12 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                     height: 80,
                                     width: 80,
                                     fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
+                                    errorBuilder: (context, error, stackTrace) {
                                       return Image.asset(
                                         'assets/images/account.png',
-                                          fit: BoxFit.contain,
-                                     );}
+                                        fit: BoxFit.contain,
+                                      );
+                                    },
                                   ),
                                   Row(
                                     children: [
@@ -120,15 +133,15 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         color: Colors.amber,
                                         size: 16,
                                       ),
-                                      // Text(
-                                      //   "${worker['rating']} (${worker['reviews']} reviews)",
-                                      //   style: const TextStyle(color: Colors.grey,fontSize: 11,fontFamily: "poppins",fontWeight: FontWeight.w400),
-                                      // ),
                                     ],
                                   ),
                                   Text(
-                                    user['experience'].toString()+" year Experiance",
-                                    style: const TextStyle(color: Color(0xff7C7C7C),fontSize: 10,fontFamily: "poppins",fontWeight: FontWeight.w400),
+                                    "${user['experience']} year Experience",
+                                    style: const TextStyle(
+                                        color: Color(0xff7C7C7C),
+                                        fontSize: 10,
+                                        fontFamily: "poppins",
+                                        fontWeight: FontWeight.w400),
                                   ),
                                 ],
                               ),
@@ -136,23 +149,57 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child:
-                            Column(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   children: [
-                                    Text(user['firstName'] ?? 'No Name',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 14,
-                                        fontFamily: "poppins",
-                                        color: AppColors.textColor,
-                                      ),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          user['firstName'] ?? 'No Name',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            fontFamily: "poppins",
+                                            color: AppColors.textColor,
+                                          ),
+                                        ),
+                                        SizedBox(height: 3),
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              width: 10,
+                                              height: 10,
+                                              decoration: const BoxDecoration(
+                                                color: Colors.green,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Center(
+                                                child: Text(
+                                                  "✅",
+                                                  style: TextStyle(fontSize: 6),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            const Text(
+                                              "Available",
+                                              style: TextStyle(
+                                                color: Colors.green,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 8,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                     const Spacer(),
                                     TextButton(
                                       onPressed: () {
+                                        // Passing only relevant data to navigate to the profile view
                                         Get.to(() => ProfessionalProfileView(), arguments: {
                                           'name': user['firstName'],
                                           'image': user['userImg'],
@@ -161,12 +208,11 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           'id': user['id'],
                                         });
                                       },
-
                                       child: Container(
-                                        height: 19,
-                                        width: 45,
+                                        height: 24,
+                                        width: 54,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(6),
+                                          borderRadius: BorderRadius.circular(10),
                                           color: Color(0xff114BCA),
                                         ),
                                         child: Center(
@@ -184,103 +230,89 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                     ),
                                   ],
                                 ),
-                                // if (worker['available'])
-                                  Row(
-                                    children: [
-                                      Container(
-                                        width:10,
-                                        height: 10,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.green,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Center(
-                                          child: Text("✅", style: TextStyle(fontSize: 6)),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      const Text(
-                                        "Available",
-                                        style: TextStyle(
-                                          color: Colors.green,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 8,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    // const Icon(
-                                    //   Icons.location_on,
-                                    //   size: 12,
-                                    //   color: Colors.grey,
-                                    // ),
-                                    Column(mainAxisAlignment: MainAxisAlignment.start,crossAxisAlignment: CrossAxisAlignment.start,
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Row(mainAxisAlignment: MainAxisAlignment.start,crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [Padding(
-                                            padding: const EdgeInsets.only(top: 3),
-                                            child: Icon(
-                                              Icons.location_on,
-                                              size: 14,
-                                              color: Colors.grey,
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 3),
+                                              child: Icon(
+                                                Icons.location_on,
+                                                size: 14,
+                                                color: Colors.grey,
+                                              ),
                                             ),
-                                          ),
-                                            // Text(
-                                            //   "${worker['distance']} "
-                                            //   ,
-                                            //   style: const TextStyle(color: Colors.grey,fontSize: 12,fontWeight: FontWeight.w500,fontFamily: "poppins"),
-                                            // ),
                                           ],
-                                        ), SizedBox(height: 3,),Row(
-                                          children: [Icon(Icons.access_time,size: 14,color: AppColors.grey,),
-                                            // Text(
-                                            //   "${worker['time']} away",
-                                            //   style: const TextStyle(color: Colors.grey,fontSize: 12,fontWeight: FontWeight.w500,fontFamily: "poppins"),
-                                            // ),
+                                        ),
+                                        SizedBox(height: 3),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.access_time,
+                                              size: 14,
+                                              color: AppColors.grey,
+                                            ),
                                           ],
                                         ),
                                       ],
-                                    ),Card(color:AppColors.white,
+                                    ),
+                                    Card(
+                                      color: Colors.white,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        side: const BorderSide(color: Colors.black12), // optional border
+                                        borderRadius: BorderRadius.circular(40),
                                       ),
                                       elevation: 2,
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 4.0,
+                                          horizontal: 10.0,
+                                        ),
                                         child: RichText(
-                                          textAlign: TextAlign.center,
                                           text: TextSpan(
-                                            style: const TextStyle(fontSize: 12, color: Colors.blue),
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.orange,
+                                              fontFamily: 'Poppins',
+                                            ),
                                             children: [
-                                              const TextSpan(
-                                                text: "Charge:\n",
-                                                style: TextStyle(fontSize: 10,color: AppColors.blue,
-                                                  fontWeight: FontWeight.w600,
+                                              TextSpan(
+                                                text: "Charge: ",
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: AppColors.orage,
+                                                  fontWeight: FontWeight.w400,
                                                 ),
                                               ),
                                               TextSpan(
-                                                text: "₹ 250/day",
+                                                text: "₹ $charge/day",
                                                 style: TextStyle(
-                                                  fontSize: 10,color: AppColors.blue,
-                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 11,
+                                                  color: AppColors.orage,
+                                                  fontWeight: FontWeight.w700,
                                                 ),
                                               ),
                                             ],
                                           ),
                                         ),
                                       ),
-                                    )
-
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: SizedBox(height:24,width:110,
+                                      child: SizedBox(
+                                        height: 24,
+                                        width: 110,
                                         child: ElevatedButton(
                                           onPressed: () {
                                             final phoneNumber = user['phone'] ?? '';
@@ -294,47 +326,51 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                               );
                                             }
                                           },
-
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Color(0xff114BCA),
                                           ),
-                                          child: const Text("Call",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 12,color: AppColors.white,fontFamily: "poppins"),),
+                                          child: const Text(
+                                            "Call",
+                                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12, color: AppColors.white, fontFamily: "poppins"),
+                                          ),
                                         ),
                                       ),
                                     ),
                                     const SizedBox(width: 10),
                                     Expanded(
-                                      child: SizedBox(height:24,width:100,
-
+                                      child: SizedBox(
+                                        height: 24,
+                                        width: 100,
                                         child: ElevatedButton(
                                           onPressed: () {
-
-                                              final receiverId = user['id'].toString(); // Ensure it's a String
-                                              if (receiverId.isNotEmpty) {
-                                                Get.toNamed('/chat', arguments: {
-                                                  'receiverId': receiverId,
-                                                  'receiverName': user['firstName'] ?? 'No Name',
-                                                  'receiverImage': user['userImg'] ?? '',
-                                                });
-                                              } else {
-                                                Get.snackbar('Error', 'Receiver ID not available',
-                                                  snackPosition: SnackPosition.BOTTOM,
-                                                  backgroundColor: Colors.red,
-                                                  colorText: Colors.white,
-                                                );
-                                              }
-
-
+                                            final receiverId = user['id'].toString();
+                                            if (receiverId.isNotEmpty) {
+                                              Get.toNamed('/chat', arguments: {
+                                                'receiverId': receiverId,
+                                                'receiverName': user['firstName'] ?? 'No Name',
+                                                'receiverImage': user['userImg'] ?? '',
+                                              });
+                                            } else {
+                                              Get.snackbar('Error', 'Receiver ID not available',
+                                                snackPosition: SnackPosition.BOTTOM,
+                                                backgroundColor: Colors.red,
+                                                colorText: Colors.white,
+                                              );
+                                            }
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor:Color(0xff114BCA),
+                                            backgroundColor: Color(0xff114BCA),
                                           ),
-                                          child: const Text("Chat",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 12,color: AppColors.white,fontFamily: "poppins")),
+                                          child: const Text(
+                                            "Chat",
+                                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12, color: AppColors.white, fontFamily: "poppins"),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ],
-                                ),SizedBox(height: 10,)
+                                ),
+                                SizedBox(height: 10)
                               ],
                             ),
                           ),
@@ -345,10 +381,310 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                 },
               ),
             ),
-          ),
+          )
         ],
       ),
-
     );
   }
+   Widget showAfterCallSheet(
+       BuildContext context, {
+         required String name,
+         required String imageUrl,
+         required String experience,
+         required String phone,
+         required String userId,
+         required String title,
+       }) {
+     return SingleChildScrollView(
+       child: Container(width: MediaQuery.of(context).size.width,
+         padding: const EdgeInsets.all(16),
+         decoration: const BoxDecoration(
+           color: Color(0xffD9E4FC),
+           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+         ),
+         child: Column(
+           mainAxisSize: MainAxisSize.min,
+           children: [
+             const SizedBox(height: 10),
+             CircleAvatar(
+               radius: 40,
+               backgroundImage: imageUrl.isNotEmpty
+                   ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
+                   : const AssetImage('assets/images/account.png') as ImageProvider,
+             ),
+             const SizedBox(height: 10),
+             Text(name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+             const SizedBox(height: 20),
+
+             /// Main Container
+             Container(
+               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+               decoration: BoxDecoration(
+                 color: Colors.white,
+                 borderRadius: BorderRadius.circular(12),
+               ),
+               child: Column(
+                 children: [
+                   const Text(
+                     "Are you satisfied with this conversation?",
+                     style: TextStyle(
+                       fontSize: 12,
+                       fontWeight: FontWeight.w500,
+                       fontFamily: "poppins",
+                       color: Color(0xFF4F4F4F),
+                     ),
+                   ),
+                   const SizedBox(height: 16),
+
+                   /// Book Now Button
+                   SizedBox(
+                     height: 42,
+                     width: 176,
+                     child: ElevatedButton(
+                       onPressed: () {
+                         Navigator.pop(context); // Close current sheet
+                         showModalBottomSheet(
+                           context: context,
+                           isScrollControlled: true,
+                           backgroundColor: Colors.transparent,
+                           shape: const RoundedRectangleBorder(
+                             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                           ),
+                           builder: (context) => showAreUSureSheet(
+                             context,
+                             name: name,
+                             imageUrl: imageUrl,
+                             experience: experience,
+                             phone: phone,
+                             userId: userId,
+                             title: title,
+                           ),
+                         );
+                       },
+                       style: ElevatedButton.styleFrom(
+                         backgroundColor: const Color(0xFF114BCA),
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(8),
+                         ),
+                       ),
+                       child: const Row(
+                         mainAxisAlignment: MainAxisAlignment.center,
+                         children: [
+                           Icon(Icons.check, color: Colors.white, size: 18),
+                           SizedBox(width: 10),
+                           Text(
+                             "Book Now",
+                             style: TextStyle(
+                               fontSize: 12,
+                               fontWeight: FontWeight.w500,
+                               fontFamily: "poppins",
+                               color: Colors.white,
+                             ),
+                           ),
+                         ],
+                       ),
+                     ),
+                   ),
+                   const SizedBox(height: 16),
+
+                   const Text(
+                     "Not Satisfied, let’s find another",
+                     style: TextStyle(
+                       fontFamily: "poppins",
+                       fontWeight: FontWeight.w500,
+                       fontSize: 12,
+                       color: Color(0xFF4F4F4F),
+                     ),
+                   ),
+                   const SizedBox(height: 10),
+
+                   /// Cancel Button
+                   SizedBox(
+                     height: 42,
+                     width: 176,
+                     child: ElevatedButton(
+                       onPressed: () {
+                         Navigator.pop(context);
+                       },
+                       style: ElevatedButton.styleFrom(
+                         backgroundColor: Colors.white,
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(8),
+                         ),
+                       ),
+                       child: const Row(
+                         mainAxisAlignment: MainAxisAlignment.center,
+                         children: [
+                           Icon(Icons.close, color: Color(0xFF114BCA), size: 18),
+                           SizedBox(width: 10),
+                           Text(
+                             "Cancel",
+                             style: TextStyle(
+                               fontSize: 12,
+                               fontWeight: FontWeight.w500,
+                               fontFamily: "poppins",
+                               color: Color(0xFF114BCA),
+                             ),
+                           ),
+                         ],
+                       ),
+                     ),
+                   ),
+                 ],
+               ),
+             ),
+             const SizedBox(height: 16),
+           ],
+         ),
+       ),
+     );
+   }
+
+
+   Widget showAreUSureSheet(
+         BuildContext context, {
+           required String name,
+           required String imageUrl,
+           required String experience,
+           required String phone,
+           required String userId,
+           required String title,
+         }) {
+       return Padding(
+           padding: const EdgeInsets.only(
+             top: 16,
+
+
+           ),
+           child: Column(
+             mainAxisSize: MainAxisSize.min,
+             children: [
+               /// Close button
+               Row(
+                 mainAxisAlignment: MainAxisAlignment.end,
+                 children: [
+                   GestureDetector(
+                     onTap: () => Navigator.pop(context),
+                     child: Icon(Icons.close, color: Colors.black),
+                   ),
+                 ],
+               ),
+
+               /// Profile Picture
+               CircleAvatar(
+                 radius: 47.5,
+                 backgroundImage: imageUrl.isNotEmpty
+                     ? NetworkImage("https://jdapi.youthadda.co/$imageUrl")
+                     : AssetImage("assets/images/placeholder.png") as ImageProvider,
+                 backgroundColor: Colors.transparent,
+               ),
+               SizedBox(height: 8),
+
+               /// Name
+               Text(
+                 name,
+                 style: TextStyle(
+                   fontFamily: "poppins",
+                   fontWeight: FontWeight.w500,
+                   fontSize: 16,
+                 ),
+               ),
+               SizedBox(height: 20),
+
+               /// Main content
+               Container(
+                 padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                 decoration: BoxDecoration(
+                   color: Colors.white,
+                   borderRadius: BorderRadius.circular(12),
+                 ),
+                 child: Column(
+                   children: [
+                     Text(
+                       "Are you sure you want to continue with this booking?",
+                       style: TextStyle(
+                         fontSize: 12,
+                         fontWeight: FontWeight.w500,
+                         fontFamily: "poppins",
+                         color: Color(0xFF4F4F4F),
+                       ),
+                     ),
+                     SizedBox(height: 16),
+
+                     /// Yes (Book Now) Button
+                     SizedBox(
+                       height: 42,
+                       width: 176,
+                       child: ElevatedButton(
+                         onPressed: () async {
+                           Navigator.pop(context);
+                           await controller.bookServiceProvider(userId.toString()); // Pass user's ID here
+                         },
+                         style: ElevatedButton.styleFrom(
+                           backgroundColor: Color(0xFF114BCA),
+                           shape: RoundedRectangleBorder(
+                             borderRadius: BorderRadius.circular(8),
+                           ),
+                         ),
+                         child: Row(
+                           mainAxisAlignment: MainAxisAlignment.center,
+                           children: [
+                             Icon(Icons.check, color: Colors.white, size: 18),
+                             SizedBox(width: 10),
+                             Text(
+                               "Yes",
+                               style: TextStyle(
+                                 fontSize: 12,
+                                 fontWeight: FontWeight.w500,
+                                 fontFamily: "poppins",
+                                 color: Colors.white,
+                               ),
+                             ),
+                           ],
+                         ),
+                       ),
+                     ),
+                     SizedBox(height: 16),
+
+                     /// No (Cancel) Button
+                     SizedBox(
+                       height: 42,
+                       width: 176,
+                       child: ElevatedButton(
+                         onPressed: () {
+                           Navigator.pop(context); // Close the bottom sheet
+                         },
+                         style: ElevatedButton.styleFrom(
+                           backgroundColor: Colors.white,
+                           shape: RoundedRectangleBorder(
+                             borderRadius: BorderRadius.circular(8),
+                           ),
+                         ),
+                         child: Row(
+                           mainAxisAlignment: MainAxisAlignment.center,
+                           children: [
+                             Icon(Icons.close, color: Color(0xFF114BCA), size: 18),
+                             SizedBox(width: 10),
+                             Text(
+                               "No",
+                               style: TextStyle(
+                                 fontSize: 12,
+                                 fontWeight: FontWeight.w500,
+                                 fontFamily: "poppins",
+                                 color: Color(0xFF114BCA),
+                               ),
+                             ),
+                           ],
+                         ),
+                       ),
+                     ),
+                   ],
+                 ),
+               ),
+             ],
+           ),
+         );
+
+
+   }
 }

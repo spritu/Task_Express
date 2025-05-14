@@ -279,7 +279,7 @@ class AppPages {
     GetPage(
       name: _Paths.ADDRESS_SCREEN,
       page: () => AddressScreenView(),
-      binding: AddressScreenBinding(),
+
     ),
     GetPage(
       name: _Paths.PROVIDER_LOGIN,

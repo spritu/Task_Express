@@ -362,10 +362,14 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     fetchCategories();
+    if (Get.arguments?['refreshHome'] == true) {
+      fetchAddress();
+    }
     if (serviceTypes.isNotEmpty) {
       expandedServiceType.value = serviceTypes.first['title']!;
       fetchAddress();
     }
+    update();
   //  fetchUsersListByCategory("catId");
     super.onInit();
   }
@@ -403,37 +407,6 @@ class HomeController extends GetxController {
     } catch (e) {
       print("❗ Error: $e");  // Catch and log any errors
     }
-  }
-  void navigateToSubcategoryScreen(String name) {
-    //Get.back(); // Close bottom sheet
-
-    Future.delayed(const Duration(milliseconds: 300), () {
-      switch (name.toLowerCase()) {
-        case 'bricklaying helper':
-          Get.to(() => BricklayingHelperView());
-          break;
-        case 'cement mixing helper':
-          Get.to(() => CementHelperView());
-          break;
-        case 'scaffolding helper':
-          Get.to(() => ScaffoldingHelperView());
-          break;
-        case 'Plastering Helper':
-          Get.to(() => PlasteringHelperView());
-          break;
-        case 'Tile Fixing Helper':
-          Get.to(() => TileFixingHelperView());
-          break;
-        case 'Road Construction Helper':
-          Get.to(() => RoadConstructionHelperView());
-          break;
-        case 'Electrician Helper':
-          Get.to(() => RoadConstructionHelperView());
-          break;
-        default:
-       //   Get.snackbar("Coming Soon", "This service is not available yet");
-      }
-    });
   }
 
   /// Called when search text changes

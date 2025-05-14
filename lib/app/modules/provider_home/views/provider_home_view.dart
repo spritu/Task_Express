@@ -5,12 +5,14 @@ import 'package:get/get.dart';
 import '../../../../colors.dart';
 import '../../Activejob_screen/views/activejob_screen_view.dart';
 import '../../YourEarning/views/your_earning_view.dart';
+import '../../provider_location/controllers/provider_location_controller.dart';
 import '../controllers/provider_home_controller.dart';
 
 class ProviderHomeView extends GetView<ProviderHomeController> {
   const ProviderHomeView({super.key});
   @override
   Widget build(BuildContext context) {
+    final locationController = Get.find<ProviderLocationController>();
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -32,7 +34,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                         Row(
                           children: [
                             Text(
-                              'Scheme No 54',
+                              'Current Address',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 12,
@@ -43,14 +45,14 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                             Icon(Icons.keyboard_arrow_down_rounded, size: 20),
                           ],
                         ),
-                        Text(
-                          'Fh-289, Vijaynagar,Indore',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            // color: AppColors.textColor,
-                          ),
-                        ),
+                        Obx(() {
+                          return Text(
+                            locationController.currentAddress.value.isNotEmpty
+                                ? locationController.currentAddress.value
+                                : "Fetching current location...",
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                          );
+                        }),
                       ],
                     ),
                     const Spacer(),
