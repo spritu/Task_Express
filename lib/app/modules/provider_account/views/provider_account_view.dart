@@ -41,7 +41,6 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                       ),
                     ),
                     SizedBox(height: 20),
-
                     /// Profile Card
                     Card(
                       child: Container(
@@ -109,10 +108,8 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                         ),
                       ),
                     ),
-
                     SizedBox(height: 10),
-
-                        Card(color: Color(0xffFCD8B7),
+                    Card(color: Color(0xffFCD8B7),
                         child: Column(
                           children: [Padding(
                             padding: const EdgeInsets.only(top: 5,right: 5),

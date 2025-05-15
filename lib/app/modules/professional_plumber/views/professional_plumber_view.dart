@@ -435,7 +435,6 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                      ),
                    ),
                    const SizedBox(height: 16),
-
                    /// Book Now Button
                    SizedBox(
                      height: 42,
@@ -542,149 +541,148 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
 
 
    Widget showAreUSureSheet(
-         BuildContext context, {
-           required String name,
-           required String imageUrl,
-           required String experience,
-           required String phone,
-           required String userId,
-           required String title,
-         }) {
-       return Padding(
-           padding: const EdgeInsets.only(
-             top: 16,
+       BuildContext context, {
+         required String name,
+         required String imageUrl,
+         required String experience,
+         required String phone,
+         required String userId,
+         required String title,
+       }) {
+     return SingleChildScrollView(
 
+       child: Container(width: MediaQuery.of(context).size.width,
+         padding: const EdgeInsets.all(16),
+         decoration: const BoxDecoration(
+           color: Color(0xffD9E4FC),
+           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+         ),
+         child: Column(
+           mainAxisSize: MainAxisSize.min,
+           children: [
+             /// Close button
+             Row(
+               mainAxisAlignment: MainAxisAlignment.end,
+               children: [
+                 GestureDetector(
+                   onTap: () => Navigator.pop(context),
+                   child: Icon(Icons.close, color: Colors.black),
+                 ),
+               ],
+             ),
 
-           ),
-           child: Column(
-             mainAxisSize: MainAxisSize.min,
-             children: [
-               /// Close button
-               Row(
-                 mainAxisAlignment: MainAxisAlignment.end,
+             /// Profile Picture
+             CircleAvatar(
+               radius: 40,
+               backgroundImage: imageUrl.isNotEmpty
+                   ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
+                   : const AssetImage('assets/images/account.png') as ImageProvider,
+             ),
+             SizedBox(height: 8),
+
+             /// Name
+             Text(
+               name,
+               style: TextStyle(
+                 fontFamily: "poppins",
+                 fontWeight: FontWeight.w500,
+                 fontSize: 16,
+               ),
+             ),
+             SizedBox(height: 20),
+
+             /// Main content
+             Container(
+               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+               decoration: BoxDecoration(
+                 color: Colors.white,
+                 borderRadius: BorderRadius.circular(12),
+               ),
+               child: Column(
                  children: [
-                   GestureDetector(
-                     onTap: () => Navigator.pop(context),
-                     child: Icon(Icons.close, color: Colors.black),
+                   Text(
+                     "Are you sure you want to continue with this booking?",
+                     style: TextStyle(
+                       fontSize: 12,
+                       fontWeight: FontWeight.w500,
+                       fontFamily: "poppins",
+                       color: Color(0xFF4F4F4F),
+                     ),
+                   ),
+                   SizedBox(height: 16),
+
+                   /// Yes Button
+                   SizedBox(
+                     height: 42,
+                     width: 176,
+                     child: ElevatedButton(
+                       onPressed: () async {
+                         Navigator.pop(context);
+                         await controller.bookServiceProvider(userId);
+                       },
+                       style: ElevatedButton.styleFrom(
+                         backgroundColor: Color(0xFF114BCA),
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(8),
+                         ),
+                       ),
+                       child: Row(
+                         mainAxisAlignment: MainAxisAlignment.center,
+                         children: [
+                           Icon(Icons.check, color: Colors.white, size: 18),
+                           SizedBox(width: 10),
+                           Text(
+                             "Yes",
+                             style: TextStyle(
+                               fontSize: 12,
+                               fontWeight: FontWeight.w500,
+                               fontFamily: "poppins",
+                               color: Colors.white,
+                             ),
+                           ),
+                         ],
+                       ),
+                     ),
+                   ),
+                   SizedBox(height: 16),
+
+                   /// No Button
+                   SizedBox(
+                     height: 42,
+                     width: 176,
+                     child: ElevatedButton(
+                       onPressed: () => Navigator.pop(context),
+                       style: ElevatedButton.styleFrom(
+                         backgroundColor: Colors.white,
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(8),
+                         ),
+                       ),
+                       child: Row(
+                         mainAxisAlignment: MainAxisAlignment.center,
+                         children: [
+                           Icon(Icons.close, color: Color(0xFF114BCA), size: 18),
+                           SizedBox(width: 10),
+                           Text(
+                             "No",
+                             style: TextStyle(
+                               fontSize: 12,
+                               fontWeight: FontWeight.w500,
+                               fontFamily: "poppins",
+                               color: Color(0xFF114BCA),
+                             ),
+                           ),
+                         ],
+                       ),
+                     ),
                    ),
                  ],
                ),
-
-               /// Profile Picture
-               CircleAvatar(
-                 radius: 47.5,
-                 backgroundImage: imageUrl.isNotEmpty
-                     ? NetworkImage("https://jdapi.youthadda.co/$imageUrl")
-                     : AssetImage("assets/images/placeholder.png") as ImageProvider,
-                 backgroundColor: Colors.transparent,
-               ),
-               SizedBox(height: 8),
-
-               /// Name
-               Text(
-                 name,
-                 style: TextStyle(
-                   fontFamily: "poppins",
-                   fontWeight: FontWeight.w500,
-                   fontSize: 16,
-                 ),
-               ),
-               SizedBox(height: 20),
-
-               /// Main content
-               Container(
-                 padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                 decoration: BoxDecoration(
-                   color: Colors.white,
-                   borderRadius: BorderRadius.circular(12),
-                 ),
-                 child: Column(
-                   children: [
-                     Text(
-                       "Are you sure you want to continue with this booking?",
-                       style: TextStyle(
-                         fontSize: 12,
-                         fontWeight: FontWeight.w500,
-                         fontFamily: "poppins",
-                         color: Color(0xFF4F4F4F),
-                       ),
-                     ),
-                     SizedBox(height: 16),
-
-                     /// Yes (Book Now) Button
-                     SizedBox(
-                       height: 42,
-                       width: 176,
-                       child: ElevatedButton(
-                         onPressed: () async {
-                           Navigator.pop(context);
-                           await controller.bookServiceProvider(userId.toString()); // Pass user's ID here
-                         },
-                         style: ElevatedButton.styleFrom(
-                           backgroundColor: Color(0xFF114BCA),
-                           shape: RoundedRectangleBorder(
-                             borderRadius: BorderRadius.circular(8),
-                           ),
-                         ),
-                         child: Row(
-                           mainAxisAlignment: MainAxisAlignment.center,
-                           children: [
-                             Icon(Icons.check, color: Colors.white, size: 18),
-                             SizedBox(width: 10),
-                             Text(
-                               "Yes",
-                               style: TextStyle(
-                                 fontSize: 12,
-                                 fontWeight: FontWeight.w500,
-                                 fontFamily: "poppins",
-                                 color: Colors.white,
-                               ),
-                             ),
-                           ],
-                         ),
-                       ),
-                     ),
-                     SizedBox(height: 16),
-
-                     /// No (Cancel) Button
-                     SizedBox(
-                       height: 42,
-                       width: 176,
-                       child: ElevatedButton(
-                         onPressed: () {
-                           Navigator.pop(context); // Close the bottom sheet
-                         },
-                         style: ElevatedButton.styleFrom(
-                           backgroundColor: Colors.white,
-                           shape: RoundedRectangleBorder(
-                             borderRadius: BorderRadius.circular(8),
-                           ),
-                         ),
-                         child: Row(
-                           mainAxisAlignment: MainAxisAlignment.center,
-                           children: [
-                             Icon(Icons.close, color: Color(0xFF114BCA), size: 18),
-                             SizedBox(width: 10),
-                             Text(
-                               "No",
-                               style: TextStyle(
-                                 fontSize: 12,
-                                 fontWeight: FontWeight.w500,
-                                 fontFamily: "poppins",
-                                 color: Color(0xFF114BCA),
-                               ),
-                             ),
-                           ],
-                         ),
-                       ),
-                     ),
-                   ],
-                 ),
-               ),
-             ],
-           ),
-         );
-
-
+             ),
+           ],
+         ),
+       ),
+     );
    }
+
 }
