@@ -318,7 +318,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           onPressed: () {
                                             final phoneNumber = user['phone'] ?? '';
                                             if (phoneNumber.isNotEmpty) {
-                                              controller.makePhoneCall(phoneNumber);
+                                              controller.makePhoneCall("phoneNumber");
                                             } else {
                                               Get.snackbar('Error', 'Phone number not available',
                                                 snackPosition: SnackPosition.BOTTOM,
@@ -476,6 +476,14 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                          phone: phone,
                          userId: userId,
                          title: skill['categoryId'].toString(),
+                         skill: skill,
+                         bookServiceProvider: (serviceIds) async {
+                           await controller.bookServiceProvider(
+                             bookedBy: userId, // <-- Ensure this is defined
+                             bookedFor: userId,
+                             serviceIds: serviceIds, selectedHelperName: '',
+                           );
+                         },
                        );
                      },
 
@@ -606,31 +614,32 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
          required String phone,
          required String userId,
          required String title,
+         required Map<String, dynamic> skill,
+         required Future<void> Function(List<String> serviceIds) bookServiceProvider,
        }) {
      showModalBottomSheet(
        context: context,
-       isScrollControlled: true,  // important for bigger bottom sheets
-       backgroundColor: Colors.transparent,  // for rounded corners effect
+       isScrollControlled: true,
+       backgroundColor: Colors.transparent,
        builder: (context) {
          return SingleChildScrollView(
            child: Padding(
              padding: const EdgeInsets.only(left: 12, right: 12),
              child: Container(
-               padding: EdgeInsets.all(16),
+               padding: const EdgeInsets.all(16),
                decoration: BoxDecoration(
-                 color: Color(0xffD9E4FC),
+                 color: const Color(0xffD9E4FC),
                  borderRadius: BorderRadius.circular(20),
                ),
                child: Column(
                  mainAxisSize: MainAxisSize.min,
                  children: [
-                   // ... all your UI here (same as your widget code) ...
                    Row(
                      mainAxisAlignment: MainAxisAlignment.end,
                      children: [
                        GestureDetector(
                          onTap: () => Navigator.pop(context),
-                         child: Icon(Icons.close, color: Colors.black),
+                         child: const Icon(Icons.close, color: Colors.black),
                        ),
                      ],
                    ),
@@ -640,25 +649,25 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                          ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
                          : const AssetImage('assets/images/account.png') as ImageProvider,
                    ),
-                   SizedBox(height: 8),
+                   const SizedBox(height: 8),
                    Text(
                      name,
-                     style: TextStyle(
+                     style: const TextStyle(
                        fontFamily: "poppins",
                        fontWeight: FontWeight.w500,
                        fontSize: 16,
                      ),
                    ),
-                   SizedBox(height: 20),
+                   const SizedBox(height: 20),
                    Container(
-                     padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                     padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                      decoration: BoxDecoration(
                        color: Colors.white,
                        borderRadius: BorderRadius.circular(12),
                      ),
                      child: Column(
                        children: [
-                         Text(
+                         const Text(
                            "Are you sure you want to continue with this booking?",
                            style: TextStyle(
                              fontSize: 12,
@@ -667,22 +676,24 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                              color: Color(0xFF4F4F4F),
                            ),
                          ),
-                         SizedBox(height: 16),
+                         const SizedBox(height: 16),
                          SizedBox(
                            height: 42,
                            width: 176,
                            child: ElevatedButton(
                              onPressed: () async {
+                               String serviceId = skill['subcategoryId']?.toString() ??
+                                   skill['categoryId'].toString();
                                Navigator.pop(context);
-                               await controller.bookServiceProvider(userId, helperName: name);
+                               await bookServiceProvider([serviceId]);
                              },
                              style: ElevatedButton.styleFrom(
-                               backgroundColor: Color(0xFF114BCA),
+                               backgroundColor: const Color(0xFF114BCA),
                                shape: RoundedRectangleBorder(
                                  borderRadius: BorderRadius.circular(8),
                                ),
                              ),
-                             child: Row(
+                             child: const Row(
                                mainAxisAlignment: MainAxisAlignment.center,
                                children: [
                                  Icon(Icons.check, color: Colors.white, size: 18),
@@ -700,7 +711,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                              ),
                            ),
                          ),
-                         SizedBox(height: 16),
+                         const SizedBox(height: 16),
                          SizedBox(
                            height: 42,
                            width: 176,
@@ -712,7 +723,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                  borderRadius: BorderRadius.circular(8),
                                ),
                              ),
-                             child: Row(
+                             child: const Row(
                                mainAxisAlignment: MainAxisAlignment.center,
                                children: [
                                  Icon(Icons.close, color: Color(0xFF114BCA), size: 18),
@@ -741,6 +752,5 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
        },
      );
    }
-
 
 }

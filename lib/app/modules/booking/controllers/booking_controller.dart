@@ -8,7 +8,7 @@ import '../../CancelBooking/views/cancel_booking_view.dart';
 
 class BookingController extends GetxController {
   //TODO: Implement BookingController
-  var currentBooking = {}.obs;
+  var currentBooking = {}.obs;var showRequestPending = false.obs;var helperName = ''.obs;
   var isLoading = false.obs;var
   hasBooking = true.obs; // Or false if no booking
   var booking = Rxn<Booking>();

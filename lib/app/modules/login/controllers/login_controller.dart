@@ -40,12 +40,25 @@ class LoginController extends GetxController {
 
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
-        print("✅ OTP sent successfully: $responseBody");
+        print("✅ OTP API Response: $responseBody");
 
         final data = json.decode(responseBody);
-        final otp = data['otp'] ?? '';
 
-        // ✅ Save mobile number
+        final otp = data['otp'] ?? '';
+        final message = data['message']?.toString().toLowerCase() ?? '';
+
+        /// 🛑 If already registered
+        if (message.contains("already") || message.contains("exist")) {
+          Get.snackbar(
+            "Already Registered",
+            "This number is already registered. Please login.",
+            backgroundColor: Colors.red.shade100,
+            colorText: Colors.black,
+          );
+          return;
+        }
+
+        // ✅ Save mobile number locally
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('mobileNumber', phone);
 
@@ -57,7 +70,7 @@ class LoginController extends GetxController {
 
         mobileController.clear();
 
-        // ✅ Show OTP in snackbar for 10 seconds
+        // ✅ Show OTP in snackbar
         if (otp.isNotEmpty) {
           Get.snackbar(
             "🔐 OTP Received",
@@ -69,6 +82,7 @@ class LoginController extends GetxController {
           );
         }
 
+        // ✅ Only navigate if not already registered
         Get.to(() => OtpView());
       } else {
         print("❌ Failed to send OTP: ${response.reasonPhrase}");
@@ -79,6 +93,7 @@ class LoginController extends GetxController {
       Get.snackbar("Error", "Exception occurred while sending OTP");
     }
   }
+
 
 
 

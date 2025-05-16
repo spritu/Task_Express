@@ -8,10 +8,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../CancelBooking/views/cancel_booking_view.dart';
 import '../../RequestPandding/views/request_pandding_view.dart';
+import '../../booking/views/booking_view.dart';
+import '../../bottom/controllers/bottom_controller.dart';
+import '../../bottom/views/bottom_view.dart';
 import '../../home/controllers/home_controller.dart';
 
-class ProfessionalPlumberController extends GetxController {
+class ProfessionalPlumberController extends GetxController with WidgetsBindingObserver{
   final HomeController userController = Get.put(HomeController());
+  bool _callInitiated = false;var showRequestPending = false.obs;
+  var helperName = ''.obs;
+  var bookingData = {}.obs; var selectedIndex = 0.obs;
+  Map<String, dynamic>? _callParams;
   //TODO: Implement ProfessionalPlumberController
   void loadSkills() async {
     List<Map<String, dynamic>> skills = await userController.getSkillsFromPrefs();
@@ -19,48 +26,63 @@ class ProfessionalPlumberController extends GetxController {
   }
 
   final landMark = Rx<String>('');final houseNo = Rx<String>('');
-  Future<void> bookServiceProvider(String bookedForId, {required String helperName}) async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? userId2 = prefs.getString('userId2');
+  Future<void> bookServiceProvider({
+    required String bookedBy,
+    required String bookedFor,
+    required List<String> serviceIds,
+    required String selectedHelperName,
+  }) async {
+    var headers = {'Content-Type': 'application/json'};
 
-      if (userId2 == null) {
-        Get.snackbar("Error", "User ID not found in SharedPreferences");
-        return;
-      }
+    var body = json.encode({
+      "bookedBy": bookedBy,
+      "bookedFor": bookedFor,
+      "bookServices": serviceIds,
+    });
 
-      var headers = {
-        'Content-Type': 'application/json',
-      };
+    var request = http.Request(
+      'POST',
+      Uri.parse('https://jdapi.youthadda.co/bookserviceprovider'),
+    );
 
-      var request = http.Request(
-        'POST',
-        Uri.parse('https://jdapi.youthadda.co/bookserviceprovider'),
-      );
+    request.body = body;
+    request.headers.addAll(headers);
 
-      request.body = json.encode({
-        "bookedBy": userId2,
-        "bookedFor": bookedForId,
-      });
+    http.StreamedResponse response = await request.send();
 
-      request.headers.addAll(headers);
+    if (response.statusCode == 200) {
+      String responseBody = await response.stream.bytesToString();
+      final responseData = jsonDecode(responseBody);
 
-      http.StreamedResponse response = await request.send();
-      final resBody = await response.stream.bytesToString();
-      print("📦 Response: $resBody");
+      print("✅ Booking successful: $responseData");
 
-      if (response.statusCode == 200) {
-        Get.snackbar("", "Send Request Successfully");
+      var acceptStatus = responseData['data']['accept'];
+      helperName.value = selectedHelperName;
 
-        // Pass helper name to the next screen
-        Get.to(() => RequestPanddingView(helperName: helperName));
+      // Check if still pending
+      if (acceptStatus == null) {
+        showRequestPending.value = true;
       } else {
-        print("❌ Error: ${response.reasonPhrase}");
-        Get.snackbar("Error", "Booking failed: ${response.reasonPhrase}");
+        showRequestPending.value = false;
       }
-    } catch (e) {
-      print("❌ Exception during booking: $e");
-      Get.snackbar("Error", "Something went wrong during booking.");
+
+      // Optionally save full booking data
+      bookingData.value = responseData['data'];
+   selectedIndex.value = 0;
+      final BottomController controller = Get.find<BottomController>();
+
+      controller.helperName.value = selectedHelperName;
+      controller.showRequestPending.value = (acceptStatus == null);
+      controller.selectedIndex.value = 1;  // Booking tab
+
+      Get.to(() => BottomView());
+      // final BottomController controller = Get.find<BottomController>();
+      // // Navigate to Booking screen
+      // Get.to(
+      // controller.selectedIndex.value = 0);
+    } else {
+      print("❌ Booking failed: ${response.reasonPhrase}");
+      // Show error/snackbar here
     }
   }
 
@@ -107,6 +129,7 @@ class ProfessionalPlumberController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
 
   }
 
@@ -119,6 +142,7 @@ class ProfessionalPlumberController extends GetxController {
   @override
   void onClose() {
     super.onClose();
+    WidgetsBinding.instance.removeObserver(this);
   }
 
   void increment() => count.value++;

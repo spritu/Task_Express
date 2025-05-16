@@ -8,26 +8,34 @@ import '../../home/views/home_view.dart';
 import '../../setting/views/setting_view.dart';
 import '../controllers/bottom_controller.dart';
 
+
 class BottomView extends GetView<BottomController> {
   const BottomView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Obx(() => _buildBody(controller.selectedIndex.value)),
+      body: Obx(() {
+        // Controller's reactive variables se values lo
+        return _buildBody(
+          controller.selectedIndex.value,
+          controller.showRequestPending.value,
+          controller.helperName.value,
+        );
+      }),
       bottomNavigationBar: Obx(
-        () => BottomNavigationBar(backgroundColor: AppColors.white,
+            () => BottomNavigationBar(
+          backgroundColor: AppColors.white,
           currentIndex: controller.selectedIndex.value,
           onTap: (index) => controller.selectedIndex.value = index,
-          selectedItemColor: Color(0xFF114BCA),
-          unselectedItemColor: Color(0xFF9F9F9F),
-          type: BottomNavigationBarType.fixed,showUnselectedLabels: true,
-          items: [
+          selectedItemColor: const Color(0xFF114BCA),
+          unselectedItemColor: const Color(0xFF9F9F9F),
+          type: BottomNavigationBarType.fixed,
+          showUnselectedLabels: true,
+          items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Bookings'),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Setting',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
             BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
           ],
@@ -37,19 +45,30 @@ class BottomView extends GetView<BottomController> {
   }
 }
 
-Widget _buildBody(int index) {
+Widget _buildBody(int index, bool showRequestPending, String helperName) {
   switch (index) {
     case 0:
-      return HomeView();
+      return const HomeView();
     case 1:
-      return BookingView();
+      return Stack(
+        children: [
+          const BookingView(),
+          if (showRequestPending)
+            Container(
+              color: Colors.black.withOpacity(0.6),
+              child: Center(
+                child: RequestPendingBottomCard(helperName: helperName),
+              ),
+            ),
+        ],
+      );
     case 2:
-      return SettingView();
+      return const SettingView();
     case 3:
-      return ChatScreenView();
+      return const ChatScreenView();
     case 4:
-      return AccountView();
+      return const AccountView();
     default:
-      return Center(child: Text('Unknown'));
+      return const Center(child: Text('Unknown'));
   }
 }

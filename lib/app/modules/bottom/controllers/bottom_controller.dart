@@ -5,7 +5,8 @@ class BottomController extends GetxController {
 
   final count = 0.obs;
   var selectedIndex = 0.obs;
-
+  var bookingData = {}.obs;  var showRequestPending = false.obs;
+  var helperName = ''.obs;
   var selected = 0.obs;
   @override
   void onInit() {

@@ -6,6 +6,9 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../auth_controller.dart';
+import '../../Bottom2/views/bottom2_view.dart';
+import '../../otp/views/otp_view.dart';
 import '../../provider_home/views/provider_home_view.dart';
 import '../../provider_otp/views/provider_otp_view.dart';
 import '../views/provider_login_view.dart';
@@ -32,10 +35,7 @@ class ProviderLoginController extends GetxController {
       return;
     }
 
-    final headers = {
-      'Content-Type': 'application/json',
-    };
-
+    final headers = {'Content-Type': 'application/json'};
     final body = json.encode({"phone": phone});
     final url = Uri.parse('https://jdapi.youthadda.co/user/sendotp');
 
@@ -48,31 +48,49 @@ class ProviderLoginController extends GetxController {
 
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
-        print("✅ OTP sent successfully: $responseBody");
+        print("✅ OTP API Response: $responseBody");
 
-        final jsonResponse = json.decode(responseBody);
+        final data = json.decode(responseBody);
 
-        // 👇 Extract and show OTP in snackbar for 10 seconds
-        final otp = jsonResponse['otp']?.toString() ?? 'N/A';
-        Get.snackbar(
-          "OTP Sent",
-          "Your OTP is: $otp",
-          duration: const Duration(seconds: 10),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.withOpacity(0.8),
-          colorText: Colors.white,
-        );
+        final message = data['message']?.toString().toLowerCase() ?? '';
+        final otp = data['otp'] ?? '';
 
-        // ✅ Save phone number
+        // 🛑 Already registered user → Go to Bottom2View
+        if (message.contains("already")) {
+          final user = data['user'];
+
+          if (user != null) {
+            Get.to(() => Bottom2View(
+
+            ));
+          } else {
+            Get.snackbar("Error", "User exists but details not found.");
+          }
+          return;
+        }
+        // ✅ New user → Save & go to OtpView
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('mobileNumber', phone);
-        await prefs.reload();
 
-        await box.write('isLoggedIn2', true);
+        await box.write('isLoggedIn', true);
         await box.write('mobile', phone);
+
+        final authController = Get.find<AuthController>();
+        authController.isLoggedIn.value = true;
+
         mobileeController.clear();
 
-        // ✅ Navigate to OTP screen
+        if (otp.isNotEmpty) {
+          Get.snackbar(
+            "🔐 OTP Received",
+            "Your OTP is: $otp",
+            duration: Duration(seconds: 10),
+            backgroundColor: Colors.black87,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+
         Get.to(() => ProviderOtpView());
       } else {
         print("❌ Failed to send OTP: ${response.reasonPhrase}");
@@ -80,7 +98,7 @@ class ProviderLoginController extends GetxController {
       }
     } catch (e) {
       print("❌ Exception: $e");
-      Get.snackbar("Error", "Something went wrong: $e");
+      Get.snackbar("Error", "Exception occurred while sending OTP");
     }
   }
 
