@@ -42,7 +42,15 @@ class HomeController extends GetxController {
     return [];
   }
   RxList<dynamic> usersList = <dynamic>[].obs;
-
+  Future<List<Map<String, dynamic>>> getSkillsFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final skillsJsonString = prefs.getString('user_skills');
+    if (skillsJsonString != null) {
+      final skillsList = jsonDecode(skillsJsonString);
+      return List<Map<String, dynamic>>.from(skillsList);
+    }
+    return [];
+  }
   void fetchUsersListBySubcategory(String subcategoryId) async {
     isLoading.value = true;
     try {
@@ -63,11 +71,14 @@ class HomeController extends GetxController {
       isLoading.value = false;
     }
   }
-
+  Map<String, String> categoryNameMap = {};
   void fetchUsersListByCategory(String catId, {String? categoryName}) async {
     results.clear();
     isLoading.value = true;
+
     try {
+      fetchCategories(); // Step 1: load category name map
+
       var url = Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId');
       var request = http.Request('GET', url);
       var response = await request.send();
@@ -76,7 +87,21 @@ class HomeController extends GetxController {
         final jsonString = await response.stream.bytesToString();
         final jsonData = json.decode(jsonString);
 
-        results.assignAll(jsonData['data']);
+        // 🔍 Debug print to show response data
+        print("API Response Data: $jsonData");
+
+        // Attach category name to each skill
+        List<dynamic> users = jsonData['data'];
+        for (var user in users) {
+          if (user['skills'] != null) {
+            for (var skill in user['skills']) {
+              skill['categoryName'] =
+                  categoryNameMap[skill['categoryId']] ?? 'Unknown';
+            }
+          }
+        }
+
+        results.assignAll(users);
 
         if (results.isNotEmpty) {
           Get.to(() => ProfessionalPlumberView(), arguments: {
@@ -84,7 +109,7 @@ class HomeController extends GetxController {
             'title': categoryName ?? 'Professionals',
           });
         } else {
-        //  Get.snackbar("No Users", "No professionals found for this category.");
+          // Get.snackbar("No Users", "No professionals found for this category.");
         }
       } else {
         print("Error: ${response.reasonPhrase}");
@@ -95,6 +120,7 @@ class HomeController extends GetxController {
       isLoading.value = false;
     }
   }
+
 
 
 
@@ -195,15 +221,24 @@ class HomeController extends GetxController {
     try {
       final uri = Uri.parse(
           'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$categoryId');
-
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         if (jsonData['data'] != null) {
           final dataList = jsonData['data'] as List;
+
+          // Save skills from the first user in the list
+          if (dataList.isNotEmpty) {
+            final userMap = dataList.first as Map<String, dynamic>;
+            final skills = userMap['skills'] ?? [];
+            await saveSkillsToSharedPrefs(skills);
+          }
+
+          // Populate users
           usersByCategory.value =
               dataList.map((e) => UserModel.fromJson(e)).toList();
+
           print("✅ Users fetched for category $categoryId");
         } else {
           usersByCategory.clear();
@@ -218,7 +253,12 @@ class HomeController extends GetxController {
       isLoading.value = false;
     }
   }
-
+  Future<void> saveSkillsToSharedPrefs(List<dynamic> skills) async {
+    final prefs = await SharedPreferences.getInstance();
+    final skillsJsonString = jsonEncode(skills);
+    await prefs.setString('user_skills', skillsJsonString);
+    print("✅ Skills saved to SharedPreferences");
+  }
   // To toggle category view between expanded and collapsed
   void toggleCategoryView() {
     showAllCategories.value = !showAllCategories.value;
@@ -438,28 +478,6 @@ class HomeController extends GetxController {
     selectedCategory.value = label;
   }
 
-  final List<String> titles1 = [
-    'Visiting Professionals',
-    'Fixed charge Helpres',
-  ];
-
-  final List<String> imagePath2 = [
-    'assets/images/visiting.png',
-    'assets/images/electretion.png',
-  ];
-
-  final List<String> titles = [
-    'Electretion',
-    'Plumber',
-    'Gardner',
-    'Home cook',
-    'House worker',
-    'AC Repair',
-    'Pest control',
-    'More',
-  ];
-
-
 
   final services = [
     {
@@ -518,13 +536,13 @@ class HomeController extends GetxController {
 }
 
 class CategoryModel {
-  final String id;
+  final String catid;
   final String label;
   final String icon;
   final String spType;
   final List<SubcategoryModel> subcategories; // Add a list of subcategories
 
-  CategoryModel({ required this.id,
+  CategoryModel({ required this.catid,
     required this.label,
     required this.icon,
     required this.spType,
@@ -541,7 +559,8 @@ class CategoryModel {
         .map((subItem) => SubcategoryModel.fromJson(subItem))
         .toList();
 
-    return CategoryModel(id:json['_id'] ?? '',
+    return CategoryModel(
+      catid: json['_id'] ?? '',
       label: json['name'] ?? '',
       icon: iconUrl,
       spType: json['spType']?.toString() ?? '',
@@ -572,30 +591,23 @@ class SubcategoryModel {
   String get id => subId;
 }
 
-
-
-// user_model.dart
 class UserModel {
-  final String? name;
-  final String? mobile;
-  final String? image;
+  final String id;
+  final String name;
+  final List<dynamic> skills;
 
-  UserModel({this.name, this.mobile, this.image});
+  UserModel({
+    required this.id,
+    required this.name,
+    required this.skills,
+  });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      name: json['firstName'],
-      mobile: json['mobile'],
-      image: json['image'],
+      id: json['_id'] ?? '',
+      name: json['firstName'] ?? 'Unknown',
+      skills: json['skills'] ?? [],
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'mobile': mobile,
-      'image': image,
-    };
   }
 }
 

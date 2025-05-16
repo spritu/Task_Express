@@ -373,7 +373,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.REQUEST_PANDDING,
-      page: () => const RequestPanddingView(),
+      page: () =>  RequestPanddingView(helperName: '',),
       binding: RequestPanddingBinding(),
     ),
     GetPage(

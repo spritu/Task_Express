@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import '../../Bottom2/views/bottom2_view.dart';
 import '../../provider_profile/views/provider_profile_view.dart';
 class ProviderOtpController extends GetxController {
   //TODO: Implement ProviderOtpController
@@ -43,11 +44,10 @@ class ProviderOtpController extends GetxController {
   // Verify OTP
   Future<void> verifyOtp(String otp) async {
     if (otp.isEmpty || otp.length != 4) {
-      //  Get.snackbar("Error", "Please enter a valid 4-digit OTP");
+      Get.snackbar("Error", "Please enter a valid 4-digit OTP");
       return;
     }
 
-    // Get mobile number from SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? mobileNumber = prefs.getString('mobileNumber');
 
@@ -56,51 +56,56 @@ class ProviderOtpController extends GetxController {
       return;
     }
 
-    final headers = {
-      'Content-Type': 'application/json',
-    };
-
+    final headers = {'Content-Type': 'application/json'};
     final body = json.encode({
       "phone": mobileNumber,
       "otp": otp,
     });
+
     final url = Uri.parse('https://jdapi.youthadda.co/user/verifyotp');
     try {
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: body,
-      );
+      final response = await http.post(url, headers: headers, body: body);
+
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-
         print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
 
-        Get.snackbar("✅ Success", responseData['msg'],colorText: Colors.green);
-        Get.off(() => ProviderProfileView()); // safer than Get.to
+        Get.snackbar("✅ Success", responseData['msg'], colorText: Colors.green);
+
         final userId = responseData['id'].toString();
-        final prefs = await SharedPreferences.getInstance();
+        final token = responseData['token'];
+        final userType = responseData['userType'];
+        final userData = responseData['userData'];
+
         await prefs.setString('userId', userId);
-        print("✅ Saved userId: $userId");
-        // Save important values
-        prefs.setString('token', responseData['token']);
-        prefs.setInt('userType', responseData['userType']);
-            prefs.setString('userId', responseData['id']);
-        prefs.setString('email', responseData['userData']['email']);
+        await prefs.setString('token', token);
+        await prefs.setInt('userType', userType);
+        await prefs.setString('email', userData['email'] ?? "");
+
         otpTextController.clear();
-        // Navigate to next screen or dashboard
+
+        final userName = userData['name']?.toString() ?? '';
+        final profession = userData['profession']?.toString() ?? '';
+
+        print("User Name: $userName");
+        print("Profession: $profession");
+
+        // ✅ Registered user if both fields have data
+        if (userName.isNotEmpty && profession.isNotEmpty) {
+          Get.offAll(() => Bottom2View());
+        } else {
+          Get.off(() => ProviderProfileView());
+        }
 
       } else {
         print("❌ Failed to verify OTP: ${response.body}");
-        Get.snackbar("", "❌ Failed to verify OTP: ${response.body}",colorText: Colors.red);
+        Get.snackbar("❌ Error", "Failed to verify OTP: ${response.body}", colorText: Colors.red);
       }
     } catch (e) {
       print("❌ Exception: $e");
-     // Get.snackbar("", "❌ Something went wrong: $e",colorText: Colors.red);
+      Get.snackbar("❌ Error", "Something went wrong: $e", colorText: Colors.red);
     }
   }
-
-
 
   // Resend OTP
   Future<void> resendOtp() async {

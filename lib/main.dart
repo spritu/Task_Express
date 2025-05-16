@@ -71,7 +71,7 @@ void main() async {
   Get.put(SettingController());
   Get.put(EditProfileController());
   Get.put(JobsController());
-  Get.put(ChatController());
+  Get.lazyPut(()=>ChatController());
   Get.put(ProviderSettingController());
   Get.put(ProviderChatController());
   Get.put(OtpController());

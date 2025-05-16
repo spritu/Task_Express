@@ -1,39 +1,17 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
 class ProviderHomeController extends GetxController {
-  //TODO: Implement ProviderHomeController
   RxBool isAvailable2 = false.obs;
   var firstName = ''.obs;
-  Future<void> updateAvailability(bool status) async {
-    try {
-      final headers = {'Content-Type': 'application/json'};
-      final body = json.encode({
-        "serviceProId": "6800d7448480f1bedc178e39",
-        "avail": status ? 1 : 0,
-      });
+  var userId = ''.obs;
+  var imagePath = ''.obs;
 
-      final response = await http.post(
-        Uri.parse('https://jdapi.youthadda.co/user/changeavailstatus'),
-        headers: headers,
-        body: body,
-      );
+  late IO.Socket socket;
 
-      if (response.statusCode == 200) {
-        final resData = json.decode(response.body);
-        Get.snackbar("Success", "Availability updated successfully");
-      } else {
-        Get.snackbar("Error", "Failed to update availability");
-        isAvailable2.value = !status; // revert toggle
-      }
-    } catch (e) {
-      Get.snackbar("Error", "Something went wrong");
-      isAvailable2.value = !status; // revert toggle
-    }
-  }
   final count = 0.obs;
   var isAvailable = true.obs;
   var isServiceProfile = false.obs;
@@ -47,23 +25,91 @@ class ProviderHomeController extends GetxController {
       "date": "10 Apr 2025",
     },
   );
-  void fetchUserName() async {
-    final prefs = await SharedPreferences.getInstance();
-    firstName.value = prefs.getString('firstName') ?? '';
-  }
+
   @override
   void onInit() {
     super.onInit();
-    fetchUserName();
+    loadUserInfo(); // Load user info and connect socket
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  Future<void> loadUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    firstName.value = prefs.getString('firstName') ?? '';
+    userId.value = prefs.getString('userId') ?? '';
+    imagePath.value = prefs.getString('userImg') ?? '';
+
+    if (userId.value.isNotEmpty) {
+      connectSocket();
+    }
+  }
+
+  void connectSocket() {
+    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+      'auth': {
+        'user': {
+          '_id': userId.value,
+          'firstName': firstName.value,
+          'image': imagePath.value,
+        },
+      },
+    });
+
+    socket.connect();
+
+    socket.onConnect((_) {
+      print("✅ Socket connected");
+
+      // Optionally emit a room join or availability
+      socket.emit("joinRoom", {"userId": userId.value});
+    });
+
+    socket.on("newBooking", (data) {
+      print("📦 New Booking Received: $data");
+      Get.snackbar("New Booking", "You have a new booking request!");
+    });
+
+    socket.onDisconnect((_) => print("❌ Socket disconnected"));
+    socket.onConnectError((err) => print("🚫 Connect error: $err"));
+    socket.onError((err) => print("🔥 Socket error: $err"));
+  }
+
+  Future<void> updateAvailability(bool status) async {
+    try {
+      final headers = {'Content-Type': 'application/json'};
+      final body = json.encode({
+        "serviceProId": userId.value,
+        "avail": status ? 1 : 0,
+      });
+
+      final response = await http.post(
+        Uri.parse('https://jdapi.youthadda.co/user/changeavailstatus'),
+        headers: headers,
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        Get.snackbar("Success", "Availability updated successfully");
+
+        // Emit availability status to socket server
+        socket.emit("availabilityChange", {
+          "userId": userId.value,
+          "status": status ? 1 : 0,
+        });
+      } else {
+        Get.snackbar("Error", "Failed to update availability");
+        isAvailable2.value = !status;
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Something went wrong");
+      isAvailable2.value = !status;
+    }
   }
 
   @override
   void onClose() {
+    socket.dispose();
     super.onClose();
   }
 

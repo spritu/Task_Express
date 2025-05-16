@@ -7,7 +7,8 @@ import '../../bottom/views/bottom_view.dart';
 import '../controllers/request_pandding_controller.dart';
 
 class RequestPanddingView extends GetView<RequestPanddingController> {
-  const RequestPanddingView({super.key});
+  final String helperName;
+  const RequestPanddingView({super.key,required this.helperName});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,8 +72,8 @@ class RequestPanddingView extends GetView<RequestPanddingController> {
                                           fontFamily: "poppins",
                                         ),
                                         children: <TextSpan>[
-                                          const TextSpan(
-                                            text: ' Suraj sen ',
+                                           TextSpan(
+                                            text: ' $helperName ',
                                             style: TextStyle(
                                               fontSize: 18,
                                               color: Color(0xFF114BCA),
@@ -97,7 +98,7 @@ class RequestPanddingView extends GetView<RequestPanddingController> {
                                     Image.asset("assets/images/Waiting.png"),
                                     SizedBox(height: 20),
                                     Text(
-                                      "We’ve notified Suraj Sen. You’ll be updated\nas soon as he responds.",
+                                      "We’ve notified $helperName . You’ll be updated\nas soon as he responds.",
                                       style: TextStyle(
                                         fontFamily: "poppins",
                                         fontWeight: FontWeight.w500,

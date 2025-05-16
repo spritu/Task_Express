@@ -74,7 +74,7 @@ class BricklayingHelperController extends GetxController {
 
       if (response.statusCode == 200) {
         Get.snackbar("Success", "Service provider booked successfully");
-        Get.to( RequestPanddingView());
+        Get.to( RequestPanddingView(helperName: '',));
       } else {
         print("❌ Error: ${response.reasonPhrase}");
         Get.snackbar("Error", "Booking failed: ${response.reasonPhrase}");

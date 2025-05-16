@@ -72,23 +72,6 @@ class HomeView extends GetView<HomeController> {
                                 ),
                               ))
 
-
-
-                                //                 Obx(() => Text("${controller.houseNo.value}",style:TextStyle(
-                //         fontWeight: FontWeight.w600,
-                //         fontSize: 12,
-                //         color: AppColors.textColor,
-                //       ), )),
-                // Obx(() =>
-                //                   Text(
-                //                     '${controller.landMark.value}',
-                //                     style: TextStyle(
-                //                       fontWeight: FontWeight.w400,
-                //                       fontSize: 12,
-                //                       color: AppColors.textColor,
-                //                     ),
-                //                   ),
-                //                 ),
                               ],
                             ),
                             const Spacer(),
@@ -182,7 +165,7 @@ class HomeView extends GetView<HomeController> {
                             }
                             // ✅ User is logged in, proceed
                             final selectedCategory = controller.visitingProfessionals.first;
-                            controller.fetchUsersByCategory(selectedCategory.id);
+                            controller.fetchUsersByCategory(selectedCategory.catid);
                             controller.toggleServiceExpansion('Visiting Professionals');
                           },
                                       child: Container(
@@ -238,7 +221,7 @@ class HomeView extends GetView<HomeController> {
                                         }
                                         // ✅ User is logged in, proceed
                                         final selectedCategory = controller.fixedChargeHelpers.first;
-                                        controller.fetchUsersByCategory(selectedCategory.id);
+                                        controller.fetchUsersByCategory(selectedCategory.catid);
                                         controller.toggleServiceExpansion('Fixed charge Helpers');
                                       },
                                       child: Container(
@@ -431,7 +414,7 @@ class HomeView extends GetView<HomeController> {
                                                 );
                                               }else if (cat.spType == '1') {
                                                 // 🔥 Call API for Visiting Professionals
-                                                controller.fetchUsersListByCategory(cat.id, categoryName: cat.label);
+                                                controller.fetchUsersListByCategory(cat.catid, categoryName: cat.label);
                                               }
                                             },
                                             child: Card(
