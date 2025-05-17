@@ -8,6 +8,11 @@ class BottomController extends GetxController {
   var bookingData = {}.obs;  var showRequestPending = false.obs;
   var helperName = ''.obs;
   var selected = 0.obs;
+  void cancelRequest() {
+    showRequestPending.value = false;
+    helperName.value = '';
+    // Optional: reset other related values if needed
+  }
   @override
   void onInit() {
     super.onInit();

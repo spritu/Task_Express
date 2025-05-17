@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import '../../Bottom2/views/bottom2_view.dart';
 import '../../provider_profile/views/provider_profile_view.dart';
 class ProviderOtpController extends GetxController {
   //TODO: Implement ProviderOtpController
@@ -43,11 +44,10 @@ class ProviderOtpController extends GetxController {
   // Verify OTP
   Future<void> verifyOtp(String otp) async {
     if (otp.isEmpty || otp.length != 4) {
-      //  Get.snackbar("Error", "Please enter a valid 4-digit OTP");
+      Get.snackbar("Error", "Please enter a valid 4-digit OTP");
       return;
     }
 
-    // Get mobile number from SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? mobileNumber = prefs.getString('mobileNumber');
 
@@ -64,45 +64,81 @@ class ProviderOtpController extends GetxController {
       "phone": mobileNumber,
       "otp": otp,
     });
+
     final url = Uri.parse('https://jdapi.youthadda.co/user/verifyotp');
+
     try {
       final response = await http.post(
         url,
         headers: headers,
         body: body,
       );
+
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-
         print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
 
-        Get.snackbar("✅ Success", responseData['msg'],colorText: Colors.green);
-        Get.off(() => ProviderProfileView()); // safer than Get.to
-        final userId = responseData['id'].toString();
-        final prefs = await SharedPreferences.getInstance();
+        final userId = responseData['id']?.toString() ?? '';
+        final token = responseData['token'] ?? '';
+        final userType = responseData['userType'] ?? 0;
+
         await prefs.setString('userId', userId);
-        print("✅ Saved userId: $userId");
-        // Save important values
-        prefs.setString('token', responseData['token']);
-        prefs.setInt('userType', responseData['userType']);
-            prefs.setString('userId', responseData['id']);
-        prefs.setString('email', responseData['userData']['email']);
+        await prefs.setString('token', token);
+        await prefs.setInt('userType', userType);
+
+        final userData = responseData['userData'];
+        bool isProfileComplete = false;
+
+        if (userData != null && userData is Map<String, dynamic>) {
+          final name = userData['name']?.toString().trim() ?? '';
+          final email = userData['email']?.toString().trim() ?? '';
+          final dob = userData['dob']?.toString().trim() ?? '';
+
+          print("👤 Name: $name, Email: $email, DOB: $dob");
+
+          // Save to SharedPreferences
+          await prefs.setString('name', name);
+          await prefs.setString('email', email);
+          await prefs.setString('dob', dob);
+          await prefs.setString('gender', userData['gender']?.toString() ?? '');
+          await prefs.setString('city', userData['city']?.toString() ?? '');
+          await prefs.setString('state', userData['state']?.toString() ?? '');
+          await prefs.setString('pincode', userData['pincode']?.toString() ?? '');
+          await prefs.setString('profileImage', userData['profileImage']?.toString() ?? '');
+
+          // Profile check
+          isProfileComplete = name.isNotEmpty && email.isNotEmpty && dob.isNotEmpty;
+        }
+
         otpTextController.clear();
-        // Navigate to next screen or dashboard
+        Get.snackbar("✅ Success", responseData['msg'], colorText: Colors.green);
+
+        if (isProfileComplete) {
+          Get.offAll(() => Bottom2View());
+        } else {
+          Get.offAll(() => ProviderProfileView());
+        }
 
       } else {
         print("❌ Failed to verify OTP: ${response.body}");
-        Get.snackbar("", "❌ Failed to verify OTP: ${response.body}",colorText: Colors.red);
+        Get.snackbar("Error", "❌ Failed to verify OTP", colorText: Colors.red);
       }
+
     } catch (e) {
       print("❌ Exception: $e");
-     // Get.snackbar("", "❌ Something went wrong: $e",colorText: Colors.red);
+      Get.snackbar("Error", "❌ Something went wrong", colorText: Colors.red);
     }
   }
 
 
 
-  // Resend OTP
+
+
+
+
+
+
+
   Future<void> resendOtp() async {
 
     final headers = {

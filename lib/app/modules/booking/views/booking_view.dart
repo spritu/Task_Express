@@ -709,7 +709,8 @@ class RequestPendingBottomCard extends StatelessWidget {
                                     elevation: 0,
                                   ),
                                   onPressed: () {
-                                  Get.back();
+                                    final BottomController controller = Get.find<BottomController>();
+                                    controller.cancelRequest();
                                   },
                                   child: const Text(
                                     "Cancel Request",

@@ -315,10 +315,15 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         height: 24,
                                         width: 110,
                                         child: ElevatedButton(
-                                          onPressed: () {
+                                          onPressed: () async {
                                             final phoneNumber = user['phone'] ?? '';
                                             if (phoneNumber.isNotEmpty) {
-                                              controller.makePhoneCall("phoneNumber");
+                                              controller.selectedUsers = users; // Store full list
+                                              controller.selectedIndexAfterCall = index; // Store selected index
+                                              controller.selectedTitle = title;
+                                              controller.shouldShowSheetAfterCall = true; // Trigger sheet on resume
+
+                                               controller.makePhoneCall(phoneNumber);
                                             } else {
                                               Get.snackbar('Error', 'Phone number not available',
                                                 snackPosition: SnackPosition.BOTTOM,
@@ -327,6 +332,8 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                               );
                                             }
                                           },
+
+
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Color(0xff114BCA),
                                           ),
@@ -399,7 +406,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
        }) {
      return SingleChildScrollView(
        child: Padding(
-         padding: const EdgeInsets.only(left: 12, right: 12),
+         padding: const EdgeInsets.only(left: 8, right: 8),
          child: Container(
            width: MediaQuery.of(context).size.width,
            padding: const EdgeInsets.all(16),
@@ -543,7 +550,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
    }) {
      return Container(
        height: 45,
-       padding: const EdgeInsets.symmetric(horizontal: 12),
+       padding: const EdgeInsets.symmetric(horizontal: 8),
        decoration: BoxDecoration(
          borderRadius: BorderRadius.circular(12),
          color: const Color(0xFFF6F6F6),
