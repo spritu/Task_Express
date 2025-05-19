@@ -71,7 +71,7 @@ class AccountView extends GetView<AccountController> {
                                   children: [
                                     Obx(() {
                                       return Text(
-                                        ' ${controller.firstName.value} ${controller.lastName.value}',
+                                        '${controller.firstName} ${controller.lastName}',
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontFamily: "poppins",
@@ -79,6 +79,7 @@ class AccountView extends GetView<AccountController> {
                                         ),
                                       );
                                     }),
+
                                     Obx(() {
                                       return Text(
                                         controller.mobileNumber.isEmpty

@@ -26,9 +26,10 @@ class ChatScreenView extends GetView<ChatScreenController> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
-                children: [SizedBox(height: 20),
-                  // Header
+                children: [
+                  SizedBox(height: 20),
 
+                  // Header
                   const Text(
                     " Chats",
                     style: TextStyle(
@@ -44,97 +45,138 @@ class ChatScreenView extends GetView<ChatScreenController> {
 
                   // Chat List
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: 40,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: InkWell(onTap: (){
-                            Get.to(ChatView());
-                          },
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 5.0,
-                                    vertical: 8.0,
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      // Profile Image
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(25),
-                                        child: Image.asset(
-                                          "assets/images/professional_profile.png",
-                                          width: 50,
-                                          height: 50,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-
-                                      // Chat Info
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            // Name and Time
-                                            Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                const Text(
-                                                  "Amit Sharma",
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontFamily: "poppins",
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "04:44 pm",
-                                                  style: TextStyle(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.w400,
-                                                    fontFamily: "poppins",
-                                                    color: Color(0xFF545454),
-                                                  ),
-                                                ),
-                                              ],
+                    child: Obx(() {
+                      return ListView.builder(
+                        itemCount: controller.chats.length,
+                        itemBuilder: (context, index) {
+                          final chat = controller.chats[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: InkWell(
+                              onTap: () {
+                                Get.to(
+                                  ChatView(),
+                                  arguments: {
+                                    'receiverId': chat.reciverId,
+                                    'receiverName':
+                                    '${chat.firstName} ${chat.lastName}',
+                                    'receiverImage': chat.profilePic,
+                                  },
+                                )?.then((_) async {
+                                  await controller.fetchLastMessages();
+                                });
+                              },
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 5.0,
+                                      vertical: 8.0,
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        // Profile Image
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            25,
+                                          ),
+                                          child:
+                                          chat.profilePic.isNotEmpty
+                                              ? Image.network(
+                                            chat.profilePic,
+                                            width: 50,
+                                            height: 50,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (
+                                                context,
+                                                error,
+                                                stack,
+                                                ) => Image.asset(
+                                              "assets/images/account.png",
+                                              width: 50,
+                                              height: 50,
                                             ),
-                                            const SizedBox(height: 4),
+                                          )
+                                              : Image.asset(
+                                            "assets/images/account.png",
+                                            width: 50,
+                                            height: 50,
+                                          ),
+                                        ),
 
-                                            // Message Preview
-                                            const Text(
-                                              "Hello sir, aapka address samzha dejiye.",
-                                              style: TextStyle(
-                                                fontFamily: "poppins",
-                                                fontWeight: FontWeight.w300,
-                                                fontSize: 12,
+                                        const SizedBox(width: 12),
+
+                                        // Chat Info
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              // Name and Time
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    '${chat.firstName} ${chat.lastName}',
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                      FontWeight.w600,
+                                                      fontFamily: "poppins",
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+
+                                                  Text(
+                                                    controller.formatTimestamp(
+                                                      chat.timestamp,
+                                                    ),
+                                                    style: TextStyle(
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                      FontWeight.w400,
+                                                      fontFamily: "poppins",
+                                                      color: Color(0xFF545454),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                              const SizedBox(height: 4),
 
-                                // Divider
-                                const Divider(
-                                  height: 1,
-                                  color: Colors.grey,
-                                  indent: 70,
-                                ),
-                              ],
+                                              // Message Preview
+                                              Text(
+                                                chat.message,
+                                                style: TextStyle(
+                                                  fontFamily: "poppins",
+                                                  fontWeight: FontWeight.w300,
+                                                  fontSize: 12,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  // Divider
+                                  const Divider(
+                                    height: 1,
+                                    color: Colors.grey,
+                                    indent: 70,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      );
+                    }),
                   ),
                 ],
               ),

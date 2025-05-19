@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:get/get.dart';
+import 'package:worknest/app/modules/Bottom2/views/bottom2_view.dart';
+import 'package:worknest/app/modules/jobs/views/jobs_view.dart';
 
 import '../../../../colors.dart';
 import '../../Activejob_screen/views/activejob_screen_view.dart';
+import '../../Bottom2/controllers/bottom2_controller.dart';
 import '../../YourEarning/views/your_earning_view.dart';
 import '../../provider_location/controllers/provider_location_controller.dart';
 import '../controllers/provider_home_controller.dart';
@@ -34,7 +37,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                         Row(
                           children: [
                             Text(
-                              'Current Address',
+                              'Current Address  ',
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 12,
@@ -50,7 +53,10 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                             locationController.currentAddress.value.isNotEmpty
                                 ? locationController.currentAddress.value
                                 : "Fetching current location...",
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
                           );
                         }),
                       ],
@@ -94,22 +100,16 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                           Container(
                             height: 46,
                             width: 154,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(14),
                               color: Colors.white,
                               boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 4,
-                                ),
+                                BoxShadow(color: Colors.black12, blurRadius: 4),
                               ],
                             ),
                             child: Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Text(
                                   "Available",
@@ -120,7 +120,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                   ),
                                 ),
                                 Obx(
-                                      () => FlutterSwitch(
+                                  () => FlutterSwitch(
                                     width: 53.0,
                                     height: 26.18,
                                     toggleSize: 23.0,
@@ -163,22 +163,16 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                           Container(
                             height: 46,
                             width: 154,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(14),
                               color: Colors.white,
                               boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 4,
-                                ),
+                                BoxShadow(color: Colors.black12, blurRadius: 4),
                               ],
                             ),
                             child: Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Text(
                                   "Service\n Profile",
@@ -189,7 +183,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                   ),
                                 ),
                                 Obx(
-                                      () => FlutterSwitch(
+                                  () => FlutterSwitch(
                                     width: 53.0,
                                     height: 26.18,
                                     toggleSize: 23.0,
@@ -207,7 +201,10 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          InkWell(onTap: (){Get.to(ActivejobScreenView());},
+                          InkWell(
+                            onTap: () {
+                              Get.to(ActivejobScreenView());
+                            },
                             child: const Text(
                               "Service profile or User profile",
                               style: TextStyle(
@@ -240,14 +237,16 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Obx(() => Text(
-                        "Hello ${controller.firstName.value}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                          fontFamily: "Poppins",
+                      Obx(
+                        () => Text(
+                          "Hello ${controller.firstName.value}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                            fontFamily: "Poppins",
+                          ),
                         ),
-                      )),
+                      ),
 
                       const SizedBox(height: 2),
                       RichText(
@@ -278,7 +277,9 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                 SizedBox(height: 10),
                 Expanded(
                   child: SingleChildScrollView(
-                    child: Column(mainAxisAlignment: MainAxisAlignment.start,crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           "Job Request",
@@ -289,162 +290,318 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                             color: Color(0xFFF67C0A),
                           ),
                         ),
-                        SizedBox(width: MediaQuery.of(context).size.width,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 4,
-                            child: Container(
-                              height: 175,
-                              padding: const EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: Colors.white,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Top Row: Left Side (Details) + Right Side (Earning & Duration)
-                                  Row(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      // Left Side Column
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: const [
-                                                Icon(
-                                                  Icons.person,
-                                                  size: 16,
-                                                  color: Colors.grey,
-                                                ),
-                                                SizedBox(width: 4),
-                                                Text(
-                                                  "Shivani singh,",
-                                                  style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 12,
-                                                    color: Color(0xFF7A7A7A),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 6),
-                                            Row(
-                                              crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                              children: const [
-                                                Icon(
-                                                  Icons.location_on,
-                                                  size: 16,
-                                                  color: Colors.black,
-                                                ),
-                                                SizedBox(width: 4),
-                                                Expanded(
-                                                  child: Text(
-                                                    "E7, 775, saket nagar Indore",
-                                                    style: TextStyle(
-                                                      fontFamily: "Poppins",
-                                                      fontWeight:
-                                                      FontWeight.w600,
-                                                      fontSize: 13,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 4),
-                                            const Padding(
-                                              padding: EdgeInsets.only(
-                                                left: 20,
-                                              ),
-                                              child: Text(
-                                                "3.5 km, 28 min to reach",
-                                                style: TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
-                                                  color: Color(0xFFF67C0A),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            const Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.check_box,
-                                                  size: 16,
-                                                  color: Colors.black45,
-                                                ),
-                                                SizedBox(width: 4),
-                                                Text(
-                                                  "Basic Plumbing work",
-                                                  style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 12,
-                                                    color: Color(0xFF7A7A7A),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: Obx(() {
+                            if (controller.isLoading.value) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+
+                            var bookingList = controller.bookingDataList;
+
+                            if (bookingList.isEmpty) {
+                              return const Center(
+                                child: Text("No current booking"),
+                              );
+                            }
+
+                            return ListView.builder(
+                              itemCount: bookingList.length,
+                              physics: NeverScrollableScrollPhysics(),
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                final booking = bookingList[index];
+
+                                final bookedBy = booking['bookedBy'] ?? {};
+                                final firstName =
+                                    bookedBy['firstName']?.toString() ??
+                                    'Unknown';
+                                final lastName =
+                                    bookedBy['lastName']?.toString() ?? '';
+                                final city =
+                                    bookedBy['city']?.toString() ?? 'No city';
+
+                                final bookServices =
+                                    booking['bookServices'] ?? [];
+                                final serviceName =
+                                    bookServices.isNotEmpty
+                                        ? bookServices[0]['name']?.toString() ??
+                                            'Service'
+                                        : 'Service';
+
+                                final earning =
+                                    booking['earning']?.toString() ?? '0';
+                                final duration =
+                                    booking['duration']?.toString() ?? '--';
+                                print('Booking index: $index');
+                                print('First name: $firstName');
+                                print('Last name: $lastName');
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    elevation: 4,
+                                    child: Container(
+                                      width:
+                                          MediaQuery.of(context).size.width *
+                                          0.9,
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: Colors.white,
                                       ),
-                                      // Right Side Column (Earning + Duration)
-                                      Column(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          _infoCard(
-                                            title: "Earning",
-                                            value: "₹250",
+                                          // Top Row
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              // Left Column
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        const Icon(
+                                                          Icons.person,
+                                                          size: 16,
+                                                          color: Colors.grey,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 4,
+                                                        ),
+                                                        Text(
+                                                          "$firstName $lastName",
+                                                          style:
+                                                              const TextStyle(
+                                                                fontFamily:
+                                                                    "Poppins",
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontSize: 12,
+                                                                color: Color(
+                                                                  0xFF7A7A7A,
+                                                                ),
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 6),
+                                                    Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        const Icon(
+                                                          Icons.location_on,
+                                                          size: 16,
+                                                          color: Colors.black,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 4,
+                                                        ),
+                                                        Expanded(
+                                                          child: Text(
+                                                            city,
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontFamily:
+                                                                      "Poppins",
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize: 13,
+                                                                  color:
+                                                                      Colors
+                                                                          .black,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    const Padding(
+                                                      padding: EdgeInsets.only(
+                                                        left: 20,
+                                                      ),
+                                                      child: Text(
+                                                        "3.5 km, 28 min to reach",
+                                                        style: TextStyle(
+                                                          fontFamily: "Poppins",
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 12,
+                                                          color: Color(
+                                                            0xFFF67C0A,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Row(
+                                                      children: [
+                                                        const Icon(
+                                                          Icons.check_box,
+                                                          size: 16,
+                                                          color: Colors.black45,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 4,
+                                                        ),
+                                                        Text(
+                                                          serviceName,
+                                                          style:
+                                                              const TextStyle(
+                                                                fontFamily:
+                                                                    "Poppins",
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontSize: 12,
+                                                                color: Color(
+                                                                  0xFF7A7A7A,
+                                                                ),
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              // Right Column (Earning + Duration)
+                                              Column(
+                                                children: [
+                                                  _infoCard(
+                                                    title: "Earning",
+                                                    value: "₹$earning",
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  _infoCard(
+                                                    title: "Duration",
+                                                    value: "$duration Hrs",
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
                                           ),
-                                          const SizedBox(height: 8),
-                                          _infoCard(
-                                            title: "Duration",
-                                            value: "3 Hrs",
+                                          const SizedBox(height: 20),
+                                          // Action Buttons
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              _actionButton(
+                                                "Reject",
+                                                Colors.white,
+                                                const Color(0xFFF67C0A),
+                                                textColor: const Color(
+                                                  0xFFF67C0A,
+                                                ),
+                                                onTap: () {
+                                                  Get.defaultDialog(
+                                                    title: "Confirmation",
+                                                    middleText:
+                                                        "Are you sure you want to reject?",
+                                                    textConfirm: "Yes",
+                                                    textCancel: "Back",
+                                                    confirmTextColor:
+                                                        Colors.white,
+                                                    cancelTextColor:
+                                                        Colors.black,
+                                                    buttonColor: const Color(
+                                                      0xFFF67C0A,
+                                                    ),
+                                                    onConfirm: () {
+                                                      Get.back(); // Close dialog
+                                                      controller
+                                                          .updateBookingStatus(
+                                                            acceptStatus: "no",
+                                                          );
+                                                      controller
+                                                          .fetchCurrentBooking();
+                                                    },
+                                                    onCancel: () {
+                                                      Get.back(); // Just close dialog
+                                                    },
+                                                  );
+                                                },
+                                              ),
+
+                                              _actionButton(
+                                                "Call",
+                                                const Color(0xFFF67C0A),
+                                                Colors.white,
+                                                onTap:
+                                                    controller
+                                                        .makePhoneCallFromSharedPrefs, // Replace with dynamic number
+                                              ),
+
+                                              _actionButton(
+                                                "Accept",
+                                                const Color(0xFFF67C0A),
+                                                Colors.white,
+                                                onTap: () {
+                                                  Get.defaultDialog(
+                                                    title: "Confirmation",
+                                                    middleText:
+                                                        "Are you sure you want to accept?",
+                                                    textConfirm: "Yes",
+                                                    textCancel: "Back",
+                                                    confirmTextColor:
+                                                        Colors.white,
+                                                    cancelTextColor:
+                                                        Colors.black,
+                                                    buttonColor: const Color(
+                                                      0xFFF67C0A,
+                                                    ),
+                                                    onConfirm: () {
+                                                      // Set the selected index in Bottom2Controller before navigation
+                                                      final bottomController =
+                                                          Get.put(
+                                                            Bottom2Controller(),
+                                                          );
+                                                      bottomController
+                                                          .selectedIndex
+                                                          .value = 1;
+                                                      Get.to(
+                                                        Bottom2View(),
+                                                      ); // Close the dialog first
+                                                      controller
+                                                          .updateBookingStatus(
+                                                            acceptStatus: "yes",
+                                                          );
+                                                      controller
+                                                          .fetchCurrentBooking();
+                                                    },
+                                                    onCancel: () {
+                                                      Get.back(); // Just close the dialog
+                                                    },
+                                                  );
+                                                },
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                  const SizedBox(height: 20),
-
-                                  // Action Buttons
-                                  Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      _actionButton(
-                                        "Reject",
-                                        Colors.white,
-                                        Color(0xFFF67C0A),
-                                        textColor: const Color(0xFFF67C0A),
-                                      ),
-                                      _actionButton(
-                                        "Call",
-                                        Color(0xFFF67C0A),
-                                        Colors.white,
-                                      ),
-                                      _actionButton(
-                                        "Accept",
-                                        Color(0xFFF67C0A),
-                                        Colors.white,
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                                );
+                              },
+                            );
+                          }),
                         ),
                         SizedBox(height: 10),
                         Text(
@@ -460,8 +617,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                         Column(
                           children: [
                             Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
                                   child: _dashboardCard(
@@ -480,8 +636,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                             ),
                             const SizedBox(height: 12),
                             Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
                                   child: _dashboardCard(
@@ -519,8 +674,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                           child: Card(
                             color: Colors.white,
                             child: Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceEvenly,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 _earningsCard(
                                   title: "This Week",
@@ -560,9 +714,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                           child: ListView.builder(
                             shrinkWrap: true,
                             itemCount: 5, // or your dynamic length
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 0,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 0),
                             physics: BouncingScrollPhysics(),
                             itemBuilder: (context, index) {
                               return Column(
@@ -616,6 +768,77 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                   ),
                 ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _infoCard({required String title, required String value}) {
+    return Container(
+      height: 43,
+      width: 82,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF7A7A7A),
+              fontFamily: "Poppins",
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+              fontFamily: "Poppins",
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _actionButton(
+    String text,
+    Color bgColor,
+    Color borderColor, {
+    Color? textColor,
+    VoidCallback? onTap, // <-- Add this line
+  }) {
+    return GestureDetector(
+      onTap: onTap, // <-- Add this line
+      child: Container(
+        height: 30,
+        width: 95,
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor),
+        ),
+        alignment: Alignment.center,
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontFamily: "Poppins",
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+              color: textColor ?? Colors.white,
             ),
           ),
         ),
@@ -785,11 +1008,11 @@ Widget _infoCard({required String title, required String value}) {
 }
 
 Widget _actionButton(
-    String text,
-    Color bgColor,
-    Color borderColor, {
-      Color? textColor,
-    }) {
+  String text,
+  Color bgColor,
+  Color borderColor, {
+  Color? textColor,
+}) {
   return Container(
     height: 30,
     width: 105,

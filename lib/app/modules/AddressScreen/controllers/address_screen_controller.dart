@@ -230,11 +230,11 @@ class AddressScreenController extends GetxController {
       }
       else {
         print('Error: ${response.reasonPhrase}');
-        Get.snackbar("Error", "Failed to save address");
+     //   Get.snackbar("Error", "Failed to save address");
       }
     } catch (e) {
       print('Exception: $e');
-      Get.snackbar("Error", "Something went wrong");
+//Get.snackbar("Error", "Something went wrong");
     }
   }
 

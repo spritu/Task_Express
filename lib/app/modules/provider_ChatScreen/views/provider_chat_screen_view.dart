@@ -2,145 +2,230 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 
 import 'package:get/get.dart';
+import 'package:worknest/app/modules/provider_chat/views/provider_chat_view.dart';
 
 import '../../../../colors.dart';
 import '../../Bottom2/controllers/bottom2_controller.dart';
 import '../../Bottom2/views/bottom2_view.dart';
+import '../../bottom/controllers/bottom_controller.dart';
+import '../../bottom/views/bottom_view.dart';
 import '../controllers/provider_chat_screen_controller.dart';
 
 class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
   const ProviderChatScreenView({super.key});
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
+    return  WillPopScope(
       onWillPop: () async {
-        Get.find<Bottom2Controller>().selectedIndex.value = 0;
-        Get.offAll(() => Bottom2View());
+        Get.find<BottomController>().selectedIndex.value = 0; // 👈 Home tab
+        Get.offAll(() => BottomView());
         return false;
       },
       child: Scaffold(
         body: Container(
-          decoration: BoxDecoration(
-            gradient: AppColors.appGradient2,
-          ),
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(gradient: AppColors.appGradient2),
           child: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                children: [
+                  SizedBox(height: 20),
+
+                  // Header
+                  const Text(
+                    " Chats",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                      fontFamily: "poppins",
+                    ),
                   ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Row(
-                          children: [
-                            InkWell(onTap:(){
-                              Get.back();
-                            },
-                                child: Icon(Icons.arrow_back)),
-                            const SizedBox(width: 20),
-                            const Text(
-                              'Chat with user',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontFamily: "poppins",
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                  const Text("         "),
+                  const SizedBox(height: 10),
+                  const CustomSearchBar(),
+                  const SizedBox(height: 20),
+
+                  // Chat List
+                  Expanded(
+                    child: Obx(() {
+                      return ListView.builder(
+                        itemCount: controller.chats.length,
+                        itemBuilder: (context, index) {
+                          final chat = controller.chats[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: InkWell(
+                              onTap: () {
+                                Get.to(
+                                  ProviderChatView(),
+                                  arguments: {
+                                    'receiverId': chat.reciverId,
+                                    'receiverName':
+                                    '${chat.firstName} ${chat.lastName}',
+                                    'receiverImage': chat.profilePic,
+                                  },
+                                )?.then((_) async {
+                                  await controller.fetchLastMessages();
+                                });
+                              },
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 5.0,
+                                      vertical: 8.0,
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        // Profile Image
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            25,
+                                          ),
+                                          child:
+                                          chat.profilePic.isNotEmpty
+                                              ? Image.network(
+                                            chat.profilePic,
+                                            width: 50,
+                                            height: 50,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (
+                                                context,
+                                                error,
+                                                stack,
+                                                ) => Image.asset(
+                                              "assets/images/account.png",
+                                              width: 50,
+                                              height: 50,
+                                            ),
+                                          )
+                                              : Image.asset(
+                                            "assets/images/account.png",
+                                            width: 50,
+                                            height: 50,
+                                          ),
+                                        ),
+
+                                        const SizedBox(width: 12),
+
+                                        // Chat Info
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              // Name and Time
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment
+                                                    .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    '${chat.firstName} ${chat.lastName}',
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                      FontWeight.w600,
+                                                      fontFamily: "poppins",
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+
+                                                  Text(
+                                                    controller.formatTimestamp(
+                                                      chat.timestamp,
+                                                    ),
+                                                    style: TextStyle(
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                      FontWeight.w400,
+                                                      fontFamily: "poppins",
+                                                      color: Color(0xFF545454),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 4),
+
+                                              // Message Preview
+                                              Text(
+                                                chat.message,
+                                                style: TextStyle(
+                                                  fontFamily: "poppins",
+                                                  fontWeight: FontWeight.w300,
+                                                  fontSize: 12,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  // Divider
+                                  const Divider(
+                                    height: 1,
+                                    color: Colors.grey,
+                                    indent: 70,
+                                  ),
+                                ],
                               ),
                             ),
-                            const Spacer(),
-                            IconButton(
-                              icon: const Icon(Icons.call, color: Colors.black),
-                              onPressed: () {
-                                // Call logic
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: Obx(
-                              () => Chat(
-                            messages: controller.messages.toList(),
-                            onSendPressed: controller.handleSendPressed,
-                            user: controller.user,
-                            showUserAvatars: true,
-                            showUserNames: true,
-                            onAttachmentPressed: controller.handleImagePick,
-                            avatarBuilder: (user) {
-                              return CircleAvatar(
-                                backgroundColor: Colors.grey.shade400,
-                                child: const Icon(Icons.person, color: Colors.white),
-                              );
-                            },
-                            theme: const DefaultChatTheme(
-                              inputBackgroundColor: Colors.white,
-                              inputTextColor: Colors.black,
-                              inputTextStyle: TextStyle(fontFamily: 'Poppins'),
-                              backgroundColor: Colors.transparent, // 👈 let gradient show
-                              primaryColor: Color(0xFF114BCA),
-                              secondaryColor: Colors.white,
-                              messageBorderRadius: 16,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
-                      //   child: Container(width: MediaQuery.of(context).size.width*0.7,
-                      //     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      //     decoration: BoxDecoration(
-                      //       color: const Color(0xFFDCE6FF),
-                      //       borderRadius: BorderRadius.circular(12),
-                      //     ),
-                      //     child: Row(
-                      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //       children: [
-                      //         const Expanded(
-                      //           child: Text(
-                      //             'Are you satisfied with this conversation?',
-                      //             style: TextStyle(
-                      //               fontSize: 10,
-                      //               fontFamily: 'Poppins',
-                      //               fontWeight: FontWeight.w500,
-                      //               color: Colors.black87,
-                      //             ),
-                      //           ),
-                      //         ),
-                      //         ElevatedButton(
-                      //           onPressed: () {
-                      //             // Book Now logic
-                      //           },
-                      //           style: ElevatedButton.styleFrom(
-                      //             backgroundColor: AppColors.blue,
-                      //             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      //             shape: RoundedRectangleBorder(
-                      //               borderRadius: BorderRadius.circular(10),
-                      //             ),
-                      //           ),
-                      //           child: const Text(
-                      //             'Book Now',
-                      //             style: TextStyle(fontSize: 10,
-                      //               fontFamily: 'Poppins',color: AppColors.white,
-                      //               fontWeight: FontWeight.w500,
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
+                          );
+                        },
+                      );
+                    }),
                   ),
-                );
-              },
+                ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class CustomSearchBar extends StatelessWidget {
+  const CustomSearchBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 44,
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: const [
+          Icon(Icons.search, color: Color(0xFF5F5D5D)),
+          SizedBox(width: 8),
+          Expanded(
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: "Search",
+                hintStyle: TextStyle(color: Colors.grey),
+                border: InputBorder.none,
+                isCollapsed: true,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -105,16 +106,23 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
 
   // Booking API call
   Future<void> bookServiceProvider({
-    required String bookedBy,
     required String bookedFor,
     required List<String> serviceIds,
     required String selectedHelperName,
   }) async {
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId2 = prefs.getString('userId'); // ✅ This should not be null
+
+      if (userId2 == null) {
+        Get.snackbar("Error", "User ID not found in local storage.");
+        return;
+      }
+
       var headers = {'Content-Type': 'application/json'};
 
       var body = json.encode({
-        "bookedBy": bookedBy,
+        "bookedBy": userId2,
         "bookedFor": bookedFor,
         "bookServices": serviceIds,
       });
@@ -123,68 +131,38 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
         'POST',
         Uri.parse('https://jdapi.youthadda.co/bookserviceprovider'),
       );
-
       request.body = body;
       request.headers.addAll(headers);
 
       http.StreamedResponse response = await request.send();
+      String responseBody = await response.stream.bytesToString();
+
+      print("📦 BookServiceProvider Response: $responseBody");
 
       if (response.statusCode == 200) {
-        String responseBody = await response.stream.bytesToString();
         final responseData = jsonDecode(responseBody);
 
         helperName.value = selectedHelperName;
 
         var acceptStatus = responseData['data']['accept'];
         showRequestPending.value = acceptStatus == null;
-
         bookingData.value = responseData['data'];
-        selectedIndex.value = 0;
 
         final BottomController controller = Get.find<BottomController>();
         controller.helperName.value = selectedHelperName;
-        controller.showRequestPending.value = (acceptStatus == null);
-        controller.selectedIndex.value = 1; // Navigate to Booking tab
+        controller.showRequestPending.value = acceptStatus == null;
+        controller.selectedIndex.value = 1;
 
         Get.to(() => BottomView());
       } else {
         Get.snackbar('Booking Failed', 'Please try again later.');
       }
     } catch (e) {
+      print("❌ Exception in booking: $e");
       Get.snackbar('Error', 'Something went wrong: $e');
     }
   }
 
-  // Reject booking API call
-  Future<void> rejectBooking(String bookingId) async {
-    try {
-      var headers = {'Content-Type': 'application/json'};
-      var request = http.Request(
-        'POST',
-        Uri.parse('https://jdapi.youthadda.co/acceptreject'),
-      );
-
-      request.body = json.encode({
-        "bookingId": bookingId,
-        "accept": "no",
-      });
-
-      request.headers.addAll(headers);
-
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        String result = await response.stream.bytesToString();
-        print(result);
-        Get.to(() => CancelBookingView());
-        Get.snackbar("Success", "Booking rejected");
-      } else {
-        Get.snackbar("Error", "Something went wrong");
-      }
-    } catch (e) {
-      Get.snackbar("Error", "Something went wrong: $e");
-    }
-  }
 
   // Widget to show bottom sheet after call ends
   Widget showAfterCallSheet(
@@ -277,7 +255,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
                       skill: skill,
                       bookServiceProvider: (serviceIds) async {
                         await bookServiceProvider(
-                          bookedBy: userId, // <-- Ensure this is defined
+                         // <-- Ensure this is defined
                           bookedFor: userId,
                           serviceIds: serviceIds, selectedHelperName: '',
                         );

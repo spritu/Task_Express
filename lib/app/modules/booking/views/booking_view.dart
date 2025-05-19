@@ -96,24 +96,16 @@ class BookingView extends GetView<BookingController> {
                                             ),
                                           ],
                                         ),
-
                                         const SizedBox(height: 16),
-
                                         // Booking Card
                                         buildBookingCard(),
-
                                         const SizedBox(height: 9),
-
                                         // Info Bar
                                         buildChargeAndArrivalCard(),
-
                                         const SizedBox(height: 9),
-
                                         // Action Buttons: Cancel, Call, Chat
                                         buildActionButtons(controller),
-
                                         const SizedBox(height: 9),
-
                                         // Close Job & Pay
                                         buildCloseJobCard(),
                                       ],

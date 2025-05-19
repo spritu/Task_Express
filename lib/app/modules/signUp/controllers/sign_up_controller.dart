@@ -100,7 +100,7 @@ class SignUpController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
 
     // ✅ Get userId2 from OTP verification step
-    String? userId2 = prefs.getString('userId2');
+    String? userId2 = prefs.getString('userId');
 
     if (userId2 == null || userId2.isEmpty) {
       Get.snackbar('Error', 'User ID not found. Please verify OTP again.');

@@ -134,7 +134,7 @@ class ProviderLoginView extends GetView<ProviderLoginController> {
                   ),
                 ),SizedBox(height: 20),
                 InkWell(onTap: (){controller.sendOtp();
-                 // Get.to(ProviderOtpView());
+                  // Get.to(ProviderOtpView());
                 },
                   child: Container(
                     height: 64,

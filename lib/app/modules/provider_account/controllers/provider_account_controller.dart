@@ -9,10 +9,14 @@ import '../../../../auth_controller.dart';
 import 'package:http/http.dart' as http;
 class ProviderAccountController extends GetxController with WidgetsBindingObserver {
   //TODO: Implement ProviderAccountController
+  var firstName = ''.obs;
+  var lastName = ''.obs;
+  var mobileNumber = ''.obs;
+  var email = ''.obs;
   var serviceCards = <ServiceModel>[].obs;
-
+  var isEditingCharge = false.obs;
   RxList<CategoryModel> filteredCategories = <CategoryModel>[].obs;
-
+  String userId = '';
   void addServiceCard() {
     serviceCards.add(ServiceModel(profession: '', category: '', charge: '', subcategory: '', categoryId: '', subCategoryId: '')); // adds an empty service card
   }
@@ -44,12 +48,10 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   RxString selectSubCategory = "".obs;
 
   RxString selectCharge = "₹ ".obs;RxString selectCharge1 = "₹ ".obs;
-  final RxString mobileNumber = ''.obs;
+
   final count = 0.obs;
   var selectedCategoryId = ''.obs;
 
-  final RxString firstName = ''.obs;
-  final RxString lastName = ''.obs;
   final RxString imagePath = ''.obs;
   RxList<CategoryModel> allCategories = <CategoryModel>[].obs;
 
@@ -65,9 +67,19 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     showServiceCard.value = !showServiceCard.value;
   }
 
-  // void addService(ServiceModel service) {
-  //   addedServices.add(service); // Add a new service to the list
-  // }
+  Future<void> loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    firstName.value = prefs.getString('firstName') ?? '';
+    lastName.value = prefs.getString('lastName') ?? '';
+    mobileNumber.value = prefs.getString('mobile') ?? '';
+    email.value = prefs.getString('email') ?? '';
+
+    print("✅ Loaded User Data:");
+    print("👤 First Name: ${firstName.value}");
+    print("👤 Last Name: ${lastName.value}");
+    print("📧 Email: ${email.value}");
+    print("📱 Mobile: ${mobileNumber.value}");
+  }
   Future<void> logout() async {
     // Clear SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -93,7 +105,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
 
   Future<void> loadUserInfo1() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    userId= prefs.getString('userId') ?? '';
     selectedProfessionName.value = prefs.getString('profession') ?? '';
     selectedCategoryName.value = prefs.getString('category') ?? '';
     selectedSubCategoryName.value = prefs.getString('subcategory') ?? '';
@@ -190,21 +202,39 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     }
   }
 
-  // void confirmDelete(int index, ServiceModel service) {
-  //   Get.defaultDialog(
-  //     title: "Delete Service",
-  //     middleText:
-  //     "Are you sure you want to delete the service for:\n\nCategory: ${service.category}\nSubcategory: ${service.subCategory}?",
-  //     textCancel: "Cancel",
-  //     textConfirm: "Delete",
-  //     confirmTextColor: Colors.white,
-  //     onConfirm: () {
-  //       final userId = Get.find<AuthController>().userId.value;
-  //      deleteUserSkill(userId, service.categoryId, service.subCategoryId, index);
-  //       Get.back();
-  //     },
-  //   );
-  // }
+  Future<void> updateSkill({
+    required String userId,
+    required String categoryId,
+    required String subcategoryId,
+    required String charge,
+  }) async {
+    final url = Uri.parse('https://jdapi.youthadda.co/user/updateskills');
+
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+
+    final body = jsonEncode({
+      "userId": userId,
+      "categoryId": categoryId,
+      "sucategoryId": subcategoryId,
+      "charge": charge,
+    });
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        print("✅ Skill updated successfully: ${response.body}");
+      } else {
+        print("❌ Failed to update skill: ${response.statusCode} - ${response.body}");
+      }
+    } catch (e) {
+      print("❌ Exception while updating skill: $e");
+    }
+  }
+
+
 
   Future<void> deleteUserSkill(String categoryId, String subCategoryId, int index) async {
     Get.dialog(

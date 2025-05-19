@@ -87,7 +87,7 @@ class ProviderOtpView extends GetView<ProviderOtpController> {
                 const Spacer(),
                 ElevatedButton(
                   onPressed: () {
-                   // Get.to(() => ProviderProfileView());
+                    // Get.to(() => ProviderProfileView());
                     controller.verifyOtp("otp"); // This should handle actual verification and navigation
                   },
                   style: ElevatedButton.styleFrom(

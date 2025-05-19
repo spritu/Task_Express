@@ -5,19 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../colors.dart';
+import '../../chat/views/chat_view.dart';
 import '../../home/controllers/home_controller.dart';
 import '../../professional_profile/views/professional_profile_view.dart';
 import '../controllers/professional_plumber_controller.dart';
 
 class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
-
-
-   ProfessionalPlumberView({super.key});
+  ProfessionalPlumberView({super.key});
   @override
   Widget build(BuildContext context) {
     final arguments = Get.arguments as Map<String, dynamic>;
     final List users = arguments['users'];
     final String title = arguments['title'] ?? 'Professionals';
+    print('12345:${users}');
 
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
@@ -68,7 +68,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
           // List of workers
           Expanded(
             child: Obx(
-                  () => ListView.builder(
+              () => ListView.builder(
                 itemCount: users.length,
                 itemBuilder: (context, index) {
                   final user = users[index];
@@ -76,9 +76,10 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   final imagePath = user['userImg'] ?? '';
                   final imageUrl = 'https://jdapi.youthadda.co/$imagePath';
 
-                  final charge = user['skills'] != null && user['skills'].isNotEmpty
-                      ? user['skills'][0]['charge']
-                      : 0;
+                  final charge =
+                      user['skills'] != null && user['skills'].isNotEmpty
+                          ? user['skills'][0]['charge']
+                          : 0;
                   print("Opening bottom sheet for ${user['firstName']}");
 
                   return InkWell(
@@ -92,13 +93,16 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                           experience: user['experience']?.toString() ?? '',
                           phone: user['phone']?.toString() ?? '',
                           userId: user['_id'],
-                          title: title,   skills: List<Map<String, dynamic>>.from(user['skills'] ?? []),
+                          title: title,
+                          skills: List<Map<String, dynamic>>.from(
+                            user['skills'] ?? [],
+                          ),
                         ),
                         isScrollControlled: true,
                       );
-
                     },
-                    child: Container(width: MediaQuery.of(context).size.width,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
                       margin: const EdgeInsets.symmetric(
                         horizontal: 10,
                         vertical: 7,
@@ -139,10 +143,11 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                   Text(
                                     "${user['experience']} year Experience",
                                     style: const TextStyle(
-                                        color: Color(0xff7C7C7C),
-                                        fontSize: 10,
-                                        fontFamily: "poppins",
-                                        fontWeight: FontWeight.w400),
+                                      color: Color(0xff7C7C7C),
+                                      fontSize: 10,
+                                      fontFamily: "poppins",
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -158,7 +163,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                     Column(
                                       children: [
                                         Text(
-                                          user['firstName'] ?? 'No Name',
+                                          "${user['firstName'] ?? 'No'} ${user['lastName'] ?? 'Name'}",
                                           style: TextStyle(
                                             fontWeight: FontWeight.w500,
                                             fontSize: 14,
@@ -168,7 +173,8 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         ),
                                         SizedBox(height: 3),
                                         Row(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               width: 10,
@@ -201,19 +207,24 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                     TextButton(
                                       onPressed: () {
                                         // Passing only relevant data to navigate to the profile view
-                                        Get.to(() => ProfessionalProfileView(), arguments: {
-                                          'name': user['firstName'],
-                                          'image': user['userImg'],
-                                          'experience': user['experience'],
-                                          'phone': user['phone'],
-                                          'id': user['_id'],
-                                        });
+                                        Get.to(
+                                          () => ProfessionalProfileView(),
+                                          arguments: {
+                                            'name': user['firstName'],
+                                            'image': user['userImg'],
+                                            'experience': user['experience'],
+                                            'phone': user['phone'],
+                                            'id': user['_id'],
+                                          },
+                                        );
                                       },
                                       child: Container(
                                         height: 24,
                                         width: 54,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
                                           color: Color(0xff114BCA),
                                         ),
                                         child: Center(
@@ -233,18 +244,25 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                 ),
                                 SizedBox(height: 4),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.only(top: 3),
+                                              padding: const EdgeInsets.only(
+                                                top: 3,
+                                              ),
                                               child: Icon(
                                                 Icons.location_on,
                                                 size: 14,
@@ -316,30 +334,45 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         width: 110,
                                         child: ElevatedButton(
                                           onPressed: () async {
-                                            final phoneNumber = user['phone'] ?? '';
+                                            final phoneNumber =
+                                                user['phone'] ?? '';
                                             if (phoneNumber.isNotEmpty) {
-                                              controller.selectedUsers = users; // Store full list
-                                              controller.selectedIndexAfterCall = index; // Store selected index
+                                              controller.selectedUsers =
+                                                  users; // Store full list
+                                              controller
+                                                      .selectedIndexAfterCall =
+                                                  index; // Store selected index
                                               controller.selectedTitle = title;
-                                              controller.shouldShowSheetAfterCall = true; // Trigger sheet on resume
+                                              controller
+                                                      .shouldShowSheetAfterCall =
+                                                  true; // Trigger sheet on resume
 
-                                               controller.makePhoneCall(phoneNumber);
+                                              controller.makePhoneCall(
+                                                phoneNumber,
+                                              );
                                             } else {
-                                              Get.snackbar('Error', 'Phone number not available',
-                                                snackPosition: SnackPosition.BOTTOM,
+                                              Get.snackbar(
+                                                'Error',
+                                                'Phone number not available',
+                                                snackPosition:
+                                                    SnackPosition.BOTTOM,
                                                 backgroundColor: Colors.red,
                                                 colorText: Colors.white,
                                               );
                                             }
                                           },
 
-
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Color(0xff114BCA),
                                           ),
                                           child: const Text(
                                             "Call",
-                                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12, color: AppColors.white, fontFamily: "poppins"),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              color: AppColors.white,
+                                              fontFamily: "poppins",
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -351,16 +384,26 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         width: 100,
                                         child: ElevatedButton(
                                           onPressed: () {
-                                            final receiverId = user['id'].toString();
+                                            final receiverId =
+                                                user['_id'].toString();
                                             if (receiverId.isNotEmpty) {
-                                              Get.toNamed('/chat', arguments: {
-                                                'receiverId': receiverId,
-                                                'receiverName': user['firstName'] ?? 'No Name',
-                                                'receiverImage': user['userImg'] ?? '',
-                                              });
+                                              Get.to(
+                                                ChatView(),
+                                                arguments: {
+                                                  'receiverId': receiverId,
+                                                  'receiverName': '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'.trim().isNotEmpty
+                                                      ? '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'.trim()
+                                                      : 'No Name',
+                                                  'receiverImage':
+                                                  user['userImg'] ?? '',
+                                                },
+                                              );
                                             } else {
-                                              Get.snackbar('Error', 'Receiver ID not available',
-                                                snackPosition: SnackPosition.BOTTOM,
+                                              Get.snackbar(
+                                                'Error',
+                                                'Receiver ID not available',
+                                                snackPosition:
+                                                    SnackPosition.BOTTOM,
                                                 backgroundColor: Colors.red,
                                                 colorText: Colors.white,
                                               );
@@ -371,14 +414,19 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           ),
                                           child: const Text(
                                             "Chat",
-                                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12, color: AppColors.white, fontFamily: "poppins"),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              color: AppColors.white,
+                                              fontFamily: "poppins",
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: 10)
+                                SizedBox(height: 10),
                               ],
                             ),
                           ),
@@ -389,375 +437,394 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                 },
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
-   Widget showAfterCallSheet(
-       BuildContext context, {
-         required String name,
-         required String imageUrl,
-         required String experience,
-         required String phone,
-         required String userId,
-         required String title,
-         required List<Map<String, dynamic>> skills, // Pass dynamic skills
-       }) {
-     return SingleChildScrollView(
-       child: Padding(
-         padding: const EdgeInsets.only(left: 8, right: 8),
-         child: Container(
-           width: MediaQuery.of(context).size.width,
-           padding: const EdgeInsets.all(16),
-           decoration: BoxDecoration(
-             color: Colors.white,
-             borderRadius: BorderRadius.circular(20),
-           ),
-           child: Column(
-             mainAxisSize: MainAxisSize.min,
-             children: [
-               const SizedBox(height: 10),
-               Row(
-                 mainAxisAlignment: MainAxisAlignment.end,
-                 children: [
-                   GestureDetector(
-                     onTap: () => Navigator.pop(context),
-                     child: const Icon(Icons.close, size: 24),
-                   ),
-                 ],
-               ),
-               Row(
-                 children: [
-                   CircleAvatar(
-                     radius: 40,
-                     backgroundImage: imageUrl.isNotEmpty
-                         ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
-                         : const AssetImage('assets/images/account.png') as ImageProvider,
-                   ),
-                   const SizedBox(width: 10),
-                   Text(
-                     name,
-                     style: const TextStyle(
-                       fontSize: 18,
-                       fontWeight: FontWeight.bold,
-                       fontFamily: "poppins",
-                       color: Color(0xFF114BCA),
-                     ),
-                   ),
-                 ],
-               ),
-               const SizedBox(height: 16),
-               Text(
-                 "If this conversation with $name meets your expectations, book now:",
-                 style: const TextStyle(
-                   fontSize: 15,
-                   fontWeight: FontWeight.w500,
-                   color: Color(0xFF4F4F4F),
-                   fontFamily: "poppins",
-                 ),
-               ),
-               const SizedBox(height: 20),
 
-               /// 🔁 Generate dynamic profession rows from skills
-               for (var skill in skills)
-                 Padding(
-                   padding: const EdgeInsets.only(bottom: 12),
-                   child: professionRow(
-                     title: (skill['subcategoryName'] != null && skill['subcategoryName'].toString().isNotEmpty)
-                         ? skill['subcategoryName']
-                         : (skill['categoryName'] != null && skill['categoryName'].toString().isNotEmpty)
-                         ? skill['categoryName']
-                         : 'Service',
+  Widget showAfterCallSheet(
+    BuildContext context, {
+    required String name,
+    required String imageUrl,
+    required String experience,
+    required String phone,
+    required String userId,
+    required String title,
+    required List<Map<String, dynamic>> skills, // Pass dynamic skills
+  }) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8, right: 8),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(Icons.close, size: 24),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundImage:
+                        imageUrl.isNotEmpty
+                            ? NetworkImage(
+                              'https://jdapi.youthadda.co/$imageUrl',
+                            )
+                            : const AssetImage('assets/images/account.png')
+                                as ImageProvider,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "poppins",
+                      color: Color(0xFF114BCA),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "If this conversation with $name meets your expectations, book now:",
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF4F4F4F),
+                  fontFamily: "poppins",
+                ),
+              ),
+              const SizedBox(height: 20),
 
+              /// 🔁 Generate dynamic profession rows from skills
+              for (var skill in skills)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: professionRow(
+                    title:
+                        (skill['subcategoryName'] != null &&
+                                skill['subcategoryName'].toString().isNotEmpty)
+                            ? skill['subcategoryName']
+                            : (skill['categoryName'] != null &&
+                                skill['categoryName'].toString().isNotEmpty)
+                            ? skill['categoryName']
+                            : 'Service',
 
+                    price: "₹ ${skill['charge'].toString()}",
+                    onBookNow: () {
+                      print("📌 Book Now tapped for: ${skill['categoryName']}");
+                      showAreUSureSheet(
+                        context,
+                        name: name,
+                        imageUrl: imageUrl,
+                        experience: experience,
+                        phone: phone,
+                        userId: userId,
+                        title: skill['categoryId'].toString(),
+                        skill: skill,
+                        bookServiceProvider: (serviceIds) async {
+                          await controller.bookServiceProvider(
+                            bookedFor: userId,
+                            serviceIds: serviceIds,
+                            selectedHelperName: '',
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
 
-                     price: "₹ ${skill['charge'].toString()}",
-                     onBookNow: () {
-                       print("📌 Book Now tapped for: ${skill['categoryName']}");
-                       showAreUSureSheet(
-                         context,
-                         name: name,
-                         imageUrl: imageUrl,
-                         experience: experience,
-                         phone: phone,
-                         userId: userId,
-                         title: skill['categoryId'].toString(),
-                         skill: skill,
-                         bookServiceProvider: (serviceIds) async {
-                           await controller.bookServiceProvider(
-                             bookedBy: userId, // <-- Ensure this is defined
-                             bookedFor: userId,
-                             serviceIds: serviceIds, selectedHelperName: '',
-                           );
-                         },
-                       );
-                     },
+              const SizedBox(height: 20),
+              const Text(
+                "Not Satisfied? Let’s help you find someone else",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF4F4F4F),
+                  fontFamily: "poppins",
+                ),
+              ),
+              const SizedBox(height: 14),
 
-                   ),
-                 ),
+              SizedBox(
+                height: 34,
+                width: 119,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.close, color: Color(0xFF114BCA)),
+                  label: const Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Color(0xFF114BCA),
+                      fontFamily: "poppins",
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    side: const BorderSide(color: Color(0xFF114BCA)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
+  Widget professionRow({
+    required String title,
+    required String price,
+    required VoidCallback onBookNow,
+  }) {
+    return Container(
+      height: 45,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFFF6F6F6),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              fontFamily: "poppins",
+            ),
+          ),
+          Row(
+            children: [
+              Text(
+                price,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: Color(0xFF114BCA),
+                  fontFamily: "poppins",
+                ),
+              ),
+              const SizedBox(width: 12),
+              SizedBox(
+                height: 25,
+                width: 79,
+                child: ElevatedButton(
+                  onPressed: onBookNow,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF114BCA),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Book Now",
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: "poppins",
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-               const SizedBox(height: 20),
-               const Text(
-                 "Not Satisfied? Let’s help you find someone else",
-                 style: TextStyle(
-                   fontSize: 12,
-                   fontWeight: FontWeight.w500,
-                   color: Color(0xFF4F4F4F),
-                   fontFamily: "poppins",
-                 ),
-               ),
-               const SizedBox(height: 14),
-
-               SizedBox(
-                 height: 34,
-                 width: 119,
-                 child: ElevatedButton.icon(
-                   onPressed: () {
-                     Navigator.pop(context);
-                   },
-                   icon: const Icon(Icons.close, color: Color(0xFF114BCA)),
-                   label: const Text(
-                     "Cancel",
-                     style: TextStyle(
-                       color: Color(0xFF114BCA),
-                       fontFamily: "poppins",
-                       fontWeight: FontWeight.w500,
-                     ),
-                   ),
-                   style: ElevatedButton.styleFrom(
-                     backgroundColor: Colors.white,
-                     side: const BorderSide(color: Color(0xFF114BCA)),
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(10),
-                     ),
-                   ),
-                 ),
-               ),
-               const SizedBox(height: 16),
-             ],
-           ),
-         ),
-       ),
-     );
-   }
-
-   Widget professionRow({
-     required String title,
-     required String price,
-     required VoidCallback onBookNow,
-   }) {
-     return Container(
-       height: 45,
-       padding: const EdgeInsets.symmetric(horizontal: 8),
-       decoration: BoxDecoration(
-         borderRadius: BorderRadius.circular(12),
-         color: const Color(0xFFF6F6F6),
-       ),
-       child: Row(
-         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-         children: [
-           Text(
-             title,
-             style: const TextStyle(
-               fontWeight: FontWeight.w600,
-               fontSize: 14,
-               fontFamily: "poppins",
-             ),
-           ),
-           Row(
-             children: [
-               Text(
-                 price,
-                 style: const TextStyle(
-                   fontWeight: FontWeight.w600,
-                   fontSize: 16,
-                   color: Color(0xFF114BCA),
-                   fontFamily: "poppins",
-                 ),
-               ),
-               const SizedBox(width: 12),
-               SizedBox(
-                 height: 25,
-                 width: 79,
-                 child: ElevatedButton(
-                   onPressed: onBookNow,
-                   style: ElevatedButton.styleFrom(
-                     backgroundColor: const Color(0xFF114BCA),
-                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(8),
-                     ),
-                   ),
-                   child: const Center(
-                     child: Text(
-                       "Book Now",
-                       style: TextStyle(
-                         fontSize: 10,
-                         fontWeight: FontWeight.w600,
-                         fontFamily: "poppins",
-                         color: Colors.white,
-                       ),
-                     ),
-                   ),
-                 ),
-               ),
-             ],
-           ),
-         ],
-       ),
-     );
-   }
-
-
-
-
-   void showAreUSureSheet(
-       BuildContext context, {
-         required String name,
-         required String imageUrl,
-         required String experience,
-         required String phone,
-         required String userId,
-         required String title,
-         required Map<String, dynamic> skill,
-         required Future<void> Function(List<String> serviceIds) bookServiceProvider,
-       }) {
-     showModalBottomSheet(
-       context: context,
-       isScrollControlled: true,
-       backgroundColor: Colors.transparent,
-       builder: (context) {
-         return SingleChildScrollView(
-           child: Padding(
-             padding: const EdgeInsets.only(left: 12, right: 12),
-             child: Container(
-               padding: const EdgeInsets.all(16),
-               decoration: BoxDecoration(
-                 color: const Color(0xffD9E4FC),
-                 borderRadius: BorderRadius.circular(20),
-               ),
-               child: Column(
-                 mainAxisSize: MainAxisSize.min,
-                 children: [
-                   Row(
-                     mainAxisAlignment: MainAxisAlignment.end,
-                     children: [
-                       GestureDetector(
-                         onTap: () => Navigator.pop(context),
-                         child: const Icon(Icons.close, color: Colors.black),
-                       ),
-                     ],
-                   ),
-                   CircleAvatar(
-                     radius: 40,
-                     backgroundImage: imageUrl.isNotEmpty
-                         ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
-                         : const AssetImage('assets/images/account.png') as ImageProvider,
-                   ),
-                   const SizedBox(height: 8),
-                   Text(
-                     name,
-                     style: const TextStyle(
-                       fontFamily: "poppins",
-                       fontWeight: FontWeight.w500,
-                       fontSize: 16,
-                     ),
-                   ),
-                   const SizedBox(height: 20),
-                   Container(
-                     padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                     decoration: BoxDecoration(
-                       color: Colors.white,
-                       borderRadius: BorderRadius.circular(12),
-                     ),
-                     child: Column(
-                       children: [
-                         const Text(
-                           "Are you sure you want to continue with this booking?",
-                           style: TextStyle(
-                             fontSize: 12,
-                             fontWeight: FontWeight.w500,
-                             fontFamily: "poppins",
-                             color: Color(0xFF4F4F4F),
-                           ),
-                         ),
-                         const SizedBox(height: 16),
-                         SizedBox(
-                           height: 42,
-                           width: 176,
-                           child: ElevatedButton(
-                             onPressed: () async {
-                               String serviceId = skill['subcategoryId']?.toString() ??
-                                   skill['categoryId'].toString();
-                               Navigator.pop(context);
-                               await bookServiceProvider([serviceId]);
-                             },
-                             style: ElevatedButton.styleFrom(
-                               backgroundColor: const Color(0xFF114BCA),
-                               shape: RoundedRectangleBorder(
-                                 borderRadius: BorderRadius.circular(8),
-                               ),
-                             ),
-                             child: const Row(
-                               mainAxisAlignment: MainAxisAlignment.center,
-                               children: [
-                                 Icon(Icons.check, color: Colors.white, size: 18),
-                                 SizedBox(width: 10),
-                                 Text(
-                                   "Yes",
-                                   style: TextStyle(
-                                     fontSize: 12,
-                                     fontWeight: FontWeight.w500,
-                                     fontFamily: "poppins",
-                                     color: Colors.white,
-                                   ),
-                                 ),
-                               ],
-                             ),
-                           ),
-                         ),
-                         const SizedBox(height: 16),
-                         SizedBox(
-                           height: 42,
-                           width: 176,
-                           child: ElevatedButton(
-                             onPressed: () => Navigator.pop(context),
-                             style: ElevatedButton.styleFrom(
-                               backgroundColor: Colors.white,
-                               shape: RoundedRectangleBorder(
-                                 borderRadius: BorderRadius.circular(8),
-                               ),
-                             ),
-                             child: const Row(
-                               mainAxisAlignment: MainAxisAlignment.center,
-                               children: [
-                                 Icon(Icons.close, color: Color(0xFF114BCA), size: 18),
-                                 SizedBox(width: 10),
-                                 Text(
-                                   "No",
-                                   style: TextStyle(
-                                     fontSize: 12,
-                                     fontWeight: FontWeight.w500,
-                                     fontFamily: "poppins",
-                                     color: Color(0xFF114BCA),
-                                   ),
-                                 ),
-                               ],
-                             ),
-                           ),
-                         ),
-                       ],
-                     ),
-                   ),
-                 ],
-               ),
-             ),
-           ),
-         );
-       },
-     );
-   }
-
+  void showAreUSureSheet(
+    BuildContext context, {
+    required String name,
+    required String imageUrl,
+    required String experience,
+    required String phone,
+    required String userId,
+    required String title,
+    required Map<String, dynamic> skill,
+    required Future<void> Function(List<String> serviceIds) bookServiceProvider,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xffD9E4FC),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: const Icon(Icons.close, color: Colors.black),
+                      ),
+                    ],
+                  ),
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundImage:
+                        imageUrl.isNotEmpty
+                            ? NetworkImage(
+                              'https://jdapi.youthadda.co/$imageUrl',
+                            )
+                            : const AssetImage('assets/images/account.png')
+                                as ImageProvider,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontFamily: "poppins",
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          "Are you sure you want to continue with this booking?",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: "poppins",
+                            color: Color(0xFF4F4F4F),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: 42,
+                          width: 176,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              String serviceId =
+                                  skill['subcategoryId']?.toString() ??
+                                  skill['categoryId'].toString();
+                              Navigator.pop(context);
+                              await bookServiceProvider([serviceId]);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF114BCA),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  "Yes",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: "poppins",
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: 42,
+                          width: 176,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.close,
+                                  color: Color(0xFF114BCA),
+                                  size: 18,
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  "No",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: "poppins",
+                                    color: Color(0xFF114BCA),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

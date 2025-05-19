@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../Bottom2/views/bottom2_view.dart';
@@ -21,7 +22,8 @@ class ProviderOtpController extends GetxController {
   }
   Future<void> loadMobileNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    prefs.reload();
+    String? userId = prefs.getString('userId');
     mobileNumber = prefs.getString('mobileNumber');
 
   }
@@ -41,10 +43,10 @@ class ProviderOtpController extends GetxController {
     }
   }
 
-  // Verify OTP
+
   Future<void> verifyOtp(String otp) async {
     if (otp.isEmpty || otp.length != 4) {
-      Get.snackbar("Error", "Please enter a valid 4-digit OTP");
+      Get.snackbar("Error", "Please enter a valid 4-digit OTP", colorText: Colors.red);
       return;
     }
 
@@ -52,27 +54,16 @@ class ProviderOtpController extends GetxController {
     String? mobileNumber = prefs.getString('mobileNumber');
 
     if (mobileNumber == null || mobileNumber.isEmpty) {
-      Get.snackbar("Error", "Mobile number not found. Please try again.");
+      Get.snackbar("Error", "Mobile number not found. Please try again.", colorText: Colors.red);
       return;
     }
 
-    final headers = {
-      'Content-Type': 'application/json',
-    };
-
-    final body = json.encode({
-      "phone": mobileNumber,
-      "otp": otp,
-    });
-
+    final headers = {'Content-Type': 'application/json'};
+    final body = json.encode({"phone": mobileNumber, "otp": otp});
     final url = Uri.parse('https://jdapi.youthadda.co/user/verifyotp');
 
     try {
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: body,
-      );
+      final response = await http.post(url, headers: headers, body: body);
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -81,49 +72,52 @@ class ProviderOtpController extends GetxController {
         final userId = responseData['id']?.toString() ?? '';
         final token = responseData['token'] ?? '';
         final userType = responseData['userType'] ?? 0;
+        final userData = responseData['userData'] ?? {};
 
-        await prefs.setString('userId', userId);
-        await prefs.setString('token', token);
-        await prefs.setInt('userType', userType);
-
-        final userData = responseData['userData'];
-        bool isProfileComplete = false;
-
-        if (userData != null && userData is Map<String, dynamic>) {
-          final name = userData['name']?.toString().trim() ?? '';
-          final email = userData['email']?.toString().trim() ?? '';
-          final dob = userData['dob']?.toString().trim() ?? '';
-
-          print("👤 Name: $name, Email: $email, DOB: $dob");
-
-          // Save to SharedPreferences
-          await prefs.setString('name', name);
-          await prefs.setString('email', email);
-          await prefs.setString('dob', dob);
-          await prefs.setString('gender', userData['gender']?.toString() ?? '');
-          await prefs.setString('city', userData['city']?.toString() ?? '');
-          await prefs.setString('state', userData['state']?.toString() ?? '');
-          await prefs.setString('pincode', userData['pincode']?.toString() ?? '');
-          await prefs.setString('profileImage', userData['profileImage']?.toString() ?? '');
-
-          // Profile check
-          isProfileComplete = name.isNotEmpty && email.isNotEmpty && dob.isNotEmpty;
-        }
+        // Extract individual user fields safely
+        final firstName = userData['firstName']?.toString() ?? '';
+        final lastName = userData['lastName']?.toString() ?? '';
+        final email = userData['email']?.toString() ?? '';
+        final phone = userData['phone']?.toString() ?? '';
 
         otpTextController.clear();
-        Get.snackbar("✅ Success", responseData['msg'], colorText: Colors.green);
 
-        if (isProfileComplete) {
-          Get.offAll(() => Bottom2View());
+        if (token.isNotEmpty) {
+          // ✅ Save all details in SharedPreferences
+          await prefs.setString('userId', userId);
+
+          await prefs.setString('token', token);
+          await prefs.setInt('userType', userType);
+          await prefs.setString('firstName', firstName);
+          await prefs.setString('lastName', lastName);
+          await prefs.setString('email', email);
+          await prefs.setString('mobile', phone);
+
+          // ✅ Mark as logged in
+          final box = GetStorage();
+          box.write('isLoggedIn2', true);
+
+          print("📦 Saved User Data:");
+          print("👤 First Name: $firstName");
+          print("👤 Last Name: $lastName");
+          print("📧 Email: $email");
+          print("📱 Phone: $phone");
+
+          if (firstName.isNotEmpty && email.isNotEmpty) {
+            Get.snackbar("✅ Success", responseData['msg'], colorText: Colors.green);
+            Get.offAllNamed('/bottom2'); // Navigate to home screen
+          } else {
+            Get.snackbar("Complete Signup", "Please complete your profile", colorText: Colors.orange);
+            Get.offAll(() => ProviderProfileView());
+          }
         } else {
+          Get.snackbar("Error", "Token not received. Please complete your registration.", colorText: Colors.orange);
           Get.offAll(() => ProviderProfileView());
         }
-
       } else {
-        print("❌ Failed to verify OTP: ${response.body}");
-        Get.snackbar("Error", "❌ Failed to verify OTP", colorText: Colors.red);
+        print("❌ OTP Verification Failed: ${response.body}");
+        Get.snackbar("Error", "❌ Invalid OTP", colorText: Colors.red);
       }
-
     } catch (e) {
       print("❌ Exception: $e");
       Get.snackbar("Error", "❌ Something went wrong", colorText: Colors.red);
@@ -131,14 +125,7 @@ class ProviderOtpController extends GetxController {
   }
 
 
-
-
-
-
-
-
-
-
+  // Resend OTP
   Future<void> resendOtp() async {
 
     final headers = {

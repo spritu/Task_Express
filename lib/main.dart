@@ -15,6 +15,7 @@ import 'app/modules/booking/controllers/booking_controller.dart';
 import 'app/modules/bottom/controllers/bottom_controller.dart';
 import 'app/modules/bottom/views/bottom_view.dart';
 import 'app/modules/chat/controllers/chat_controller.dart';
+import 'app/modules/chat_screen/controllers/chat_screen_controller.dart';
 import 'app/modules/edit_profile/controllers/edit_profile_controller.dart';
 import 'app/modules/home/controllers/home_controller.dart';
 import 'app/modules/jobs/controllers/jobs_controller.dart';
@@ -51,19 +52,22 @@ void main() async {
   await GetStorage.init();
   //
   // SharedPreferences prefs = await SharedPreferences.getInstance();// <-- ADD THIS
-   final box = GetStorage();
+  final box = GetStorage();
   // await prefs.clear();
   final isLoggedIn = box.read('isLoggedIn') ?? false;
   Get.put(LoginController());
+  Get.put(ChatScreenController());
   Get.put(WorknestController());
   Get.put(SignUpController());
   Get.put(BottomController());
-  Get.put(HomeController());Get.put(CancelBookingController());
+  Get.put(HomeController());
+  Get.put(CancelBookingController());
   Get.put(PlasteringHelperController());
   Get.put(BricklayingHelperController());
   Get.put(BookingController());
   Get.put(ScaffoldingHelperController());
-  Get.put(AccountController()); Get.put(AuthController());
+  Get.put(AccountController());
+  Get.put(AuthController());
   Get.put(TileFixingHelperController());
   Get.put(JobsDetailsController());
   Get.put(RoadConstructionHelperController());
@@ -71,7 +75,7 @@ void main() async {
   Get.put(SettingController());
   Get.put(EditProfileController());
   Get.put(JobsController());
-  Get.lazyPut(()=>ChatController());
+  Get.lazyPut(() => ChatController(),fenix: true);
   Get.put(ProviderSettingController());
   Get.put(ProviderChatController());
   Get.put(OtpController());
@@ -83,8 +87,10 @@ void main() async {
   Get.put(ProviderOtpController());
   Get.put(Bottom2Controller());
   Get.put(ProviderAccountController());
-  Get.put(AddAddressController());Get.put(ProfessionalProfileController());
-  Get.put(LocationController());Get.put(ProviderLocationController());
+  Get.put(AddAddressController());
+  Get.put(ProfessionalProfileController());
+  Get.put(LocationController());
+  Get.put(ProviderLocationController());
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
@@ -108,35 +114,36 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
-    bool isLoggedIn = box.read('isLoggedIn') ?? false;
-    bool isLoggedIn2 = box.read('isLoggedIn2') ?? false;
+    final box = GetStorage();
+    final isLoggedIn = box.read('isLoggedIn') ?? false;
+    final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
     if (isLoggedIn) {
-
       Future.delayed(const Duration(seconds: 0), () {
-        Get.offAllNamed('/bottom'); 
+        Get.offAllNamed('/bottom');
       });
-    } else {
-
-      autoNavigateSplash();
-    }
-    if (isLoggedIn2) {
-
+    } else if (isLoggedIn2) {
       Future.delayed(const Duration(seconds: 0), () {
         Get.offAllNamed('/bottom2');
       });
     } else {
-
-    //  autoNavigateSplash();
+      autoNavigateSplash();
     }
   }
 
   void autoNavigateSplash() async {
     await Future.delayed(const Duration(seconds: 2));
-    if (_controller.hasClients) _controller.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
+    if (_controller.hasClients)
+      _controller.nextPage(
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.ease,
+      );
 
     await Future.delayed(const Duration(seconds: 2));
-    if (_controller.hasClients) _controller.nextPage(duration: const Duration(milliseconds: 500), curve: Curves.ease);
+    if (_controller.hasClients)
+      _controller.nextPage(
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.ease,
+      );
 
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
@@ -156,11 +163,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 _currentPage = index;
               });
             },
-            children: const [
-              Splash1View(),
-              Splash2View(),
-              Splash3View(),
-            ],
+            children: const [Splash1View(), Splash2View(), Splash3View()],
           ),
           if (_currentPage != 0)
             Positioned(
@@ -171,29 +174,29 @@ class _SplashScreenState extends State<SplashScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed: () {Get.to(JoinView());
-                    _controller.jumpToPage(2);
+                    onPressed: () {
+                      Get.to(JoinView());
+                      _controller.jumpToPage(2);
                     },
                     child: const Text(
                       "Skip",
-                      style: TextStyle(
-                        color: Color(0xff090F47),
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Color(0xff090F47), fontSize: 16),
                     ),
                   ),
                   Row(
                     children: List.generate(
                       2,
-                          (index) => AnimatedContainer(
+                      (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: const EdgeInsets.symmetric(horizontal: 5),
                         height: 10,
                         width: 10,
                         decoration: BoxDecoration(
-                          color: (_currentPage == 1 && index == 0) || (_currentPage == 2 && index == 1)
-                              ? const Color(0xff235CD7)
-                              : Colors.grey,
+                          color:
+                              (_currentPage == 1 && index == 0) ||
+                                      (_currentPage == 2 && index == 1)
+                                  ? const Color(0xff235CD7)
+                                  : Colors.grey,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -212,10 +215,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     },
                     child: const Text(
                       "Next",
-                      style: TextStyle(
-                        color: Color(0xff090F47),
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Color(0xff090F47), fontSize: 16),
                     ),
                   ),
                 ],

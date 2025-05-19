@@ -380,8 +380,6 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                               controller.selectedSubCategoryName.value = selectedSub.name;
                               }
                               },
-
-
                                       ),
                                     ),
                                   ),

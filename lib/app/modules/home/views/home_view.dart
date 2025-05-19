@@ -32,13 +32,15 @@ class HomeView extends GetView<HomeController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Location & Search Bar
-              InkWell(onTap: (){   if (!authController.isLoggedIn.value) {
-                controller.showSignupSheet(context);
-              } else {
-                // Normal action
-                print('Navigate to service');
-              }
-              },
+              InkWell(
+                onTap: () {
+                  if (!authController.isLoggedIn.value) {
+                    controller.showSignupSheet(context);
+                  } else {
+                    // Normal action
+                    print('Navigate to service');
+                  }
+                },
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -57,21 +59,28 @@ class HomeView extends GetView<HomeController> {
                             const SizedBox(width: 8),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [Obx(() => Text(
-                                controller.landMark.value.isNotEmpty
-                                    ? '${controller.houseNo.value}, ${controller.landMark.value}'
-                                    : locationController.currentAddress.value.isNotEmpty
-                                    ? locationController.currentAddress.value
-                                    : "Fetching current location...",
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                  color: AppColors.textColor,
+                              children: [
+                                Obx(
+                                  () => Text(
+                                    controller.landMark.value.isNotEmpty
+                                        ? '${controller.houseNo.value}, ${controller.landMark.value}'
+                                        : locationController
+                                            .currentAddress
+                                            .value
+                                            .isNotEmpty
+                                        ? locationController
+                                            .currentAddress
+                                            .value
+                                        : "Fetching current location...",
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                      color: AppColors.textColor,
+                                    ),
+                                  ),
                                 ),
-                              ))
-
                               ],
                             ),
                             const Spacer(),
@@ -103,16 +112,22 @@ class HomeView extends GetView<HomeController> {
                               return;
                             }
                             if (value.isEmpty) {
-                              controller.searchResults.clear();  // Clear the results when the field is empty
+                              controller.searchResults
+                                  .clear(); // Clear the results when the field is empty
                             } else {
-                              controller.fetchServiceProviders(value);  // Call API when text is entered
+                              controller.fetchServiceProviders(
+                                value,
+                              ); // Call API when text is entered
                             }
                           },
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.search),
                             hintText: "Search for ‘Plumber’",
                             isDense: true,
-                            contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 16,
+                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(25),
                               borderSide: BorderSide.none,
@@ -125,21 +140,24 @@ class HomeView extends GetView<HomeController> {
                         // Search Results
                         Obx(() {
                           return controller.searchResults.isEmpty
-                              ? SizedBox()  // If no results, show nothing
+                              ? SizedBox() // If no results, show nothing
                               : ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: controller.searchResults.length,
-                            itemBuilder: (context, index) {
-                              final item = controller.searchResults[index];
-                              return ListTile(
-                                title: Text(item['firstName'] ?? 'No Name'),
-                                subtitle: Text(item['city'] ?? 'No City'),
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: controller.searchResults.length,
+                                itemBuilder: (context, index) {
+                                  final item = controller.searchResults[index];
+                                  return ListTile(
+                                    title: Text(item['name'] ?? 'No Name'),
+                                    // subtitle: Text(item['city'] ?? 'No City'),
+                                  );
+                                },
                               );
-                            },
-                          );
                         }),
-                      ]))),
+                      ],
+                    ),
+                  ),
+                ),
               ),
               // Service Type Buttons
               Expanded(
@@ -157,23 +175,34 @@ class HomeView extends GetView<HomeController> {
                                   // Visiting Professionals Button
                                   Expanded(
                                     child: InkWell(
-                              onTap: () {
-                            if (!authController.isLoggedIn.value) {
-                              // User not logged in, show bottom sheet
-                             controller.showSignupSheet(context);
-                              return;
-                            }
-                            // ✅ User is logged in, proceed
-                            final selectedCategory = controller.visitingProfessionals.first;
-                            controller.fetchUsersByCategory(selectedCategory.catid);
-                            controller.toggleServiceExpansion('Visiting Professionals');
-                          },
+                                      onTap: () {
+                                        if (!authController.isLoggedIn.value) {
+                                          // User not logged in, show bottom sheet
+                                          controller.showSignupSheet(context);
+                                          return;
+                                        }
+                                        // ✅ User is logged in, proceed
+                                        final selectedCategory =
+                                            controller
+                                                .visitingProfessionals
+                                                .first;
+                                        controller.fetchUsersByCategory(
+                                          selectedCategory.catid,
+                                        );
+                                        controller.toggleServiceExpansion(
+                                          'Visiting Professionals',
+                                        );
+                                      },
                                       child: Container(
                                         padding: const EdgeInsets.all(14),
                                         decoration: BoxDecoration(
-                                          color: controller.expandedServiceType.value == 'Visiting Professionals'
-                                              ? const Color(0xFFD9E4FC)
-                                              : Colors.transparent,
+                                          color:
+                                              controller
+                                                          .expandedServiceType
+                                                          .value ==
+                                                      'Visiting Professionals'
+                                                  ? const Color(0xFFD9E4FC)
+                                                  : Colors.transparent,
                                           borderRadius: const BorderRadius.only(
                                             topLeft: Radius.circular(20),
                                             topRight: Radius.circular(20),
@@ -185,13 +214,18 @@ class HomeView extends GetView<HomeController> {
                                           child: Card(
                                             color: Colors.white,
                                             child: Padding(
-                                              padding: const EdgeInsets.all(4.0),
+                                              padding: const EdgeInsets.all(
+                                                4.0,
+                                              ),
                                               child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Image.asset(
                                                     "assets/images/service_provider.png",
-                                                    color: const Color(0xffF67C0A),
+                                                    color: const Color(
+                                                      0xffF67C0A,
+                                                    ),
                                                   ),
                                                   const SizedBox(height: 4),
                                                   const Text(
@@ -199,7 +233,8 @@ class HomeView extends GetView<HomeController> {
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
                                                       fontSize: 10,
-                                                      fontWeight: FontWeight.w500,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                       height: 1.3,
                                                     ),
                                                   ),
@@ -220,16 +255,25 @@ class HomeView extends GetView<HomeController> {
                                           return;
                                         }
                                         // ✅ User is logged in, proceed
-                                        final selectedCategory = controller.fixedChargeHelpers.first;
-                                        controller.fetchUsersByCategory(selectedCategory.catid);
-                                        controller.toggleServiceExpansion('Fixed charge Helpers');
+                                        final selectedCategory =
+                                            controller.fixedChargeHelpers.first;
+                                        controller.fetchUsersByCategory(
+                                          selectedCategory.catid,
+                                        );
+                                        controller.toggleServiceExpansion(
+                                          'Fixed charge Helpers',
+                                        );
                                       },
                                       child: Container(
                                         padding: const EdgeInsets.all(14),
                                         decoration: BoxDecoration(
-                                          color: controller.expandedServiceType.value == 'Fixed charge Helpers'
-                                              ? const Color(0xFFD9E4FC)
-                                              : Colors.transparent,
+                                          color:
+                                              controller
+                                                          .expandedServiceType
+                                                          .value ==
+                                                      'Fixed charge Helpers'
+                                                  ? const Color(0xFFD9E4FC)
+                                                  : Colors.transparent,
                                           borderRadius: const BorderRadius.only(
                                             topLeft: Radius.circular(20),
                                             topRight: Radius.circular(20),
@@ -241,13 +285,18 @@ class HomeView extends GetView<HomeController> {
                                           child: Card(
                                             color: Colors.white,
                                             child: Padding(
-                                              padding: const EdgeInsets.all(4.0),
+                                              padding: const EdgeInsets.all(
+                                                4.0,
+                                              ),
                                               child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Image.asset(
                                                     "assets/images/helper.png",
-                                                    color: const Color(0xffF67C0A),
+                                                    color: const Color(
+                                                      0xffF67C0A,
+                                                    ),
                                                   ),
                                                   const SizedBox(height: 4),
                                                   const Text(
@@ -255,7 +304,8 @@ class HomeView extends GetView<HomeController> {
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
                                                       fontSize: 10,
-                                                      fontWeight: FontWeight.w500,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                       height: 1.3,
                                                     ),
                                                   ),
@@ -270,7 +320,10 @@ class HomeView extends GetView<HomeController> {
                                 ],
                               ),
                               // Category Grid
-                              if (controller.expandedServiceType.value.isNotEmpty)
+                              if (controller
+                                  .expandedServiceType
+                                  .value
+                                  .isNotEmpty)
                                 Container(
                                   decoration: const BoxDecoration(
                                     color: Color(0xFFD9E4FC),
@@ -281,37 +334,51 @@ class HomeView extends GetView<HomeController> {
                                   ),
                                   child: Obx(() {
                                     final categories = controller.categories;
-                                    final isExpanded = controller.showAllCategories.value;
-                                    final itemCount = isExpanded
-                                        ? categories.length + 1
-                                        : (categories.length > 7 ? 8 : categories.length);
+                                    final isExpanded =
+                                        controller.showAllCategories.value;
+                                    final itemCount =
+                                        isExpanded
+                                            ? categories.length + 1
+                                            : (categories.length > 7
+                                                ? 8
+                                                : categories.length);
                                     return Padding(
                                       padding: const EdgeInsets.all(5.0),
                                       child: GridView.builder(
                                         shrinkWrap: true,
-                                        physics: const NeverScrollableScrollPhysics(),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
                                         itemCount: itemCount,
-                                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 4,
-                                          crossAxisSpacing: 10,
-                                          mainAxisSpacing: 10,
-                                          childAspectRatio: 1,
-                                        ),
+                                        gridDelegate:
+                                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 4,
+                                              crossAxisSpacing: 10,
+                                              mainAxisSpacing: 10,
+                                              childAspectRatio: 1,
+                                            ),
                                         itemBuilder: (context, index) {
-                                          if (!isExpanded && index == 7 && categories.length > 7) {
+                                          if (!isExpanded &&
+                                              index == 7 &&
+                                              categories.length > 7) {
                                             return InkWell(
-                                              onTap:() {
+                                              onTap: () {
                                                 controller.toggleCategoryView();
-
                                               },
                                               child: const Card(
                                                 color: Colors.white,
                                                 child: Center(
                                                   child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: [
                                                       Icon(Icons.add),
-                                                      Text('More', style: TextStyle(fontSize: 10)),
+                                                      Text(
+                                                        'More',
+                                                        style: TextStyle(
+                                                          fontSize: 10,
+                                                        ),
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -319,17 +386,26 @@ class HomeView extends GetView<HomeController> {
                                             );
                                           }
 
-                                          if (isExpanded && index == categories.length) {
+                                          if (isExpanded &&
+                                              index == categories.length) {
                                             return InkWell(
-                                              onTap: controller.toggleCategoryView,
+                                              onTap:
+                                                  controller.toggleCategoryView,
                                               child: const Card(
                                                 color: Colors.white,
                                                 child: Center(
                                                   child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: [
                                                       Icon(Icons.close),
-                                                      Text('Close', style: TextStyle(fontSize: 10)),
+                                                      Text(
+                                                        'Close',
+                                                        style: TextStyle(
+                                                          fontSize: 10,
+                                                        ),
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -344,64 +420,137 @@ class HomeView extends GetView<HomeController> {
                                                 // Show subcategories
                                                 Get.bottomSheet(
                                                   Container(
-                                                    padding: const EdgeInsets.all(16),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                          16,
+                                                        ),
                                                     decoration: const BoxDecoration(
                                                       color: Color(0xFFD9E4FC),
-                                                      borderRadius: BorderRadius.only(
-                                                        topLeft: Radius.circular(20),
-                                                        topRight: Radius.circular(20),
-                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                  20,
+                                                                ),
+                                                            topRight:
+                                                                Radius.circular(
+                                                                  20,
+                                                                ),
+                                                          ),
                                                     ),
                                                     child: Column(
-                                                      mainAxisSize: MainAxisSize.min,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
                                                       children: [
                                                         Row(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
                                                           children: [
-                                                            Text(cat.label, style: const TextStyle(fontSize: 16)),
+                                                            Text(
+                                                              cat.label,
+                                                              style:
+                                                                  const TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                  ),
+                                                            ),
                                                             InkWell(
-                                                              onTap: () => Get.back(),
-                                                              child: const Icon(Icons.close),
+                                                              onTap:
+                                                                  () =>
+                                                                      Get.back(),
+                                                              child: const Icon(
+                                                                Icons.close,
+                                                              ),
                                                             ),
                                                           ],
                                                         ),
-                                                        const SizedBox(height: 16),
+                                                        const SizedBox(
+                                                          height: 16,
+                                                        ),
                                                         GridView.builder(
                                                           shrinkWrap: true,
-                                                          physics: const NeverScrollableScrollPhysics(),
-                                                          itemCount: cat.subcategories.length,
-                                                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                                            crossAxisCount: 3,
-                                                            crossAxisSpacing: 10,
-                                                            mainAxisSpacing: 10,
-                                                            childAspectRatio: 1.8,
-                                                          ),
-                                                          itemBuilder: (context, index) {
-                                                            final sub = cat.subcategories[index];
+                                                          physics:
+                                                              const NeverScrollableScrollPhysics(),
+                                                          itemCount:
+                                                              cat
+                                                                  .subcategories
+                                                                  .length,
+                                                          gridDelegate:
+                                                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                                                crossAxisCount:
+                                                                    3,
+                                                                crossAxisSpacing:
+                                                                    10,
+                                                                mainAxisSpacing:
+                                                                    10,
+                                                                childAspectRatio:
+                                                                    1.8,
+                                                              ),
+                                                          itemBuilder: (
+                                                            context,
+                                                            index,
+                                                          ) {
+                                                            final sub =
+                                                                cat.subcategories[index];
                                                             return InkWell(
                                                               onTap: () {
+                                                                controller.fetchUsersListByCategory(
+                                                                  sub.id,
+                                                                  categoryName:
+                                                                      sub.name,
+                                                                );
 
-                                                                controller.fetchUsersListByCategory(sub.id, categoryName: sub.name);
                                                                 Get.back();
                                                               },
                                                               child: Container(
-                                                                alignment: Alignment.center,
-                                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                                                                alignment:
+                                                                    Alignment
+                                                                        .center,
+                                                                padding:
+                                                                    const EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          8,
+                                                                      vertical:
+                                                                          12,
+                                                                    ),
                                                                 decoration: BoxDecoration(
-                                                                  color: Colors.white,
-                                                                  borderRadius: BorderRadius.circular(12),
+                                                                  color:
+                                                                      Colors
+                                                                          .white,
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                        12,
+                                                                      ),
                                                                   boxShadow: [
                                                                     BoxShadow(
-                                                                      color: Colors.black.withOpacity(0.05),
-                                                                      blurRadius: 4,
-                                                                      offset: const Offset(0, 2),
+                                                                      color: Colors
+                                                                          .black
+                                                                          .withOpacity(
+                                                                            0.05,
+                                                                          ),
+                                                                      blurRadius:
+                                                                          4,
+                                                                      offset:
+                                                                          const Offset(
+                                                                            0,
+                                                                            2,
+                                                                          ),
                                                                     ),
                                                                   ],
                                                                 ),
                                                                 child: Text(
                                                                   sub.name,
-                                                                  textAlign: TextAlign.center,
-                                                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  style: const TextStyle(
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                  ),
                                                                 ),
                                                               ),
                                                             );
@@ -412,34 +561,51 @@ class HomeView extends GetView<HomeController> {
                                                   ),
                                                   isScrollControlled: true,
                                                 );
-                                              }else if (cat.spType == '1') {
+                                              } else if (cat.spType == '1') {
                                                 // 🔥 Call API for Visiting Professionals
-                                                controller.fetchUsersListByCategory(cat.catid, categoryName: cat.label);
+                                                controller
+                                                    .fetchUsersListByCategory(
+                                                      cat.catid,
+                                                      categoryName: cat.label,
+                                                    );
                                               }
                                             },
                                             child: Card(
                                               color: Colors.white,
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                               ),
                                               child: Center(
                                                 child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
                                                   children: [
                                                     Image.network(
                                                       cat.icon,
                                                       height: 20,
                                                       width: 20,
                                                       fit: BoxFit.contain,
-                                                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+                                                      errorBuilder:
+                                                          (
+                                                            context,
+                                                            error,
+                                                            stackTrace,
+                                                          ) => const Icon(
+                                                            Icons.broken_image,
+                                                          ),
                                                     ),
                                                     const SizedBox(height: 2),
                                                     Text(
                                                       cat.label,
-                                                      style: const TextStyle(fontSize: 10),
-                                                      textAlign: TextAlign.center,
+                                                      style: const TextStyle(
+                                                        fontSize: 10,
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.center,
                                                       maxLines: 2,
-                                                      overflow: TextOverflow.ellipsis,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
                                                   ],
                                                 ),

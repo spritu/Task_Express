@@ -94,6 +94,8 @@ import '../modules/provider_setting/bindings/provider_setting_binding.dart';
 import '../modules/provider_setting/views/provider_setting_view.dart';
 import '../modules/road_construction_helper/bindings/road_construction_helper_binding.dart';
 import '../modules/road_construction_helper/views/road_construction_helper_view.dart';
+import '../modules/servicepro/bindings/servicepro_binding.dart';
+import '../modules/servicepro/views/servicepro_view.dart';
 import '../modules/setting/bindings/setting_binding.dart';
 import '../modules/setting/views/setting_view.dart';
 import '../modules/signUp/bindings/sign_up_binding.dart';
@@ -233,12 +235,12 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PROFESSIONAL_PLUMBER,
-      page: () =>  ProfessionalPlumberView(),
+      page: () => ProfessionalPlumberView(),
       binding: ProfessionalPlumberBinding(),
     ),
     GetPage(
       name: _Paths.PROFESSIONAL_PROFILE,
-      page: () =>  ProfessionalProfileView(),
+      page: () => ProfessionalProfileView(),
       binding: ProfessionalProfileBinding(),
     ),
     GetPage(
@@ -279,7 +281,6 @@ class AppPages {
     GetPage(
       name: _Paths.ADDRESS_SCREEN,
       page: () => AddressScreenView(),
-
     ),
     GetPage(
       name: _Paths.PROVIDER_LOGIN,
@@ -373,7 +374,9 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.REQUEST_PANDDING,
-      page: () =>  RequestPanddingView(helperName: '',),
+      page: () => RequestPanddingView(
+        helperName: '',
+      ),
       binding: RequestPanddingBinding(),
     ),
     GetPage(
@@ -400,6 +403,11 @@ class AppPages {
       name: _Paths.BOOKING_CANCELLED,
       page: () => const BookingCancelledView(),
       binding: BookingCancelledBinding(),
+    ),
+    GetPage(
+      name: _Paths.SERVICEPRO,
+      page: () => const ServiceproView(),
+      binding: ServiceproBinding(),
     ),
   ];
 }

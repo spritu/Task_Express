@@ -88,11 +88,11 @@ class AddAddressController extends GetxController {
         await fetchAddress();
       } else {
         print('Failed to delete address: ${response.reasonPhrase}');
-        Get.snackbar('Error', 'Failed to delete address', snackPosition: SnackPosition.BOTTOM);
+     //   Get.snackbar('Error', 'Failed to delete address', snackPosition: SnackPosition.BOTTOM);
       }
     } catch (e) {
       print('Error deleting address: $e');
-      Get.snackbar('Error', 'An error occurred while deleting the address', snackPosition: SnackPosition.BOTTOM);
+   //   Get.snackbar('Error', 'An error occurred while deleting the address', snackPosition: SnackPosition.BOTTOM);
     }
   }
 }

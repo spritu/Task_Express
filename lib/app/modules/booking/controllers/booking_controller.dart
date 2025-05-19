@@ -52,6 +52,7 @@ class BookingController extends GetxController {
 
 
 }
+
   void makePhoneCall(String phoneNumber) async {
     final Uri callUri = Uri(scheme: 'tel', path: phoneNumber);
     if (await canLaunchUrl(callUri)) {

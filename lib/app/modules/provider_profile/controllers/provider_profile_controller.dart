@@ -265,8 +265,7 @@ class ProviderProfileController extends GetxController {
 
   Future<void> loadUserId() async {
     final prefs = await SharedPreferences.getInstance();
-    userId = prefs.getString('userId') ?? '';
-
+    String? userId = prefs.getString('userId'); // Use correct key
     print("🔄 Loaded userId from SharedPreferences: $userId");
   }
 
@@ -307,7 +306,7 @@ class ProviderProfileController extends GetxController {
     if (!validateFields()) return;
 
     final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId') ?? '';
+    userId = prefs.getString('userId') ?? '';
     mobileNumber = prefs.getString('mobileNumber');
     if (userId.isEmpty) {
       Get.snackbar('Error', 'No user ID found, please login again.');
@@ -320,32 +319,36 @@ class ProviderProfileController extends GetxController {
     );
 
     print('📤 Sending registration data:');
-    print('UserId: $userId');
+    print('userId: $userId');
     print('First Name: ${firstName.value}');
     print('Last Name: ${lastName.value}');
     print('Gender: ${gender.value}');
     print('DOB: ${dateOfBirth.value}');
     print('Email: ${email.value}');
-    print('Mobile: ${mobileNumber}');
+    print('Phone: ${mobileNumber}');
     print('City: ${city.value}');
     print('Pin Code: ${pinCode.value}');
     print('State: ${state.value}');
     print('Referral Code: ${referralCode.value}');
     print('CategoryId: ${selectedCategoryId.value}');
     print('SubcategoryId: ${selectedSubCategoryId.value}');
-    print('Charge: ${chargesController.text}'); // Assume charge is selected somewhere
+    print('Charge: ${chargesController.text}');
     print('Aadhar No: ${aadharNo.text}');
 
-    // Construct skills JSON list
-    List<Map<String, dynamic>> skills = [
-      {
-        "categoryId": selectedCategoryId.value,
-        "sucategoryId": selectedSubCategoryId.value,
-        "charge": chargesController.text, // Make sure this is available
-      }
-    ];
+    // ✅ Construct skills JSON
+    Map<String, dynamic> skillData = {
+      "categoryId": selectedCategoryId.value,
+      "charge": chargesController.text,
+    };
 
-    // Add all required form fields
+    if (selectedSubCategoryId.value.isNotEmpty) {
+      skillData["sucategoryId"] = selectedSubCategoryId.value;
+    }
+
+    List<Map<String, dynamic>> skills = [skillData];
+    print('Skills JSON: $skills');
+
+    // 🔸 Add all required fields
     request.fields.addAll({
       '_id': userId,
       'userType': '2',
@@ -354,16 +357,25 @@ class ProviderProfileController extends GetxController {
       'gender': gender.value,
       'dateOfBirth': dateOfBirth.value,
       'email': email.value,
-      'mobile': mobileNumber!,
+      'phone': mobileNumber.toString(),
       'city': city.value,
       'pinCode': pinCode.value,
       'state': state.value,
       'referralCode': referralCode.value,
-      'skills': jsonEncode(skills), // Send skills as JSON string
+      'skills': jsonEncode(skills),
       'aadharNo': aadharNo.text,
     });
 
-    // Add image
+    // ✅ Optional subcategory fields in SharedPreferences
+    if (selectedSubCategoryId.value.isNotEmpty) {
+      request.fields['subcategoryId'] = selectedSubCategoryId.value;
+      await prefs.setString('subcategoryId', selectedSubCategoryId.value);
+      await prefs.setString('subcategory', selectedSubCategoryName.value);
+      print("✅ Subcategory ID: ${selectedSubCategoryId.value}");
+      print("✅ Subcategory Name: ${selectedSubCategoryName.value}");
+    }
+
+    // 🔸 Add image if exists
     if (imagePath.value.isNotEmpty) {
       File imageFile = File(imagePath.value);
 
@@ -395,20 +407,13 @@ class ProviderProfileController extends GetxController {
 
         final message = jsonRes['msg'] ?? 'Service provider registered';
         Get.snackbar('Success', message);
+
+        // 🔸 Save required data to SharedPreferences
         await prefs.setString('categoryId', selectedCategoryId.value);
-        await prefs.setString('category', selectedCategoryName.value); // ✅ Save name
-        await prefs.setString('subcategoryId', selectedSubCategoryId.value);
-        await prefs.setString('subcategory', selectedSubCategoryName.value);
-        print("✅ Selected Subcategory ID: ${selectedSubCategoryId.value}");
-        print("✅ Selected Subcategory Name: ${selectedSubCategoryName.value}");
-
-
-        // Save data to SharedPreferences
+        await prefs.setString('category', selectedCategoryName.value);
         await prefs.setString('firstName', firstName.value);
         await prefs.setString('lastName', lastName.value);
         await prefs.setString('profession', selectedProfession.value);
-        await prefs.setString('categoryId', selectedCategoryId.value);
-        await prefs.setString('subcategoryId', selectedSubCategoryId.value);
         await prefs.setString('gender', gender.value);
         await prefs.setString('dob', dateOfBirth.value);
         await prefs.setString('email', email.value);
@@ -418,7 +423,7 @@ class ProviderProfileController extends GetxController {
         await prefs.setString('state', state.value);
         await prefs.setString('referralCode', referralCode.value);
         await prefs.setString('aadharNo', aadharNo.text);
-        await prefs.setString('charge',chargesController.text.toString());
+        await prefs.setString('charge', chargesController.text);
 
         await prefs.reload();
 
@@ -439,12 +444,10 @@ class ProviderProfileController extends GetxController {
       }
     } catch (e) {
       print('❗ Exception: $e');
-      Get.snackbar(
-        'Error',
-        'Could not register. Check your internet connection.',
-      );
+      Get.snackbar('Error', 'Could not register. Check your internet connection.');
     }
   }
+
 
 
 

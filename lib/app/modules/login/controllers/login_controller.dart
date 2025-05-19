@@ -62,8 +62,8 @@ class LoginController extends GetxController {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('mobileNumber', phone);
 
-        await box.write('isLoggedIn', true);
-        await box.write('mobile', phone);
+        // await box.write('isLoggedIn', true);
+        // await box.write('mobile', phone);
 
         final authController = Get.find<AuthController>();
         authController.isLoggedIn.value = true;

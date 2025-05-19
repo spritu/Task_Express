@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:worknest/app/modules/chat_screen/controllers/chat_screen_controller.dart';
 import 'package:worknest/colors.dart';
 import '../../account/views/account_view.dart';
 import '../../booking/views/booking_view.dart';
@@ -45,6 +46,7 @@ class BottomView extends GetView<BottomController> {
   }
 }
 
+final ChatScreenController chatScreenController = Get.put(ChatScreenController());
 Widget _buildBody(int index, bool showRequestPending, String helperName) {
   switch (index) {
     case 0:
@@ -65,7 +67,9 @@ Widget _buildBody(int index, bool showRequestPending, String helperName) {
     case 2:
       return const SettingView();
     case 3:
-      return const ChatScreenView();
+
+      chatScreenController.fetchLastMessages();
+      return   ChatScreenView();
     case 4:
       return const AccountView();
     default:

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:worknest/app/modules/servicepro/views/servicepro_view.dart';
 import '../../BricklayingHelper/views/bricklaying_helper_view.dart';
 import '../../CementHelper/views/cement_helper_view.dart';
 import '../../Scaffolding_helper/views/scaffolding_helper_view.dart';
@@ -109,7 +110,10 @@ class HomeController extends GetxController {
             'title': categoryName ?? 'Professionals',
           });
         } else {
-          // Get.snackbar("No Users", "No professionals found for this category.");
+          Get.to(() => ServiceproView(),arguments: {
+            'users': results,
+            'title': categoryName ?? 'Professionals',
+          });
         }
       } else {
         print("Error: ${response.reasonPhrase}");

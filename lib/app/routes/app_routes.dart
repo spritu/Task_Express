@@ -61,6 +61,7 @@ abstract class Routes {
   static const SPLASH_SCREEN = _Paths.SPLASH_SCREEN;
   static const CANCEL_BOOKING = _Paths.CANCEL_BOOKING;
   static const BOOKING_CANCELLED = _Paths.BOOKING_CANCELLED;
+  static const SERVICEPRO = _Paths.SERVICEPRO;
 }
 
 abstract class _Paths {
@@ -123,4 +124,5 @@ abstract class _Paths {
   static const SPLASH_SCREEN = '/splash-screen';
   static const CANCEL_BOOKING = '/cancel-booking';
   static const BOOKING_CANCELLED = '/booking-cancelled';
+  static const SERVICEPRO = '/servicepro';
 }

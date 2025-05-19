@@ -35,7 +35,6 @@ class JobsView extends GetView<JobsController> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-
                       const Text(
                         'Jobs',
                         style: TextStyle(
@@ -45,12 +44,247 @@ class JobsView extends GetView<JobsController> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-
                     ],
                   ),
                 ),
                 SizedBox(height: 20),
-                _buildCurrentJobCard(),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Obx(() {
+                    if (controller.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    var bookingList = controller.bookingDataList;
+
+                    if (bookingList.isEmpty) {
+                      return const Center(child: Text("No current booking"));
+                    }
+
+                    return ListView.builder(
+                      itemCount: bookingList.length,
+                      physics: NeverScrollableScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final booking = bookingList[index];
+
+                        final bookedBy = booking['bookedBy'] ?? {};
+                        final firstName =
+                            bookedBy['firstName']?.toString() ?? 'Unknown';
+                        final lastName = bookedBy['lastName']?.toString() ?? '';
+                        final city = bookedBy['city']?.toString() ?? 'No city';
+
+                        final bookServices = booking['bookServices'] ?? [];
+                        final serviceName =
+                            bookServices.isNotEmpty
+                                ? bookServices[0]['name']?.toString() ??
+                                    'Service'
+                                : 'Service';
+
+                        final earning = booking['earning']?.toString() ?? '0';
+                        final duration =
+                            booking['duration']?.toString() ?? '--';
+                        print('Booking index: $index');
+                        print('First name: $firstName');
+                        print('Last name: $lastName');
+
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            padding: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFFFCC9E),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Current Job",
+                                  style: TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                Container(
+                                  padding: EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(height: 8),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          SizedBox(width: 6),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.person,
+                                                      size: 16,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    SizedBox(width: 6),
+                                                    Text(
+                                                      "$firstName $lastName",
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontFamily: "Poppins",
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 10),
+                                                Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.location_on,
+                                                      size: 18,
+                                                      color: Colors.black,
+                                                    ),
+                                                    SizedBox(width: 6),
+                                                    Expanded(
+                                                      child: Text(
+                                                        city,
+                                                        style: TextStyle(
+                                                          fontFamily: "Poppins",
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 13,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 10),
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                    left: 22,
+                                                  ),
+                                                  child: Text(
+                                                    '3.5 km, 28 min to reach',
+                                                    style: TextStyle(
+                                                      fontFamily: "Poppins",
+                                                      fontSize: 12,
+                                                      color: Colors.orange,
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 10),
+                                                Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.assignment_turned_in,
+                                                      size: 16,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    SizedBox(width: 6),
+                                                    Text(
+                                                      serviceName,
+                                                      style: TextStyle(
+                                                        fontFamily: "Poppins",
+                                                        fontSize: 13,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          // Price/Time Button
+                                          // priceTimeButton(
+                                          //   price: "₹$earning",
+                                          //   duration: "$duration Hrs",
+                                          //   isSelected: true,
+                                          //   onTap: () {},
+                                          // ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: _outlinedButton("Call", false),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: InkWell(
+                                              onTap: () {
+                                                showModalBottomSheet(
+                                                  context: Get.context!,
+                                                  isScrollControlled: true,
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  builder:
+                                                      (_) => Container(
+                                                        decoration: const BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                                topLeft:
+                                                                    Radius.circular(
+                                                                      16,
+                                                                    ),
+                                                                topRight:
+                                                                    Radius.circular(
+                                                                      16,
+                                                                    ),
+                                                              ),
+                                                        ),
+                                                        child:
+                                                            const JobDetailView(),
+                                                      ),
+                                                );
+                                              },
+                                              child: _outlinedButton(
+                                                "Details",
+                                                false,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: InkWell(
+                                              onTap: () {
+                                                Get.to(() => HelpSupportView());
+                                              },
+                                              child: _outlinedButton(
+                                                "Help",
+                                                true,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }),
+                ),
                 const SizedBox(height: 16),
                 const Text(
                   'Past Jobs',
@@ -96,160 +330,210 @@ class JobsView extends GetView<JobsController> {
     );
   }
 
-  Widget _buildCurrentJobCard() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFCC9E),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Current Job",
-            style: TextStyle(
-              fontFamily: "Poppins",
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Name
+  Widget _buildCurrentJobCard(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-                const SizedBox(height: 8),
+        var bookingList = controller.bookingDataList;
 
-                // Location + Price
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+        if (bookingList.isEmpty) {
+          return const Center(child: Text("No current booking"));
+        }
 
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [    Row(
-                          children: const [
-                            Icon(Icons.person, size: 16, color: Colors.grey),
+        return ListView.builder(
+          itemCount: bookingList.length,
+          itemBuilder: (context, index) {
+            final booking = bookingList[index];
+
+            final bookedBy = booking['bookedBy'] ?? {};
+            final firstName = bookedBy['firstName']?.toString() ?? 'Unknown';
+            final lastName = bookedBy['lastName']?.toString() ?? '';
+            final city = bookedBy['city']?.toString() ?? 'No city';
+
+            final bookServices = booking['bookServices'] ?? [];
+            final serviceName =
+                bookServices.isNotEmpty
+                    ? bookServices[0]['name']?.toString() ?? 'Service'
+                    : 'Service';
+
+            final earning = booking['earning']?.toString() ?? '0';
+            final duration = booking['duration']?.toString() ?? '--';
+            print('Booking index: $index');
+            print('First name: $firstName');
+            print('Last name: $lastName');
+
+            return Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Color(0xFFFFCC9E),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Current Job",
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             SizedBox(width: 6),
-                            Text(
-                              'Shivani singh,',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: "Poppins",
-                                color: Colors.grey,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.person,
+                                        size: 16,
+                                        color: Colors.grey,
+                                      ),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        "$firstName $lastName",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: "Poppins",
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.location_on,
+                                        size: 18,
+                                        color: Colors.black,
+                                      ),
+                                      SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          'E7, 775, Saket Nagar, Indore',
+                                          style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 22),
+                                    child: Text(
+                                      '3.5 km, 28 min to reach',
+                                      style: TextStyle(
+                                        fontFamily: "Poppins",
+                                        fontSize: 12,
+                                        color: Colors.orange,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.assignment_turned_in,
+                                        size: 16,
+                                        color: Colors.grey,
+                                      ),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        'Basic Plumbing work',
+                                        style: TextStyle(
+                                          fontFamily: "Poppins",
+                                          fontSize: 13,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Price/Time Button
+                            priceTimeButton(
+                              price: "₹250",
+                              duration: "3 hrs",
+                              isSelected: true,
+                              onTap: () {},
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(child: _outlinedButton("Call", false)),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                    context: Get.context!,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    builder:
+                                        (_) => Container(
+                                          decoration: const BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(16),
+                                              topRight: Radius.circular(16),
+                                            ),
+                                          ),
+                                          child: const JobDetailView(),
+                                        ),
+                                  );
+                                },
+                                child: _outlinedButton("Details", false),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  Get.to(() => HelpSupportView());
+                                },
+                                child: _outlinedButton("Help", true),
                               ),
                             ),
                           ],
-                        ),SizedBox(height: 10,),
-                          Row(
-                            children: [   const Icon(Icons.location_on, size: 18, color: Colors.black),
-                              Text(
-                                'E7, 775, Saket nagar, Indore',
-                                style: TextStyle(
-                                  fontFamily: "Poppins",
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Text(
-                              '3.5 km, 28 min to reach',
-                              style: TextStyle(
-                                fontFamily: "Poppins",
-                                fontSize: 12,
-                                color: Colors.orange,
-                              ),
-                            ),
-                          ), SizedBox(height: 10),   Row(
-                            children: const [
-                              Icon(
-                                Icons.assignment_turned_in,
-                                size: 16,
-                                color: Colors.grey,
-                              ),
-                              SizedBox(width: 6),
-                              Text(
-                                'Basic Plumbing work',
-                                style: TextStyle(
-                                  fontFamily: "Poppins",
-                                  fontSize: 13,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-
-                    // Price box
-                    priceTimeButton(
-                      price: "₹250",
-                      duration: "3 hrs",
-                      isSelected: true,
-                      onTap: () {},
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 12),
-                // Action Buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(child: _outlinedButton("Call", false)),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: InkWell(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: Get.context!,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent, // to allow custom radius
-                            builder: (_) => Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(16),
-                                  topRight: Radius.circular(16),
-                                ),
-                              ),
-                              child: const JobDetailView(), // Your full screen popup content
-                            ),
-                          );
-
-                        },
-                        child: _outlinedButton("Details", false),
-                      ),
-                    ),
-
-                    const SizedBox(width: 8),
-                    Expanded(child: InkWell(onTap: (){
-                      Get.to(HelpSupportView());
-                    },
-                        child: _outlinedButton("Help", true))),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      }),
     );
   }
 
@@ -262,10 +546,10 @@ class JobsView extends GetView<JobsController> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-       width: 60,
+        width: 60,
         height: 100,
         decoration: BoxDecoration(
-          color:  Colors.white,
+          color: Colors.white,
           border: Border.all(color: Colors.black),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -277,7 +561,7 @@ class JobsView extends GetView<JobsController> {
               price,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color:  Colors.black,
+                color: Colors.black,
                 fontSize: 14,
               ),
             ),
@@ -285,8 +569,9 @@ class JobsView extends GetView<JobsController> {
             Text(
               "for",
               style: TextStyle(
-                color:  Colors.grey,
-                fontSize: 12,  fontWeight: FontWeight.w400,
+                color: Colors.grey,
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
               ),
             ),
             const SizedBox(height: 4),
@@ -294,7 +579,7 @@ class JobsView extends GetView<JobsController> {
               duration,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color:  Colors.black,
+                color: Colors.black,
                 fontSize: 14,
               ),
             ),
@@ -366,8 +651,6 @@ class JobsView extends GetView<JobsController> {
     );
   }
 
-
-
   Widget _buildPastJob({
     required String name,
     required String location,
@@ -413,10 +696,12 @@ class JobsView extends GetView<JobsController> {
               "Date: $date",
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
-            InkWell(onTap: (){
-              Get.to(JobsDetailsView());
-            },
-                child: _actionButton("Details", Colors.white, Colors.orange)),
+            InkWell(
+              onTap: () {
+                Get.to(JobsDetailsView());
+              },
+              child: _actionButton("Details", Colors.white, Colors.orange),
+            ),
           ],
         ),
       ],

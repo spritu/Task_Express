@@ -34,7 +34,7 @@ class AuthController extends GetxController {
     String? emailData = prefs.getString('email');
 
     if (userId2 != null && userId2.isNotEmpty) {
-      userId.value = userId2;  // Set the observable to the loaded value
+      userId.value = userId2; // Set the observable to the loaded value
     }
 
     if (tokenData != null && tokenData.isNotEmpty) {
@@ -46,8 +46,11 @@ class AuthController extends GetxController {
     }
 
     // Debug log
-    print("🔑 Loaded userId: $userId.value, token: $token.value, email: $email.value");
+    print(
+      "🔑 Loaded userId: $userId.value, token: $token.value, email: $email.value",
+    );
   }
+
   void logout() {
     box.write('isLoggedIn', false);
     box.remove('mobile');

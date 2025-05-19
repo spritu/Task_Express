@@ -1,184 +1,385 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 
 import 'package:get/get.dart';
 
 import '../../../../colors.dart';
-import '../../provider_ChatScreen/views/provider_chat_screen_view.dart';
 import '../controllers/provider_chat_controller.dart';
 
 class ProviderChatView extends GetView<ProviderChatController> {
+
   const ProviderChatView({super.key});
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    final TextEditingController messageController = TextEditingController();
+    return Scaffold(
+      appBar: AppBar(
+        title: Obx(
+              () => Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              CircleAvatar(
+                backgroundImage:
+                controller.imagePath.value.isNotEmpty
+                    ? FileImage(File(controller.imagePath.value))
+                    : const AssetImage('assets/images/account.png'),
+              ),
+              const SizedBox(width: 10),
+              Obx(() => Text(controller.receiverName.value,style: TextStyle(fontSize: 15),)),
+              Spacer(),
+              IconButton(onPressed: () {}, icon: Icon(Icons.info_outline)),
+              IconButton(onPressed: () {}, icon: Icon(Icons.person)),
+              IconButton(onPressed: () {}, icon: Icon(Icons.call)),
+            ],
+          ),
+        ),
+        backgroundColor: Color(0xFFFDE1C8),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Get.back(),
+        ),
+      ),
       body: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(gradient: AppColors.appGradient2),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              children: [SizedBox(height: 20),
-                // Header
+        decoration: BoxDecoration(color: Color(0xFFFDE1C8)),
+        child: Column(
+          children: [
+            Expanded(
+              child: Obx(() {
+                final messages = controller.messages;
+                return ListView.builder(
+                  reverse: true,
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final msg = messages[index];
+                    final isSender = msg.author.id == controller.user.value?.id;
+                    final name =
+                    isSender ? "You" : controller.receiverName.value;
+                    print('object121 ${controller.receiverImage.value}');
+                    final imageUrl =
+                    (isSender
+                        ? controller.user.value?.imageUrl
+                        : controller.receiverImage.value)
+                        ?.trim();
 
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [Icon(Icons.arrow_back),
-                    const Text(
-                      " Chats",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                        fontFamily: "poppins",
+                    final ImageProvider displayImage =
+                    (imageUrl != null && imageUrl.isNotEmpty)
+                        ? NetworkImage(imageUrl)
+                        :   AssetImage('assets/images/account.png');
+
+                    final time =
+                    msg.createdAt != null
+                        ? TimeOfDay.fromDateTime(
+                      DateTime.fromMillisecondsSinceEpoch(
+                        msg.createdAt!,
                       ),
-                    ),Icon(Icons.phone)
-                  ],
-                ),
-           
-                const SizedBox(height: 20),
-                const CustomSearchBar(),
-                const SizedBox(height: 20),
+                    ).format(context)
+                        : '';
 
-                // Chat List
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: 40,
-                    itemBuilder: (context, index) {
+                    if (msg is types.TextMessage) {
                       return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: InkWell(onTap: (){
-                          Get.to(ProviderChatScreenView());
-                        },
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 5.0,
-                                  vertical: 8.0,
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Profile Image
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(25),
-                                      child: Image.asset(
-                                        "assets/images/professional_profile.png",
-                                        width: 50,
-                                        height: 50,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-
-                                    // Chat Info
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          // Name and Time
-                                          Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              const Text(
-                                                "Amit Sharma",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontFamily: "poppins",
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                              Text(
-                                                "04:44 pm",
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w400,
-                                                  fontFamily: "poppins",
-                                                  color: Color(0xFF545454),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-
-                                          // Message Preview
-                                          const Text(
-                                            "Hello sir, aapka address samzha dejiye.",
-                                            style: TextStyle(
-                                              fontFamily: "poppins",
-                                              fontWeight: FontWeight.w300,
-                                              fontSize: 12,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // Divider
-                              const Divider(
-                                height: 1,
-                                color: Colors.grey,
-                                indent: 70,
-                              ),
-                            ],
-                          ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        child: _buildMessageBubble(
+                            isSender: isSender,
+                            name: name,
+                            message: msg.text,
+                            time: time,
+                            imageUrl: displayImage,
+                            isRead: true
                         ),
                       );
+                    } else if (msg is types.ImageMessage) {
+                      return msg.uri.isNotEmpty
+                          ? Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        child: _buildImageMessageBubble(
+                          isSender: isSender,
+                          name: name,
+                          imageFile: File(msg.uri),
+                          time: time,
+                          imageUrl: displayImage,
+                        ),
+                      )
+                          : const SizedBox.shrink();
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  },
+                );
+              }),
+            ),
+
+            /// Message Input
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              color: Colors.grey[100],
+              child: Row(
+                children: [
+                  // IconButton(
+                  //   icon: const Icon(Icons.photo),
+                  //   onPressed: controller.handleImagePick,
+                  // ),
+                  Expanded(
+                    child: TextField(
+                      controller: messageController,
+                      decoration: const InputDecoration(
+                        hintText: 'Type a message...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: () {
+                      final text = messageController.text.trim();
+                      if (text.isNotEmpty) {
+                        controller.handleSendPressed(
+                          types.PartialText(text: text),
+                        );
+                        messageController.clear();
+                      }
                     },
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+
+            /// Book Now Section
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 8,
+              ),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.7,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDCE6FF),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Are you satisfied with this conversation?',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Book Now logic here
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.blue,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Book Now',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
-
   }
-}
 
-class CustomSearchBar extends StatelessWidget {
-  const CustomSearchBar({super.key});
+  /// Bubble for text messages
+  Widget _buildMessageBubble({
+    required bool isSender,
+    required String name,
+    required String message,
+    required String time,
+    required ImageProvider imageUrl,
+    required bool isRead,
+  }) {
+    final alignment =
+    isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
+    final bubbleColor = isSender ? Color(0xFF114BCA) : Colors.white;
+    final textColor = isSender ? Colors.white : Colors.black87;
+    final radius =
+    isSender
+        ? BorderRadius.only(
+      topLeft: Radius.circular(16),
+      topRight: Radius.circular(0),
+      bottomLeft: Radius.circular(16),
+      bottomRight: Radius.circular(16),
+    )
+        : BorderRadius.only(
+      topLeft: Radius.circular(0),
+      topRight: Radius.circular(16),
+      bottomLeft: Radius.circular(16),
+      bottomRight: Radius.circular(16),
+    );
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 44,
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    return Row(
+      mainAxisAlignment: alignment,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (!isSender) CircleAvatar(backgroundImage: imageUrl, radius: 20),
+        if (!isSender) const SizedBox(width: 8),
+        Flexible(
+          child: Column(
+            crossAxisAlignment:
+            isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: bubbleColor,
+                  borderRadius: radius,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(message, style: TextStyle(color: textColor)),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(width: 4),
+                  Text(
+                    time,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                  if (isSender) ...[ // ✅ only sender will show this icon
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.done_all,
+                      size: 16,
+                      color: isRead ? Colors.blue : Colors.grey, // ✅ read status
+                    ),
+                  ],
+                ],
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        children: const [
-          Icon(Icons.search, color: Color(0xFF5F5D5D)),
-          SizedBox(width: 8),
-          Expanded(
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: "Search",
-                hintStyle: TextStyle(color: Colors.grey),
-                border: InputBorder.none,
-                isCollapsed: true,
+        ),
+        if (isSender) const SizedBox(width: 8),
+        if (isSender) CircleAvatar(backgroundImage: imageUrl, radius: 20),
+      ],
+    );
+  }
+
+  /// Bubble for image messages
+  Widget _buildImageMessageBubble({
+    required bool isSender,
+    required String name,
+    required File imageFile,
+    required String time,
+    required ImageProvider imageUrl,
+  }) {
+    final alignment =
+    isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
+    final radius =
+    isSender
+        ? const BorderRadius.only(
+      topLeft: Radius.circular(16),
+      topRight: Radius.circular(0),
+      bottomLeft: Radius.circular(16),
+      bottomRight: Radius.circular(16),
+    )
+        : const BorderRadius.only(
+      topLeft: Radius.circular(0),
+      topRight: Radius.circular(16),
+      bottomLeft: Radius.circular(16),
+      bottomRight: Radius.circular(16),
+    );
+
+    return Row(
+      mainAxisAlignment: alignment,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (!isSender) CircleAvatar(backgroundImage: imageUrl, radius: 20),
+        if (!isSender) const SizedBox(width: 8),
+        Column(
+          crossAxisAlignment:
+          isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: isSender ? Colors.blue[200] : Colors.grey[300],
+                borderRadius: radius,
+              ),
+              child: ClipRRect(
+                borderRadius: radius,
+                child: Image.file(
+                  imageFile,
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  time,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.done_all,
+                  size: 16,
+                  color: isSender ? Colors.blue : Colors.green,
+                ),
+              ],
+            ),
+          ],
+        ),
+        if (isSender) const SizedBox(width: 8),
+        if (isSender) CircleAvatar(backgroundImage: imageUrl, radius: 20),
+      ],
     );
   }
 }
