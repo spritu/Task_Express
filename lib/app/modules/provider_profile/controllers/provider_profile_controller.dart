@@ -18,7 +18,7 @@ class ProviderProfileController extends GetxController {
   var filteredSubCategories = <SubCategory>[].obs;
   var selectedSubCategoryId = ''.obs;
   final isCategoryLoading = false.obs;
-
+  var userId = ''.obs;
   // final selectedSubCategoryId = ''.obs;
   final selectedCategoryName = ''.obs;
   final selectedSubCategoryName = ''.obs;
@@ -187,7 +187,7 @@ class ProviderProfileController extends GetxController {
   final dateOfBirth = ''.obs;
   final email = ''.obs;
   final city = ''.obs;
-  String userId = '';
+
   final pinCode = ''.obs;
   final state = ''.obs;
   final referralCode = ''.obs;
@@ -265,7 +265,8 @@ class ProviderProfileController extends GetxController {
 
   Future<void> loadUserId() async {
     final prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userId'); // Use correct key
+    String? userId = prefs.getString('userId');
+
     print("🔄 Loaded userId from SharedPreferences: $userId");
   }
 
@@ -306,12 +307,14 @@ class ProviderProfileController extends GetxController {
     if (!validateFields()) return;
 
     final prefs = await SharedPreferences.getInstance();
-    userId = prefs.getString('userId') ?? '';
-    mobileNumber = prefs.getString('mobileNumber');
-    if (userId.isEmpty) {
-      Get.snackbar('Error', 'No user ID found, please login again.');
+    String? userId = prefs.getString('userId');
+
+    if (userId == null || userId.isEmpty) {
+      Get.snackbar('Error', 'User ID not found. Please verify OTP again.');
       return;
     }
+    mobileNumber = prefs.getString('mobileNumber');
+
 
     final request = http.MultipartRequest(
       'POST',

@@ -23,9 +23,10 @@ class ProviderOtpController extends GetxController {
   Future<void> loadMobileNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.reload();
-    String? userId = prefs.getString('userId');
-    mobileNumber = prefs.getString('mobileNumber');
 
+    mobileNumber = prefs.getString('mobileNumber');
+    String? userId = prefs.getString('userId');
+    print("🔑 Loaded userId: $userId");
   }
 
 
@@ -68,8 +69,9 @@ class ProviderOtpController extends GetxController {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
+        final userId = responseData['id'] ?? '';
+        await prefs.setString('userId', userId.toString()); // ✅ Save it properly
 
-        final userId = responseData['id']?.toString() ?? '';
         final token = responseData['token'] ?? '';
         final userType = responseData['userType'] ?? 0;
         final userData = responseData['userData'] ?? {};
@@ -92,6 +94,7 @@ class ProviderOtpController extends GetxController {
           await prefs.setString('lastName', lastName);
           await prefs.setString('email', email);
           await prefs.setString('mobile', phone);
+          print("✅ Saved userId: $userId");
 
           // ✅ Mark as logged in
           final box = GetStorage();
@@ -111,16 +114,16 @@ class ProviderOtpController extends GetxController {
             Get.offAll(() => ProviderProfileView());
           }
         } else {
-          Get.snackbar("Error", "Token not received. Please complete your registration.", colorText: Colors.orange);
+       //   Get.snackbar("Error", "Token not received. Please complete your registration.", colorText: Colors.orange);
           Get.offAll(() => ProviderProfileView());
         }
       } else {
         print("❌ OTP Verification Failed: ${response.body}");
-        Get.snackbar("Error", "❌ Invalid OTP", colorText: Colors.red);
+       // Get.snackbar("Error", "❌ Invalid OTP", colorText: Colors.red);
       }
     } catch (e) {
       print("❌ Exception: $e");
-      Get.snackbar("Error", "❌ Something went wrong", colorText: Colors.red);
+    //  Get.snackbar("Error", "❌ Something went wrong", colorText: Colors.red);
     }
   }
 
