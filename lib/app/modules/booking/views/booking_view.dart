@@ -374,42 +374,56 @@ class BookingView extends GetView<BookingController> {
       ),
     );
   }
-  Widget buildBookingCard() => Container(
-    height: 83,
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(8),
-      color: Colors.white,
-      boxShadow: [
-        BoxShadow(blurRadius: 4, color: Colors.grey.shade400),
-      ],
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(5.0),
-      child: Row(
+  Widget buildBookingCard() => Obx(() {
+    if (controller.isLoading.value) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (controller.bookings.isEmpty) {
+      return Center(child: Text("No bookings found."));
+    }
+
+    return ListView.builder(
+      itemCount: controller.bookings.length,
+      itemBuilder: (context, index) {
+        final booking = controller.bookings[index];
+        return BookingCard(booking: booking);
+      },
+    );
+  });
+}
+class BookingCard extends StatelessWidget {
+  final BookingModel booking;
+
+  const BookingCard({Key? key, required this.booking}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [BoxShadow(color: Colors.grey.shade300, blurRadius: 6, offset: Offset(0, 2))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset("assets/images/rajesh.png"),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text("Suraj Sen", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, fontFamily: "poppins")),
-              const Text("Fixed Charge Helper", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, fontFamily: "poppins", color: Color(0xFF575757))),
-              const SizedBox(height: 15),
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(fontSize: 14, fontFamily: "poppins", fontWeight: FontWeight.w500, color: Colors.black),
-                  children: [
-                    TextSpan(text: "Booked: "),
-                    TextSpan(text: "Today, 10:45 am", style: TextStyle(fontWeight: FontWeight.w700)),
-                  ],
-                ),
-              ),
-            ],
+          Text(
+            booking.name ?? 'No Name', // replace with your field
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
+          SizedBox(height: 8),
+        //  Text('Date: ${booking.date ?? 'N/A'}'), // replace with your field
+          SizedBox(height: 4),
+         // Text('Status: ${booking.status ?? 'Pending'}'), // replace with your field
+          // add more fields as needed
         ],
       ),
-    ),
-  );
+    );
+  }
+}
 
   Widget buildChargeAndArrivalCard() => Container(
     height: 48,
@@ -535,7 +549,7 @@ class BookingView extends GetView<BookingController> {
     ),
   );
 
-}
+
 
 
 class RequestPendingBottomCard extends StatelessWidget {

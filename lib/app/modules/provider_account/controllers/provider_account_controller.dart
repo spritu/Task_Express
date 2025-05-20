@@ -12,6 +12,13 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   var firstName = ''.obs;
   var lastName = ''.obs;
   var mobileNumber = ''.obs;
+  var imagePath = ''.obs;
+
+  var selectedProfessionName = ''.obs;
+  var selectedCategoryName = ''.obs;
+  var selectedSubCategoryName = ''.obs;
+  var charge = ''.obs;
+
   var email = ''.obs;
   var serviceCards = <ServiceModel>[].obs;
   var isEditingCharge = false.obs;
@@ -22,9 +29,6 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   }
 
   final RxString selectedProfession = ''.obs;
-  final RxString selectedCategoryName = ''.obs;
-  final RxString selectedSubCategoryName = ''.obs;
-  final RxString selectedProfessionName = ''.obs;
   RxBool showServiceCard = false.obs;
   RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
   RxList<CategoryModel> fixedChargeHelpers = <CategoryModel>[].obs;
@@ -52,7 +56,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   final count = 0.obs;
   var selectedCategoryId = ''.obs;
 
-  final RxString imagePath = ''.obs;
+
   RxList<CategoryModel> allCategories = <CategoryModel>[].obs;
 
   // List<CategoryModel> get filteredCategories {
@@ -67,19 +71,19 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     showServiceCard.value = !showServiceCard.value;
   }
 
-  Future<void> loadUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    firstName.value = prefs.getString('firstName') ?? '';
-    lastName.value = prefs.getString('lastName') ?? '';
-    mobileNumber.value = prefs.getString('mobile') ?? '';
-    email.value = prefs.getString('email') ?? '';
-
-    print("✅ Loaded User Data:");
-    print("👤 First Name: ${firstName.value}");
-    print("👤 Last Name: ${lastName.value}");
-    print("📧 Email: ${email.value}");
-    print("📱 Mobile: ${mobileNumber.value}");
-  }
+  // Future<void> loadUserData() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   firstName.value = prefs.getString('firstName') ?? '';
+  //   lastName.value = prefs.getString('lastName') ?? '';
+  //   mobileNumber.value = prefs.getString('mobile') ?? '';
+  //   email.value = prefs.getString('email') ?? '';
+  //
+  //   print("✅ Loaded User Data:");
+  //   print("👤 First Name: ${firstName.value}");
+  //   print("👤 Last Name: ${lastName.value}");
+  //   print("📧 Email: ${email.value}");
+  //   print("📱 Mobile: ${mobileNumber.value}");
+  // }
   Future<void> logout() async {
     // Clear SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -91,7 +95,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
 
     // Set login status to false in AuthController
     final authController = Get.find<AuthController>();
-    authController.isLoggedIn.value = false;
+    authController.isLoggedIn2.value = false;
 
     // Navigate to login screen
     Get.offAllNamed('/provider-login');
@@ -131,7 +135,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   void toggleServiceCard() {
     showServiceCard.value = !showServiceCard.value;
   }
-  var charge = "250".obs;var charge1 = "250".obs;
+var charge1 = "250".obs;
   void setCharge(String charge) {
     selectCharge.value = charge;
   }
@@ -146,6 +150,20 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   }
   void setCategory(String category) {
     selectedCategoryId.value = category;
+  }
+  Future<void> loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    firstName.value = prefs.getString('firstName') ?? '';
+    lastName.value = prefs.getString('lastName') ?? '';
+    mobileNumber.value = prefs.getString('mobile') ?? '';
+    imagePath.value = prefs.getString('profileImage') ?? '';
+
+    // You can load skill data if saved previously like this:
+    selectedProfessionName.value = prefs.getString('profession') ?? '';
+    selectedCategoryName.value = prefs.getString('category') ?? '';
+    selectedSubCategoryName.value = prefs.getString('subCategory') ?? '';
+    charge.value = prefs.getString('charge') ?? '';
   }
   Future<void> loadMobileNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -284,15 +302,15 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
               serviceCards.refresh(); // Refresh the list to update UI
 
                   // Show success message
-                  Get.snackbar("Deleted", "Service deleted successfully");
+                 // Get.snackbar("Deleted", "Service deleted successfully");
                 } else {
                   // Do not remove the card if the API fails
-                  Get.snackbar("Error", "Failed to delete: ${response.reasonPhrase}");
+               //   Get.snackbar("Error", "Failed to delete: ${response.reasonPhrase}");
                 }
               } catch (e) {
                 // Handle any exceptions and print to debug
                 print("Error: $e");
-                Get.snackbar("Error", "Something went wrong");
+             //   Get.snackbar("Error", "Something went wrong");
               }
             },
             child: const Text("Yes"),

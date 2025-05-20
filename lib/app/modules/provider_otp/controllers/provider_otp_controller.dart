@@ -83,7 +83,16 @@ class ProviderOtpController extends GetxController {
         final phone = userData['phone']?.toString() ?? '';
 
         otpTextController.clear();
-
+        final skills = userData['skills'];
+        if (skills != null && skills.isNotEmpty) {
+          final skill = skills[0]; // assuming single skill for now
+          await prefs.setString('profession', skill['professionName'] ?? '');
+          await prefs.setString('category', skill['categoryName'] ?? '');
+          await prefs.setString('subCategory', skill['subCategoryName'] ?? '');
+          await prefs.setString('charge', skill['charge']?.toString() ?? '');
+        }
+        final profileImage = userData['userImg'] ?? '';
+        await prefs.setString('profileImage', profileImage);
         if (token.isNotEmpty) {
           // ✅ Save all details in SharedPreferences
           await prefs.setString('userId', userId);

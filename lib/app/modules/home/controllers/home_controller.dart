@@ -87,10 +87,8 @@ class HomeController extends GetxController {
       if (response.statusCode == 200) {
         final jsonString = await response.stream.bytesToString();
         final jsonData = json.decode(jsonString);
-
         // 🔍 Debug print to show response data
         print("API Response Data: $jsonData");
-
         // Attach category name to each skill
         List<dynamic> users = jsonData['data'];
         for (var user in users) {

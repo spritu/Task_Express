@@ -72,14 +72,20 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                 itemCount: users.length,
                 itemBuilder: (context, index) {
                   final user = users[index];
+                  final lat = double.tryParse(user['lat'] ?? '0') ?? 0.0;
+                  final lng = double.tryParse(user['lng'] ?? '0') ?? 0.0;
 
+                  // Trigger distance fetch for each user if not already fetched
+                  if (!controller.distances.containsKey(index)) {
+                    controller.fetchDistanceForUser(index, lat, lng);
+                  }
+
+                  final distance = controller.distances[index] ?? 'Calculating...';
                   final imagePath = user['userImg'] ?? '';
                   final imageUrl = 'https://jdapi.youthadda.co/$imagePath';
-
-                  final charge =
-                      user['skills'] != null && user['skills'].isNotEmpty
-                          ? user['skills'][0]['charge']
-                          : 0;
+                  final charge = user['skills'] != null && user['skills'].isNotEmpty
+                      ? user['skills'][0]['charge']
+                      : 0;
                   print("Opening bottom sheet for ${user['firstName']}");
 
                   return InkWell(
@@ -155,7 +161,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Column(
+                            child: Column(mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
@@ -172,7 +178,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           ),
                                         ),
                                         SizedBox(height: 3),
-                                        Row(
+                                        Row(mainAxisAlignment: MainAxisAlignment.start,
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
@@ -254,33 +260,18 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
                                           children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                top: 3,
-                                              ),
-                                              child: Icon(
-                                                Icons.location_on,
-                                                size: 14,
-                                                color: Colors.grey,
-                                              ),
+                                            Icon(Icons.location_on, size: 14, color: Colors.grey),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              controller.distances[index] ?? 'N/A',style: TextStyle(fontSize: 12),
                                             ),
+
                                           ],
                                         ),
+
                                         SizedBox(height: 3),
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.access_time,
-                                              size: 14,
-                                              color: AppColors.grey,
-                                            ),
-                                          ],
-                                        ),
+
                                       ],
                                     ),
                                     Card(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -12,6 +13,20 @@ import '../../home/controllers/home_controller.dart';
 
 class ProfessionalPlumberController extends GetxController with WidgetsBindingObserver {
   final HomeController userController = Get.put(HomeController());
+  var distances = <int, String>{}.obs;
+  Position? currentPosition;
+
+  Future<void> saveCurrentLocationToPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (currentPosition != null) {
+      await prefs.setDouble('lat1', currentPosition!.latitude);
+      await prefs.setDouble('lng1', currentPosition!.longitude);
+      print("✅ Saved location: ${currentPosition!.latitude}, ${currentPosition!.longitude}");
+    } else {
+      print("⚠️ currentPosition is null. Location not saved.");
+    }
+  }
+
   int? selectedIndexAfterCall;
   List<dynamic>? selectedUsers;
   String? selectedTitle;
@@ -24,7 +39,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
   }
   // To show bottom sheet after phone call ends
   bool shouldShowSheetAfterCall = false;
-
+  var distance = ''.obs;
   RxBool isDataReady = false.obs;
 
   // Data for bottom sheet
@@ -41,11 +56,90 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
   var bookingData = {}.obs;
   var selectedIndex = 0.obs;
   final selectedUser = Rxn<Map<String, dynamic>>();
+  //Position? currentPosition;
+
+  double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
+    return Geolocator.distanceBetween(lat1, lng1, lat2, lng2) / 1000; // in kilometers
+  }
+  Future<void> getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+  }
 
   @override
   void onInit() {
     super.onInit();
+  //  getDistanceFromApi( lat2,  lng2)
+ //   getDistanceFromSharedPrefs(lat2,);
     WidgetsBinding.instance.addObserver(this);
+  }
+  Future<void> fetchDistanceForUser(int index, double lat2, double lng2) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    double? lat1 = prefs.getDouble('lat1');
+    double? lng1 = prefs.getDouble('lng1');
+
+    if (lat1 != null && lng1 != null) {
+      final url = Uri.parse(
+          'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lng1&lat2=$lat2&lon2=$lng2');
+
+      try {
+        var request = http.MultipartRequest('GET', url);
+        http.StreamedResponse response = await request.send();
+
+        if (response.statusCode == 200) {
+          String result = await response.stream.bytesToString();
+          var data = json.decode(result);
+          print("✅ API response: $data");
+
+          // ✅ Extract from `data['data']['distance']`
+          if (data['data'] != null && data['data']['distance'] != null) {
+            double rawDistance = data['data']['distance'];
+            String formattedDistance = (rawDistance / 1000).toStringAsFixed(2); // convert to KM
+            distances[index] = '$formattedDistance KM';
+            print("📏 Distance for user[$index]: ${distances[index]}");
+          } else {
+            distances[index] = 'N/A';
+          }
+        } else {
+          distances[index] = 'Error';
+          print("❌ Failed with status: ${response.statusCode}");
+        }
+      } catch (e) {
+        distances[index] = 'Error';
+        print("❌ Exception: $e");
+      }
+    } else {
+      distances[index] = 'No Location';
+    }
+
+    update(); // update UI in GetX
+  }
+
+
+
+
+  void updateUserDistances(List<dynamic> users) {
+    for (int i = 0; i < users.length; i++) {
+      final lat = double.tryParse(users[i]['lat'] ?? '0') ?? 0.0;
+      final lng = double.tryParse(users[i]['lng'] ?? '0') ?? 0.0;
+
+      if (lat != 0.0 && lng != 0.0) {
+        fetchDistanceForUser(i, lat, lng);
+      } else {
+        distances[i] = 'Invalid';
+      }
+    }
   }
 
   @override
@@ -53,6 +147,71 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
     super.onClose();
     WidgetsBinding.instance.removeObserver(this);
   }
+  Future<String> getDistanceFromApi(double lat2, double lng2) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    double? lat1 = prefs.getDouble('lat1');
+    double? lng1 = prefs.getDouble('lng1');
+
+    if (lat1 != null && lng1 != null) {
+      final url = Uri.parse(
+        'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lng1&lat2=$lat2&lon2=$lng2',
+      );
+
+      var request = http.MultipartRequest('GET', url);
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        String result = await response.stream.bytesToString();
+        var data = json.decode(result);
+        return data['distance']?.toString() ?? 'N/A';
+      } else {
+        print("❌ Error: ${response.statusCode} - ${response.reasonPhrase}");
+        return 'Error';
+      }
+    } else {
+      return 'Coordinates missing';
+    }
+  }
+
+  // Future<void> getDistanceFromSharedPrefs() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //
+  //   double? lat1 = prefs.getDouble('lat1');
+  //   double? lng1 = prefs.getDouble('lng1');
+  //   double? lat2 = prefs.getDouble('lat2');
+  //   double? lng2 = prefs.getDouble('lng2');
+  //
+  //   if (lat1 != null && lng1 != null && lat2 != null && lng2 != null) {
+  //     print("📍 User1: ($lat1, $lng1)");
+  //     print("📍 User2: ($lat2, $lng2)");
+  //
+  //     final url = Uri.parse(
+  //       'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lng1&lat2=$lat2&lon2=$lng2',
+  //     );
+  //
+  //     var request = http.MultipartRequest('GET', url);
+  //     http.StreamedResponse response = await request.send();
+  //
+  //     if (response.statusCode == 200) {
+  //       String result = await response.stream.bytesToString();
+  //       print("✅ Distance API Response: $result");
+  //
+  //       // Parse JSON response
+  //       var data = json.decode(result);
+  //       if (data['distance'] != null) {
+  //         distance.value = data['distance'].toString(); // Update Rx value
+  //       } else {
+  //         distance.value = 'null';
+  //       }
+  //     } else {
+  //       print("❌ Failed to fetch distance: ${response.statusCode} - ${response.reasonPhrase}");
+  //       distance.value = 'Error';
+  //     }
+  //   } else {
+  //     print("⚠️ One or more coordinates are missing in SharedPreferences.");
+  //     distance.value = 'Coordinates missing';
+  //   }
+  // }
 
   // Listen for app lifecycle changes, mainly to detect when phone call ends
   @override

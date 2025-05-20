@@ -71,7 +71,7 @@ class HomeView extends GetView<HomeController> {
                                         ? locationController
                                             .currentAddress
                                             .value
-                                        : "Fetching current location...",
+                                        : "Fetching location..",
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(

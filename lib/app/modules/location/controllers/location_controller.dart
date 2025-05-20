@@ -13,46 +13,102 @@ class LocationController extends GetxController {
   void onInit() {
     super.onInit();
     determinePosition();
+    _loadUserData();
   }
+  Future<void> _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.reload();
+    String? userId2 = prefs.getString('userId');
+    String? token = prefs.getString('token');
+    String? email = prefs.getString('email');
 
+    // Use the loaded data as needed
+    print("🔑 Loaded userId: $userId2");
+    print("🔑 Loaded token: $token");
+    print("🔑 Loaded email: $email");
+
+    // You can also update the UI or variables as needed here
+  }
   Future<bool> determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      Get.snackbar('Location Error', 'Please enable location services');
-      return false;
-    }
+    if (!serviceEnabled) return false;
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        Get.snackbar('Location Error', 'Location permissions are denied');
-        return false;
-      }
+      if (permission == LocationPermission.denied) return false;
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      Get.snackbar('Location Error', 'Location permissions are permanently denied');
-      return false;
-    }
+    if (permission == LocationPermission.deniedForever) return false;
 
     try {
       currentPosition.value = await Geolocator.getCurrentPosition();
       await getAddressFromLatLng();
-      print("Current Address: ${currentAddress.value}");
 
-      // 🚀 Call API after getting location
-      await sendAddressToApi(userId: '', contactNo: '');
+      print("📍 Latitude: ${currentPosition.value?.latitude}");
+      print("📍 Longitude: ${currentPosition.value?.longitude}");
+
+      // ✅ Get userId from SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.reload();
+      String? userId2 = prefs.getString('userId');
+
+      if (userId2 != null && currentPosition.value != null) {
+        await updateCoordinatesApi(userId2);
+      }
 
       return true;
     } catch (e) {
-      Get.snackbar('Error', 'Failed to get location');
+      print("❌ Location Error: $e");
       return false;
     }
   }
+
+  Future<void> updateCoordinatesApi(String userId) async {
+    var headers = {'Content-Type': 'application/json'};
+
+    var body = json.encode({
+      "userId": userId,
+      "latitude": currentPosition.value?.latitude,
+      "longitude": currentPosition.value?.longitude,
+    });
+
+    var response = await http.post(
+      Uri.parse('https://jdapi.youthadda.co/user/updateusercoordinates'),
+      headers: headers,
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      print("✅ Coordinates updated: ${response.body}");
+
+      final data = json.decode(response.body);
+      final coordinates = data['user']?['location']?['coordinates'];
+
+      if (coordinates != null && coordinates.length >= 2) {
+        final double longitude = coordinates[0];
+        final double latitude = coordinates[1];
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        bool isUser1Saved = prefs.containsKey('lat1') && prefs.containsKey('lng1');
+        if (!isUser1Saved) {
+          await prefs.setDouble('lat1', latitude);
+          await prefs.setDouble('lng1', longitude);
+          print("📍 Saved User1 Coordinates: lat1=$latitude, lng1=$longitude");
+        }
+
+        print("📍 Saved to SharedPreferences: lat=$latitude, lng=$longitude");
+      } else {
+        print("⚠️ Coordinates not found in API response.");
+      }
+    } else {
+      print("❌ Failed to update coordinates: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
 
   Future<void> getAddressFromLatLng() async {
     if (currentPosition.value != null) {
@@ -74,7 +130,7 @@ class LocationController extends GetxController {
         print("Short Address: ${currentAddress.value}");
       } catch (e) {
         print(e);
-        Get.snackbar('Error', 'Failed to get address');
+     //   Get.snackbar('Error', 'Failed to get address');
       }
     }
   }
@@ -88,8 +144,7 @@ class LocationController extends GetxController {
   }) async {
     var headers = {'Content-Type': 'application/json'};
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.reload();
-    String? userId2 = prefs.getString('userId2');
+    String? userId2 = prefs.getString('userId');
     var body = json.encode({
       "userId": userId2,
       "houseNo": houseNo,
@@ -106,10 +161,10 @@ class LocationController extends GetxController {
 
     if (response.statusCode == 200) {
       print("Address posted successfully: ${response.body}");
-      Get.snackbar('Success', 'Address submitted successfully');
+     // Get.snackbar('Success', 'Address submitted successfully');
     } else {
       print("Failed to post address: ${response.reasonPhrase}");
-      Get.snackbar('Error', 'Failed to submit address');
+     // Get.snackbar('Error', 'Failed to submit address');
     }
   }
 

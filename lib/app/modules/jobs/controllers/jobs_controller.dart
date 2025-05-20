@@ -21,7 +21,7 @@ class JobsController extends GetxController {
       String? userId = prefs.getString('userId');
 
       if (userId == null) {
-        Get.snackbar("Error", "User not logged in");
+      //  Get.snackbar("Error", "User not logged in");
         return;
       }
 
@@ -66,11 +66,11 @@ class JobsController extends GetxController {
           bookingDataList.clear();
         }
       } else {
-        Get.snackbar("Error", "Failed to fetch booking");
+      //  Get.snackbar("Error", "Failed to fetch booking");
       }
     } catch (e) {
       print("❌ Exception in fetchCurrentBooking: $e");
-      Get.snackbar("Error", "Exception: $e");
+     // Get.snackbar("Error", "Exception: $e");
     } finally {
       isLoading.value = false;
     }

@@ -55,22 +55,15 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                           child: Row(
                             children: [
                               Obx(
-                                () => CircleAvatar(
+                                    () => CircleAvatar(
                                   radius: 40,
-                                  backgroundImage:
-                                      controller.imagePath.value.isNotEmpty
-                                          ? FileImage(
-                                            File(controller.imagePath.value),
-                                          )
-                                          : AssetImage(
-                                                'assets/images/account.png',
-                                              )
-                                              as ImageProvider,
+                                  backgroundImage: controller.imagePath.value.isNotEmpty
+                                      ? NetworkImage(controller.imagePath.value)
+                                      : AssetImage('assets/images/account.png') as ImageProvider,
                                 ),
                               ),
                               SizedBox(width: 8),
-                              Obx(
-                                () => Column(
+                              Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -99,7 +92,7 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                     }),
                                   ],
                                 ),
-                              ),
+
                               Spacer(),
                               InkWell(
                                 onTap: () {

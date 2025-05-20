@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../auth_controller.dart';
 import '../../provider_home/views/provider_home_view.dart';
 import '../../provider_otp/views/provider_otp_view.dart';
 import '../views/provider_login_view.dart';
@@ -12,7 +13,8 @@ class ProviderLoginController extends GetxController {
 
   final TextEditingController mobileeController = TextEditingController();
   var isChecked = false.obs;
- // final box = GetStorage();
+  //final box = GetStorage();
+  // final box = GetStorage();
   // void main() async {
   //   WidgetsFlutterBinding.ensureInitialized();
   //   await GetStorage.init();
@@ -62,7 +64,9 @@ class ProviderLoginController extends GetxController {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('mobileNumber', phone);
         await prefs.reload();
-
+        final authController = Get.find<AuthController>();
+        authController.isLoggedIn2.value = true;
+        //
         // await box.write('isLoggedIn2', true);
         // await box.write('mobile', phone);
         mobileeController.clear();

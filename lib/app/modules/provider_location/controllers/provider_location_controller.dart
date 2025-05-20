@@ -1,10 +1,11 @@
+import 'dart:convert';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class ProviderLocationController extends GetxController {
-  //TODO: Implement ProviderLocationController
-
   var currentAddress = ''.obs;
   var currentPosition = Rxn<Position>();
 
@@ -42,13 +43,21 @@ class ProviderLocationController extends GetxController {
       currentPosition.value = await Geolocator.getCurrentPosition();
       await getAddressFromLatLng();
       print("Current Address: ${currentAddress.value}");
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.reload();
+      String? userId = prefs.getString('userId');
+
+      if (userId != null && currentPosition.value != null) {
+        await updateCoordinatesApi(userId);
+      }
+      // Call API to update coordinates
+
       return true;
     } catch (e) {
       Get.snackbar('Error', 'Failed to get location');
       return false;
     }
   }
-
 
   Future<void> getAddressFromLatLng() async {
     if (currentPosition.value != null) {
@@ -60,7 +69,6 @@ class ProviderLocationController extends GetxController {
 
         Placemark place = placemarks[0];
 
-        // Use locality (e.g. city/town) and subLocality (e.g. area)
         currentAddress.value = [
           if (place.subLocality != null && place.subLocality!.isNotEmpty)
             place.subLocality,
@@ -75,5 +83,91 @@ class ProviderLocationController extends GetxController {
       }
     }
   }
+  Future<void> updateCoordinatesApi(String userId) async {
+    var headers = {'Content-Type': 'application/json'};
 
+    var body = json.encode({
+      "userId": userId,
+      "latitude": currentPosition.value?.latitude,
+      "longitude": currentPosition.value?.longitude,
+    });
+
+    var response = await http.post(
+      Uri.parse('https://jdapi.youthadda.co/user/updateusercoordinates'),
+      headers: headers,
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      print("✅ Coordinates updated: ${response.body}");
+
+      final data = json.decode(response.body);
+      final coordinates = data['user']?['location']?['coordinates'];
+
+      if (coordinates != null && coordinates.length >= 2) {
+        final double longitude = coordinates[0];
+        final double latitude = coordinates[1];
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        bool isUser2Saved = prefs.containsKey('lat2') && prefs.containsKey('lng2');
+        if (!isUser2Saved) {
+          await prefs.setDouble('lat2', latitude);
+          await prefs.setDouble('lng2', longitude);
+          print("📍 Saved User2 Coordinates: lat2=$latitude, lng2=$longitude");
+        }
+        print("📍 Saved to SharedPreferences: lat=$latitude, lng=$longitude");
+      } else {
+        print("⚠️ Coordinates not found in API response.");
+      }
+    } else {
+      print("❌ Failed to update coordinates: ${response.statusCode} - ${response.reasonPhrase}");
+    }
+  }
+
+
+// Future<void> updateCoordinatesToAPI() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? userId = prefs.getString('userId'); // Make sure 'userId' is stored here
+  //
+  //   if (userId == null || currentPosition.value == null) {
+  //     Get.snackbar('Error', 'User ID or coordinates are missing');
+  //     return;
+  //   }
+  //
+  //   var headers = {'Content-Type': 'application/json'};
+  //   var body = json.encode({
+  //     "userId": userId,
+  //     "latitude": currentPosition.value!.latitude,
+  //     "longitude": currentPosition.value!.longitude
+  //   });
+  //
+  //   var request = http.Request(
+  //     'POST',
+  //     Uri.parse('https://jdapi.youthadda.co/user/updateusercoordinates'),
+  //   );
+  //   request.body = body;
+  //   request.headers.addAll(headers);
+  //
+  //   http.StreamedResponse response = await request.send();
+  //
+  //   if (response.statusCode == 200) {
+  //     String responseBody = await response.stream.bytesToString();
+  //     print("✅ Location updated: $responseBody");
+  //
+  //     // Save API response to SharedPreferences
+  //     Map<String, dynamic> responseData = json.decode(responseBody);
+  //     await prefs.setString('locationUpdateResponse', responseBody);
+  //
+  //     // Optional: Save specific data if needed
+  //     if (responseData['data'] != null && responseData['data']['updatedLocation'] != null) {
+  //       await prefs.setDouble('savedLatitude', responseData['data']['updatedLocation']['latitude']);
+  //       await prefs.setDouble('savedLongitude', responseData['data']['updatedLocation']['longitude']);
+  //     }
+  //
+  //     Get.snackbar('Success', 'Location updated successfully');
+  //   } else {
+  //     print("❌ Error: ${response.statusCode} - ${response.reasonPhrase}");
+  //     Get.snackbar('Error', 'Failed to update location');
+  //   }
+  // }
 }

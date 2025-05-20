@@ -72,7 +72,7 @@ class EditProfileController extends GetxController {
     final userId = prefs.getString('userId'); // Get stored ID from registration
 
     if (userId == null) {
-      Get.snackbar("Error", "User ID not found. Please log in again.");
+    //  Get.snackbar("Error", "User ID not found. Please log in again.");
       return;
     }
 
@@ -108,18 +108,18 @@ class EditProfileController extends GetxController {
       final responseJson = jsonDecode(responseBody);
 
       if (response.statusCode == 200 && responseJson['code'] == 200) {
-        Get.snackbar("Success", responseJson['msg'] ?? "Profile updated successfully");
+      //  Get.snackbar("Success", responseJson['msg'] ?? "Profile updated successfully");
 
         final accountController = Get.find<AccountController>();
         await accountController.loadUserInfo();
         await accountController.loadMobileNumber();
       } else {
         print("❌ Error from API: ${responseJson['msg']}");
-        Get.snackbar("Error", responseJson['msg'] ?? "Failed to update profile");
+       // Get.snackbar("Error", responseJson['msg'] ?? "Failed to update profile");
       }
     } catch (e) {
       print("❌ Exception caught: $e");
-      Get.snackbar("Error", "Something went wrong. Please try again.");
+     // Get.snackbar("Error", "Something went wrong. Please try again.");
     }
 
   }

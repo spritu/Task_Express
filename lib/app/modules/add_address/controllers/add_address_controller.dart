@@ -82,7 +82,7 @@ class AddAddressController extends GetxController {
 
         addressList.removeWhere((address) => address['_id'] == addressId);
 
-        Get.snackbar('Success', 'Address deleted successfully', snackPosition: SnackPosition.BOTTOM);
+     //   Get.snackbar('Success', 'Address deleted successfully', snackPosition: SnackPosition.BOTTOM);
 
         // Optionally refresh fresh list:
         await fetchAddress();

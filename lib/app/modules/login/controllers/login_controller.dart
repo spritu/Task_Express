@@ -10,7 +10,7 @@ import '../../otp/views/otp_view.dart';
 class LoginController extends GetxController {
   final TextEditingController mobileController = TextEditingController();
   var isChecked = false.obs; // Observable state
-  final box = GetStorage(); // <<<< ADDED GetStorage box
+  // final box = GetStorage(); // <<<< ADDED GetStorage box
 
   void toggleCheck(bool value) {
     isChecked.value = value;

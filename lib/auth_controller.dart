@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthController extends GetxController {
   final box = GetStorage(); // ✅ Add this line
   var isLoggedIn = false.obs;
+  var isLoggedIn2 = false.obs;
   var userId = ''.obs;
   var token = ''.obs;
   var email = ''.obs;

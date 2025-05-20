@@ -220,7 +220,7 @@ class AddressScreenController extends GetxController {
       if (response.statusCode == 200) {
         final result = await response.stream.bytesToString();
         print('Success: $result');
-        Get.snackbar("Success", "Address saved successfully");
+       // Get.snackbar("Success", "Address saved successfully");
 
         clear();
         await fetchAddress();

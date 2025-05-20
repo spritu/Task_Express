@@ -71,7 +71,7 @@ class OtpController extends GetxController {
 
   Future<void> verifyOtp(String otp) async {
     if (otp.isEmpty || otp.length != 4) {
-      Get.snackbar("Error", "Please enter a valid 4-digit OTP", colorText: Colors.red);
+    //  Get.snackbar("Error", "Please enter a valid 4-digit OTP", colorText: Colors.red);
       return;
     }
 
@@ -79,7 +79,7 @@ class OtpController extends GetxController {
     String? mobileNumber = prefs.getString('mobileNumber');
 
     if (mobileNumber == null || mobileNumber.isEmpty) {
-      Get.snackbar("Error", "Mobile number not found. Please try again.", colorText: Colors.red);
+     // Get.snackbar("Error", "Mobile number not found. Please try again.", colorText: Colors.red);
       return;
     }
 
@@ -123,10 +123,10 @@ class OtpController extends GetxController {
             final box = GetStorage();
             box.write('isLoggedIn', true);
 
-            Get.snackbar("✅ Success", responseData['msg'], colorText: Colors.green);
+          //  Get.snackbar("✅ Success", responseData['msg'], colorText: Colors.green);
             Get.offAllNamed('/bottom'); // Navigate to home screen
           } else {
-            Get.snackbar("Complete Signup", "Please complete your profile", colorText: Colors.orange);
+          //  Get.snackbar("Complete Signup", "Please complete your profile", colorText: Colors.orange);
             Get.offAll(() => SignUpView());
           }
         } else {
@@ -144,86 +144,7 @@ class OtpController extends GetxController {
   }
 
 
-  // Future<void> verifyOtp(String otp) async {
-  //   if (otp.isEmpty || otp.length != 4) {
-  //     Get.snackbar("Error", "Please enter a valid 4-digit OTP", colorText: Colors.red);
-  //     return;
-  //   }
-  //
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String? mobileNumber = prefs.getString('mobileNumber');
-  //
-  //   if (mobileNumber == null || mobileNumber.isEmpty) {
-  //     Get.snackbar("Error", "Mobile number not found. Please try again.", colorText: Colors.red);
-  //     return;
-  //   }
-  //
-  //   final headers = {'Content-Type': 'application/json'};
-  //   final body = json.encode({"phone": mobileNumber, "otp": otp});
-  //   final url = Uri.parse('https://jdapi.youthadda.co/user/verifyotp');
-  //
-  //   try {
-  //     final response = await http.post(url, headers: headers, body: body);
-  //
-  //     if (response.statusCode == 200) {
-  //       final responseData = json.decode(response.body);
-  //       print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
-  //       final userId2 = responseData['id'] ?? '';
-  //       await prefs.setString('userId', userId2.toString()); // ✅ Save it properly
-  //
-  //       final token = responseData['token'];
-  //
-  //       final userType = responseData['userType'] ?? 0;
-  //       final userData = responseData['userData'];
-  //       final userId = responseData['id'];
-  //       await prefs.setString('userId2', userId ?? ''); // Ensure userId is
-  //       otpController.clear();
-  //
-  //       if (token != null && token.isNotEmpty) {
-  //         // Save basic data
-  //         await prefs.setString('token', token);
-  //
-  //         await prefs.setInt('userType', userType);
-  //         await prefs.setString('mobile', userData?['phone'] ?? '');
-  //         String? userId2 = prefs.getString('userId');
-  //         print("🔁 Loaded userId: $userId2");
-  //         final email = userData?['email'] ?? '';
-  //         final firstName = userData?['firstName'] ?? '';
-  //
-  //         if (email.isNotEmpty && firstName.isNotEmpty) {
-  //           await prefs.setString('email', email);
-  //           await prefs.setString('firstName', firstName);
-  //           await prefs.setString('lastName', userData?['lastName'] ?? '');
-  //
-  //           // ✅ Mark as logged in
-  //           final box = GetStorage();
-  //           box.write('isLoggedIn', true);
-  //
-  //           Get.snackbar("✅ Success", responseData['msg'], colorText: Colors.green);
-  //           Get.offAllNamed('/bottom'); // Navigate to home screen
-  //         } else {
-  //           Get.snackbar("Complete Signup", "Please complete your profile", colorText: Colors.orange);
-  //           Get.offAll(() => SignUpView());
-  //         }
-  //       } else {
-  //         Get.snackbar("Error", "Token not received. Please complete your registration.", colorText: Colors.orange);
-  //         Get.offAll(() => SignUpView());
-  //       }
-  //     } else {
-  //       print("❌ OTP Verification Failed: ${response.body}");
-  //       Get.snackbar("Error", "❌ Invalid OTP", colorText: Colors.red);
-  //     }
-  //   } catch (e) {
-  //     print("❌ Exception: $e");
-  //     Get.snackbar("Error", "❌ Something went wrong", colorText: Colors.red);
-  //   }
-  // }
 
-
-
-
-
-  // Resend OTP
   Future<void> resendOtp() async {
 
     final headers = {
@@ -242,10 +163,10 @@ class OtpController extends GetxController {
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
         print("OTP resent successfully: $responseBody");
-        Get.snackbar("Success", "OTP resent successfully to +91 $mobileNumber");
+      //  Get.snackbar("Success", "OTP resent successfully to +91 $mobileNumber");
       } else {
         print("Failed to resend OTP: ${response.reasonPhrase}");
-        Get.snackbar("", "please fill the Correct OTP");
+     //   Get.snackbar("", "please fill the Correct OTP");
       }
     } catch (e) {
       print("Exception: $e");
