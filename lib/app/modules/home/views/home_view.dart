@@ -21,10 +21,11 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    final HomeController controller = Get.put(HomeController());
+
     final locationController = Get.find<LocationController>();
     final AuthController authController = Get.find<AuthController>();
-    return Scaffold(
-      backgroundColor: Colors.white,
+    return Scaffold(backgroundColor: AppColors.white,
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         child: SafeArea(
@@ -37,8 +38,7 @@ class HomeView extends GetView<HomeController> {
                   if (!authController.isLoggedIn.value) {
                     controller.showSignupSheet(context);
                   } else {
-                    // Normal action
-                    print('Navigate to service');
+
                   }
                 },
                 child: Container(
@@ -63,7 +63,7 @@ class HomeView extends GetView<HomeController> {
                                 Obx(
                                   () => Text(
                                     controller.landMark.value.isNotEmpty
-                                        ? '${controller.houseNo.value}, ${controller.landMark.value}'
+                                        ? '${controller.houseNo.value} ${controller.landMark.value}'
                                         : locationController
                                             .currentAddress
                                             .value

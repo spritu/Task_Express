@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../../auth_controller.dart';
 import 'package:http/http.dart' as http;
+
 class ProviderAccountController extends GetxController with WidgetsBindingObserver {
   //TODO: Implement ProviderAccountController
+  var imagePath = ''.obs;
   var firstName = ''.obs;
   var lastName = ''.obs;
   var mobileNumber = ''.obs;
-  var imagePath = ''.obs;
+
 
   var selectedProfessionName = ''.obs;
   var selectedCategoryName = ''.obs;
@@ -24,10 +25,21 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   var isEditingCharge = false.obs;
   RxList<CategoryModel> filteredCategories = <CategoryModel>[].obs;
   String userId = '';
+  Future<void> loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? profileImage = prefs.getString('profileImage');
+    if (profileImage != null && !profileImage.startsWith('http')) {
+      profileImage = 'https://jdapi.youthadda.co/$profileImage';
+    }
+
+    imagePath.value = profileImage ?? '';
+    firstName.value = prefs.getString('firstName') ?? '';
+    lastName.value = prefs.getString('lastName') ?? '';
+    mobileNumber.value = prefs.getString('mobile') ?? '';
+  }
   void addServiceCard() {
     serviceCards.add(ServiceModel(profession: '', category: '', charge: '', subcategory: '', categoryId: '', subCategoryId: '')); // adds an empty service card
   }
-
   final RxString selectedProfession = ''.obs;
   RxBool showServiceCard = false.obs;
   RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
@@ -47,7 +59,36 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
       charge: "₹500",
     ));
   }
+  Future<void> _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedImage = prefs.getString('image') ?? '';
+    String? image = prefs.getString('image');
 
+// If it's just the file name and needs to be combined with base URL
+    if (image != null && !image.startsWith('http')) {
+      image = 'https://jdapi.youthadda.co/$image';
+    }
+
+    imagePath.value = image ?? '';
+    await prefs.setString('image', imagePath.value); // ✅ Safe fallback
+    String? userId = prefs.getString('userId');
+    String? token = prefs.getString('token');
+    String? email = prefs.getString('email');
+    firstName.value = prefs.getString('firstName') ?? '';
+    lastName.value = prefs.getString('lastName') ?? '';
+    String? mobile = prefs.getString('mobile');
+    imagePath.value = prefs.getString('image') ?? '';
+    print("🖼️ Loaded image path: ${imagePath.value}");
+
+    print("👤 Loaded: $firstName $lastName, 📸 Image: ${imagePath.value}");
+    print("📦 Stored Data:");
+    print("🔑 userId: $userId");
+    print("🔑 token: $token");
+    print("📧 email: $email");
+    print("👤 firstName: $firstName");
+    print("👤 lastName: $lastName");
+    print("📱 mobile: $mobile");
+  }
   TextEditingController chargeController = TextEditingController();
   RxString selectSubCategory = "".obs;
 
@@ -151,20 +192,7 @@ var charge1 = "250".obs;
   void setCategory(String category) {
     selectedCategoryId.value = category;
   }
-  Future<void> loadUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    firstName.value = prefs.getString('firstName') ?? '';
-    lastName.value = prefs.getString('lastName') ?? '';
-    mobileNumber.value = prefs.getString('mobile') ?? '';
-    imagePath.value = prefs.getString('profileImage') ?? '';
-
-    // You can load skill data if saved previously like this:
-    selectedProfessionName.value = prefs.getString('profession') ?? '';
-    selectedCategoryName.value = prefs.getString('category') ?? '';
-    selectedSubCategoryName.value = prefs.getString('subCategory') ?? '';
-    charge.value = prefs.getString('charge') ?? '';
-  }
   Future<void> loadMobileNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final number = prefs.getString('mobileNumber') ?? '';
@@ -177,6 +205,15 @@ var charge1 = "250".obs;
     firstName.value = prefs.getString('firstName') ?? '';
     lastName.value = prefs.getString('lastName') ?? '';
     mobileNumber.value = prefs.getString('mobile') ?? '';
+    String? image = prefs.getString('image');
+
+// If it's just the file name and needs to be combined with base URL
+    if (image != null && !image.startsWith('http')) {
+      image = 'https://jdapi.youthadda.co/$image';
+    }
+
+    imagePath.value = image ?? '';
+    await prefs.setString('image', imagePath.value); // ✅ Safe fallback
 
     String? base64Image = prefs.getString('userImgBase64');
 
@@ -333,8 +370,8 @@ var charge1 = "250".obs;
   }
   @override
   void onInit()  {
-    super.onInit();
-    fetchCategories();
+    super.onInit();loadUserData();
+    fetchCategories(); _loadUserData();
     chargeController.text = charge.value;
     loadUserInfo1();
     WidgetsBinding.instance.addObserver(this);

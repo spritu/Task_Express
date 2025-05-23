@@ -7,7 +7,6 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../account/controllers/account_controller.dart';
 
 class EditProfileController extends GetxController {
@@ -23,13 +22,25 @@ class EditProfileController extends GetxController {
   final TextEditingController genderController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-
-  final RxString imagePath = ''.obs;
+  var imagePath = ''.obs;
+  //final RxString imagePath = ''.obs;
   final ImagePicker _picker = ImagePicker();
+  Future<void> _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedImage = prefs.getString('image') ?? '';
+    String? image = prefs.getString('image');
 
+// If it's just the file name and needs to be combined with base URL
+    if (image != null && !image.startsWith('http')) {
+      image = 'https://jdapi.youthadda.co/$image';
+    }
+
+    imagePath.value = image ?? '';
+    await prefs.setString('image', imagePath.value); // ✅ Safe fallback
+  }
   @override
   void onInit() {
-    super.onInit();
+    super.onInit();_loadUserData();
     loadUserInfo(); // Fetch data when controller initializes
   }
 
@@ -53,7 +64,6 @@ class EditProfileController extends GetxController {
     if (image != null && image.isNotEmpty) {
       imagePath.value = image;
     }
-
     update(); // Update UI if necessary
   }
 

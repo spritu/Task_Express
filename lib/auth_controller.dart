@@ -15,8 +15,9 @@ class AuthController extends GetxController {
     _loadUserData();
     // ✅ Load login state from storage
     isLoggedIn.value = box.read('isLoggedIn') ?? false;
-
+    isLoggedIn.value = box.read('isLoggedIn2') ?? false;
     print("Login status onInit: ${isLoggedIn.value}");
+    print("Login status onInit: ${isLoggedIn2.value}");
   }
 
   void login(String mobile) {
@@ -25,7 +26,12 @@ class AuthController extends GetxController {
     isLoggedIn.value = true;
     print("Logged in: $mobile");
   }
-
+  void login2(String mobile) {
+    box.write('isLoggedIn', true);
+    box.write('mobile', mobile);
+    isLoggedIn2.value = true;
+    print("Logged in: $mobile");
+  }
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -56,6 +62,11 @@ class AuthController extends GetxController {
     box.write('isLoggedIn', false);
     box.remove('mobile');
     isLoggedIn.value = false;
+    print("Logged out");
+  } void logout2() {
+    box.write('isLoggedIn2', false);
+    box.remove('mobile');
+    isLoggedIn2.value = false;
     print("Logged out");
   }
 }

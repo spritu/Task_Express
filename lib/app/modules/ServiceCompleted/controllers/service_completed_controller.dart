@@ -18,11 +18,11 @@ class ServiceCompletedController extends GetxController {
     final userId = prefs.getString('userId'); // Get stored ID from registration
 
     if (userId == null) {
-      Get.snackbar("Error", "User ID not found. Please log in again.");
+    //  Get.snackbar("Error", "User ID not found. Please log in again.");
       return;
     }
     if (rating.value == 0.0) {
-      Get.snackbar("Rating Required", "Please provide a rating before submitting.");
+    //  Get.snackbar("Rating Required", "Please provide a rating before submitting.");
       return;
     }
 
@@ -44,17 +44,17 @@ class ServiceCompletedController extends GetxController {
       if (response.statusCode == 200) {
         String responseData = await response.stream.bytesToString();
         print("Review submitted: $responseData");
-        Get.snackbar("Success", "Thank you for your feedback!");
+       // Get.snackbar("Success", "Thank you for your feedback!");
 
         // Navigate on success
         Get.to(() => const ServiceCompletedSuccessfullyView());
       } else {
         print("Review submit failed: ${response.reasonPhrase}");
-        Get.snackbar("Error", "Failed to submit review: ${response.reasonPhrase}");
+       // Get.snackbar("Error", "Failed to submit review: ${response.reasonPhrase}");
       }
     } catch (e) {
       print("Exception: $e");
-      Get.snackbar("Error", "Something went wrong: $e");
+     // Get.snackbar("Error", "Something went wrong: $e");
     }
   }
 }

@@ -2,43 +2,48 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../../auth_controller.dart';
 
 class AccountController extends GetxController {
   //TODO: Implement AccountController
   final RxString mobileNumber = ''.obs;
-  final count = 0.obs;
+  var count = 0.obs;
   var firstName = ''.obs;
   var lastName = ''.obs;
+  var imagePath = ''.obs;
 
-  final RxString imagePath = ''.obs;
 
 
   @override
   void onInit() {
     super.onInit();
-    loadMobileNumber();
+    loadMobileNumber();loadProfileImage();
     _loadUserData();
+  }
+
+
+  Future<void> loadProfileImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? storedImage = prefs.getString('image');
+    if (storedImage != null && storedImage.isNotEmpty) {
+      imagePath.value = storedImage;
+    }
   }
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String? userId = prefs.getString('userId');
-    String? token = prefs.getString('token');
-    String? email = prefs.getString('email');
+    String? image = prefs.getString('image') ?? '';
+    if (image.isNotEmpty && !image.startsWith('http')) {
+      image = 'https://jdapi.youthadda.co/$image';
+    }
+    imagePath.value = image;
     firstName.value = prefs.getString('firstName') ?? '';
     lastName.value = prefs.getString('lastName') ?? '';
-    String? mobile = prefs.getString('mobile');
+    mobileNumber.value = prefs.getString('mobileNumber') ?? '';
 
-    print("📦 Stored Data:");
-    print("🔑 userId: $userId");
-    print("🔑 token: $token");
-    print("📧 email: $email");
-    print("👤 firstName: $firstName");
-    print("👤 lastName: $lastName");
-    print("📱 mobile: $mobile");
+    print("🖼️ Loaded image path: ${imagePath.value}");
   }
+
 
   Future<void> logout() async {
     // Clear SharedPreferences
@@ -83,5 +88,5 @@ class AccountController extends GetxController {
     super.onClose();
   }
 
-  void increment() => count.value++;
+  void increment() => count.value++;// auto referesh
 }

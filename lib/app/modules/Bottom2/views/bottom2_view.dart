@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:worknest/app/modules/jobs/controllers/jobs_controller.dart';
+import 'package:worknest/app/modules/provider_ChatScreen/views/provider_chat_screen_view.dart';
 import 'package:worknest/app/modules/provider_home/controllers/provider_home_controller.dart';
 import '../../../../colors.dart';
 import '../../jobs/views/jobs_view.dart';
@@ -58,7 +59,7 @@ Widget _buildBody(int index) {
       return ProviderSettingView();
     case 3:
       providerChatScreenController.fetchLastMessages();
-      return ProviderChatView();
+      return ProviderChatScreenView();
     case 4:
       return ProviderAccountView();
     default:

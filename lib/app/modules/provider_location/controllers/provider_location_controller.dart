@@ -21,7 +21,7 @@ class ProviderLocationController extends GetxController {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      Get.snackbar('Location Error', 'Please enable location services');
+     // Get.snackbar('Location Error', 'Please enable location services');
       return false;
     }
 
@@ -29,13 +29,13 @@ class ProviderLocationController extends GetxController {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        Get.snackbar('Location Error', 'Location permissions are denied');
+       // Get.snackbar('Location Error', 'Location permissions are denied');
         return false;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      Get.snackbar('Location Error', 'Location permissions are permanently denied');
+      //Get.snackbar('Location Error', 'Location permissions are permanently denied');
       return false;
     }
 
@@ -54,7 +54,7 @@ class ProviderLocationController extends GetxController {
 
       return true;
     } catch (e) {
-      Get.snackbar('Error', 'Failed to get location');
+     // Get.snackbar('Error', 'Failed to get location');
       return false;
     }
   }
@@ -79,7 +79,7 @@ class ProviderLocationController extends GetxController {
         print("Short Address: ${currentAddress.value}");
       } catch (e) {
         print(e);
-        Get.snackbar('Error', 'Failed to get address');
+      //  Get.snackbar('Error', 'Failed to get address');
       }
     }
   }

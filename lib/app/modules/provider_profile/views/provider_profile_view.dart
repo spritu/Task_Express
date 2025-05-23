@@ -32,45 +32,34 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                   ),
                   const SizedBox(height: 20),
 
-                  Obx(
-                        () => Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        CircleAvatar(
-                          radius: 45,
-                          backgroundColor: Colors.white,
-                          backgroundImage:
-                          controller.imagePath.value.isNotEmpty
-                              ? FileImage(File(controller.imagePath.value))
-                              : null,
-                          child:
-                          controller.imagePath.value.isEmpty
-                              ? const Icon(
-                            Icons.person,
-                            size: 60,
-                            color: Colors.grey,
-                          )
-                              : null,
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 4,
-                          child: InkWell(
-                            onTap: () => _showImagePicker(context, controller),
-                            child: const CircleAvatar(
-                              radius: 16,
-                              backgroundColor: Colors.white,
-                              child: Icon(
-                                Icons.edit,
-                                size: 16,
-                                color: Colors.black,
-                              ),
-                            ),
+                  Obx(() => Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      controller.imagePath.value.isNotEmpty
+                          ? CircleAvatar(
+                        radius: 45,
+                        backgroundImage: FileImage(File(controller.imagePath.value)),
+                      )
+                          : const CircleAvatar(
+                        radius: 45,
+                        backgroundColor: Colors.white,
+                        child: Icon(Icons.person, size: 60, color: Colors.grey),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 4,
+                        child: InkWell(
+                          onTap: () => _showImagePicker(context, controller),
+                          child: const CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Colors.white,
+                            child: Icon(Icons.edit, size: 16, color: Colors.black),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    ],
+                  )),
+
                   buildTextField(
                     "First Name",
                     "Enter first name",

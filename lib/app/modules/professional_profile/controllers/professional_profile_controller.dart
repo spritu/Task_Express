@@ -25,13 +25,13 @@ class ProfessionalProfileController extends GetxController {
         final jsonData = json.decode(response.body);
         users.assignAll(jsonData['data'] ?? []);
         if (users.isEmpty) {
-          Get.snackbar("Info", "No data found");
+        //  Get.snackbar("Info", "No data found");
         }
       } else {
-        Get.snackbar("Server Error", "Status Code: ${response.statusCode}");
+       // Get.snackbar("Server Error", "Status Code: ${response.statusCode}");
       }
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+     // Get.snackbar("Error", e.toString());
     } finally {
       isLoading.value = false;
     }

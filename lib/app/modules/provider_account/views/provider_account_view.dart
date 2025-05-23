@@ -14,6 +14,7 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
 
   @override
   Widget build(BuildContext context) {
+    final ProviderAccountController controller = Get.put(ProviderAccountController());
     return WillPopScope(
       onWillPop: () async {
         Get.find<Bottom2Controller>().selectedIndex.value = 0;
@@ -43,27 +44,53 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                     SizedBox(height: 20),
                     /// Profile Card
                     Card(
-                      child: Container(
-                        height: 80,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              Obx(
-                                    () => CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage: controller.imagePath.value.isNotEmpty
-                                      ? NetworkImage(controller.imagePath.value)
-                                      : AssetImage('assets/images/account.png') as ImageProvider,
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Column(
+                      child: InkWell(onTap: (){
+                        Get.to(() => ProviderEditProfileView());
+                      },
+                        child: Container(
+                          height: 80,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Obx(() {
+                                  final imageUrl = controller.imagePath.value;
+                                  return CircleAvatar(
+                                    radius: 40,
+                                    backgroundColor: Colors.grey[200],
+                                    child: ClipOval(
+                                      child: imageUrl.isNotEmpty
+                                          ? Image.network(
+                                        imageUrl,
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          print("❌ Image failed to load: $error");
+                                          return Image.asset(
+                                            'assets/images/account.png',
+                                            width: 80,
+                                            height: 80,
+                                            fit: BoxFit.cover,
+                                          );
+                                        },
+                                      )
+                                          : Image.asset(
+                                        'assets/images/account.png',
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  );
+                                }),
+                                SizedBox(width: 8),
+                                Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -92,15 +119,15 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                     }),
                                   ],
                                 ),
-
-                              Spacer(),
-                              InkWell(
-                                onTap: () {
-                                  Get.to(() => ProviderEditProfileView());
-                                },
-                                child: Icon(Icons.arrow_forward_ios, size: 16),
-                              ),
-                            ],
+                                Spacer(),
+                                InkWell(
+                                  onTap: () {
+                                    Get.to(() => ProviderEditProfileView());
+                                  },
+                                  child: Icon(Icons.arrow_forward_ios, size: 16),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -159,7 +186,6 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                         ),
                                       ),
                                       Divider(thickness: 1),
-
                                       Obx(
                                         () => _buildRow(
                                           "Sub Category",
@@ -168,7 +194,6 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                         ),
                                       ),
                                       Divider(thickness: 1),
-
                                       Obx(
                                             () => _buildRow(
                                           "Charge",
@@ -180,9 +205,7 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                             });
                                           },
                                         ),
-                                      ),
-
-                                    ],
+                                      ),],
                                   ),
                                 ),
                               ),
@@ -190,7 +213,6 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                           ],
                         ),
                       ),
-
                     SizedBox(height: 20),
                     /// Toggleable Service Card
                     Obx(() {

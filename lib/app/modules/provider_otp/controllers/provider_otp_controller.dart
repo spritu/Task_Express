@@ -44,10 +44,10 @@ class ProviderOtpController extends GetxController {
     }
   }
 
-
+  var imagePath = ''.obs;
   Future<void> verifyOtp(String otp) async {
     if (otp.isEmpty || otp.length != 4) {
-      Get.snackbar("Error", "Please enter a valid 4-digit OTP", colorText: Colors.red);
+    //  Get.snackbar("Error", "Please enter a valid 4-digit OTP", colorText: Colors.red);
       return;
     }
 
@@ -55,7 +55,7 @@ class ProviderOtpController extends GetxController {
     String? mobileNumber = prefs.getString('mobileNumber');
 
     if (mobileNumber == null || mobileNumber.isEmpty) {
-      Get.snackbar("Error", "Mobile number not found. Please try again.", colorText: Colors.red);
+    //  Get.snackbar("Error", "Mobile number not found. Please try again.", colorText: Colors.red);
       return;
     }
 
@@ -71,7 +71,11 @@ class ProviderOtpController extends GetxController {
         print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
         final userId = responseData['id'] ?? '';
         await prefs.setString('userId', userId.toString()); // ✅ Save it properly
-
+        String? image = prefs.getString('image');
+        if (image != null && !image.startsWith('http')) {
+          image = 'https://jdapi.youthadda.co/$image';
+        }
+        imagePath.value = image ?? '';
         final token = responseData['token'] ?? '';
         final userType = responseData['userType'] ?? 0;
         final userData = responseData['userData'] ?? {};
@@ -107,7 +111,11 @@ class ProviderOtpController extends GetxController {
 
           // ✅ Mark as logged in
           final box = GetStorage();
-          box.write('isLoggedIn2', true);
+          box.write('isLoggedIn2', true); // ✅ ONLY THIS
+          box.remove('isLoggedIn');       // ❌ Remove old login flag if set
+
+
+          prefs.remove('userId2');
 
           print("📦 Saved User Data:");
           print("👤 First Name: $firstName");
@@ -116,10 +124,10 @@ class ProviderOtpController extends GetxController {
           print("📱 Phone: $phone");
 
           if (firstName.isNotEmpty && email.isNotEmpty) {
-            Get.snackbar("✅ Success", responseData['msg'], colorText: Colors.green);
+           // Get.snackbar("✅ Success", responseData['msg'], colorText: Colors.green);
             Get.offAllNamed('/bottom2'); // Navigate to home screen
           } else {
-            Get.snackbar("Complete Signup", "Please complete your profile", colorText: Colors.orange);
+          //  Get.snackbar("Complete Signup", "Please complete your profile", colorText: Colors.orange);
             Get.offAll(() => ProviderProfileView());
           }
         } else {
@@ -156,14 +164,14 @@ class ProviderOtpController extends GetxController {
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
         print("OTP resent successfully: $responseBody");
-        Get.snackbar("Success", "OTP resent successfully to +91 $mobileNumber");
+       // Get.snackbar("Success", "OTP resent successfully to +91 $mobileNumber");
       } else {
         print("Failed to resend OTP: ${response.reasonPhrase}");
-        Get.snackbar("Error", "Failed to resend OTP: ${response.reasonPhrase}");
+      //  Get.snackbar("Error", "Failed to resend OTP: ${response.reasonPhrase}");
       }
     } catch (e) {
       print("Exception: $e");
-      Get.snackbar("Error", "Something went wrong: $e");
+      //Get.snackbar("Error", "Something went wrong: $e");
     }
   }
 

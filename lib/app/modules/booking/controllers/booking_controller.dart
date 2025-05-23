@@ -9,64 +9,113 @@ import '../../CancelBooking/views/cancel_booking_view.dart';
 class BookingController extends GetxController {
   //TODO: Implement BookingController
   var isLoading = false.obs;
-  var bookings = <BookingModel>[].obs;
-
+ // var bookings = <BookingModel>[].obs;
+  var bookingList = [].obs;
   @override
   void onInit() {
     super.onInit();
-    fetchBookings();fetchCurrentBooking();
-    fetchUserCurrentBooking();
+    fetchCurrentBookings();
+    fetchPastBookings();
   }
-
-  Future<void> fetchBookings() async {
+  // Inside your controller
+  //var bookingList = <dynamic>[].obs;
+  var bookings = <dynamic>[].obs;
+  Future<void> fetchCurrentBookings() async {
     isLoading.value = true;
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId2 = prefs.getString('userId');
 
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? userId2 = prefs.getString('userId');
-      var headers = {'Content-Type': 'application/json'};
-      var request = http.Request(
-        'POST',
-        Uri.parse('https://jdapi.youthadda.co/getusercurrentbooking'),
-      );
+    var headers = {'Content-Type': 'application/json'};
+    var request = http.Request(
+      'POST',
+      Uri.parse('https://jdapi.youthadda.co/getusercurrentbooking'),
+    );
+    request.body = json.encode({"userId": userId2});
+    request.headers.addAll(headers);
 
-      request.body = json.encode({"userId": userId2});
-      request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
 
-      http.StreamedResponse response = await request.send();
+    if (response.statusCode == 200) {
+      final result = await response.stream.bytesToString();
+      final decoded = json.decode(result);
+      print("API Response: $decoded");
 
-      if (response.statusCode == 200) {
-        final jsonString = await response.stream.bytesToString();
-        final result = json.decode(jsonString);
+      if (decoded["code"] == 200 && decoded["data"] != null) {
+        bookings.value = decoded["data"];
 
-        if (result['data'] is List) {
-          bookings.value = (result['data'] as List)
-              .map((e) => BookingModel.fromJson(e))
-              .toList();
-        } else if (result['data'] is Map) {
-          bookings.value = [BookingModel.fromJson(result['data'])];
+        // ✅ Save `id` or `bookid` to SharedPreferences
+        // If "data" is a list:
+        if (decoded["data"] is List && decoded["data"].isNotEmpty) {
+          final firstBooking = decoded["data"][0];
+          final bookId = firstBooking["_id"]; // or "bookid", based on your actual API field
+          if (bookId != null) {
+            await prefs.setString('bookId', bookId.toString());
+            print("Saved bookId to SharedPreferences: $bookId");
+          }
         }
+
       } else {
-        print("❌ Error: ${response.reasonPhrase}");
+        bookings.clear();
       }
-    } catch (e) {
-      print("❌ Exception: $e");
-    } finally {
-      isLoading.value = false;
+    } else {
+      print("Error: ${response.reasonPhrase}");
     }
+
+    isLoading.value = false;
   }
 
-  Future<void> rejectBooking(String bookingId) async {
+
+
+  var pastBookings = [].obs;
+
+
+  Future<void> fetchPastBookings() async {
+    isLoading.value = true;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+
     var headers = {'Content-Type': 'application/json'};
+    var request = http.Request(
+      'POST',
+      Uri.parse('https://jdapi.youthadda.co/getuserpastbooking'),
+    );
+    request.body = json.encode({"userId": userId});
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      final result = await response.stream.bytesToString();
+      final decoded = json.decode(result);
+      print("Past Booking Response: $decoded");
+
+      if (decoded["code"] == 200 && decoded["data"] != null) {
+        pastBookings.value = decoded["data"];
+      } else {
+        pastBookings.clear();
+      }
+    } else {
+      print("Error: ${response.reasonPhrase}");
+    }
+
+    isLoading.value = false;
+  }
+
+  Future<void> rejectBooking() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? bookId = prefs.getString('bookId');
+
+    var headers = {
+      'Content-Type': 'application/json',
+    };
     var request = http.Request(
       'POST',
       Uri.parse('https://jdapi.youthadda.co/acceptreject'),
     );
 
     request.body = json.encode({
-      "bookingId": bookingId,
+      "bookingId":bookId,
       "accept": "no",
     });
 
@@ -77,9 +126,11 @@ class BookingController extends GetxController {
     if (response.statusCode == 200) {
       String result = await response.stream.bytesToString();
       print(result);
-      Get.to(() => CancelBookingView());
+     Get.to(CancelBookingView());
+
     } else {
       print(response.reasonPhrase);
+
     }
   }
 
@@ -88,12 +139,11 @@ class BookingController extends GetxController {
     if (await canLaunchUrl(callUri)) {
       await launchUrl(callUri);
     } else {
-      Get.snackbar('Error', 'Could not launch phone call');
+     // Get.snackbar('Error', 'Could not launch phone call');
     }
   }
   var currentBooking = {}.obs;var showRequestPending = false.obs;var helperName = ''.obs;
-var
-  hasBooking = true.obs; // Or false if no booking
+var hasBooking = true.obs; // Or false if no booking
 
   var booking = Rxn<Booking>();
 
@@ -101,9 +151,9 @@ var
     isLoading.value = true;
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? userId = prefs.getString('userId');
+      String? userId2 = prefs.getString('userId');
 
-      print("📦 Service Provider userId: $userId"); // 👈 PRINT USER ID HERE
+      print("📦 Service Provider userId: $userId2"); // 👈 PRINT USER ID HERE
 
       var headers = {
         'Content-Type': 'application/json'
@@ -113,7 +163,7 @@ var
         Uri.parse('https://jdapi.youthadda.co/getserprocurrentbooking'),
       );
       request.body = json.encode({
-        "serviceProId": userId,
+        "serviceProId": userId2,
       });
       request.headers.addAll(headers);
 
@@ -122,6 +172,7 @@ var
       if (response.statusCode == 200) {
         String res = await response.stream.bytesToString();
         print("📥 Raw Response: $res"); // 👈 RAW RESPONSE
+        print("rrrrrrrrrrrrrrrrrrrrrrrr");
         currentBooking.value = json.decode(res);
       } else {
       //  Get.snackbar("Error", "Failed to fetch booking");
@@ -190,37 +241,10 @@ void makePhoneCall(String phoneNumber) async {
   if (await canLaunchUrl(callUri)) {
     await launchUrl(callUri);
   } else {
-    Get.snackbar('Error', 'Could not launch phone call');
+   // Get.snackbar('Error', 'Could not launch phone call');
   }
 }
-  Future<void> rejectBooking() async {
-    var headers = {
-      'Content-Type': 'application/json',
-    };
-    var request = http.Request(
-      'POST',
-      Uri.parse('https://jdapi.youthadda.co/acceptreject'),
-    );
 
-    request.body = json.encode({
-      "bookingId": "680883961c5342a65525df76",
-      "accept": "no",
-    });
-
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      String result = await response.stream.bytesToString();
-      print(result);
-      Get.to(CancelBookingView());
-    //  Get.snackbar("Success", "Booking rejected");
-    } else {
-      print(response.reasonPhrase);
-    //  Get.snackbar("Error", "Something went wrong");
-    }
-  }
 var bookings = <BookingModel>[].obs;
   final count = 0.obs;
   @override

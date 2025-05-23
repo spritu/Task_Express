@@ -109,7 +109,6 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                                       fontFamily: "Poppins",
                                     ),
                                   ),
-
                                   Obx(
                                         () => FlutterSwitch(
                                       width: 53.0,

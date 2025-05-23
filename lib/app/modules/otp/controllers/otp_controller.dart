@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-
 import '../../bottom/views/bottom_view.dart';
 import '../../home/views/home_view.dart';
 import '../../signUp/views/sign_up_view.dart';
@@ -25,7 +24,6 @@ class OtpController extends GetxController {
   final pinCodeController = TextEditingController();
   final stateController = TextEditingController();
   final referralCodeController = TextEditingController();
-
   final genderValue = ''.obs;
   final profileImageUrl = ''.obs;
 
@@ -67,19 +65,17 @@ class OtpController extends GetxController {
       FocusScope.of(Get.context!).previousFocus();
     }
   }
-
+  var imagePath = ''.obs;
 
   Future<void> verifyOtp(String otp) async {
     if (otp.isEmpty || otp.length != 4) {
-    //  Get.snackbar("Error", "Please enter a valid 4-digit OTP", colorText: Colors.red);
       return;
     }
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? mobileNumber = prefs.getString('mobileNumber');
 
     if (mobileNumber == null || mobileNumber.isEmpty) {
-     // Get.snackbar("Error", "Mobile number not found. Please try again.", colorText: Colors.red);
+
       return;
     }
 
@@ -93,7 +89,11 @@ class OtpController extends GetxController {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
-
+        String? image = prefs.getString('image');
+        if (image != null && !image.startsWith('http')) {
+          image = 'https://jdapi.youthadda.co/$image';
+        }
+        imagePath.value = image ?? '';
 
         final userId2 = responseData['id'] ?? '';
                await prefs.setString('userId', userId2.toString()); // ✅ Save it properly
@@ -101,7 +101,7 @@ class OtpController extends GetxController {
         final userId = responseData['id'];
         final userType = responseData['userType'] ?? 0;
         final userData = responseData['userData'];
-
+        print("🖼️ Saved Image URL: $image");
         otpController.clear();
 
         if (token != null && token.isNotEmpty) {
@@ -109,6 +109,9 @@ class OtpController extends GetxController {
           await prefs.setString('token', token);
           await prefs.setString('userId', userId);
           await prefs.setInt('userType', userType);
+          await prefs.setString('image', image?.toString() ?? '');
+          print("📦 Stored Image in SharedPreferences: ${prefs.getString('image')}");
+
           await prefs.setString('mobile', userData?['phone'] ?? '');
 
           final email = userData?['email'] ?? '';

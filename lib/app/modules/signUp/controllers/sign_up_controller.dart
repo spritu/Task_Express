@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -76,7 +77,7 @@ class SignUpController extends GetxController {
         city.value.isEmpty ||
         pinCode.value.isEmpty ||
         state.value.isEmpty) {
-      Get.snackbar('Error', 'Please fill in all required fields');
+     // Get.snackbar('Error', 'Please fill in all required fields');
       return false;
     }
     return true;
@@ -103,13 +104,13 @@ class SignUpController extends GetxController {
     String? userId2 = prefs.getString('userId');
 
     if (userId2 == null || userId2.isEmpty) {
-      Get.snackbar('Error', 'User ID not found. Please verify OTP again.');
+     // Get.snackbar('Error', 'User ID not found. Please verify OTP again.');
       return;
     }
 
     // ✅ Validate required fields (optional check)
     if (firstName.value.isEmpty || lastName.value.isEmpty || gender.value.isEmpty || dateOfBirth.value.isEmpty || email.value.isEmpty) {
-      Get.snackbar('Error', 'Please fill all the fields');
+    //  Get.snackbar('Error', 'Please fill all the fields');
       return;
     }
 
@@ -174,20 +175,20 @@ class SignUpController extends GetxController {
           Get.delete<EditProfileController>();
           Get.put(EditProfileController());
 
-          Get.snackbar('Success', 'Registration Successful');
+        //  Get.snackbar('Success', 'Registration Successful');
           clearFields();
           Get.to(() => LocationView());
         } else {
           print("❗ Missing 'data' in response");
-          Get.snackbar('Error', 'Invalid response from server.');
+        //  Get.snackbar('Error', 'Invalid response from server.');
         }
       } else {
         print('❌ Server Error (${response.statusCode}): $resBody');
-        Get.snackbar('Error', 'Server Error: ${response.statusCode}');
+       // Get.snackbar('Error', 'Server Error: ${response.statusCode}');
       }
     } catch (e) {
       print('❌ Exception: $e');
-      Get.snackbar('Error', 'Something went wrong. Try again later.');
+     // Get.snackbar('Error', 'Something went wrong. Try again later.');
     }
   }
 

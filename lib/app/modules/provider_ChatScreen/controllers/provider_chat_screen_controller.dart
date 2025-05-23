@@ -50,16 +50,16 @@ class ProviderChatScreenController extends GetxController {
 
   Future<void> fetchLastMessages() async {
     final prefs = await SharedPreferences.getInstance();
-    final userId3 = prefs.getString('userId3');
-    print("📌 userIdpro: $userId3");
+    final userId = prefs.getString('userId');
+    print("📌 userIdpro: $userId");
 
-    if (userId3 == null || userId3.isEmpty) {
+    if (userId == null || userId.isEmpty) {
       print("❌ userId not found in SharedPreferences.");
       return;
     }
 
     final url = Uri.parse(
-      'https://jdapi.youthadda.co/conversationlastmessages?userId=$userId3',
+      'https://jdapi.youthadda.co/conversationlastmessages?userId=$userId',
     );
 
     try {

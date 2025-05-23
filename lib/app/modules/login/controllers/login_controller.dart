@@ -20,7 +20,7 @@ class LoginController extends GetxController {
     final phone = mobileController.text.trim();
 
     if (phone.isEmpty || phone.length != 10) {
-      Get.snackbar("Error", "Please enter a valid 10-digit mobile number");
+      Get.snackbar("", "Please enter a valid 10-digit mobile number");
       return;
     }
 
@@ -49,12 +49,12 @@ class LoginController extends GetxController {
 
         /// 🛑 If already registered
         if (message.contains("already") || message.contains("exist")) {
-          Get.snackbar(
-            "Already Registered",
-            "This number is already registered. Please login.",
-            backgroundColor: Colors.red.shade100,
-            colorText: Colors.black,
-          );
+          // Get.snackbar(
+          //   "Already Registered",
+          //   "This number is already registered. Please login.",
+          //   backgroundColor: Colors.red.shade100,
+          //   colorText: Colors.black,
+          // );
           return;
         }
 
@@ -69,7 +69,6 @@ class LoginController extends GetxController {
         authController.isLoggedIn.value = true;
 
         mobileController.clear();
-
         // ✅ Show OTP in snackbar
         if (otp.isNotEmpty) {
           Get.snackbar(
@@ -81,21 +80,17 @@ class LoginController extends GetxController {
             snackPosition: SnackPosition.BOTTOM,
           );
         }
-
         // ✅ Only navigate if not already registered
         Get.to(() => OtpView());
       } else {
         print("❌ Failed to send OTP: ${response.reasonPhrase}");
-        Get.snackbar("Error", "Failed to send OTP: ${response.reasonPhrase}");
+      //  Get.snackbar("Error", "Failed to send OTP: ${response.reasonPhrase}");
       }
     } catch (e) {
       print("❌ Exception: $e");
-      Get.snackbar("Error", "Exception occurred while sending OTP");
+   //   Get.snackbar("Error", "Exception occurred while sending OTP");
     }
   }
-
-
-
 
   void openTerms() {
     print('Terms & Conditions clicked');
@@ -150,7 +145,7 @@ class LoginController extends GetxController {
   @override
   void onClose() {
     super.onClose();
-    mobileController.dispose(); // controller dispose karna zaroori hai
+   mobileController.dispose();
   }
 
   void increment() => count.value++;

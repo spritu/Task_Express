@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../provider_account/controllers/provider_account_controller.dart';
 import '../../provider_location/views/provider_location_view.dart';
+import 'package:http_parser/http_parser.dart';
 
 class ProviderProfileController extends GetxController {
   //TODO: Implement ProviderProfileController
@@ -85,16 +87,16 @@ class ProviderProfileController extends GetxController {
           //filterSubCategories(); // Optional if you're filtering
           print("✅ Subcategories loaded: ${subCategories.length}");
         } else {
-          Get.snackbar("", "No subcategories found for this category");
+         // Get.snackbar("", "No subcategories found for this category");
         }
       } else {
-        Get.snackbar(
-          "",
-          response.reasonPhrase ?? "Failed to load subcategories",
-        );
+        // Get.snackbar(
+        //   "",
+        //   response.reasonPhrase ?? "Failed to load subcategories",
+        // );
       }
     } catch (e) {
-      Get.snackbar("", e.toString());
+   //   Get.snackbar("", e.toString());
     }
   }
 
@@ -281,10 +283,10 @@ class ProviderProfileController extends GetxController {
         state.value.isEmpty ||
         selectedProfession.value.isEmpty ||
         selectedCategoryId.value.isEmpty) {
-      Get.snackbar(
-        '',
-        'Please fill in all required fields including Profession, Category, and Subcategory',
-      );
+      // Get.snackbar(
+      //   '',
+      //   'Please fill in all required fields including Profession, Category, and Subcategory',
+      // );
       return false;
     }
     return true;
@@ -310,7 +312,7 @@ class ProviderProfileController extends GetxController {
     String? userId = prefs.getString('userId');
 
     if (userId == null || userId.isEmpty) {
-      Get.snackbar('Error', 'User ID not found. Please verify OTP again.');
+     // Get.snackbar('Error', 'User ID not found. Please verify OTP again.');
       return;
     }
     mobileNumber = prefs.getString('mobileNumber');
@@ -383,20 +385,24 @@ class ProviderProfileController extends GetxController {
       File imageFile = File(imagePath.value);
 
       if (await imageFile.exists()) {
+        print('✅ Image file exists: ${imagePath.value}');
         request.files.add(
-          await http.MultipartFile.fromPath('Img', imagePath.value),
+          await http.MultipartFile.fromPath(
+            'Img', // Make sure this field name is what your backend expects
+            imagePath.value,
+            contentType: MediaType('image', 'jpeg'), // or 'png' if needed
+          ),
         );
 
         final bytes = await imageFile.readAsBytes();
         final base64Image = base64Encode(bytes);
-
         await prefs.setString('userImgBase64', base64Image);
         await prefs.setString('userImg', imagePath.value);
-        print('✅ Image saved to SharedPreferences');
       } else {
-        print('❗ Image file not found: ${imagePath.value}');
+        print('❗ File not found at path: ${imagePath.value}');
       }
     }
+
 
     try {
       final streamed = await request.send();
@@ -409,7 +415,7 @@ class ProviderProfileController extends GetxController {
         print('✅ JSON Response: $jsonRes');
 
         final message = jsonRes['msg'] ?? 'Service provider registered';
-        Get.snackbar('Success', message);
+       // Get.snackbar('Success', message);
 
         // 🔸 Save required data to SharedPreferences
         await prefs.setString('categoryId', selectedCategoryId.value);
@@ -427,12 +433,18 @@ class ProviderProfileController extends GetxController {
         await prefs.setString('referralCode', referralCode.value);
         await prefs.setString('aadharNo', aadharNo.text);
         await prefs.setString('charge', chargesController.text);
+         // final box = GetStorage();
+         // box.write('isLoggedIn2', true);
+        //await prefs.reload();
+        final box = GetStorage();
+        box.write('isLoggedIn2', true); // ✅ ONLY THIS
+        box.remove('isLoggedIn');       // ❌ Remove old login flag if set
 
-        await prefs.reload();
 
-        final accountController = Get.find<ProviderAccountController>();
-        await accountController.loadUserInfo();
-        await accountController.loadMobileNumber();
+        prefs.remove('userId2');
+        // final ProviderAccountController = Get.find<ProviderAccountController>();
+        // await accountController.loadUserInfo();
+        // await accountController.loadMobileNumber();
 
         clearFields();
         Get.to(() => ProviderLocationView());
@@ -440,14 +452,14 @@ class ProviderProfileController extends GetxController {
         print('❌ ${streamed.statusCode}: $body');
         try {
           final error = json.decode(body);
-          Get.snackbar('Error', error['msg'] ?? 'Something went wrong.');
+       //   Get.snackbar('Error', error['msg'] ?? 'Something went wrong.');
         } catch (_) {
-          Get.snackbar('Error', 'Server returned ${streamed.statusCode}');
+       //   Get.snackbar('Error', 'Server returned ${streamed.statusCode}');
         }
       }
     } catch (e) {
       print('❗ Exception: $e');
-      Get.snackbar('Error', 'Could not register. Check your internet connection.');
+    //  Get.snackbar('Error', 'Could not register. Check your internet connection.');
     }
   }
 

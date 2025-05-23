@@ -10,6 +10,7 @@ class EditProfileView extends GetView<EditProfileController> {
 
   @override
   Widget build(BuildContext context) {
+    final EditProfileController controller = Get.put(EditProfileController());
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(

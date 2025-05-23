@@ -10,8 +10,11 @@ import '../controllers/chat_screen_controller.dart';
 class ChatScreenView extends GetView<ChatScreenController> {
   const ChatScreenView({super.key});
 
+
+
   @override
   Widget build(BuildContext context) {
+    final ChatScreenController controller = Get.put(ChatScreenController());
     return WillPopScope(
       onWillPop: () async {
         Get.find<BottomController>().selectedIndex.value = 0; // 👈 Home tab

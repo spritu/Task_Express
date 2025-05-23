@@ -378,7 +378,6 @@ class HomeController extends GetxController {
                       ),
                     ),
                     const SizedBox(height: 20),
-
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text(

@@ -16,6 +16,8 @@ class AccountView extends GetView<AccountController> {
 
   @override
   Widget build(BuildContext context) {
+    final AccountController controller = Get.put(AccountController());
+
     return WillPopScope(
       onWillPop: () async {
         Get.find<BottomController>().selectedIndex.value = 0;
@@ -55,13 +57,20 @@ class AccountView extends GetView<AccountController> {
                           padding: EdgeInsets.all(8.0),
                           child: Row(
                             children: [
-                              Obx(() => CircleAvatar(
-                                radius: 40,
-                                backgroundImage: controller.imagePath.value.isNotEmpty
-                                    ? FileImage(File(controller.imagePath.value)) as ImageProvider
-                                    : AssetImage('assets/images/account.png'),
-                              )),
-                              Padding(
+                              Obx(() {
+                        final imageUrl = controller.imagePath.value;
+                        return CircleAvatar(
+                        radius: 40,
+                        backgroundImage: imageUrl.isNotEmpty
+                        ? NetworkImage(imageUrl)
+                            : const AssetImage('assets/images/account.png') as ImageProvider,
+                        onBackgroundImageError: (_, __) {
+                        print("❌ Image failed to load.");
+                        },
+                        );
+                        }),
+
+                        Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8.0,
                                   vertical: 10,

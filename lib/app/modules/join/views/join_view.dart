@@ -22,8 +22,7 @@ class JoinView extends GetView<JoinController> {
               Colors.white,
             ],
           ),),
-          //margin: EdgeInsets.only(left: 16, right: 16),
-          // alignment: Alignment.center,
+
           child: Padding(
             padding: const EdgeInsets.only(left: 16,right: 16),
             child: Column(

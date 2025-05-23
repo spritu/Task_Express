@@ -15,9 +15,10 @@ class BottomView extends GetView<BottomController> {
 
   @override
   Widget build(BuildContext context) {
+    final BottomController controller = Get.put(BottomController());
+
     return Scaffold(
       body: Obx(() {
-        // Controller's reactive variables se values lo
         return _buildBody(
           controller.selectedIndex.value,
           controller.showRequestPending.value,
@@ -52,22 +53,10 @@ Widget _buildBody(int index, bool showRequestPending, String helperName) {
     case 0:
       return const HomeView();
     case 1:
-      return Stack(
-        children: [
-          const BookingView(),
-          if (showRequestPending)
-            Container(
-              color: Colors.black.withOpacity(0.6),
-              child: Center(
-                child: RequestPendingBottomCard(helperName: helperName),
-              ),
-            ),
-        ],
-      );
-    case 2:
+      return BookingView();
+      case 2:
       return const SettingView();
     case 3:
-
       chatScreenController.fetchLastMessages();
       return   ChatScreenView();
     case 4:

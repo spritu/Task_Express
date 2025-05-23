@@ -75,11 +75,11 @@ class ProviderLoginController extends GetxController {
         Get.to(() => ProviderOtpView());
       } else {
         print("❌ Failed to send OTP: ${response.reasonPhrase}");
-        Get.snackbar("Error", "Failed to send OTP: ${response.reasonPhrase}");
+       // Get.snackbar("Error", "Failed to send OTP: ${response.reasonPhrase}");
       }
     } catch (e) {
       print("❌ Exception: $e");
-      Get.snackbar("Error", "Something went wrong: $e");
+    //  Get.snackbar("Error", "Something went wrong: $e");
     }
   }
 

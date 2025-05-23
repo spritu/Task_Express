@@ -249,9 +249,6 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
     }
   }
 
-
-
-
   // Make phone call and mark to show sheet after call ends
   void makePhoneCall(String phoneNumber) async {
     final Uri callUri = Uri(scheme: 'tel', path: phoneNumber);
@@ -259,7 +256,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
       shouldShowSheetAfterCall = true;
       await launchUrl(callUri);
     } else {
-      Get.snackbar('Error', 'Could not launch phone call');
+   //   Get.snackbar('Error', 'Could not launch phone call');
     }
   }
 
@@ -274,7 +271,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
       String? userId2 = prefs.getString('userId'); // ✅ This should not be null
 
       if (userId2 == null) {
-        Get.snackbar("Error", "User ID not found in local storage.");
+      //  Get.snackbar("Error", "User ID not found in local storage.");
         return;
       }
 
@@ -314,11 +311,11 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
 
         Get.to(() => BottomView());
       } else {
-        Get.snackbar('Booking Failed', 'Please try again later.');
+   //     Get.snackbar('Booking Failed', 'Please try again later.');
       }
     } catch (e) {
       print("❌ Exception in booking: $e");
-      Get.snackbar('Error', 'Something went wrong: $e');
+  //    Get.snackbar('Error', 'Something went wrong: $e');
     }
   }
 
