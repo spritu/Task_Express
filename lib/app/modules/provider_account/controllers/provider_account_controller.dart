@@ -13,7 +13,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   var firstName = ''.obs;
   var lastName = ''.obs;
   var mobileNumber = ''.obs;
-
+  RxString userId = ''.obs;
 
   var selectedProfessionName = ''.obs;
   var selectedCategoryName = ''.obs;
@@ -24,7 +24,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   var serviceCards = <ServiceModel>[].obs;
   var isEditingCharge = false.obs;
   RxList<CategoryModel> filteredCategories = <CategoryModel>[].obs;
-  String userId = '';
+
   Future<void> loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? profileImage = prefs.getString('profileImage');
@@ -150,7 +150,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
 
   Future<void> loadUserInfo1() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    userId= prefs.getString('userId') ?? '';
+    userId.value = prefs.getString('userId') ?? '';
     selectedProfessionName.value = prefs.getString('profession') ?? '';
     selectedCategoryName.value = prefs.getString('category') ?? '';
     selectedSubCategoryName.value = prefs.getString('subcategory') ?? '';

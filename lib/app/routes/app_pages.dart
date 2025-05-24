@@ -44,6 +44,8 @@ import '../modules/chat/bindings/chat_binding.dart';
 import '../modules/chat/views/chat_view.dart';
 import '../modules/chat_screen/bindings/chat_screen_binding.dart';
 import '../modules/chat_screen/views/chat_screen_view.dart';
+import '../modules/completejob/bindings/completejob_binding.dart';
+import '../modules/completejob/views/completejob_view.dart';
 import '../modules/edit_profile/bindings/edit_profile_binding.dart';
 import '../modules/edit_profile/views/edit_profile_view.dart';
 import '../modules/helper_profile/bindings/helper_profile_binding.dart';
@@ -250,7 +252,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.EDIT_PROFILE,
-      page: () => const EditProfileView(),
+      page: () =>  EditProfileView(),
       binding: EditProfileBinding(),
     ),
     GetPage(
@@ -408,6 +410,11 @@ class AppPages {
       name: _Paths.SERVICEPRO,
       page: () => const ServiceproView(),
       binding: ServiceproBinding(),
+    ),
+    GetPage(
+      name: _Paths.COMPLETEJOB,
+      page: () => const CompletejobView(),
+      binding: CompletejobBinding(),
     ),
   ];
 }

@@ -13,19 +13,15 @@ class ProviderEditProfileView extends GetView<ProviderEditProfileController> {
   Widget build(BuildContext context) {
     final ProviderEditProfileController controller = Get.put(ProviderEditProfileController());
     return Scaffold(
-      //  appBar: AppBar(title: Text("Profile")),
       body: SingleChildScrollView(
         child: Container(
-          height: MediaQuery
-              .of(context)
-              .size
-              .height,
+          height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(gradient: AppColors.appGradient2),
           child: Padding(
-            padding: const EdgeInsets.only(left: 12, right: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Column(
               children: [
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -33,109 +29,72 @@ class ProviderEditProfileView extends GetView<ProviderEditProfileController> {
                       icon: const Icon(Icons.arrow_back),
                       onPressed: () => Get.back(),
                     ),
-        
-                    const Text(
-                      "Profile",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                        fontFamily: "poppins",
-                      ),
-                    ),
-                    Text("     "),
+                    const Text("Profile",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                            fontFamily: "poppins")),
+                    const SizedBox(width: 48),
                   ],
                 ),
-                Obx(() => Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 45,
-                      backgroundColor: Colors.white,
-                      backgroundImage: controller.imagePath.value.isNotEmpty
-                          ? FileImage(File(controller.imagePath.value))
-                          : null,
-                      child: controller.imagePath.value.isEmpty
-                          ? const Icon(Icons.person, size: 60, color: Colors.grey)
-                          : null,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: InkWell(
-                        onTap: () => _showImagePicker(context, controller),
-                        child: Image.asset("assets/images/edit1.png"),
-                      ),
-                    ),
-                  ],
-                )),
-                SizedBox(height: 20),
-                Card(
-                  color: AppColors.white,
-                  child: Column(
+
+                Obx(() {
+                  final imagePath = controller.imagePath.value;
+                  return Stack(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 8),
-                        child: _buildEditableField(
-                          "Full Name",
-                          controller.nameController,
-                          controller.isEditingName,
-                              () {
-                            controller.isEditingName = controller.isEditingName;
-                          },
-                        ),
-                      ), Divider(thickness: 1),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 8),
-                        child: _buildEditableField(
-                          "Gender",
-                          controller.genderController,
-                          controller.isEditingGender,
-                              () {
-                            controller.isEditingGender =
-                                controller.isEditingGender;
-                          },
-                        ),
-                      ), Divider(thickness: 1),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 8),
-                        child: _buildEditableField(
-                          "Date Of Birth",
-                          controller.dobController,
-                          controller.isEditingDOB,
-                              () {
-                            controller.isEditingDOB = controller.isEditingDOB;
-                          },
-                        ),
-                      ), Divider(thickness: 1),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 8),
-                        child: _buildEditableField(
-                          "Email",
-                          controller.emailController,
-                          controller.isEditingEmail,
-                              () {
-                            controller.isEditingEmail = controller.isEditingEmail;
-                          },
+                      CircleAvatar(
+                        radius: 45,
+                        backgroundColor: Colors.white,
+                        backgroundImage: imagePath.isNotEmpty
+                            ? (imagePath.startsWith("http")
+                            ? NetworkImage(imagePath)
+                            : FileImage(File(imagePath)) as ImageProvider)
+                            : null,
+                        child: imagePath.isEmpty
+                            ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                            : null,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: InkWell(
+                          onTap: () => _showImagePicker(context, controller),
+                          child: Image.asset("assets/images/edit1.png", width: 30),
                         ),
                       ),
                     ],
+                  );
+                }),
+
+                const SizedBox(height: 20),
+
+                Card(
+                  color: AppColors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        _buildEditableField("Full Name", controller.nameController, controller),
+                        _buildEditableField("Gender", controller.genderController, controller),
+                        _buildEditableField("Date Of Birth", controller.dobController, controller),
+                        _buildEditableField("Email", controller.emailController, controller),
+                      ],
+                    ),
                   ),
                 ),
-        
-                SizedBox(height: MediaQuery
-                    .of(context)
-                    .size
-                    .height * 0.2),
+
+                const SizedBox(height: 40),
+
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.orage,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 80, vertical: 14),
+                    padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 14),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8), // 👈 8 radius
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   onPressed: () {
-                    // Save logic
+                    controller.updateUser();
                   },
                   child: const Text(
                     "Save",
@@ -147,7 +106,6 @@ class ProviderEditProfileView extends GetView<ProviderEditProfileController> {
                     ),
                   ),
                 ),
-        
               ],
             ),
           ),
@@ -156,10 +114,8 @@ class ProviderEditProfileView extends GetView<ProviderEditProfileController> {
     );
   }
 
-  Widget _buildEditableField(String label,
-      TextEditingController controller,
-      bool isEditing,
-      VoidCallback onEditPressed,) {
+  Widget _buildEditableField(
+      String label, TextEditingController textController, ProviderEditProfileController controller) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 5),
       child: Row(
@@ -167,44 +123,28 @@ class ProviderEditProfileView extends GetView<ProviderEditProfileController> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
+            child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
           ),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                controller.text,
-                style: const TextStyle(color: Colors.grey),
-              ),
+              Text(textController.text, style: const TextStyle(color: Colors.grey)),
               IconButton(
                 onPressed: () async {
                   final result = await showDialog<String>(
                     context: Get.context!,
                     builder: (context) {
-                      final TextEditingController tempController =
-                      TextEditingController(text: controller.text);
-
+                      final tempController = TextEditingController(text: textController.text);
                       return AlertDialog(
                         title: Text("Edit $label"),
                         content: TextField(
                           controller: tempController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                          ),
+                          decoration: const InputDecoration(border: OutlineInputBorder()),
                         ),
                         actions: [
+                          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
                           TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text("Cancel"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(
-                                  context, tempController.text.trim());
-                            },
+                            onPressed: () => Get.back(result: tempController.text.trim()),
                             child: const Text("Save"),
                           ),
                         ],
@@ -213,7 +153,8 @@ class ProviderEditProfileView extends GetView<ProviderEditProfileController> {
                   );
 
                   if (result != null && result.isNotEmpty) {
-                    controller.text = result;
+                    textController.text = result;
+                    controller.update();
                   }
                 },
                 icon: const Icon(Icons.edit, size: 18),

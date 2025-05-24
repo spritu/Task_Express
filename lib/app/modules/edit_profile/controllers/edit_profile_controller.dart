@@ -1,50 +1,44 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../account/controllers/account_controller.dart';
 
 class EditProfileController extends GetxController {
-  bool isEditingName = false;
-  bool isEditingGender = false;
-  bool isEditingDOB = false;
-  bool isEditingEmail = false;
-
-  final RxString firstName = ''.obs;
-  final RxString lastName = ''.obs;
+  RxString imagePath = ''.obs;
+  final ImagePicker _picker = ImagePicker();
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController genderController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  var imagePath = ''.obs;
-  //final RxString imagePath = ''.obs;
-  final ImagePicker _picker = ImagePicker();
-  Future<void> _loadUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? storedImage = prefs.getString('image') ?? '';
-    String? image = prefs.getString('image');
+  var userData = {}.obs;
 
-// If it's just the file name and needs to be combined with base URL
-    if (image != null && !image.startsWith('http')) {
-      image = 'https://jdapi.youthadda.co/$image';
-    }
-
-    imagePath.value = image ?? '';
-    await prefs.setString('image', imagePath.value); // ✅ Safe fallback
-  }
   @override
   void onInit() {
-    super.onInit();_loadUserData();
-    loadUserInfo(); // Fetch data when controller initializes
+    super.onInit();
+    loadUserInfo();getUserData();
   }
 
-  // Load user data from SharedPreferences
+  void toggleEdit(RxBool fieldEditable) {
+    fieldEditable.value = !fieldEditable.value;
+  }
+  void getUserData() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? userJson = prefs.getString('userData');
+  if (userJson != null) {
+  Map<String, dynamic> userMap = jsonDecode(userJson);
+  userData.value = userMap;
+
+  nameController.text = userMap['name'] ?? '';
+  genderController.text = userMap['gender'] ?? '';
+  dobController.text = userMap['dob'] ?? '';
+  emailController.text = userMap['email'] ?? '';
+  }
+  }
   Future<void> loadUserInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -55,34 +49,34 @@ class EditProfileController extends GetxController {
     final String? email = prefs.getString('email');
     final String? image = prefs.getString('userImg');
 
-    nameController.text = '${firstName ?? ''} ${lastName ?? ''}';
+    nameController.text = '${firstName ?? ''} ${lastName ?? ''}'.trim();
     genderController.text = gender ?? '';
     dobController.text = dob ?? '';
     emailController.text = email ?? '';
 
-    // Set image if available
     if (image != null && image.isNotEmpty) {
-      imagePath.value = image;
+      imagePath.value = image.startsWith("http")
+          ? image
+          : 'https://jdapi.youthadda.co/$image';
     }
-    update(); // Update UI if necessary
+
+    update();
   }
 
-  // Get image from camera or gallery
   Future<void> getImage(ImageSource source) async {
     final XFile? image = await _picker.pickImage(source: source);
     if (image != null) {
       imagePath.value = image.path;
-      update(); // Update UI after image selection
+      update();
     }
   }
 
-  // Update user data
   Future<void> updateUser() async {
     final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId'); // Get stored ID from registration
+    final userId = prefs.getString('userId');
 
     if (userId == null) {
-    //  Get.snackbar("Error", "User ID not found. Please log in again.");
+      Get.snackbar("Error", "User ID not found. Please log in again.");
       return;
     }
 
@@ -91,46 +85,77 @@ class EditProfileController extends GetxController {
       Uri.parse('https://jdapi.youthadda.co/user/updateUser'),
     );
 
-    // Fields
+    final firstName = nameController.text.split(" ").first;
+    final lastName = nameController.text.split(" ").length > 1
+        ? nameController.text.split(" ").sublist(1).join(" ")
+        : "";
+
     request.fields.addAll({
       "_id": userId,
-      "firstName": nameController.text.split(" ").first,
-      "lastName": nameController.text.split(" ").length > 1
-          ? nameController.text.split(" ").sublist(1).join(" ")
-          : "",
+      "firstName": firstName,
+      "lastName": lastName,
       "email": emailController.text,
       "gender": genderController.text,
       "dob": dobController.text,
     });
 
-    // Optional image file
-    if (imagePath.value.isNotEmpty) {
+    if (imagePath.value.isNotEmpty && !imagePath.value.startsWith("http")) {
       request.files.add(await http.MultipartFile.fromPath('userImg', imagePath.value));
     }
 
     try {
       http.StreamedResponse response = await request.send();
       final responseBody = await response.stream.bytesToString();
-
-      print("🔁 Response Status: ${response.statusCode}");
-      print("🔁 Raw Response Body: $responseBody");
-
       final responseJson = jsonDecode(responseBody);
 
       if (response.statusCode == 200 && responseJson['code'] == 200) {
-      //  Get.snackbar("Success", responseJson['msg'] ?? "Profile updated successfully");
+        // Save updated data into SharedPreferences immediately
+        await prefs.setString('firstName', firstName);
+        await prefs.setString('lastName', lastName);
+        await prefs.setString('email', emailController.text);
+        await prefs.setString('gender', genderController.text);
+        await prefs.setString('dob', dobController.text);
 
+        if (imagePath.value.isNotEmpty) {
+          if (imagePath.value.startsWith("http")) {
+            await prefs.setString('userImg', imagePath.value);
+          } else {
+            // For local path, you might want to upload first or handle differently.
+            // Here just save the local path temporarily.
+            await prefs.setString('userImg', imagePath.value);
+          }
+        }
+
+        // Update userData observable for immediate UI refresh
+        userData.value = {
+          "firstName": firstName,
+          "lastName": lastName,
+          "email": emailController.text,
+          "gender": genderController.text,
+          "dob": dobController.text,
+          "userImg": prefs.getString('userImg') ?? '',
+        };
+
+        // Update controllers (optional, but useful if server might change data)
+        nameController.text = "$firstName $lastName".trim();
+        genderController.text = genderController.text;
+        dobController.text = dobController.text;
+        emailController.text = emailController.text;
+
+        update(); // refresh UI
+
+        // Also update AccountController's info to keep app consistent
         final accountController = Get.find<AccountController>();
         await accountController.loadUserInfo();
         await accountController.loadMobileNumber();
+
+        Get.snackbar("Success", responseJson['msg'] ?? "Profile updated successfully");
       } else {
-        print("❌ Error from API: ${responseJson['msg']}");
-       // Get.snackbar("Error", responseJson['msg'] ?? "Failed to update profile");
+        Get.snackbar("Error", responseJson['msg'] ?? "Failed to update profile");
       }
     } catch (e) {
-      print("❌ Exception caught: $e");
-     // Get.snackbar("Error", "Something went wrong. Please try again.");
+      Get.snackbar("Error", "Something went wrong. Please try again.");
     }
-
   }
+
 }

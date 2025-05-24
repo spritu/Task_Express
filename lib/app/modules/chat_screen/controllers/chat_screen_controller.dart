@@ -1,8 +1,12 @@
 import 'dart:convert';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:uuid/uuid.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class ChatItem {
   final String message;
@@ -18,7 +22,7 @@ class ChatItem {
     required this.firstName,
     required this.lastName,
     required this.profilePic,
-    required this.reciverId
+    required this.reciverId,
   });
 }
 
@@ -26,12 +30,17 @@ class ChatScreenController extends GetxController {
   // List of chat items
   RxList<ChatItem> chats = <ChatItem>[].obs;
 
-  final count = 0.obs;
+  final RxList<types.Message> messages = <types.Message>[].obs;
+  final Rxn<types.User> user = Rxn<types.User>();
+  late IO.Socket socket;
+  RxString userId = ''.obs;
+  final player = AudioPlayer();
 
   @override
   void onInit() {
     super.onInit();
     fetchLastMessages();
+    connectSocket();
   }
 
   @override
@@ -43,8 +52,6 @@ class ChatScreenController extends GetxController {
   void onClose() {
     super.onClose();
   }
-
-
 
   Future<void> fetchLastMessages() async {
     final prefs = await SharedPreferences.getInstance();
@@ -101,6 +108,65 @@ class ChatScreenController extends GetxController {
       print("⚠️ Exception: $e");
     }
   }
+
+
+
+  void playNotificationSound() async {
+    await player.setVolume(1.0); // Ensure full volume
+    await player.play(AssetSource('assets/sounds/sms.mp3'));
+  }
+
+  void connectSocket() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    if (userId == null) return;
+    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+      'auth': {
+        'user': {'_id': userId, 'firstName': 'plumber naman'},
+      },
+    });
+    print('1234:${userId}');
+    socket.connect();
+
+    socket.onConnect((_) {
+      print('✅ Connected to socket contacts list');
+    });
+
+    socket.onDisconnect((_) {
+      print('❌ Disconnected from socket');
+    });
+
+    socket.onConnectError((err) {
+      print('🚫 Connect Error: $err');
+    });
+
+    socket.onError((err) {
+      print('🔥 Socket Error: $err');
+    });
+
+    socket.on('message', (data) {
+      final ChatScreenController chatScreenController = Get.put(
+        ChatScreenController(),
+      );
+      chatScreenController.fetchLastMessages();
+      //fetchChatHistory();
+      print('📩 Received message: $data');
+
+      playNotificationSound();
+
+      final msg = types.TextMessage(
+        id: data['_id'] ?? const Uuid().v4(),
+        text: data['message'] ?? '',
+        author: types.User(id: data['senderId']),
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      messages.insert(0, msg);
+    });
+  }
+
   String formatTimestamp(String isoString) {
     try {
       final dateTime = DateTime.parse(isoString).toLocal();
@@ -110,5 +176,4 @@ class ChatScreenController extends GetxController {
       return 'Invalid time';
     }
   }
-
 }

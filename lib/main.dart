@@ -74,7 +74,7 @@ void main() async {
   Get.put(RoadConstructionHelperController(),permanent: true);
   Get.put(ProfessionalPlumberController(),permanent: true);
   Get.put(SettingController(),permanent: true);
-  Get.put(EditProfileController(),permanent: true);
+ // Get.put(EditProfileController(),permanent: true);
   Get.put(JobsController(),permanent: true);
   Get.lazyPut(() => ChatController(),fenix: true);
   Get.put(ProviderSettingController(),permanent: true);

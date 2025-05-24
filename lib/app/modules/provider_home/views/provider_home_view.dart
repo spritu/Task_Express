@@ -1633,6 +1633,8 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                       );
                                                       controller
                                                           .fetchCurrentBooking();
+
+                                                      controller.connectSocketReject();
                                                     },
                                                     onCancel: () {
                                                       Get.back(); // Just close dialog
@@ -1685,7 +1687,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                         acceptStatus: "yes",
                                                       );
                                                       controller
-                                                          .fetchCurrentBooking();
+                                                          .fetchCurrentBooking();controller.connectSocketAccept();
                                                     },
                                                     onCancel: () {
                                                       Get.back(); // Just close the dialog

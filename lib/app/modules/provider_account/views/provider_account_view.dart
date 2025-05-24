@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../colors.dart';
 import '../../Bottom2/controllers/bottom2_controller.dart';
@@ -242,11 +244,47 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       InkWell(
-                                        onTap: () {
-                                          controller.serviceCards.removeAt(index);
-                                          controller.serviceCards.refresh();
-                                        },
-                                        child: Container(
+                                      onTap: () async {
+                          final selectedCat = categories.firstWhereOrNull((cat) => cat.label == model.category);
+                          final selectedSub = selectedCat?.subcategories.firstWhereOrNull((sub) => sub.name == model.subcategory);
+                          final userId = controller.userId.value;
+
+                          if (selectedCat != null && selectedSub != null && userId.isNotEmpty) {
+                          try {
+                          var headers = {'Content-Type': 'application/json'};
+                          var request = http.Request(
+                          'POST',
+                          Uri.parse('https://jdapi.youthadda.co/user/deleteuserskill'),
+                          );
+
+                          request.body = json.encode({
+                          "userId": userId,
+                          "categoryId": selectedCat.id,
+                          "sucategoryId": selectedSub.id,
+                          });
+
+                          request.headers.addAll(headers);
+                          http.StreamedResponse response = await request.send();
+
+                          if (response.statusCode == 200) {
+                          // Remove from UI after successful delete
+                          controller.serviceCards.removeAt(index);
+                          controller.serviceCards.refresh();
+                          print(await response.stream.bytesToString());
+                          } else {
+                          print("Delete failed: ${response.reasonPhrase}");
+                          Get.snackbar("Error", "Skill delete failed: ${response.reasonPhrase}");
+                          }
+                          } catch (e) {
+                          print("Delete error: $e");
+                          Get.snackbar("Error", "Something went wrong while deleting skill.");
+                          }
+                          } else {
+                          Get.snackbar("Error", "Invalid category or subcategory data.");
+                          }
+                          },
+
+                            child: Container(
                                           height: 21,
                                           width: 57,
                                           decoration: BoxDecoration(
@@ -313,7 +351,7 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                               final selectedCat = categories.firstWhereOrNull((c) => c.label == value);
                                               if (selectedCat != null && selectedCat.subcategories.isNotEmpty) {
                                                 await controller.updateSkill(
-                                                  userId: "681ee71724d24a6606d13eda",
+                                                  userId: controller.userId.value,
                                                   categoryId: selectedCat.id ?? '',
                                                   subcategoryId: selectedCat.subcategories.first.id ?? '',
                                                   charge: model.charge,
@@ -339,7 +377,7 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                               final selectedCat = categories.firstWhereOrNull((c) => c.label == model.category);
                                               if (selectedCat != null && selectedSub != null) {
                                                 await controller.updateSkill(
-                                                  userId: "681ee71724d24a6606d13eda",
+                                                  userId: controller.userId.value,
                                                   categoryId: selectedCat.id ?? '',
                                                   subcategoryId: selectedSub.id ?? '',
                                                   charge: model.charge,
@@ -364,7 +402,7 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                               final selectedCat = categories.firstWhereOrNull((c) => c.label == model.category);
                                               if (selectedCat != null && selectedSub != null) {
                                                 await controller.updateSkill(
-                                                  userId: "681ee71724d24a6606d13eda",
+                                                  userId: controller.userId.value,
                                                   categoryId: selectedCat.id ?? '',
                                                   subcategoryId: selectedSub.id ?? '',
                                                   charge: value,

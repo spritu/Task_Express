@@ -62,6 +62,7 @@ abstract class Routes {
   static const CANCEL_BOOKING = _Paths.CANCEL_BOOKING;
   static const BOOKING_CANCELLED = _Paths.BOOKING_CANCELLED;
   static const SERVICEPRO = _Paths.SERVICEPRO;
+  static const COMPLETEJOB = _Paths.COMPLETEJOB;
 }
 
 abstract class _Paths {
@@ -125,4 +126,5 @@ abstract class _Paths {
   static const CANCEL_BOOKING = '/cancel-booking';
   static const BOOKING_CANCELLED = '/booking-cancelled';
   static const SERVICEPRO = '/servicepro';
+  static const COMPLETEJOB = '/completejob';
 }

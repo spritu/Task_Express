@@ -305,7 +305,111 @@ class ProviderHomeController extends GetxController {
     loadUserInfo(); // Load user info and connect socket
     fetchCurrentBooking();
   }
+  void connectSocketAccept() {
+    print('444444: ${bookedBy}');
 
+
+    print("❌ wdwcdtf :${userId}");
+
+    if (userId == null) {
+      print("❌ User ID or BookedFor missing");
+      return;
+    }
+
+    print('🔌 Connecting socket for user: ${userId.value}');
+
+    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+      'forceNew': true,
+      'auth': {
+        'user': {
+          '_id': userId.value,
+          'firstName': 'plumber naman', // Optional, can be dynamic
+        },
+      },
+    });
+
+    socket.connect();
+
+    socket.onConnect((_) {
+      print('✅ Connected to socket');
+
+      final payload = {
+        'receiver':bookedBy.trim(),
+
+      };
+
+      print('📤 Emitting acceptBooking payload: $payload');
+      socket.emit('acceptBooking', payload);
+    });
+
+    socket.onDisconnect((_) {
+      print('❌ Disconnected from socket');
+    });
+
+    socket.onConnectError((err) {
+      print('🚫 Connect Error: $err');
+    });
+
+    socket.onError((err) {
+      print('🔥 Socket Error: $err');
+    });
+
+  }
+
+  void connectSocketReject() {
+    print('55555: ${bookedBy}');
+
+
+    print("❌ wdwcdtf55 :${userId}");
+
+    if (userId == null) {
+      print("❌ User ID or BookedFor missing55");
+      return;
+    }
+
+    print('🔌 Connecting socket for user55: ${userId.value}');
+
+    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+      'forceNew': true,
+      'auth': {
+        'user': {
+          '_id': userId.value,
+          'firstName': 'plumber naman', // Optional, can be dynamic
+        },
+      },
+    });
+
+    socket.connect();
+
+    socket.onConnect((_) {
+      print('✅ Connected to socket55');
+
+      final payload = {
+        'receiver':bookedBy.trim(),
+
+      };
+
+      print('📤 Emitting rejectBooking payload55: $payload');
+      socket.emit('rejectBooking', payload);
+    });
+
+    socket.onDisconnect((_) {
+      print('❌ Disconnected from socket');
+    });
+
+    socket.onConnectError((err) {
+      print('🚫 Connect Error: $err');
+    });
+
+    socket.onError((err) {
+      print('🔥 Socket Error: $err');
+    });
+
+  }
   var bookingData = {}.obs;
   void makePhoneCallFromSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -505,57 +609,7 @@ class ProviderHomeController extends GetxController {
   }
 
 
-  void connectSocketAccept() {
-    print('444444: ${bookedBy}');
 
-
-    print("❌ wdwcdtf :${userId}");
-
-    if (userId == null) {
-      print("❌ User ID or BookedFor missing");
-      return;
-    }
-
-    print('🔌 Connecting socket for user: ${userId.value}');
-
-    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
-      'transports': ['websocket'],
-      'autoConnect': false,
-      'forceNew': true,
-      'auth': {
-        'user': {
-          '_id': userId.value,
-          'firstName': 'plumber naman', // Optional, can be dynamic
-        },
-      },
-    });
-
-    socket.connect();
-
-    socket.onConnect((_) {
-      print('✅ Connected to socket');
-
-      final payload = {
-        'receiver': bookedBy,
-      };
-
-      print('📤 Emitting acceptBooking payload: $payload');
-      socket.emit('acceptBooking', payload);
-    });
-
-    socket.onDisconnect((_) {
-      print('❌ Disconnected from socket');
-    });
-
-    socket.onConnectError((err) {
-      print('🚫 Connect Error: $err');
-    });
-
-    socket.onError((err) {
-      print('🔥 Socket Error: $err');
-    });
-
-  }
 
 
   Future<void> updateAvailability(bool status) async {
