@@ -9,9 +9,8 @@ class WorknestView extends GetView<WorknestController> {
   const WorknestView({super.key});
   @override
   Widget build(BuildContext context) {
-    final WorknestController controller = Get.put(WorknestController());
-
-    return Scaffold(
+ Get.put(WorknestController());
+     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(gradient: AppColors.primaryGradient),
@@ -49,9 +48,7 @@ class WorknestView extends GetView<WorknestController> {
                       ],
                     ),
                   ),
-                  Icon(Icons.notifications_active_outlined),
-                ],
-              ),
+                  Icon(Icons.notifications_active_outlined),],),
               SizedBox(height: 10),
               SearchBarWidget(),
               SizedBox(

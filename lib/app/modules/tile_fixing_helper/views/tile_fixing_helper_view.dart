@@ -9,6 +9,7 @@ class TileFixingHelperView extends GetView<TileFixingHelperController> {
   const TileFixingHelperView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(TileFixingHelperController());
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(

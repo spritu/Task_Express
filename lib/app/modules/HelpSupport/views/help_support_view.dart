@@ -7,6 +7,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
   const HelpSupportView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(HelpSupportController());
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,

@@ -16,7 +16,7 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
 
   @override
   Widget build(BuildContext context) {
-    final ProviderAccountController controller = Get.put(ProviderAccountController());
+ Get.put(ProviderAccountController());
     return WillPopScope(
       onWillPop: () async {
         Get.find<Bottom2Controller>().selectedIndex.value = 0;

@@ -9,6 +9,7 @@ class LocationView extends GetView<LocationController> {
   const LocationView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(LocationController());
     return Scaffold(
       body: Container(decoration: BoxDecoration(gradient: AppColors.appGradient),
         height: MediaQuery.of(context).size.height,width: MediaQuery.of(context).size.width,

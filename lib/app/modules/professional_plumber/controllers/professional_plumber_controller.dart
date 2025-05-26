@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:uuid/uuid.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -12,21 +15,11 @@ import '../../bottom/views/bottom_view.dart';
 import '../../home/controllers/home_controller.dart';
 
 class ProfessionalPlumberController extends GetxController with WidgetsBindingObserver {
+
+  final RxList<types.Message> messages = <types.Message>[].obs;
+  final Rxn<types.User> user = Rxn<types.User>();
+  late IO.Socket socket;
   final HomeController userController = Get.put(HomeController());
-  var distances = <int, String>{}.obs;
-  Position? currentPosition;
-
-  Future<void> saveCurrentLocationToPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (currentPosition != null) {
-      await prefs.setDouble('lat1', currentPosition!.latitude);
-      await prefs.setDouble('lng1', currentPosition!.longitude);
-      print("✅ Saved location: ${currentPosition!.latitude}, ${currentPosition!.longitude}");
-    } else {
-      print("⚠️ currentPosition is null. Location not saved.");
-    }
-  }
-
   int? selectedIndexAfterCall;
   List<dynamic>? selectedUsers;
   String? selectedTitle;
@@ -39,7 +32,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
   }
   // To show bottom sheet after phone call ends
   bool shouldShowSheetAfterCall = false;
-  var distance = ''.obs;
+
   RxBool isDataReady = false.obs;
 
   // Data for bottom sheet
@@ -56,162 +49,23 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
   var bookingData = {}.obs;
   var selectedIndex = 0.obs;
   final selectedUser = Rxn<Map<String, dynamic>>();
-  //Position? currentPosition;
 
-  double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
-    return Geolocator.distanceBetween(lat1, lng1, lat2, lng2) / 1000; // in kilometers
-  }
-  Future<void> getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      return;
-    }
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
 
-    currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-  }
 
   @override
   void onInit() {
     super.onInit();
-  //  getDistanceFromApi( lat2,  lng2)
- //   getDistanceFromSharedPrefs(lat2,);
     WidgetsBinding.instance.addObserver(this);
-  }
-  Future<void> fetchDistanceForUser(int index, double lat2, double lng2) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    double? lat1 = prefs.getDouble('lat1');
-    double? lng1 = prefs.getDouble('lng1');
 
-    if (lat1 != null && lng1 != null) {
-      final url = Uri.parse(
-          'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lng1&lat2=$lat2&lon2=$lng2');
-
-      try {
-        var request = http.MultipartRequest('GET', url);
-        http.StreamedResponse response = await request.send();
-
-        if (response.statusCode == 200) {
-          String result = await response.stream.bytesToString();
-          var data = json.decode(result);
-          print("✅ API response: $data");
-
-          // ✅ Extract from `data['data']['distance']`
-          if (data['data'] != null && data['data']['distance'] != null) {
-            double rawDistance = data['data']['distance'];
-            String formattedDistance = (rawDistance / 1000).toStringAsFixed(2); // convert to KM
-            distances[index] = '$formattedDistance KM';
-            print("📏 Distance for user[$index]: ${distances[index]}");
-          } else {
-            distances[index] = 'N/A';
-          }
-        } else {
-          distances[index] = 'Error';
-          print("❌ Failed with status: ${response.statusCode}");
-        }
-      } catch (e) {
-        distances[index] = 'Error';
-        print("❌ Exception: $e");
-      }
-    } else {
-      distances[index] = 'No Location';
-    }
-
-    update(); // update UI in GetX
-  }
-
-
-
-
-  void updateUserDistances(List<dynamic> users) {
-    for (int i = 0; i < users.length; i++) {
-      final lat = double.tryParse(users[i]['lat'] ?? '0') ?? 0.0;
-      final lng = double.tryParse(users[i]['lng'] ?? '0') ?? 0.0;
-
-      if (lat != 0.0 && lng != 0.0) {
-        fetchDistanceForUser(i, lat, lng);
-      } else {
-        distances[i] = 'Invalid';
-      }
-    }
   }
 
   @override
   void onClose() {
     super.onClose();
+    socket.dispose();
     WidgetsBinding.instance.removeObserver(this);
   }
-  Future<String> getDistanceFromApi(double lat2, double lng2) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    double? lat1 = prefs.getDouble('lat1');
-    double? lng1 = prefs.getDouble('lng1');
-
-    if (lat1 != null && lng1 != null) {
-      final url = Uri.parse(
-        'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lng1&lat2=$lat2&lon2=$lng2',
-      );
-
-      var request = http.MultipartRequest('GET', url);
-      http.StreamedResponse response = await request.send();
-
-      if (response.statusCode == 200) {
-        String result = await response.stream.bytesToString();
-        var data = json.decode(result);
-        return data['distance']?.toString() ?? 'N/A';
-      } else {
-        print("❌ Error: ${response.statusCode} - ${response.reasonPhrase}");
-        return 'Error';
-      }
-    } else {
-      return 'Coordinates missing';
-    }
-  }
-
-  // Future<void> getDistanceFromSharedPrefs() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //
-  //   double? lat1 = prefs.getDouble('lat1');
-  //   double? lng1 = prefs.getDouble('lng1');
-  //   double? lat2 = prefs.getDouble('lat2');
-  //   double? lng2 = prefs.getDouble('lng2');
-  //
-  //   if (lat1 != null && lng1 != null && lat2 != null && lng2 != null) {
-  //     print("📍 User1: ($lat1, $lng1)");
-  //     print("📍 User2: ($lat2, $lng2)");
-  //
-  //     final url = Uri.parse(
-  //       'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lng1&lat2=$lat2&lon2=$lng2',
-  //     );
-  //
-  //     var request = http.MultipartRequest('GET', url);
-  //     http.StreamedResponse response = await request.send();
-  //
-  //     if (response.statusCode == 200) {
-  //       String result = await response.stream.bytesToString();
-  //       print("✅ Distance API Response: $result");
-  //
-  //       // Parse JSON response
-  //       var data = json.decode(result);
-  //       if (data['distance'] != null) {
-  //         distance.value = data['distance'].toString(); // Update Rx value
-  //       } else {
-  //         distance.value = 'null';
-  //       }
-  //     } else {
-  //       print("❌ Failed to fetch distance: ${response.statusCode} - ${response.reasonPhrase}");
-  //       distance.value = 'Error';
-  //     }
-  //   } else {
-  //     print("⚠️ One or more coordinates are missing in SharedPreferences.");
-  //     distance.value = 'Coordinates missing';
-  //   }
-  // }
 
   // Listen for app lifecycle changes, mainly to detect when phone call ends
   @override
@@ -249,6 +103,9 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
     }
   }
 
+
+
+
   // Make phone call and mark to show sheet after call ends
   void makePhoneCall(String phoneNumber) async {
     final Uri callUri = Uri(scheme: 'tel', path: phoneNumber);
@@ -256,9 +113,10 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
       shouldShowSheetAfterCall = true;
       await launchUrl(callUri);
     } else {
-   //   Get.snackbar('Error', 'Could not launch phone call');
+      Get.snackbar('Error', 'Could not launch phone call');
     }
   }
+  RxString bookedFor = ''.obs;
 
   // Booking API call
   Future<void> bookServiceProvider({
@@ -271,7 +129,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
       String? userId2 = prefs.getString('userId'); // ✅ This should not be null
 
       if (userId2 == null) {
-      //  Get.snackbar("Error", "User ID not found in local storage.");
+        Get.snackbar("Error", "User ID not found in local storage.");
         return;
       }
 
@@ -309,15 +167,89 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
         controller.showRequestPending.value = acceptStatus == null;
         controller.selectedIndex.value = 1;
 
+        user.value = types.User(id: userId2);
+        this.bookedFor.value = bookedFor;
+
+        connectSocket();
+
         Get.to(() => BottomView());
       } else {
-   //     Get.snackbar('Booking Failed', 'Please try again later.');
+        Get.snackbar('Booking Failed', 'Please try again later.');
       }
     } catch (e) {
       print("❌ Exception in booking: $e");
-  //    Get.snackbar('Error', 'Something went wrong: $e');
+      Get.snackbar('Error', 'Something went wrong: $e');
     }
   }
+
+
+  void connectSocket() {
+    print("❌ wdwcdtf");
+
+    if (user.value == null || bookedFor.value.isEmpty) {
+      print("❌ User ID or BookedFor missing");
+      return;
+    }
+
+    print('🔌 Connecting socket for user: ${user.value!.id}, bookedFor: ${bookedFor.value}');
+
+    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+      'forceNew': true,
+      'auth': {
+        'user': {
+          '_id': user.value!.id,
+          'firstName': 'plumber naman', // Optional, can be dynamic
+        },
+      },
+    });
+
+    socket.connect();
+
+    // socket.onConnect((_) {
+    //   print('✅ Connected to socket12121212');
+    // });
+
+    socket.onConnect((_) {
+      print('✅ Connected to socket');
+
+      /// ✅ Emit userId and bookedFor after socket is connected
+      final payload = {
+        'receiver': bookedFor.value,
+      };
+
+      print('📤 Emitting newBooking payload: $payload');
+      socket.emit('newBooking', payload);
+    });
+
+    socket.onDisconnect((_) {
+      print('❌ Disconnected from socket');
+    });
+
+    socket.onConnectError((err) {
+      print('🚫 Connect Error: $err');
+    });
+
+    socket.onError((err) {
+      print('🔥 Socket Error: $err');
+    });
+
+    /// ✅ Listen to newBooking messages
+    socket.on('newBooking', (data) {
+      print('📩 Received newBooking message: $data');
+
+      final msg = types.TextMessage(
+        id: data['_id'] ?? const Uuid().v4(),
+        text: data['message'] ?? '',
+        author: types.User(id: data['senderId'] ?? 'unknown'),
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      messages.insert(0, msg);
+    });
+  }
+
 
 
   // Widget to show bottom sheet after call ends
@@ -411,7 +343,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
                       skill: skill,
                       bookServiceProvider: (serviceIds) async {
                         await bookServiceProvider(
-                         // <-- Ensure this is defined
+                          // <-- Ensure this is defined
                           bookedFor: userId,
                           serviceIds: serviceIds, selectedHelperName: '',
                         );

@@ -14,6 +14,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
   ProfessionalPlumberView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(ProfessionalPlumberController());
     final arguments = Get.arguments as Map<String, dynamic>;
     final List users = arguments['users'];
     final String title = arguments['title'] ?? 'Professionals';
@@ -68,22 +69,16 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
           // List of workers
           Expanded(
             child: Obx(
-              () => ListView.builder(
+                  () => ListView.builder(
                 itemCount: users.length,
                 itemBuilder: (context, index) {
                   final user = users[index];
-                  final lat = double.tryParse(user['lat'] ?? '0') ?? 0.0;
-                  final lng = double.tryParse(user['lng'] ?? '0') ?? 0.0;
 
-                  // Trigger distance fetch for each user if not already fetched
-                  if (!controller.distances.containsKey(index)) {
-                    controller.fetchDistanceForUser(index, lat, lng);
-                  }
-
-                  final distance = controller.distances[index] ?? 'Calculating...';
                   final imagePath = user['userImg'] ?? '';
                   final imageUrl = 'https://jdapi.youthadda.co/$imagePath';
-                  final charge = user['skills'] != null && user['skills'].isNotEmpty
+
+                  final charge =
+                  user['skills'] != null && user['skills'].isNotEmpty
                       ? user['skills'][0]['charge']
                       : 0;
                   print("Opening bottom sheet for ${user['firstName']}");
@@ -161,7 +156,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Column(mainAxisAlignment: MainAxisAlignment.start,
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
@@ -178,9 +173,9 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           ),
                                         ),
                                         SizedBox(height: 3),
-                                        Row(mainAxisAlignment: MainAxisAlignment.start,
+                                        Row(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               width: 10,
@@ -214,7 +209,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                       onPressed: () {
                                         // Passing only relevant data to navigate to the profile view
                                         Get.to(
-                                          () => ProfessionalProfileView(),
+                                              () => ProfessionalProfileView(),
                                           arguments: {
                                             'name': user['firstName'],
                                             'image': user['userImg'],
@@ -251,27 +246,42 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                 SizedBox(height: 4),
                                 Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                      MainAxisAlignment.start,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                           children: [
-                                            Icon(Icons.location_on, size: 14, color: Colors.grey),
-                                            SizedBox(width: 4),
-                                            Text(
-                                              controller.distances[index] ?? 'N/A',style: TextStyle(fontSize: 12),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 3,
+                                              ),
+                                              child: Icon(
+                                                Icons.location_on,
+                                                size: 14,
+                                                color: Colors.grey,
+                                              ),
                                             ),
-
                                           ],
                                         ),
-
                                         SizedBox(height: 3),
-
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.access_time,
+                                              size: 14,
+                                              color: AppColors.grey,
+                                            ),
+                                          ],
+                                        ),
                                       ],
                                     ),
                                     Card(
@@ -331,12 +341,12 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                               controller.selectedUsers =
                                                   users; // Store full list
                                               controller
-                                                      .selectedIndexAfterCall =
+                                                  .selectedIndexAfterCall =
                                                   index; // Store selected index
                                               controller.selectedTitle = title;
                                               controller
-                                                      .shouldShowSheetAfterCall =
-                                                  true; // Trigger sheet on resume
+                                                  .shouldShowSheetAfterCall =
+                                              true; // Trigger sheet on resume
 
                                               controller.makePhoneCall(
                                                 phoneNumber,
@@ -346,7 +356,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                                 'Error',
                                                 'Phone number not available',
                                                 snackPosition:
-                                                    SnackPosition.BOTTOM,
+                                                SnackPosition.BOTTOM,
                                                 backgroundColor: Colors.red,
                                                 colorText: Colors.white,
                                               );
@@ -376,7 +386,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         child: ElevatedButton(
                                           onPressed: () {
                                             final receiverId =
-                                                user['_id'].toString();
+                                            user['_id'].toString();
                                             if (receiverId.isNotEmpty) {
                                               Get.to(
                                                 ChatView(),
@@ -394,7 +404,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                                 'Error',
                                                 'Receiver ID not available',
                                                 snackPosition:
-                                                    SnackPosition.BOTTOM,
+                                                SnackPosition.BOTTOM,
                                                 backgroundColor: Colors.red,
                                                 colorText: Colors.white,
                                               );
@@ -435,15 +445,15 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
   }
 
   Widget showAfterCallSheet(
-    BuildContext context, {
-    required String name,
-    required String imageUrl,
-    required String experience,
-    required String phone,
-    required String userId,
-    required String title,
-    required List<Map<String, dynamic>> skills, // Pass dynamic skills
-  }) {
+      BuildContext context, {
+        required String name,
+        required String imageUrl,
+        required String experience,
+        required String phone,
+        required String userId,
+        required String title,
+        required List<Map<String, dynamic>> skills, // Pass dynamic skills
+      }) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.only(left: 8, right: 8),
@@ -472,12 +482,12 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   CircleAvatar(
                     radius: 40,
                     backgroundImage:
-                        imageUrl.isNotEmpty
-                            ? NetworkImage(
-                              'https://jdapi.youthadda.co/$imageUrl',
-                            )
-                            : const AssetImage('assets/images/account.png')
-                                as ImageProvider,
+                    imageUrl.isNotEmpty
+                        ? NetworkImage(
+                      'https://jdapi.youthadda.co/$imageUrl',
+                    )
+                        : const AssetImage('assets/images/account.png')
+                    as ImageProvider,
                   ),
                   const SizedBox(width: 10),
                   Text(
@@ -509,13 +519,13 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   padding: const EdgeInsets.only(bottom: 12),
                   child: professionRow(
                     title:
-                        (skill['subcategoryName'] != null &&
-                                skill['subcategoryName'].toString().isNotEmpty)
-                            ? skill['subcategoryName']
-                            : (skill['categoryName'] != null &&
-                                skill['categoryName'].toString().isNotEmpty)
-                            ? skill['categoryName']
-                            : 'Service',
+                    (skill['subcategoryName'] != null &&
+                        skill['subcategoryName'].toString().isNotEmpty)
+                        ? skill['subcategoryName']
+                        : (skill['categoryName'] != null &&
+                        skill['categoryName'].toString().isNotEmpty)
+                        ? skill['categoryName']
+                        : 'Service',
 
                     price: "₹ ${skill['charge'].toString()}",
                     onBookNow: () {
@@ -657,16 +667,16 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
   }
 
   void showAreUSureSheet(
-    BuildContext context, {
-    required String name,
-    required String imageUrl,
-    required String experience,
-    required String phone,
-    required String userId,
-    required String title,
-    required Map<String, dynamic> skill,
-    required Future<void> Function(List<String> serviceIds) bookServiceProvider,
-  }) {
+      BuildContext context, {
+        required String name,
+        required String imageUrl,
+        required String experience,
+        required String phone,
+        required String userId,
+        required String title,
+        required Map<String, dynamic> skill,
+        required Future<void> Function(List<String> serviceIds) bookServiceProvider,
+      }) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -696,12 +706,12 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   CircleAvatar(
                     radius: 40,
                     backgroundImage:
-                        imageUrl.isNotEmpty
-                            ? NetworkImage(
-                              'https://jdapi.youthadda.co/$imageUrl',
-                            )
-                            : const AssetImage('assets/images/account.png')
-                                as ImageProvider,
+                    imageUrl.isNotEmpty
+                        ? NetworkImage(
+                      'https://jdapi.youthadda.co/$imageUrl',
+                    )
+                        : const AssetImage('assets/images/account.png')
+                    as ImageProvider,
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -741,7 +751,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                             onPressed: () async {
                               String serviceId =
                                   skill['subcategoryId']?.toString() ??
-                                  skill['categoryId'].toString();
+                                      skill['categoryId'].toString();
                               Navigator.pop(context);
                               await bookServiceProvider([serviceId]);
                             },

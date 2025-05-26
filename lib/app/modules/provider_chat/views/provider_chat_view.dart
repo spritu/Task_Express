@@ -13,7 +13,7 @@ class ProviderChatView extends GetView<ProviderChatController> {
 
   const ProviderChatView({super.key});
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { Get.put(ProviderChatController());
     final TextEditingController messageController = TextEditingController();
     return Scaffold(
       appBar: AppBar(

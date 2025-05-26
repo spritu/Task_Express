@@ -14,7 +14,7 @@ class ChatScreenView extends GetView<ChatScreenController> {
 
   @override
   Widget build(BuildContext context) {
-    final ChatScreenController controller = Get.put(ChatScreenController());
+  Get.put(ChatScreenController());
     return WillPopScope(
       onWillPop: () async {
         Get.find<BottomController>().selectedIndex.value = 0; // 👈 Home tab

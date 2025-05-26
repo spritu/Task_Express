@@ -10,6 +10,7 @@ class CementHelperView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(CementHelperController());
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(

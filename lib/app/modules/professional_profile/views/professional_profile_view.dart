@@ -10,6 +10,7 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(ProfessionalProfileController());
     final args = Get.arguments as Map<String, dynamic>;
     final arguments = Get.arguments as Map<String, dynamic>;
     final String appBarTitle = arguments['title'] ?? 'Professional Profile';

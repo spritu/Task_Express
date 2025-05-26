@@ -7,6 +7,7 @@ class ScaffoldingHelperView extends GetView<ScaffoldingHelperController> {
   const ScaffoldingHelperView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(ScaffoldingHelperController());
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:worknest/app/modules/servicepro/views/servicepro_view.dart';
+import '../../../../auth_controller.dart';
 import '../../BricklayingHelper/views/bricklaying_helper_view.dart';
 import '../../CementHelper/views/cement_helper_view.dart';
 import '../../Scaffolding_helper/views/scaffolding_helper_view.dart';
@@ -403,6 +404,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     fetchCategories();
+    Get.put(AuthController(), permanent: true);
     if (Get.arguments?['refreshHome'] == true) {
       fetchAddress();
     }

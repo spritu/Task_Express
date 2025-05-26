@@ -10,6 +10,7 @@ class JobsDetailsView extends GetView<JobsDetailsController> {
   const JobsDetailsView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(JobsDetailsController());
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,

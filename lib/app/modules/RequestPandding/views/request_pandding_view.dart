@@ -11,6 +11,7 @@ class RequestPanddingView extends GetView<RequestPanddingController> {
   const RequestPanddingView({super.key,required this.helperName});
   @override
   Widget build(BuildContext context) {
+    Get.put(RequestPanddingController());
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,

@@ -11,7 +11,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
 
   @override
   Widget build(BuildContext context) {
-    final ProviderProfileController controller = Get.put(
+  Get.put(
       ProviderProfileController(),
     );
     return Scaffold(

@@ -13,6 +13,7 @@ class JobsView extends GetView<JobsController> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(JobsController());
     return WillPopScope(
       onWillPop: () async {
         Get.find<Bottom2Controller>().selectedIndex.value = 0;

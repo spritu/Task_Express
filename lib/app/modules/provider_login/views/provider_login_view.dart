@@ -11,6 +11,7 @@ class ProviderLoginView extends GetView<ProviderLoginController> {
   const ProviderLoginView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(ProviderLoginController());
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SingleChildScrollView(

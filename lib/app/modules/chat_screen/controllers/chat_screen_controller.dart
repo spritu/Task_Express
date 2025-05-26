@@ -122,7 +122,7 @@ class ChatScreenController extends GetxController {
     if (userId == null) return;
     socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
       'transports': ['websocket'],
-      'autoConnect': false,
+      'autoConnect': false,"forceNew":true,
       'auth': {
         'user': {'_id': userId, 'firstName': 'plumber naman'},
       },

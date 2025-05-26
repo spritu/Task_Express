@@ -13,7 +13,7 @@ class SignUpView extends GetView<SignUpController> {
 
   @override
   Widget build(BuildContext context) {
-    final SignUpController controller = Get.put(SignUpController());
+ Get.put(SignUpController());
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(

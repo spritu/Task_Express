@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:uuid/uuid.dart';
 
 class ChatItem {
@@ -31,10 +32,15 @@ class ProviderChatScreenController extends GetxController {
 
   RxList<ChatItem> chats = <ChatItem>[].obs;
 
+
+  final RxList<types.Message> messages = <types.Message>[].obs;
+  final Rxn<types.User> user = Rxn<types.User>();
+  late IO.Socket socket; RxString userId = ''.obs;
   @override
   void onInit() {
     super.onInit();
     fetchLastMessages();
+    connectSocket();
   }
 
   @override
@@ -47,7 +53,55 @@ class ProviderChatScreenController extends GetxController {
     super.onClose();
   }
 
+  void connectSocket() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    if (userId == null) return;
+    print(" Service provider:$userId");
+    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,"forceNew":true,
+      'auth': {
+        'user': {'_id': userId, 'firstName': 'plumber naman'},
+      },
+    });
+    print('1234:${userId}');
+    socket.connect();
 
+    socket.onConnect((_) {
+      print('✅ Connected to socket contacts list provider');
+    });
+
+    socket.onDisconnect((_) {
+      print('❌ Disconnected from socket');
+    });
+
+    socket.onConnectError((err) {
+      print('🚫 Connect Error: $err');
+    });
+
+    socket.onError((err) {
+      print('🔥 Socket Error: $err');
+    });
+
+    socket.on('message', (data) {
+
+      fetchLastMessages();
+      //fetchChatHistory();
+      print('📩 Received message: $data');
+
+
+
+      final msg = types.TextMessage(
+        id: data['_id'] ?? const Uuid().v4(),
+        text: data['message'] ?? '',
+        author: types.User(id: data['senderId']),
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      messages.insert(0, msg);
+    });
+  }
   Future<void> fetchLastMessages() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');

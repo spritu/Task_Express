@@ -8,6 +8,7 @@ class ProfileView extends GetView<ProfileController> {
   const ProfileView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(ProfileController());
     return Scaffold(
       body: Container(
         decoration: BoxDecoration( gradient: LinearGradient(

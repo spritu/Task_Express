@@ -9,6 +9,7 @@ class AddAddressView extends GetView<AddAddressController> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(AddAddressController());
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,

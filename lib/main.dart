@@ -50,47 +50,22 @@ import 'auth_controller.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  // SharedPreferences prefs = await SharedPreferences.getInstance();// <-- ADD THIS
+  final prefs = await SharedPreferences.getInstance();
   final box = GetStorage();
-  // await prefs.clear();
-  final isLoggedIn = box.read('isLoggedIn') ?? false;
-  final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
 
+  // Check if first launch
+  final isFirstRun = prefs.getBool('isFirstRun') ?? true;
 
-  //Get.put(WorknestController(),permanent: true);
-  //Get.put(SignUpController(),permanent: true);
-  //Get.put(BottomController(),permanent: true);
- // Get.put(HomeController(),permanent: true);
-  //Get.put(CancelBookingController(),permanent: true);
+  if (isFirstRun) {
+    await box.erase(); // ✅ Clear GetStorage on first launch
+    await prefs.clear(); // ✅ Clear SharedPreferences on first launch
+    await prefs.setBool('isFirstRun', false); // Mark first run done
+  }
 
-  Get.put(PlasteringHelperController(),permanent: true);
-  Get.put(BricklayingHelperController(),permanent: true);
-  Get.put(BookingController(),permanent: true);
-  Get.put(ScaffoldingHelperController(),permanent: true);
+ Get.put(AuthController(), permanent: true);
+  Get.put(LocationController(), permanent: true);
+  Get.put(ProviderLocationController(), permanent: true);
 
-  Get.put(AuthController(),permanent: true);
-  Get.put(TileFixingHelperController(),permanent: true);
-  Get.put(JobsDetailsController(),permanent: true);
-  Get.put(RoadConstructionHelperController(),permanent: true);
-  Get.put(ProfessionalPlumberController(),permanent: true);
-  Get.put(SettingController(),permanent: true);
- // Get.put(EditProfileController(),permanent: true);
-  Get.put(JobsController(),permanent: true);
-  Get.lazyPut(() => ChatController(),fenix: true);
-  Get.put(ProviderSettingController(),permanent: true);
-  Get.lazyPut(()=>ProviderChatController(),fenix: true);
-  Get.put(OtpController(),permanent: true);
- // Get.put(ProviderHomeController(),permanent: true);  //auto referesh
- // Get.put(ProviderEditProfileController(),permanent: true);
-  Get.put(ProviderLoginController(),permanent: true);
-  Get.put(ActivejobScreenController(),permanent: true);
-  Get.put(ProviderChatScreenController(),permanent: true);
-  Get.put(ProviderOtpController(),permanent: true);
-  Get.put(Bottom2Controller(),permanent: true);
-  Get.put(AddAddressController(),permanent: true);
-  Get.put(ProfessionalProfileController(),permanent: true);
-  Get.put(LocationController(),permanent: true);
-  Get.put(ProviderLocationController(),permanent: true);
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
@@ -100,6 +75,70 @@ void main() async {
     ),
   );
 }
+
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await GetStorage.init();
+//
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   final box = GetStorage();
+//   final userId = prefs.getString('userId');
+//   if (userId == null) {
+//     await box.erase(); // Clear all GetStorage values
+//   }
+//
+//   final isLoggedIn = box.read('isLoggedIn') ?? false;
+//   final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
+//
+//   Get.put(AuthController(), permanent: true);
+//   Get.put(LocationController(), permanent: true);
+//   Get.put(ProviderLocationController(), permanent: true);
+//
+//
+//   //Get.put(WorknestController(),permanent: true);
+//   //Get.put(SignUpController(),permanent: true);
+//   //Get.put(BottomController(),permanent: true);
+//  // Get.put(HomeController(),permanent: true);
+//   //Get.put(CancelBookingController(),permanent: true);
+//
+//  //  Get.put(PlasteringHelperController(),permanent: true);
+//  //  Get.put(BricklayingHelperController(),permanent: true);
+//  //  Get.put(BookingController(),permanent: true);
+//  //  Get.put(ScaffoldingHelperController(),permanent: true);
+//  //
+//    Get.put(AuthController(),permanent: true);
+//  //  Get.put(TileFixingHelperController(),permanent: true);
+//  //  Get.put(JobsDetailsController(),permanent: true);
+//  //  Get.put(RoadConstructionHelperController(),permanent: true);
+//  //  Get.put(ProfessionalPlumberController(),permanent: true);
+//  //  Get.put(SettingController(),permanent: true);
+//  // // Get.put(EditProfileController(),permanent: true);
+//  //  Get.put(JobsController(),permanent: true);
+//  //  Get.lazyPut(() => ChatController(),fenix: true);
+//  //  Get.put(ProviderSettingController(),permanent: true);
+//  //  Get.lazyPut(()=>ProviderChatController(),fenix: true);
+//  //  Get.put(OtpController(),permanent: true);
+//  // Get.put(ProviderHomeController(),permanent: true);  //auto referesh
+//  // Get.put(ProviderEditProfileController(),permanent: true);
+//  //  Get.put(ProviderLoginController(),permanent: true);
+//  //  Get.put(ActivejobScreenController(),permanent: true);
+//  //  Get.put(ProviderChatScreenController(),permanent: true);
+//  //  Get.put(ProviderOtpController(),permanent: true);
+//  //  Get.put(Bottom2Controller(),permanent: true);
+//  //  Get.put(AddAddressController(),permanent: true);
+//  //  Get.put(ProfessionalProfileController(),permanent: true);
+//   Get.put(LocationController(),permanent: true);
+//    Get.put(ProviderLocationController(),permanent: true);
+//   runApp(
+//     GetMaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       title: "Application",
+//       getPages: AppPages.routes,
+//       home: SplashScreen(),
+//     ),
+//   );
+// }
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -140,8 +179,8 @@ class _SplashScreenState extends State<SplashScreen> {
   // }
   void checkLoginStatus() async {
     final box = GetStorage();
-    final isLoggedIn = box.read('isLoggedIn') ?? false;
-    final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
+    bool  isLoggedIn = box.read('isLoggedIn') ?? false;
+    bool  isLoggedIn2 = box.read('isLoggedIn2') ?? false;
 
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');

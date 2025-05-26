@@ -14,7 +14,7 @@ class ChatView extends GetView<ChatController> {
   @override
   Widget build(BuildContext context) {
     final TextEditingController messageController = TextEditingController();
-
+    Get.put(ChatController());
     return Scaffold(
       appBar: AppBar(
         title: Obx(

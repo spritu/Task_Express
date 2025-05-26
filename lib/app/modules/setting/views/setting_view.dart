@@ -11,6 +11,7 @@ class SettingView extends GetView<SettingController> {
   const SettingView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(SettingController());
     return WillPopScope(
       onWillPop: () async {
         Get.find<BottomController>().selectedIndex.value = 0;

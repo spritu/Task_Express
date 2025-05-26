@@ -1115,7 +1115,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
   const ProviderHomeView({super.key});
   @override
   Widget build(BuildContext context) {
-    final ProviderHomeController controller = Get.put(ProviderHomeController());
+   Get.put(ProviderHomeController());
     final locationController = Get.find<ProviderLocationController>();
     return Scaffold(
       body: Container(

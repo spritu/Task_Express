@@ -11,7 +11,7 @@ class ProviderEditProfileView extends GetView<ProviderEditProfileController> {
 
   @override
   Widget build(BuildContext context) {
-    final ProviderEditProfileController controller = Get.put(ProviderEditProfileController());
+    Get.put(ProviderEditProfileController());
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(

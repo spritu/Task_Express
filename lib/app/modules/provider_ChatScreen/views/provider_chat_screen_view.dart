@@ -15,6 +15,7 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
   const ProviderChatScreenView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(ProviderChatScreenController());
     return  WillPopScope(
       onWillPop: () async {
         Get.find<BottomController>().selectedIndex.value = 0; // 👈 Home tab

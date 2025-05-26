@@ -11,6 +11,7 @@ class AddressScreenView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(AddressScreenController());
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(gradient: AppColors.appGradient),

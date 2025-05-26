@@ -9,6 +9,7 @@ class JoinView extends GetView<JoinController> {
   const JoinView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(JoinController());
     return  Scaffold(
       //backgroundColor: AppColors.white,
       body: SingleChildScrollView(

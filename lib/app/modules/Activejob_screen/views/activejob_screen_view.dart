@@ -9,6 +9,7 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
   const ActivejobScreenView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(ActivejobScreenController());
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,

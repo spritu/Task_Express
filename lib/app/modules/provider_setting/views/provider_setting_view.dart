@@ -11,6 +11,7 @@ class ProviderSettingView extends GetView<ProviderSettingController> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(ProviderSettingController());
     return WillPopScope(
       onWillPop: () async {
         Get.find<Bottom2Controller>().selectedIndex.value = 0;

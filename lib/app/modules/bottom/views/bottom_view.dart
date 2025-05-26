@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:worknest/app/modules/booking/controllers/booking_controller.dart';
 import 'package:worknest/app/modules/chat_screen/controllers/chat_screen_controller.dart';
 import 'package:worknest/colors.dart';
 import '../../account/views/account_view.dart';
+import '../../booking/controllers/booking_controller.dart';
 import '../../booking/views/booking_view.dart';
 import '../../chat_screen/views/chat_screen_view.dart';
 import '../../home/views/home_view.dart';
@@ -15,8 +17,8 @@ class BottomView extends GetView<BottomController> {
 
   @override
   Widget build(BuildContext context) {
-    final BottomController controller = Get.put(BottomController());
 
+    Get.put(BottomController());
     return Scaffold(
       body: Obx(() {
         return _buildBody(
@@ -48,12 +50,15 @@ class BottomView extends GetView<BottomController> {
 }
 
 final ChatScreenController chatScreenController = Get.put(ChatScreenController());
+final BookingController bookingController = Get.put(BookingController());
 Widget _buildBody(int index, bool showRequestPending, String helperName) {
   switch (index) {
     case 0:
       return const HomeView();
     case 1:
+      bookingController.fetchCurrentBookings();
       return BookingView();
+
       case 2:
       return const SettingView();
     case 3:

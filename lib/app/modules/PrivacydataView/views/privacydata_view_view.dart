@@ -10,6 +10,7 @@ class PrivacydataViewView extends GetView<PrivacydataViewController> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(PrivacydataViewController());
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(gradient: AppColors.appGradient),

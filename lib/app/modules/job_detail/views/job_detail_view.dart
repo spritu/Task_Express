@@ -7,6 +7,7 @@ class JobDetailView extends GetView<JobDetailController> {
   const JobDetailView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(JobDetailController());
     return Scaffold(
       backgroundColor: const Color(0xFFFFF0E6),
 

@@ -6,7 +6,7 @@ import '../controllers/helper_profile_controller.dart';
 class HelperProfileView extends GetView<HelperProfileController> {
   const HelperProfileView({super.key});
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { Get.put(HelperProfileController());
     return Scaffold(
 
       body: Container(

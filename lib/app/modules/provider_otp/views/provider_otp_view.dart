@@ -12,6 +12,7 @@ class ProviderOtpView extends GetView<ProviderOtpController> {
   const ProviderOtpView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(ProviderOtpController());
     return Scaffold(
       body: Container(
         decoration: BoxDecoration( gradient: AppColors.appGradient2 ),

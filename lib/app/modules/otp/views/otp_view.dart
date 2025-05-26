@@ -10,6 +10,7 @@ class OtpView extends GetView<OtpController> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(OtpController());
     return Scaffold(
       body: Container(height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(

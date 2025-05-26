@@ -10,6 +10,7 @@ class RoadConstructionHelperView
   const RoadConstructionHelperView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(RoadConstructionHelperController());
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(

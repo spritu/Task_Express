@@ -13,7 +13,7 @@ class LoginView extends GetView<LoginController> {
 
   @override
   Widget build(BuildContext context) {
-    final LoginController controller = Get.put(LoginController());
+  Get.put(LoginController());
 
     return Scaffold(
       backgroundColor: AppColors.white,

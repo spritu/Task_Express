@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-
-
 import '../../../../colors.dart';
 import '../controllers/your_earning_controller.dart';
 
@@ -10,6 +7,7 @@ class YourEarningView extends GetView<YourEarningController> {
   const YourEarningView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(YourEarningController());
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -182,9 +180,7 @@ class YourEarningView extends GetView<YourEarningController> {
                                     ),
                                   ],
                                 ),
-
                                 const SizedBox(height: 6),
-
                                 // Plumbing service text
                                 const Text(
                                   "Plumbing service",
@@ -195,9 +191,7 @@ class YourEarningView extends GetView<YourEarningController> {
                                     color: Color(0xFF575757),
                                   ),
                                 ),
-
                                 const SizedBox(height: 6),
-
                                 // Date + Details Button
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -227,7 +221,6 @@ class YourEarningView extends GetView<YourEarningController> {
                                         ],
                                       ),
                                     ),
-
                                     // Details button
                                     Container(
                                       height: 26,
@@ -250,7 +243,6 @@ class YourEarningView extends GetView<YourEarningController> {
                                     ),
                                   ],
                                 ),
-
                                 const SizedBox(height:5),
                                 const Divider(thickness: 1),
                               ],

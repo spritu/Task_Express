@@ -13,6 +13,7 @@ class ProviderLocationView extends GetView<ProviderLocationController> {
   const ProviderLocationView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(ProviderLocationController());
     return Scaffold(
       body: Container(decoration: BoxDecoration(gradient: AppColors.appGradient2),
         height: MediaQuery.of(context).size.height,width: MediaQuery.of(context).size.width,

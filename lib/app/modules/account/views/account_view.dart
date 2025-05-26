@@ -16,7 +16,7 @@ class AccountView extends GetView<AccountController> {
 
   @override
   Widget build(BuildContext context) {
-    final AccountController controller = Get.put(AccountController());
+  Get.put(AccountController());
 
     return WillPopScope(
       onWillPop: () async {

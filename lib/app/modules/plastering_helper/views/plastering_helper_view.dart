@@ -9,6 +9,7 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
   const PlasteringHelperView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(PlasteringHelperController());
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(

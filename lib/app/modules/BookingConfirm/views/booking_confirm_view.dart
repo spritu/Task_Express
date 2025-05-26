@@ -8,6 +8,7 @@ class BookingConfirmView extends GetView<BookingConfirmController> {
   const BookingConfirmView({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.put(BookingConfirmController());
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
