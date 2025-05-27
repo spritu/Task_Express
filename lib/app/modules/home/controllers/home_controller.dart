@@ -22,7 +22,8 @@ class HomeController extends GetxController {
   RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
   RxList<CategoryModel> fixedChargeHelpers = <CategoryModel>[].obs;
   var users = <UserModel>[].obs;
-  final houseNo = Rx<String>('');var isLoading = false.obs;
+  final houseNo = Rx<String>('');
+  var isLoading = false.obs;
   final landMark = Rx<String>('');
   final addressType = Rx<String>('');
   final contactNo = Rx<String>('');
@@ -31,10 +32,11 @@ class HomeController extends GetxController {
   var expandedServiceType = ''.obs;
   RxBool showAllCategories = false.obs;
   final TextEditingController searchTextController = TextEditingController();
-  var serviceTypes = [
-    {'title': 'Visiting Professionals'},
-    {'title': 'Fixed charge Helpers'},
-  ].obs;
+  var serviceTypes =
+      [
+        {'title': 'Visiting Professionals'},
+        {'title': 'Fixed charge Helpers'},
+      ].obs;
   List<CategoryModel> get categories {
     if (expandedServiceType.value == 'Visiting Professionals') {
       return visitingProfessionals;
@@ -43,6 +45,7 @@ class HomeController extends GetxController {
     }
     return [];
   }
+
   RxList<dynamic> usersList = <dynamic>[].obs;
   Future<List<Map<String, dynamic>>> getSkillsFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
@@ -53,26 +56,32 @@ class HomeController extends GetxController {
     }
     return [];
   }
+
   void fetchUsersListBySubcategory(String subcategoryId) async {
     isLoading.value = true;
     try {
-      final response = await http.get(Uri.parse(
-        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$subcategoryId',
-      ));
+      final response = await http.get(
+        Uri.parse(
+          'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$subcategoryId',
+        ),
+      );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         usersList.assignAll(data); // Make sure `usersList` is an RxList
-        Get.to(() => SubcategoryUserListScreen(subcategoryName: subcategoryId)); // Navigate to screen
+        Get.to(
+          () => SubcategoryUserListScreen(subcategoryName: subcategoryId),
+        ); // Navigate to screen
       } else {
-      //  Get.snackbar("", "Failed to load users");
+        //  Get.snackbar("", "Failed to load users");
       }
     } catch (e) {
-     // Get.snackbar("Error", e.toString());
+      // Get.snackbar("Error", e.toString());
     } finally {
       isLoading.value = false;
     }
   }
+
   Map<String, String> categoryNameMap = {};
   void fetchUsersListByCategory(String catId, {String? categoryName}) async {
     results.clear();
@@ -81,7 +90,9 @@ class HomeController extends GetxController {
     try {
       fetchCategories(); // Step 1: load category name map
 
-      var url = Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId');
+      var url = Uri.parse(
+        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId',
+      );
       var request = http.Request('GET', url);
       var response = await request.send();
 
@@ -104,15 +115,21 @@ class HomeController extends GetxController {
         results.assignAll(users);
 
         if (results.isNotEmpty) {
-          Get.to(() => ProfessionalPlumberView(), arguments: {
-            'users': results,
-            'title': categoryName ?? 'Professionals',
-          });
+          Get.to(
+            () => ProfessionalPlumberView(),
+            arguments: {
+              'users': results,
+              'title': categoryName ?? 'Professionals',
+            },
+          );
         } else {
-          Get.to(() => ServiceproView(),arguments: {
-            'users': results,
-            'title': categoryName ?? 'Professionals',
-          });
+          Get.to(
+            () => ServiceproView(),
+            arguments: {
+              'users': results,
+              'title': categoryName ?? 'Professionals',
+            },
+          );
         }
       } else {
         print("Error: ${response.reasonPhrase}");
@@ -124,15 +141,12 @@ class HomeController extends GetxController {
     }
   }
 
-
-
-
-
-
   Future<void> fetchAddress() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? userId = prefs.getString('userId');  // Retrieve the userId from SharedPreferences
+      String? userId = prefs.getString(
+        'userId',
+      ); // Retrieve the userId from SharedPreferences
 
       if (userId == null) {
         print("User ID not found");
@@ -140,9 +154,12 @@ class HomeController extends GetxController {
       }
 
       var headers = {'Content-Type': 'application/json'};
-      var request = http.Request('POST', Uri.parse('https://jdapi.youthadda.co/user/getmyaddress'));
+      var request = http.Request(
+        'POST',
+        Uri.parse('https://jdapi.youthadda.co/user/getmyaddress'),
+      );
       request.body = json.encode({
-        "userId": userId,  // Use the dynamic userId
+        "userId": userId, // Use the dynamic userId
       });
       request.headers.addAll(headers);
 
@@ -159,7 +176,7 @@ class HomeController extends GetxController {
         var jsonResponse = json.decode(responseString);
 
         if (jsonResponse['data'] != null && jsonResponse['data'].isNotEmpty) {
-          var addressesList = jsonResponse['data'];  // List of addresses
+          var addressesList = jsonResponse['data']; // List of addresses
 
           // Clear any previous address data
           houseNo.value = '';
@@ -168,14 +185,14 @@ class HomeController extends GetxController {
           contactNo.value = '';
 
           // Select the last address from the list
-          var lastAddress = addressesList.last;  // Using the last address in the list
+          var lastAddress =
+              addressesList.last; // Using the last address in the list
 
           // Storing the fetched address fields (using the last one here)
           houseNo.value = lastAddress['houseNo'] ?? '';
           landMark.value = lastAddress['landMark'] ?? '';
           addressType.value = lastAddress['addressType'] ?? '';
           contactNo.value = lastAddress['contactNo'] ?? '';
-
         } else {
           print("Data empty or not found in response");
         }
@@ -187,10 +204,12 @@ class HomeController extends GetxController {
     }
   }
 
-
   void fetchCategories() async {
     try {
-      var request = http.Request('GET', Uri.parse('https://jdapi.youthadda.co/category/getCategory'));
+      var request = http.Request(
+        'GET',
+        Uri.parse('https://jdapi.youthadda.co/category/getCategory'),
+      );
       var response = await request.send();
 
       if (response.statusCode == 200) {
@@ -199,14 +218,17 @@ class HomeController extends GetxController {
 
         if (jsonData['data'] != null) {
           var dataList = jsonData['data'] as List;
-          allCategories.value = dataList.map((item) {
-            final category = CategoryModel.fromJson(item);
-            print('🖼️ Image URL: ${category.icon}'); // 🔍 Print here
-            return category;
-          }).toList();
+          allCategories.value =
+              dataList.map((item) {
+                final category = CategoryModel.fromJson(item);
+                print('🖼️ Image URL: ${category.icon}'); // 🔍 Print here
+                return category;
+              }).toList();
 
-          visitingProfessionals.value = allCategories.where((c) => c.spType == '1').toList();
-          fixedChargeHelpers.value = allCategories.where((c) => c.spType == '2').toList();
+          visitingProfessionals.value =
+              allCategories.where((c) => c.spType == '1').toList();
+          fixedChargeHelpers.value =
+              allCategories.where((c) => c.spType == '2').toList();
 
           print("✅ Categories loaded");
         }
@@ -218,12 +240,12 @@ class HomeController extends GetxController {
     }
   }
 
-
   void fetchUsersByCategory(String categoryId) async {
     isLoading.value = true;
     try {
       final uri = Uri.parse(
-          'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$categoryId');
+        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$categoryId',
+      );
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
@@ -256,12 +278,14 @@ class HomeController extends GetxController {
       isLoading.value = false;
     }
   }
+
   Future<void> saveSkillsToSharedPrefs(List<dynamic> skills) async {
     final prefs = await SharedPreferences.getInstance();
     final skillsJsonString = jsonEncode(skills);
     await prefs.setString('user_skills', skillsJsonString);
     print("✅ Skills saved to SharedPreferences");
   }
+
   // To toggle category view between expanded and collapsed
   void toggleCategoryView() {
     showAllCategories.value = !showAllCategories.value;
@@ -276,8 +300,6 @@ class HomeController extends GetxController {
     }
   }
 
-
-
   void showSignupSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -291,9 +313,8 @@ class HomeController extends GetxController {
           height: MediaQuery.of(context).size.height * 0.8,
           child: Container(
             decoration: BoxDecoration(
-            color:Color(0xffD9E4FC),
+              color: Color(0xffD9E4FC),
               boxShadow: [BoxShadow(blurRadius: 4, color: Color(0xFFD9E4FC))],
-
 
               borderRadius: const BorderRadius.only(
                 topRight: Radius.circular(20),
@@ -302,7 +323,7 @@ class HomeController extends GetxController {
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(
-               // horizontal: 16.0,
+                // horizontal: 16.0,
                 vertical: 16.0,
               ),
               child: SingleChildScrollView(
@@ -312,7 +333,9 @@ class HomeController extends GetxController {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Text("  "),SizedBox(width: 30,),
+                      children: [
+                        Text("  "),
+                        SizedBox(width: 30),
                         Row(
                           children: [
                             Text(
@@ -322,7 +345,8 @@ class HomeController extends GetxController {
                                 fontWeight: FontWeight.w700,
                                 fontFamily: 'Poppins',
                               ),
-                            ),  Icon(Icons.arrow_downward),
+                            ),
+                            Icon(Icons.arrow_downward),
                           ],
                         ),
                         IconButton(
@@ -413,18 +437,19 @@ class HomeController extends GetxController {
       fetchAddress();
     }
     update();
-  //  fetchUsersListByCategory("catId");
+    //  fetchUsersListByCategory("catId");
     super.onInit();
   }
 
   var searchController = TextEditingController();
 
-
   /// Fetch service providers from API
   Future<void> fetchServiceProviders(String keyword) async {
     try {
       // Constructing the URL with the search keyword
-      var url = Uri.parse('https://jdapi.youthadda.co/user/searchServiceProviders?name=$keyword');
+      var url = Uri.parse(
+        'https://jdapi.youthadda.co/user/searchServiceProviders?name=$keyword',
+      );
       var request = http.Request('GET', url);
 
       // Sending the HTTP request
@@ -440,15 +465,19 @@ class HomeController extends GetxController {
 
         // Checking if 'data' is a list and updating the searchResults
         if (jsonData['data'] is List) {
-          searchResults.value = jsonData['data'];  // Update the observable list with data
+          searchResults.value =
+              jsonData['data']; // Update the observable list with data
         } else {
-          searchResults.clear();  // Clear results if data is not in the expected format
+          searchResults
+              .clear(); // Clear results if data is not in the expected format
         }
       } else {
-        print("❌ Failed: ${response.reasonPhrase}");  // Log failure if status code isn't 200
+        print(
+          "❌ Failed: ${response.reasonPhrase}",
+        ); // Log failure if status code isn't 200
       }
     } catch (e) {
-      print("❗ Error: $e");  // Catch and log any errors
+      print("❗ Error: $e"); // Catch and log any errors
     }
   }
 
@@ -480,7 +509,6 @@ class HomeController extends GetxController {
   void selectCategory(String label) {
     selectedCategory.value = label;
   }
-
 
   final services = [
     {
@@ -535,6 +563,7 @@ class HomeController extends GetxController {
   void onClose() {
     super.onClose();
   }
+
   void increment() => count.value++;
 }
 
@@ -545,7 +574,8 @@ class CategoryModel {
   final String spType;
   final List<SubcategoryModel> subcategories; // Add a list of subcategories
 
-  CategoryModel({ required this.catid,
+  CategoryModel({
+    required this.catid,
     required this.label,
     required this.icon,
     required this.spType,
@@ -554,13 +584,15 @@ class CategoryModel {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     String rawIcon = json['categoryImg'] ?? '';
-    String iconUrl = rawIcon.startsWith('http')
-        ? rawIcon
-        : 'https://jdapi.youthadda.co/${rawIcon.replaceFirst(RegExp(r'^/'), '')}';
+    String iconUrl =
+        rawIcon.startsWith('http')
+            ? rawIcon
+            : 'https://jdapi.youthadda.co/${rawIcon.replaceFirst(RegExp(r'^/'), '')}';
 
-    var subcategoriesList = (json['subcategories'] as List)
-        .map((subItem) => SubcategoryModel.fromJson(subItem))
-        .toList();
+    var subcategoriesList =
+        (json['subcategories'] as List)
+            .map((subItem) => SubcategoryModel.fromJson(subItem))
+            .toList();
 
     return CategoryModel(
       catid: json['_id'] ?? '',
@@ -571,6 +603,7 @@ class CategoryModel {
     );
   }
 }
+
 class SubcategoryModel {
   final String subId;
   final String name;
@@ -599,11 +632,7 @@ class UserModel {
   final String name;
   final List<dynamic> skills;
 
-  UserModel({
-    required this.id,
-    required this.name,
-    required this.skills,
-  });
+  UserModel({required this.id, required this.name, required this.skills});
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
@@ -613,8 +642,6 @@ class UserModel {
     );
   }
 }
-
-
 
 class SubcategoryUserListScreen extends StatelessWidget {
   final String subcategoryName;

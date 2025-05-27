@@ -117,7 +117,8 @@ class JobsView extends GetView<JobsController> {
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       SizedBox(height: 8),
                                       Row(
@@ -190,7 +191,8 @@ class JobsView extends GetView<JobsController> {
                                                 Row(
                                                   children: [
                                                     Icon(
-                                                      Icons.assignment_turned_in,
+                                                      Icons
+                                                          .assignment_turned_in,
                                                       size: 16,
                                                       color: Colors.grey,
                                                     ),
@@ -223,7 +225,10 @@ class JobsView extends GetView<JobsController> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
-                                            child: _outlinedButton("Call", false),
+                                            child: _outlinedButton(
+                                              "Call",
+                                              false,
+                                            ),
                                           ),
                                           const SizedBox(width: 8),
                                           Expanded(
@@ -699,13 +704,225 @@ class JobsView extends GetView<JobsController> {
             ),
             InkWell(
               onTap: () {
-                Get.to(JobsDetailsView());
+                // Get.to(JobsDetailsView());
               },
               child: _actionButton("Details", Colors.white, Colors.orange),
             ),
           ],
         ),
       ],
+    );
+  }
+}
+
+void showPaymentBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+    ),
+    builder: (context) {
+      return Container(
+        height: MediaQuery.of(context).size.height * 0.9,
+        decoration: BoxDecoration(
+          gradient: AppColors.appGradient2,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    icon: Icon(Icons.close),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Confirm Payment Received',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  fontFamily: 'poppins',
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              Image.asset(
+                'assets/images/payment_confirm.png', // replace with your illustration
+                height: 246,
+                width: 246,
+              ),
+
+              const SizedBox(height: 20),
+              Text(
+                'You’ve received a payment confirmation from the user. Please verify the amount received.',
+                textAlign: TextAlign.start,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'poppins',
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black87,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Card(
+                  child: Container(
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 10,
+                          color: Colors.black12,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        InfoRow(label: 'User', value: 'Shivani Singh'),
+                        InfoRow(label: 'Duration', value: '3 Hours'),
+                        InfoRow(label: 'Date', value: '7 April, 2025'),
+                        InfoRow(label: 'Time', value: '10:30 AM - 01:30 PM'),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              Card(
+                color: Colors.white,
+                child: Container(
+                  height: 44,
+                  width: 157,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text(
+                        'Amount: ',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'poppins',
+                        ),
+                      ),
+                      Text(
+                        '₹250',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.orange,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 37,
+                    width: 100,
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.orange),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Colors.orange,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'poppins',
+                        ),
+                        textAlign: TextAlign.start,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  SizedBox(
+                    height: 37,
+                    width: 147,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Accept Payment logic here
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'Accept Payment',
+                        style: TextStyle(
+                          fontFamily: 'poppins',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.start,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const InfoRow({required this.label, required this.value, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(label, style: TextStyle(color: Colors.grey[700])),
+          ),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+        ],
+      ),
     );
   }
 }
