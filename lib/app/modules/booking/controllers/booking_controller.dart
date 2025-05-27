@@ -351,6 +351,7 @@
 // }
 //
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -360,7 +361,9 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:url_launcher/url_launcher.dart' show canLaunchUrl, launchUrl;
 import 'package:uuid/uuid.dart';
 
+import '../../../../auth_controller.dart';
 import '../../CancelBooking/views/cancel_booking_view.dart';
+import '../../login/views/login_view.dart';
 
 class BookingController extends GetxController {
   //TODO: Implement BookingController
@@ -716,9 +719,143 @@ Future<void> fetchBookings() async {
   }
 }
 
+void Function(Function(BuildContext))? onNeedContext;
+final AuthController authController = Get.find<AuthController>();
 @override
-void onReady() {}
+void onReady() {
+  //super.onReady();
+  Future.delayed(Duration.zero, () {
+    if (!authController.isLoggedIn.value) {
+      // context use nahi kar sakte directly yahan, toh callback ke through bhejna padega
+      if (onNeedContext != null) {
+        onNeedContext!(showSignupSheet);
+      }
+    }
+  });
+}
 
+void showSignupSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (context) {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.8,
+        child: Container(
+          decoration: BoxDecoration(
+            color:Color(0xffD9E4FC),
+            boxShadow: [BoxShadow(blurRadius: 4, color: Color(0xFFD9E4FC))],
+
+
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(20),
+              topLeft: Radius.circular(20),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              // horizontal: 16.0,
+              vertical: 16.0,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [Text("  "),SizedBox(width: 30,),
+                      Row(
+                        children: [
+                          Text(
+                            "Sign Up Required ",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),  Icon(Icons.arrow_downward),
+                        ],
+                      ),
+                      IconButton(
+                        onPressed: () => Get.back(),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  Image.asset(
+                    "assets/images/Signupbro.png",
+                    height: 293,
+                    width: 393,
+                  ),
+                  const SizedBox(height: 20),
+
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      'Please verify your mobile number to continue \nusing TaskExpress.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 36.93,
+                    width: 170,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF114BCA),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        Get.to(LoginView());
+                      },
+                      child: Text(
+                        "Continue",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15,
+                          color: Colors.white,
+                          fontFamily: "poppins",
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      'This helps us personalize your experience and keep your data secure.',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
 @override
 void onClose() {}
 void increment() => count.value++;

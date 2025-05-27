@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
+import '../../../../auth_controller.dart';
 import '../../../../colors.dart';
 import '../../provider_otp/views/provider_otp_view.dart';
 import '../controllers/provider_login_controller.dart';
@@ -135,7 +136,7 @@ class ProviderLoginView extends GetView<ProviderLoginController> {
                   ),
                 ),SizedBox(height: 20),
                 InkWell(onTap: (){controller.sendOtp();
-                  // Get.to(ProviderOtpView());
+                final AuthController authController = Get.find();
                 },
                   child: Container(
                     height: 64,

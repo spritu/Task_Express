@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart'; // <-- ADD THIS
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,11 +58,15 @@ void main() async {
   final isFirstRun = prefs.getBool('isFirstRun') ?? true;
 
   if (isFirstRun) {
+    final box = GetStorage();
     await box.erase(); // ✅ Clear GetStorage on first launch
     await prefs.clear(); // ✅ Clear SharedPreferences on first launch
     await prefs.setBool('isFirstRun', false); // Mark first run done
   }
-
+  SystemChannels.lifecycle.setMessageHandler((msg) {
+    print('App lifecycle state: $msg');
+    return Future.value();
+  });
  Get.put(AuthController(), permanent: true);
   Get.put(LocationController(), permanent: true);
   Get.put(ProviderLocationController(), permanent: true);
@@ -152,7 +157,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    checkLoginStatus();
+    checkLoginStatus(); _navigate();
   }
 
   // void checkLoginStatus() async {
@@ -177,28 +182,58 @@ class _SplashScreenState extends State<SplashScreen> {
   //     startSplashFlow();
   //   }
   // }
+  // void checkLoginStatus() async {
+  //   final box = GetStorage();
+  //   bool  isLoggedIn = box.read('isLoggedIn') ?? false;
+  //   bool  isLoggedIn2 = box.read('isLoggedIn2') ?? false;
+  //
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final userId = prefs.getString('userId');
+  //
+  //   print('isLoggedIn: $isLoggedIn');
+  //   print('isLoggedIn2: $isLoggedIn2');
+  //   print('userId: $userId');
+  //
+  //   await Future.delayed(Duration(seconds: 1));
+  //
+  //   if (isLoggedIn2) {
+  //     Get.offAllNamed('/bottom2'); // 👈 Pehle Login2 check karo
+  //   } else if (isLoggedIn || userId != null) {
+  //     Get.offAllNamed('/bottom');
+  //   } else {
+  //     startSplashFlow();
+  //   }
+  // }
+  Future<void> _navigate() async {
+    await Future.delayed(Duration(seconds: 2)); // Splash delay
+    final box = GetStorage();
+    final isLoggedIn = box.read('isLoggedIn') ?? false;
+
+    if (isLoggedIn) {
+      Get.offAllNamed('/bottom');
+    } else {
+      Get.offAllNamed('/login');
+    }
+  }
   void checkLoginStatus() async {
     final box = GetStorage();
-    bool  isLoggedIn = box.read('isLoggedIn') ?? false;
-    bool  isLoggedIn2 = box.read('isLoggedIn2') ?? false;
-
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
+    final isLoggedIn = box.read('isLoggedIn') ?? false;
+    final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
 
     print('isLoggedIn: $isLoggedIn');
     print('isLoggedIn2: $isLoggedIn2');
-    print('userId: $userId');
 
     await Future.delayed(Duration(seconds: 1));
 
-    if (isLoggedIn2) {
-      Get.offAllNamed('/bottom2'); // 👈 Pehle Login2 check karo
-    } else if (isLoggedIn || userId != null) {
+    if (isLoggedIn) {
       Get.offAllNamed('/bottom');
+    } else if (isLoggedIn2) {
+      Get.offAllNamed('/bottom2');
     } else {
-      startSplashFlow();
+      startSplashFlow(); // your onboarding screen logic
     }
   }
+
 
 
 
