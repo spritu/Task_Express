@@ -80,6 +80,7 @@ class EditProfileView extends StatelessWidget {
                         _buildEditableField("Email", controller.emailController, controller),
                       ],
                     ),
+
                   ),
                 ),
 
@@ -116,6 +117,7 @@ class EditProfileView extends StatelessWidget {
 
   Widget _buildEditableField(
       String label, TextEditingController textController, EditProfileController controller) {
+    final tempController = TextEditingController(text: textController.text);
     return Padding(
       padding: const EdgeInsets.only(bottom: 5),
       child: Row(

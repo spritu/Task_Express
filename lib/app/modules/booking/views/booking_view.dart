@@ -15,7 +15,7 @@ class BookingView extends GetView<BookingController> {
 
   @override
   Widget build(BuildContext context) {
-
+    final bottomController = Get.find<BottomController>();
     Get.put(BookingController());
     return WillPopScope(
       onWillPop: () async {
@@ -483,7 +483,7 @@ class BookingView extends GetView<BookingController> {
     if (controller.bookings.isEmpty) {
       return Center(child: Text("No bookings found."));
     }
-
+    final bottomController = Get.find<BottomController>();
     return ListView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(), // Prevents scroll conflicts
@@ -576,7 +576,12 @@ class BookingView extends GetView<BookingController> {
                       style: TextStyle(color: Colors.black, fontSize: 14),
                     ),
                     InkWell(
-                      onTap: () => Get.to(UserHelpView()),
+                       onTap: () {
+              if (!authController.isLoggedIn.value) {
+                          bottomController.checkAndShowSignupSheet(context);
+                          return;
+                        }
+                        Get.to(UserHelpView());},
                       child: const Text(
                         "Help",
                         style: TextStyle(
@@ -923,6 +928,7 @@ class RequestPendingBottomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomController = Get.find<BottomController>();
     return Container(
       height: MediaQuery.of(context).size.height,
       color: Color(0xFFEEF3FE),
@@ -958,6 +964,10 @@ class RequestPendingBottomCard extends StatelessWidget {
                     children: [
                       InkWell(
                         onTap: () {
+                          if (!authController.isLoggedIn.value) {
+                            bottomController.checkAndShowSignupSheet(context);
+                            return;
+                          }
                           Get.to(BookingConfirmView());
                         },
                         child: Card(

@@ -8,6 +8,7 @@ import '../../../../auth_controller.dart';
 import '../../BricklayingHelper/views/bricklaying_helper_view.dart';
 import '../../CementHelper/views/cement_helper_view.dart';
 import '../../Scaffolding_helper/views/scaffolding_helper_view.dart';
+import '../../booking/controllers/booking_controller.dart';
 import '../../login/views/login_view.dart';
 import '../../plastering_helper/views/plastering_helper_view.dart';
 import '../../professional_plumber/views/professional_plumber_view.dart';
@@ -17,6 +18,7 @@ import '../../tile_fixing_helper/views/tile_fixing_helper_view.dart';
 
 class HomeController extends GetxController {
   // TODO: Implement WorknestController
+
   RxList<UserModel> usersByCategory = <UserModel>[].obs;
   RxList<CategoryModel> allCategories = <CategoryModel>[].obs;
   RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
@@ -26,7 +28,9 @@ class HomeController extends GetxController {
   final landMark = Rx<String>('');
   final addressType = Rx<String>('');
   final contactNo = Rx<String>('');
-  RxList<dynamic> searchResults = RxList([]);
+  final RxList<dynamic> searchResults = <dynamic>[].obs;
+
+
   RxList<dynamic> results = RxList([]);
   var expandedServiceType = ''.obs;
   RxBool showAllCategories = false.obs;
@@ -404,7 +408,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     fetchCategories();
-    Get.put(AuthController(), permanent: true);
+
     if (Get.arguments?['refreshHome'] == true) {
       fetchAddress();
     }
@@ -444,11 +448,11 @@ class HomeController extends GetxController {
         } else {
           searchResults.clear();  // Clear results if data is not in the expected format
         }
-      } else {
-        print("❌ Failed: ${response.reasonPhrase}");  // Log failure if status code isn't 200
+      } else { searchResults.clear();
+      print("❌ Failed: ${response.reasonPhrase}");  // Log failure if status code isn't 200
       }
-    } catch (e) {
-      print("❗ Error: $e");  // Catch and log any errors
+    } catch (e) { searchResults.clear();
+    print("❗ Error: $e");  // Catch and log any errors
     }
   }
 
@@ -529,8 +533,15 @@ class HomeController extends GetxController {
   @override
   void onReady() {
     super.onReady();
+    Future.delayed(Duration.zero, () {
+      if (!authController.isLoggedIn.value) {
+        if (onNeedContext != null) {
+          onNeedContext!(showSignupSheet);
+        }
+      }
+    });
   }
-
+  void Function(Function(BuildContext))? onNeedContext;
   @override
   void onClose() {
     super.onClose();

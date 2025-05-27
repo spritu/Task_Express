@@ -18,6 +18,7 @@ class BottomView extends GetView<BottomController> {
   @override
   Widget build(BuildContext context) {
 
+
     Get.put(BottomController());
     return Scaffold(
       body: Obx(() {
