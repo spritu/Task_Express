@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../colors.dart';
 import '../controllers/sign_up_controller.dart';
 
@@ -15,177 +14,170 @@ class SignUpView extends GetView<SignUpController> {
   @override
   Widget build(BuildContext context) {
  Get.put(SignUpController());
-    return WillPopScope(
-      onWillPop: () async {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        bool isProfileCompleted = prefs.getBool('profileCompleted') ?? false;
-        return isProfileCompleted;
-      },
-      child: Scaffold(
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFF87AAF6), Colors.white],
-            ),
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF87AAF6), Colors.white],
           ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                const Text(
-                  "Your Profile",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 20),
-                Obx(
-                      () => Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      CircleAvatar(
-                        radius: 45,
-                        backgroundColor: Colors.white,
-                        backgroundImage: controller.imagePath.value.isNotEmpty
-                            ? FileImage(File(controller.imagePath.value))
-                            : null,
-                        child: controller.imagePath.value.isEmpty
-                            ? const Icon(Icons.person, size: 60, color: Colors.grey)
-                            : null,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 4,
-                        child: InkWell(
-                          onTap: () => _showImagePicker(context, controller),
-                          child: const CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Colors.white,
-                            child: Icon(Icons.edit, size: 16, color: Colors.black),
-                          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+              const Text(
+                "Your Profile",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 20),
+              Obx(
+                    () => Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    CircleAvatar(
+                      radius: 45,
+                      backgroundColor: Colors.white,
+                      backgroundImage: controller.imagePath.value.isNotEmpty
+                          ? FileImage(File(controller.imagePath.value))
+                          : null,
+                      child: controller.imagePath.value.isEmpty
+                          ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                          : null,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 4,
+                      child: InkWell(
+                        onTap: () => _showImagePicker(context, controller),
+                        child: const CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.white,
+                          child: Icon(Icons.edit, size: 16, color: Colors.black),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    child: Form(
-                      key: _formKey,  // Assign the form key
-                      child: Column(
-                        children: [
-                          buildTextField("First Name", "Enter first name", onChanged: (val) => controller.firstName.value = val, validator: (val) => val?.isEmpty ?? true ? 'First name is required' : null),
-                          const SizedBox(height: 12),
-                          buildTextField("Last Name", "Enter last name", onChanged: (val) => controller.lastName.value = val, validator: (val) => val?.isEmpty ?? true ? 'Last name is required' : null),
-                          const SizedBox(height: 20),
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Gender", style: TextStyle(fontSize: 12)),
-                          ),
-                          const SizedBox(height: 10),
-                          Obx(
-                                () => Row(
-                              children: ["Female", "Male", "Other"].map((e) {
-                                final isSelected = controller.gender.value == e;
-                                return Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                                    child: OutlinedButton(
-                                      style: OutlinedButton.styleFrom(
-                                        backgroundColor: isSelected ? AppColors.blue : Colors.white,
-                                        side: BorderSide(color: isSelected ? AppColors.blue : Colors.black26),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                      ),
-                                      onPressed: () => controller.gender.value = e,
-                                      child: Text(
-                                        e,
-                                        style: TextStyle(color: isSelected ? Colors.white : Colors.black, fontWeight: FontWeight.w600),
-                                      ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Form(
+                    key: _formKey,  // Assign the form key
+                    child: Column(
+                      children: [
+                        buildTextField("First Name", "Enter first name", onChanged: (val) => controller.firstName.value = val, validator: (val) => val?.isEmpty ?? true ? 'First name is required' : null),
+                        const SizedBox(height: 12),
+                        buildTextField("Last Name", "Enter last name", onChanged: (val) => controller.lastName.value = val, validator: (val) => val?.isEmpty ?? true ? 'Last name is required' : null),
+                        const SizedBox(height: 20),
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text("Gender", style: TextStyle(fontSize: 12)),
+                        ),
+                        const SizedBox(height: 10),
+                        Obx(
+                              () => Row(
+                            children: ["Female", "Male", "Other"].map((e) {
+                              final isSelected = controller.gender.value == e;
+                              return Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  child: OutlinedButton(
+                                    style: OutlinedButton.styleFrom(
+                                      backgroundColor: isSelected ? AppColors.blue : Colors.white,
+                                      side: BorderSide(color: isSelected ? AppColors.blue : Colors.black26),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    ),
+                                    onPressed: () => controller.gender.value = e,
+                                    child: Text(
+                                      e,
+                                      style: TextStyle(color: isSelected ? Colors.white : Colors.black, fontWeight: FontWeight.w600),
                                     ),
                                   ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          buildTextField("Date Of Birth", "DD/MM/YYYY",
-                              icon: Icons.calendar_month,
-                              isDate: true,
-                              controller: controller.dobController,
-                              onChanged: (val) => controller.dateOfBirth.value = val, validator: (val) => val?.isEmpty ?? true ? 'Date of birth is required' : null),
-                          const SizedBox(height: 12),
-                          buildTextField("Email", "Enter email",
-                              onChanged: (val) => controller.email.value = val,
-                              keyboardType: TextInputType.emailAddress,
-                              validator: (val) => val?.isEmpty ?? true ? 'Email is required' : null),
-                          const SizedBox(height: 12),
-                          buildDropdown(
-                            "State",
-                            controller.stateCityMap.keys.toList(),
-                            controller.state,
-                            validator: (val) => val?.isEmpty ?? true ? 'State is required' : null,
-                            onChanged: controller.onStateChanged, // 👈 triggers city reset
-                          ),
-                          const SizedBox(height: 12),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Obx(() => buildDropdown(
-                                  "City",
-                                  controller.citiesForSelectedState,
-                                  controller.city,
-                                  validator: (val) => val?.isEmpty ?? true ? 'City is required' : null,
-                                )),
-                              ),
-                              const SizedBox(width: 10),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width / 3,
-                                child: buildTextField(
-                                  "Pin Code",
-                                  "Enter pin code",
-                                  keyboardType: TextInputType.number,
-                                  onChanged: (val) => controller.pinCode.value = val,
-                               //   validator: (val) => val?.isEmpty ?? true ? 'Pin code is required' : null,
                                 ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        buildTextField("Date Of Birth", "DD/MM/YYYY",
+                            icon: Icons.calendar_month,
+                            isDate: true,
+                            controller: controller.dobController,
+                            onChanged: (val) => controller.dateOfBirth.value = val, validator: (val) => val?.isEmpty ?? true ? 'Date of birth is required' : null),
+                        const SizedBox(height: 12),
+                        buildTextField("Email", "Enter email",
+                            onChanged: (val) => controller.email.value = val,
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (val) => val?.isEmpty ?? true ? 'Email is required' : null),
+                        const SizedBox(height: 12),
+                        buildDropdown(
+                          "State",
+                          controller.stateCityMap.keys.toList(),
+                          controller.state,
+                          validator: (val) => val?.isEmpty ?? true ? 'State is required' : null,
+                          onChanged: controller.onStateChanged, // 👈 triggers city reset
+                        ),
+                        const SizedBox(height: 12),
+
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Obx(() => buildDropdown(
+                                "City",
+                                controller.citiesForSelectedState,
+                                controller.city,
+                                validator: (val) => val?.isEmpty ?? true ? 'City is required' : null,
+                              )),
+                            ),
+                            const SizedBox(width: 10),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 3,
+                              child: buildTextField(
+                                "Pin Code",
+                                "Enter pin code",
+                                keyboardType: TextInputType.number,
+                                onChanged: (val) => controller.pinCode.value = val,
+                             //   validator: (val) => val?.isEmpty ?? true ? 'Pin code is required' : null,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
+                        ),
 
 
-                          const SizedBox(height: 12),
-                          buildTextField("Referral Code", "Enter referral code",
-                              keyboardType: TextInputType.number,
-                              onChanged: (val) => controller.referralCode.value = val,
-                              //validator: (val) => val?.isEmpty ?? true ? 'Referral code is required' : null
-                            ),
-                          const SizedBox(height: 30),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.6,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              color: AppColors.blue,
-                            ),
-                            child: TextButton(
-                              onPressed: () {
-                                // Validate form before proceeding
-                                if (_formKey.currentState?.validate() ?? false) {
-                                  controller.registerUser();
-                                }
-                              },
-                              child: const Text("Proceed", style: TextStyle(color: Colors.white, fontSize: 16)),
-                            ),
+                        const SizedBox(height: 12),
+                        buildTextField("Referral Code", "Enter referral code",
+                            keyboardType: TextInputType.number,
+                            onChanged: (val) => controller.referralCode.value = val,
+                            //validator: (val) => val?.isEmpty ?? true ? 'Referral code is required' : null
                           ),
-                          const SizedBox(height: 30),
-                        ],
-                      ),
+                        const SizedBox(height: 30),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            color: AppColors.blue,
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              // Validate form before proceeding
+                              if (_formKey.currentState?.validate() ?? false) {
+                                controller.registerUser();
+                              }
+                            },
+                            child: const Text("Proceed", style: TextStyle(color: Colors.white, fontSize: 16)),
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
