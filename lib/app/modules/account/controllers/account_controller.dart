@@ -59,7 +59,7 @@ class AccountController extends GetxController {
     authController.isLoggedIn.value = false;
 
     // Navigate to login screen
-    Get.offAllNamed('/login');
+    Get.offAllNamed('/join');
   }
 
   Future<void> loadMobileNumber() async {

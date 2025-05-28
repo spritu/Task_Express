@@ -68,7 +68,6 @@ class SignUpController extends GetxController {
 
 
 
-
   bool validateFields() {
     if (firstName.value.isEmpty ||
         lastName.value.isEmpty ||
@@ -155,7 +154,8 @@ class SignUpController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final decodedResponse = json.decode(resBody);
         print('🔍 Decoded Response: $decodedResponse');
-
+        final box = GetStorage();
+        box.write('isLoggedIn', true);
         final userData = decodedResponse['data'] ?? decodedResponse['user'] ?? decodedResponse;
 
         if (userData != null) {
