@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart'; // <-- ADD THIS
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,26 +50,47 @@ import 'auth_controller.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
-  final prefs = await SharedPreferences.getInstance();
+  // SharedPreferences prefs = await SharedPreferences.getInstance();// <-- ADD THIS
   final box = GetStorage();
+  // await prefs.clear();
+  final isLoggedIn = box.read('isLoggedIn') ?? false;
+  final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
 
-  // Check if first launch
-  final isFirstRun = prefs.getBool('isFirstRun') ?? true;
 
-  if (isFirstRun) {
-    final box = GetStorage();
-    await box.erase(); // ✅ Clear GetStorage on first launch
-    await prefs.clear(); // ✅ Clear SharedPreferences on first launch
-    await prefs.setBool('isFirstRun', false); // Mark first run done
-  }
-  SystemChannels.lifecycle.setMessageHandler((msg) {
-    print('App lifecycle state: $msg');
-    return Future.value();
-  });
- Get.put(AuthController(), permanent: true);
-  Get.put(LocationController(), permanent: true);
-  Get.put(ProviderLocationController(), permanent: true);
+  //Get.put(WorknestController(),permanent: true);
+  //Get.put(SignUpController(),permanent: true);
+  //Get.put(BottomController(),permanent: true);
+  // Get.put(HomeController(),permanent: true);
+  //Get.put(CancelBookingController(),permanent: true);
 
+  Get.put(PlasteringHelperController(),permanent: true);
+  Get.put(BricklayingHelperController(),permanent: true);
+  Get.put(BookingController(),permanent: true);
+  Get.put(ScaffoldingHelperController(),permanent: true);
+
+  Get.put(AuthController(),permanent: true);
+  Get.put(TileFixingHelperController(),permanent: true);
+  Get.put(JobsDetailsController(),permanent: true);
+  Get.put(RoadConstructionHelperController(),permanent: true);
+  Get.put(ProfessionalPlumberController(),permanent: true);
+  Get.put(SettingController(),permanent: true);
+  Get.put(EditProfileController(),permanent: true);
+  Get.put(JobsController(),permanent: true);
+  Get.lazyPut(() => ChatController(),fenix: true);
+  Get.put(ProviderSettingController(),permanent: true);
+  Get.lazyPut(()=>ProviderChatController(),fenix: true);
+  Get.put(OtpController(),permanent: true);
+  // Get.put(ProviderHomeController(),permanent: true);  //auto referesh
+  // Get.put(ProviderEditProfileController(),permanent: true);
+  Get.put(ProviderLoginController(),permanent: true);
+  Get.put(ActivejobScreenController(),permanent: true);
+  Get.put(ProviderChatScreenController(),permanent: true);
+  Get.put(ProviderOtpController(),permanent: true);
+  Get.put(Bottom2Controller(),permanent: true);
+  Get.put(AddAddressController(),permanent: true);
+  Get.put(ProfessionalProfileController(),permanent: true);
+  Get.put(LocationController(),permanent: true);
+  Get.put(ProviderLocationController(),permanent: true);
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
@@ -80,70 +100,6 @@ void main() async {
     ),
   );
 }
-
-
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await GetStorage.init();
-//
-//   SharedPreferences prefs = await SharedPreferences.getInstance();
-//   final box = GetStorage();
-//   final userId = prefs.getString('userId');
-//   if (userId == null) {
-//     await box.erase(); // Clear all GetStorage values
-//   }
-//
-//   final isLoggedIn = box.read('isLoggedIn') ?? false;
-//   final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
-//
-//   Get.put(AuthController(), permanent: true);
-//   Get.put(LocationController(), permanent: true);
-//   Get.put(ProviderLocationController(), permanent: true);
-//
-//
-//   //Get.put(WorknestController(),permanent: true);
-//   //Get.put(SignUpController(),permanent: true);
-//   //Get.put(BottomController(),permanent: true);
-//  // Get.put(HomeController(),permanent: true);
-//   //Get.put(CancelBookingController(),permanent: true);
-//
-//  //  Get.put(PlasteringHelperController(),permanent: true);
-//  //  Get.put(BricklayingHelperController(),permanent: true);
-//  //  Get.put(BookingController(),permanent: true);
-//  //  Get.put(ScaffoldingHelperController(),permanent: true);
-//  //
-//    Get.put(AuthController(),permanent: true);
-//  //  Get.put(TileFixingHelperController(),permanent: true);
-//  //  Get.put(JobsDetailsController(),permanent: true);
-//  //  Get.put(RoadConstructionHelperController(),permanent: true);
-//  //  Get.put(ProfessionalPlumberController(),permanent: true);
-//  //  Get.put(SettingController(),permanent: true);
-//  // // Get.put(EditProfileController(),permanent: true);
-//  //  Get.put(JobsController(),permanent: true);
-//  //  Get.lazyPut(() => ChatController(),fenix: true);
-//  //  Get.put(ProviderSettingController(),permanent: true);
-//  //  Get.lazyPut(()=>ProviderChatController(),fenix: true);
-//  //  Get.put(OtpController(),permanent: true);
-//  // Get.put(ProviderHomeController(),permanent: true);  //auto referesh
-//  // Get.put(ProviderEditProfileController(),permanent: true);
-//  //  Get.put(ProviderLoginController(),permanent: true);
-//  //  Get.put(ActivejobScreenController(),permanent: true);
-//  //  Get.put(ProviderChatScreenController(),permanent: true);
-//  //  Get.put(ProviderOtpController(),permanent: true);
-//  //  Get.put(Bottom2Controller(),permanent: true);
-//  //  Get.put(AddAddressController(),permanent: true);
-//  //  Get.put(ProfessionalProfileController(),permanent: true);
-//   Get.put(LocationController(),permanent: true);
-//    Get.put(ProviderLocationController(),permanent: true);
-//   runApp(
-//     GetMaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       title: "Application",
-//       getPages: AppPages.routes,
-//       home: SplashScreen(),
-//     ),
-//   );
-// }
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -157,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    checkLoginStatus(); _navigate();
+    checkLoginStatus();
   }
 
   // void checkLoginStatus() async {
@@ -182,58 +138,28 @@ class _SplashScreenState extends State<SplashScreen> {
   //     startSplashFlow();
   //   }
   // }
-  // void checkLoginStatus() async {
-  //   final box = GetStorage();
-  //   bool  isLoggedIn = box.read('isLoggedIn') ?? false;
-  //   bool  isLoggedIn2 = box.read('isLoggedIn2') ?? false;
-  //
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final userId = prefs.getString('userId');
-  //
-  //   print('isLoggedIn: $isLoggedIn');
-  //   print('isLoggedIn2: $isLoggedIn2');
-  //   print('userId: $userId');
-  //
-  //   await Future.delayed(Duration(seconds: 1));
-  //
-  //   if (isLoggedIn2) {
-  //     Get.offAllNamed('/bottom2'); // 👈 Pehle Login2 check karo
-  //   } else if (isLoggedIn || userId != null) {
-  //     Get.offAllNamed('/bottom');
-  //   } else {
-  //     startSplashFlow();
-  //   }
-  // }
-  Future<void> _navigate() async {
-    await Future.delayed(Duration(seconds: 2)); // Splash delay
-    final box = GetStorage();
-    final isLoggedIn = box.read('isLoggedIn') ?? false;
-
-    if (isLoggedIn) {
-      Get.offAllNamed('/bottom');
-    } else {
-      Get.offAllNamed('/login');
-    }
-  }
   void checkLoginStatus() async {
     final box = GetStorage();
     final isLoggedIn = box.read('isLoggedIn') ?? false;
     final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
 
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+
     print('isLoggedIn: $isLoggedIn');
     print('isLoggedIn2: $isLoggedIn2');
+    print('userId: $userId');
 
     await Future.delayed(Duration(seconds: 1));
 
-    if (isLoggedIn) {
+    if (isLoggedIn2) {
+      Get.offAllNamed('/bottom2'); // 👈 Pehle Login2 check karo
+    } else if (isLoggedIn || userId != null) {
       Get.offAllNamed('/bottom');
-    } else if (isLoggedIn2) {
-      Get.offAllNamed('/bottom2');
     } else {
-      startSplashFlow(); // your onboarding screen logic
+      startSplashFlow();
     }
   }
-
 
 
 

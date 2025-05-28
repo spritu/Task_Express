@@ -68,6 +68,7 @@ class SignUpController extends GetxController {
 
 
 
+
   bool validateFields() {
     if (firstName.value.isEmpty ||
         lastName.value.isEmpty ||
