@@ -16,7 +16,7 @@ class AccountView extends GetView<AccountController> {
 
   @override
   Widget build(BuildContext context) {
-  Get.put(AccountController());
+    Get.put(AccountController());
 
     return WillPopScope(
       onWillPop: () async {
@@ -58,19 +58,23 @@ class AccountView extends GetView<AccountController> {
                           child: Row(
                             children: [
                               Obx(() {
-                        final imageUrl = controller.imagePath.value;
-                        return CircleAvatar(
-                        radius: 40,
-                        backgroundImage: imageUrl.isNotEmpty
-                        ? NetworkImage(imageUrl)
-                            : const AssetImage('assets/images/account.png') as ImageProvider,
-                        onBackgroundImageError: (_, __) {
-                        print("❌ Image failed to load.");
-                        },
-                        );
-                        }),
+                                final imageUrl = controller.imagePath.value;
+                                return CircleAvatar(
+                                  radius: 40,
+                                  backgroundImage:
+                                      imageUrl.isNotEmpty
+                                          ? NetworkImage(imageUrl)
+                                          : const AssetImage(
+                                                'assets/images/account.png',
+                                              )
+                                              as ImageProvider,
+                                  onBackgroundImageError: (_, __) {
+                                    print("❌ Image failed to load.");
+                                  },
+                                );
+                              }),
 
-                        Padding(
+                              Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8.0,
                                   vertical: 10,
@@ -115,7 +119,8 @@ class AccountView extends GetView<AccountController> {
                           ),
                         ),
                       ),
-                    ),SizedBox(height: 20),
+                    ),
+                    SizedBox(height: 20),
                     Card(
                       child: Container(
                         // height: 80,
@@ -153,14 +158,14 @@ class AccountView extends GetView<AccountController> {
                               Spacer(),
                               InkWell(
                                 onTap: () async {
-                                  final prefs = await SharedPreferences.getInstance();
-                                  final userId = prefs.getString('user_id') ?? '';
+                                  final prefs =
+                                      await SharedPreferences.getInstance();
+                                  final userId =
+                                      prefs.getString('user_id') ?? '';
 
                                   Get.to(
-                                        () => ProviderProfileView(),
-                                    arguments: {
-                                      'userId': userId,
-                                    },
+                                    () => ProviderProfileView(),
+                                    arguments: {'userId': userId},
                                   );
                                 },
 
@@ -174,7 +179,8 @@ class AccountView extends GetView<AccountController> {
                           ),
                         ),
                       ),
-                    ),SizedBox(height: 20),
+                    ),
+                    SizedBox(height: 20),
                     Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(
@@ -188,7 +194,6 @@ class AccountView extends GetView<AccountController> {
                         ),
                         child: Column(
                           children: [
-
                             InkWell(
                               onTap: () {
                                 Get.to(AddAddressView());
@@ -239,10 +244,11 @@ class AccountView extends GetView<AccountController> {
                         ),
                       ),
                     ),
-                    SizedBox(height: MediaQuery.of(context).size.height*0.2),
-                    InkWell(onTap: (){
-                      controller. logout();
-                    },
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                    InkWell(
+                      onTap: () {
+                        controller.logout();
+                      },
                       child: Container(
                         height: 28,
                         width: 75,
@@ -258,7 +264,8 @@ class AccountView extends GetView<AccountController> {
                               fontSize: 12,
                               fontFamily: "poppins",
                               fontWeight: FontWeight.w500,
-                            color: Color(0xff114BCA)),
+                              color: Color(0xff114BCA),
+                            ),
                           ),
                         ),
                       ),
