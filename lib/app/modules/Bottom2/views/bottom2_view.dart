@@ -17,6 +17,7 @@ class Bottom2View extends GetView<Bottom2Controller> {
   @override
   Widget build(BuildContext context) {
     Get.put(Bottom2Controller());
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Obx(() => _buildBody(controller.selectedIndex.value)),

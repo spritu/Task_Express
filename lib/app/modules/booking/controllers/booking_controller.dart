@@ -484,7 +484,7 @@ class BookingController extends GetxController {
     socket.connect();
 
     socket.onConnect((_) {
-      print('✅ Connected 2222 booking');
+      print('✅ Connected 2222 booking1');
     });
 
     print('socket99:${socket}');
@@ -545,7 +545,7 @@ class BookingController extends GetxController {
     socket.connect();
 
     socket.onConnect((_) {
-      print('✅ Connected 2222 booking');
+      print('✅ Connected 2222 booking2');
     });
 
     print('socket99:${socket}');
@@ -747,9 +747,8 @@ void showSignupSheet(BuildContext context) {
         height: MediaQuery.of(context).size.height * 0.8,
         child: Container(
           decoration: BoxDecoration(
-            color:Color(0xffD9E4FC),
+            color: Color(0xffD9E4FC),
             boxShadow: [BoxShadow(blurRadius: 4, color: Color(0xFFD9E4FC))],
-
 
             borderRadius: const BorderRadius.only(
               topRight: Radius.circular(20),
@@ -768,7 +767,9 @@ void showSignupSheet(BuildContext context) {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [Text("  "),SizedBox(width: 30,),
+                    children: [
+                      Text("  "),
+                      SizedBox(width: 30),
                       Row(
                         children: [
                           Text(
@@ -778,7 +779,8 @@ void showSignupSheet(BuildContext context) {
                               fontWeight: FontWeight.w700,
                               fontFamily: 'Poppins',
                             ),
-                          ),  Icon(Icons.arrow_downward),
+                          ),
+                          Icon(Icons.arrow_downward),
                         ],
                       ),
                       IconButton(
@@ -856,6 +858,7 @@ void showSignupSheet(BuildContext context) {
     },
   );
 }
+
 @override
 void onClose() {}
 void increment() => count.value++;

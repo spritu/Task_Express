@@ -11,19 +11,20 @@ class ServiceCompletedSuccessfullyView
   @override
   Widget build(BuildContext context) {
     Get.put(ServiceCompletedSuccessfullyController());
-    return  WillPopScope(
+    return WillPopScope(
       onWillPop: () async {
         Get.find<BottomController>().selectedIndex.value = 0; // 👈 Home tab
         Get.offAll(() => BottomView());
         return false;
       },
-      child: Scaffold(backgroundColor: Colors.white,
+      child: Scaffold(
+        backgroundColor: Colors.white,
         body: Container(
           height: MediaQuery.of(context).size.height,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
-              end:Alignment.bottomCenter,
+              end: Alignment.bottomCenter,
               stops: [0.1, 0.2],
               colors: [Color(0xFFC0D1F6), Color(0xFFFFFFFF)],
             ),
@@ -95,34 +96,62 @@ class ServiceCompletedSuccessfullyView
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset("assets/images/beg.png", height: 19, width: 20),
+                          Image.asset(
+                            "assets/images/beg.png",
+                            height: 19,
+                            width: 20,
+                          ),
                           SizedBox(width: 5),
-                          Text('Find work',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xff746E6E),
-                                  fontWeight: FontWeight.w400)),
+                          Text(
+                            'Find work',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Color(0xff746E6E),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
                           SizedBox(width: 10),
-                          Container(height: 16, width: 1, color: Color(0xff746E6E)),
+                          Container(
+                            height: 16,
+                            width: 1,
+                            color: Color(0xff746E6E),
+                          ),
                           SizedBox(width: 10),
-                          Image.asset("assets/images/hired.png",
-                              height: 19, width: 20),
+                          Image.asset(
+                            "assets/images/hired.png",
+                            height: 19,
+                            width: 20,
+                          ),
                           SizedBox(width: 5),
-                          Text('Get Hired',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xff746E6E),
-                                  fontWeight: FontWeight.w400)),
+                          Text(
+                            'Get Hired',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Color(0xff746E6E),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
                           SizedBox(width: 10),
-                          Container(height: 16, width: 1, color: Color(0xff746E6E)),
+                          Container(
+                            height: 16,
+                            width: 1,
+                            color: Color(0xff746E6E),
+                          ),
                           SizedBox(width: 10),
-                          Image.asset("assets/images/grow.png", height: 19, width: 20),
+                          Image.asset(
+                            "assets/images/grow.png",
+                            height: 19,
+                            width: 20,
+                          ),
                           SizedBox(width: 5),
-                          Text('Grow',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xff746E6E),
-                                  fontWeight: FontWeight.w400)),
+                          Text(
+                            'Grow',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Color(0xff746E6E),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 50),

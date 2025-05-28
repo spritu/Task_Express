@@ -12,7 +12,10 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
 
   @override
   Widget build(BuildContext context) {
-   Get.put(ServiceCompletedController());
+    final Map<String, dynamic> booking = Get.arguments;
+
+    print('completed data : ${booking}');
+    Get.put(ServiceCompletedController());
 
     return WillPopScope(
       onWillPop: () async {
@@ -29,8 +32,8 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: [
-
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.arrow_back),
@@ -44,7 +47,8 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                           fontSize: 16,
                           fontFamily: "poppins",
                         ),
-                      ),Text("")
+                      ),
+                      Text(""),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -77,7 +81,7 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                             ),
                             TextSpan(
                               text:
-                              " has completed the work at your location. Please review the details below and proceed to payment.",
+                                  " has completed the work at your location. Please review the details below and proceed to payment.",
                               style: TextStyle(
                                 fontWeight: FontWeight.w400,
                                 fontSize: 12,
@@ -122,11 +126,14 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                           const SizedBox(height: 10),
                           summaryRow(
                             "Worker",
-                            "Suraj Sen",
+                            "${booking['data']['bookedFor']['firstName']} ${booking['data']['bookedFor']['lastName']}",
                             valueColor: const Color(0xFF114BCA),
                           ),
                           summaryRow("Duration", "3 Hours"),
-                          summaryRow("Charge", "₹250"),
+                          summaryRow(
+                            "Charge",
+                            "${booking['data']['bookedFor']['charge']}",
+                          ),
                           summaryRow("Date", "7 April, 2025"),
                           summaryRow("Time", "10:30 AM – 01:30 PM"),
                         ],
@@ -137,8 +144,9 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                   const SizedBox(height: 10),
 
                   // Rate & Review
-                  Container(height: 242,
-                    width:double.infinity,
+                  Container(
+                    height: 242,
+                    width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(18),
                       color: const Color(0xFFD9E4FC),
@@ -164,11 +172,12 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                           ),
                         ),
                         const SizedBox(height: 5),
-                        Container(height: 53,
-                          width:  273,
+                        Container(
+                          height: 53,
+                          width: 273,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 5,vertical: 3
-
+                            horizontal: 5,
+                            vertical: 3,
                           ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
@@ -195,7 +204,7 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                               ),
                               const SizedBox(height: 4),
                               Obx(
-                                    () => RatingBar.builder(
+                                () => RatingBar.builder(
                                   initialRating: controller.rating.value,
                                   minRating: 1,
                                   allowHalfRating: true,
@@ -204,9 +213,9 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                                   direction: Axis.horizontal,
                                   itemBuilder:
                                       (context, _) => const Icon(
-                                    Icons.star,
-                                    color: Colors.amber,
-                                  ),
+                                        Icons.star,
+                                        color: Colors.amber,
+                                      ),
                                   unratedColor: Colors.grey.shade400,
                                   onRatingUpdate: controller.setRating,
                                 ),
@@ -219,11 +228,9 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
 
                         // TextField
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-
-                          ),
-                          height: 79,width: 341,
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          height: 79,
+                          width: 341,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: Colors.white,
@@ -237,7 +244,8 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                             ],
                           ),
                           child: TextField(
-                            onChanged: (value) => controller.review.value = value,
+                            onChanged:
+                                (value) => controller.review.value = value,
                             maxLines: null,
                             keyboardType: TextInputType.multiline,
                             decoration: const InputDecoration(
@@ -266,8 +274,10 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                             height: 37,
                             width: 105,
                             child: ElevatedButton(
-                              onPressed:() {  controller.submitReview();
-                              Get.to(ServiceCompletedSuccessfullyView());},
+                              onPressed: () {
+                                controller.submitReview();
+                                Get.to(ServiceCompletedSuccessfullyView());
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF114BCA),
                                 shape: RoundedRectangleBorder(
@@ -302,10 +312,10 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
   }
 
   Widget summaryRow(
-      String label,
-      String value, {
-        Color valueColor = Colors.black,
-      }) {
+    String label,
+    String value, {
+    Color valueColor = Colors.black,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(

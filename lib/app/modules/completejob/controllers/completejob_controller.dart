@@ -12,6 +12,7 @@ class CompletejobController extends GetxController {
   //TODO: Implement CompletejobController
 
   final count = 0.obs;
+
   late var bookedby = ''.obs;
   late var bookedFor = ''.obs;
   var bookingId = ''.obs;
@@ -20,6 +21,7 @@ class CompletejobController extends GetxController {
   late IO.Socket socket;
 
   TextEditingController payController = TextEditingController();
+  final Map<String, dynamic> booking = Get.arguments;
 
   // Function to call API and close job
   Future<void> closeJob(String bookingId) async {
@@ -27,7 +29,7 @@ class CompletejobController extends GetxController {
       print('❌ Pay is empty');
       return;
     }
-
+    print('new: ${booking}');
     final pay = int.tryParse(payController.text);
     if (pay == null) {
       print('❌ Invalid pay input');
@@ -43,7 +45,7 @@ class CompletejobController extends GetxController {
 
       if (response.statusCode == 200) {
         connectSocketjobpay();
-        Get.to(ServiceCompletedView());
+        Get.to(ServiceCompletedView(), arguments: booking);
         print('✅ Success: ${response.body}');
       } else {
         print('❌ Error ${response.statusCode}: ${response.body}');

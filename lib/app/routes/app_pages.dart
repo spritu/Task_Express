@@ -152,11 +152,7 @@ class AppPages {
       page: () => const SettingView(),
       binding: SettingBinding(),
     ),
-    GetPage(
-      name: _Paths.CHAT,
-      page: () => ChatView(),
-      binding: ChatBinding(),
-    ),
+    GetPage(name: _Paths.CHAT, page: () => ChatView(), binding: ChatBinding()),
     GetPage(
       name: _Paths.ACCOUNT,
       page: () => const AccountView(),
@@ -282,10 +278,7 @@ class AppPages {
       page: () => const ServiceCompletedSuccessfullyView(),
       binding: ServiceCompletedSuccessfullyBinding(),
     ),
-    GetPage(
-      name: _Paths.ADDRESS_SCREEN,
-      page: () => AddressScreenView(),
-    ),
+    GetPage(name: _Paths.ADDRESS_SCREEN, page: () => AddressScreenView()),
     GetPage(
       name: _Paths.PROVIDER_LOGIN,
       page: () => const ProviderLoginView(),
@@ -378,9 +371,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.REQUEST_PANDDING,
-      page: () => RequestPanddingView(
-        helperName: '',
-      ),
+      page: () => RequestPanddingView(helperName: ''),
       binding: RequestPanddingBinding(),
     ),
     GetPage(
@@ -420,7 +411,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.CONFIRM_PAYMENT_RECIVED,
-      page: () => const ConfirmPaymentRecivedView(),
+      page: () => ConfirmPaymentRecivedView(paymentData: {}),
       binding: ConfirmPaymentRecivedBinding(),
     ),
   ];
