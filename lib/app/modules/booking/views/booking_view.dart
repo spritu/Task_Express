@@ -15,7 +15,6 @@ class BookingView extends GetView<BookingController> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomController = Get.find<BottomController>();
     Get.put(BookingController());
     return WillPopScope(
       onWillPop: () async {
@@ -24,7 +23,7 @@ class BookingView extends GetView<BookingController> {
         return false;
       },
       child: Obx(
-            () => Stack(
+        () => Stack(
           children: [
             Scaffold(
               body: Container(
@@ -64,97 +63,97 @@ class BookingView extends GetView<BookingController> {
                                 Obx(() {
                                   return controller.hasBooking.value
                                       ? // If booking exists, show full booking details
-                                  buildBookingCard()
-                                  // Container(
-                                  //   width: double.infinity,
-                                  //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 15),
-                                  //   decoration: BoxDecoration(
-                                  //     color: const Color(0xFFD9E4FC),
-                                  //     borderRadius: BorderRadius.circular(18),
-                                  //   ),
-                                  //   child: Column(
-                                  //     crossAxisAlignment: CrossAxisAlignment.start,
-                                  //     children: [
-                                  //       /// Header Row: "Current Booking" + Help
-                                  //       Row(
-                                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  //         children: [
-                                  //           const Text(
-                                  //             "Current Booking",
-                                  //             style: TextStyle(
-                                  //               fontSize: 14,
-                                  //               fontWeight: FontWeight.w500,
-                                  //               fontFamily: "poppins",
-                                  //             ),
-                                  //           ),
-                                  //           InkWell(
-                                  //             onTap: () => Get.to(UserHelpView()),
-                                  //             child: const Text(
-                                  //               "Help",
-                                  //               style: TextStyle(
-                                  //                 fontSize: 14,
-                                  //                 fontWeight: FontWeight.w600,
-                                  //                 color: Color(0xff114BCA),
-                                  //                 fontFamily: "poppins",
-                                  //               ),
-                                  //             ),
-                                  //           ),
-                                  //         ],
-                                  //       ),
-                                  //       const SizedBox(height: 16),
-                                  //       // Booking Card
-                                  //       buildBookingCard(),
-                                  //       const SizedBox(height: 9),
-                                  //       // Info Bar
-                                  //       buildChargeAndArrivalCard(),
-                                  //       const SizedBox(height: 9),
-                                  //       // Action Buttons: Cancel, Call, Chat
-                                  //       buildActionButtons(controller),
-                                  //       const SizedBox(height: 9),
-                                  //       // Close Job & Pay
-                                  //       buildCloseJobCard(),
-                                  //     ],
-                                  //   ),
-                                  // )
+                                      buildBookingCard()
+                                      // Container(
+                                      //   width: double.infinity,
+                                      //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 15),
+                                      //   decoration: BoxDecoration(
+                                      //     color: const Color(0xFFD9E4FC),
+                                      //     borderRadius: BorderRadius.circular(18),
+                                      //   ),
+                                      //   child: Column(
+                                      //     crossAxisAlignment: CrossAxisAlignment.start,
+                                      //     children: [
+                                      //       /// Header Row: "Current Booking" + Help
+                                      //       Row(
+                                      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      //         children: [
+                                      //           const Text(
+                                      //             "Current Booking",
+                                      //             style: TextStyle(
+                                      //               fontSize: 14,
+                                      //               fontWeight: FontWeight.w500,
+                                      //               fontFamily: "poppins",
+                                      //             ),
+                                      //           ),
+                                      //           InkWell(
+                                      //             onTap: () => Get.to(UserHelpView()),
+                                      //             child: const Text(
+                                      //               "Help",
+                                      //               style: TextStyle(
+                                      //                 fontSize: 14,
+                                      //                 fontWeight: FontWeight.w600,
+                                      //                 color: Color(0xff114BCA),
+                                      //                 fontFamily: "poppins",
+                                      //               ),
+                                      //             ),
+                                      //           ),
+                                      //         ],
+                                      //       ),
+                                      //       const SizedBox(height: 16),
+                                      //       // Booking Card
+                                      //       buildBookingCard(),
+                                      //       const SizedBox(height: 9),
+                                      //       // Info Bar
+                                      //       buildChargeAndArrivalCard(),
+                                      //       const SizedBox(height: 9),
+                                      //       // Action Buttons: Cancel, Call, Chat
+                                      //       buildActionButtons(controller),
+                                      //       const SizedBox(height: 9),
+                                      //       // Close Job & Pay
+                                      //       buildCloseJobCard(),
+                                      //     ],
+                                      //   ),
+                                      // )
                                       :
-                                  // If no booking, show this small container
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 12,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFD9E4FC),
-                                      borderRadius: BorderRadius.circular(
-                                        18,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: const [
-                                        Text(
-                                          "Current Booking",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: "poppins",
-                                            color: Colors.black,
+                                      // If no booking, show this small container
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 12,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFD9E4FC),
+                                          borderRadius: BorderRadius.circular(
+                                            18,
                                           ),
                                         ),
-                                        Text(
-                                          "No current booking",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            fontFamily: "poppins",
-                                            color: Color(0xff114BCA),
-                                          ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: const [
+                                            Text(
+                                              "Current Booking",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                fontFamily: "poppins",
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            Text(
+                                              "No current booking",
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w400,
+                                                fontFamily: "poppins",
+                                                color: Color(0xff114BCA),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  );
+                                      );
                                 }),
                                 SizedBox(height: 10),
 
@@ -170,7 +169,7 @@ class BookingView extends GetView<BookingController> {
                                       children: [
                                         Row(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                              CrossAxisAlignment.center,
                                           children: [
                                             SizedBox(width: 10),
                                             Text(
@@ -194,57 +193,57 @@ class BookingView extends GetView<BookingController> {
                                                 color: AppColors.white,
                                                 child: Container(
                                                   margin:
-                                                  const EdgeInsets.symmetric(
-                                                    vertical: 8,
-                                                    horizontal: 4,
-                                                  ),
+                                                      const EdgeInsets.symmetric(
+                                                        vertical: 8,
+                                                        horizontal: 4,
+                                                      ),
                                                   // padding: const EdgeInsets.all(12),
                                                   child: Column(
                                                     children: [
                                                       Row(
                                                         mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
                                                         // crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
                                                           /// Left Section - Text
                                                           Column(
                                                             crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                                CrossAxisAlignment
+                                                                    .start,
                                                             children: [
                                                               /// Name
                                                               Row(
                                                                 children: [
                                                                   CircleAvatar(
                                                                     backgroundImage:
-                                                                    AssetImage(
-                                                                      "assets/images/professional_profile.png",
-                                                                    ),
+                                                                        AssetImage(
+                                                                          "assets/images/professional_profile.png",
+                                                                        ),
                                                                   ),
 
                                                                   Column(
                                                                     mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .start,
+                                                                        MainAxisAlignment
+                                                                            .start,
                                                                     crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
+                                                                        CrossAxisAlignment
+                                                                            .start,
                                                                     children: [
                                                                       const Text(
                                                                         "Amit Sharma",
                                                                         style: TextStyle(
                                                                           fontFamily:
-                                                                          "poppins",
+                                                                              "poppins",
                                                                           fontSize:
-                                                                          14,
+                                                                              14,
                                                                           fontWeight:
-                                                                          FontWeight.w500,
+                                                                              FontWeight.w500,
                                                                         ),
                                                                       ),
                                                                       const SizedBox(
                                                                         height:
-                                                                        4,
+                                                                            4,
                                                                       ),
 
                                                                       /// Subtitle
@@ -252,27 +251,27 @@ class BookingView extends GetView<BookingController> {
                                                                         text: TextSpan(
                                                                           style: TextStyle(
                                                                             fontFamily:
-                                                                            "poppins",
+                                                                                "poppins",
                                                                             fontSize:
-                                                                            12,
+                                                                                12,
                                                                             fontWeight:
-                                                                            FontWeight.w400,
+                                                                                FontWeight.w400,
                                                                             color:
-                                                                            Colors.grey.shade600,
+                                                                                Colors.grey.shade600,
                                                                           ),
                                                                           children: const [
                                                                             TextSpan(
                                                                               text:
-                                                                              "Visiting Professional, ",
+                                                                                  "Visiting Professional, ",
                                                                             ),
                                                                             TextSpan(
                                                                               text:
-                                                                              "Electrician",
+                                                                                  "Electrician",
                                                                               style: TextStyle(
                                                                                 fontWeight:
-                                                                                FontWeight.w400,
+                                                                                    FontWeight.w400,
                                                                                 fontSize:
-                                                                                12,
+                                                                                    12,
                                                                                 color: Color(
                                                                                   0xFF114BCA,
                                                                                 ), // Blue color
@@ -296,36 +295,36 @@ class BookingView extends GetView<BookingController> {
                                                                   children: [
                                                                     TextSpan(
                                                                       text:
-                                                                      'Booked: ',
+                                                                          'Booked: ',
                                                                       style: TextStyle(
                                                                         fontFamily:
-                                                                        'Poppins',
+                                                                            'Poppins',
                                                                         fontWeight:
-                                                                        FontWeight.w400, // 400 = regular
+                                                                            FontWeight.w400, // 400 = regular
                                                                         fontSize:
-                                                                        14,
+                                                                            14,
 
                                                                         letterSpacing:
-                                                                        0,
+                                                                            0,
                                                                         color:
-                                                                        Colors.black,
+                                                                            Colors.black,
                                                                       ),
                                                                     ),
                                                                     TextSpan(
                                                                       text:
-                                                                      '12/12/2024, 11:34 PM',
+                                                                          '12/12/2024, 11:34 PM',
                                                                       style: TextStyle(
                                                                         fontFamily:
-                                                                        'Poppins',
+                                                                            'Poppins',
                                                                         fontWeight:
-                                                                        FontWeight.w500, // 500 = medium
+                                                                            FontWeight.w500, // 500 = medium
                                                                         fontSize:
-                                                                        11,
+                                                                            11,
 
                                                                         letterSpacing:
-                                                                        0,
+                                                                            0,
                                                                         color:
-                                                                        Colors.black,
+                                                                            Colors.black,
                                                                       ),
                                                                     ),
                                                                   ],
@@ -346,38 +345,38 @@ class BookingView extends GetView<BookingController> {
                                                                       () {},
                                                                   style: ElevatedButton.styleFrom(
                                                                     backgroundColor:
-                                                                    Colors
-                                                                        .white,
+                                                                        Colors
+                                                                            .white,
                                                                     elevation:
-                                                                    0,
+                                                                        0,
                                                                     side: const BorderSide(
                                                                       color:
-                                                                      Colors
-                                                                          .black,
+                                                                          Colors
+                                                                              .black,
                                                                     ),
                                                                     shape: RoundedRectangleBorder(
                                                                       borderRadius:
-                                                                      BorderRadius.circular(
-                                                                        8,
-                                                                      ),
+                                                                          BorderRadius.circular(
+                                                                            8,
+                                                                          ),
                                                                     ),
                                                                     padding:
-                                                                    EdgeInsets
-                                                                        .zero,
+                                                                        EdgeInsets
+                                                                            .zero,
                                                                   ),
                                                                   child: const Text(
                                                                     "Re-Book",
                                                                     style: TextStyle(
                                                                       fontSize:
-                                                                      12,
+                                                                          12,
                                                                       fontFamily:
-                                                                      "poppins",
+                                                                          "poppins",
                                                                       fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
+                                                                          FontWeight
+                                                                              .w500,
                                                                       color:
-                                                                      Colors
-                                                                          .black,
+                                                                          Colors
+                                                                              .black,
                                                                     ),
                                                                   ),
                                                                 ),
@@ -398,10 +397,10 @@ class BookingView extends GetView<BookingController> {
                                                                   },
                                                                   style: ElevatedButton.styleFrom(
                                                                     backgroundColor:
-                                                                    Colors
-                                                                        .white,
+                                                                        Colors
+                                                                            .white,
                                                                     elevation:
-                                                                    0,
+                                                                        0,
                                                                     side: const BorderSide(
                                                                       color: Color(
                                                                         0xFF114BCA,
@@ -409,24 +408,24 @@ class BookingView extends GetView<BookingController> {
                                                                     ),
                                                                     shape: RoundedRectangleBorder(
                                                                       borderRadius:
-                                                                      BorderRadius.circular(
-                                                                        8,
-                                                                      ),
+                                                                          BorderRadius.circular(
+                                                                            8,
+                                                                          ),
                                                                     ),
                                                                     padding:
-                                                                    EdgeInsets
-                                                                        .zero,
+                                                                        EdgeInsets
+                                                                            .zero,
                                                                   ),
                                                                   child: const Text(
                                                                     "Rate Service ",
                                                                     style: TextStyle(
                                                                       fontSize:
-                                                                      12,
+                                                                          12,
                                                                       fontFamily:
-                                                                      "poppins",
+                                                                          "poppins",
                                                                       fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
+                                                                          FontWeight
+                                                                              .w500,
                                                                       color: Color(
                                                                         0xFF114BCA,
                                                                       ),
@@ -483,7 +482,7 @@ class BookingView extends GetView<BookingController> {
     if (controller.bookings.isEmpty) {
       return Center(child: Text("No bookings found."));
     }
-    final bottomController = Get.find<BottomController>();
+
     return ListView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(), // Prevents scroll conflicts
@@ -500,7 +499,7 @@ class BookingView extends GetView<BookingController> {
             'Fixed Charge Helper'; // Or use category/subcategory if needed
         final time = '10:45 am'; // If not dynamic, keep static
         final charge =
-        skills.isNotEmpty ? (skills[0]['charge']?.toString() ?? '0') : '0';
+            skills.isNotEmpty ? (skills[0]['charge']?.toString() ?? '0') : '0';
         final arriveIn = '30 min'; // Change if ETA available
         final imageUrl =
             bookedFor['userImg'] ?? 'https://via.placeholder.com/150';
@@ -529,20 +528,22 @@ class BookingView extends GetView<BookingController> {
           statusText = 'Rejected';
 
           // Show dialog once when rejected
-          Future.delayed(Duration.zero, () {
-            if (controller.showBookingCard.value) {
-              Get.defaultDialog(
-                title: "Booking Rejected",
-                middleText: "Your booking was rejected by $name.",
-                textConfirm: "OK",
-                confirmTextColor: Colors.white,
-                onConfirm: () {
-                  controller.showBookingCard.value = false;
-                  Get.back(); // Close dialog
-                },
-              );
-            }
-          });
+          // Future.delayed(Duration.zero, () {
+          //   if (controller.showBookingCard.value) {
+          //     Get.defaultDialog(
+          //       title: "Booking Rejected",
+          //       middleText: "Your booking was rejected by $name.",
+          //       textConfirm: "OK",
+          //       confirmTextColor: Colors.white,
+          //       onConfirm: () {
+          //         Get.back();
+          //         controller.showBookingCard.value = false;
+          //         controller.bookings.removeAt(index);
+          //         // Close dialog
+          //       },
+          //     );
+          //   }
+          // });
         } else {
           borderColor = Colors.grey;
           statusText = 'Unknown';
@@ -576,12 +577,7 @@ class BookingView extends GetView<BookingController> {
                       style: TextStyle(color: Colors.black, fontSize: 14),
                     ),
                     InkWell(
-                       onTap: () {
-              if (!authController.isLoggedIn.value) {
-                          bottomController.checkAndShowSignupSheet(context);
-                          return;
-                        }
-                        Get.to(UserHelpView());},
+                      onTap: () => Get.to(UserHelpView()),
                       child: const Text(
                         "Help",
                         style: TextStyle(
@@ -618,21 +614,21 @@ class BookingView extends GetView<BookingController> {
                           ),
                           clipBehavior: Clip.hardEdge,
                           child:
-                          imageUrl.isNotEmpty
-                              ? Image.network(
-                            imageUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                'assets/images/account.png',
-                                fit: BoxFit.contain,
-                              );
-                            },
-                          )
-                              : Image.asset(
-                            'assets/images/account.png',
-                            fit: BoxFit.cover,
-                          ),
+                              imageUrl.isNotEmpty
+                                  ? Image.network(
+                                    imageUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.asset(
+                                        'assets/images/account.png',
+                                        fit: BoxFit.contain,
+                                      );
+                                    },
+                                  )
+                                  : Image.asset(
+                                    'assets/images/account.png',
+                                    fit: BoxFit.cover,
+                                  ),
                         ),
                         const SizedBox(width: 10),
                         Column(
@@ -670,7 +666,8 @@ class BookingView extends GetView<BookingController> {
                                     text: controller.formatCreatedAt(
                                       bookedBy['createdAt'],
                                     ),
-                                    style: TextStyle(fontSize: 12,
+                                    style: TextStyle(
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -758,19 +755,19 @@ class BookingView extends GetView<BookingController> {
                         "Cancel Booking",
                         AppColors.white,
                         const Color(0xFF114BCA),
-                            () => controller.rejectBooking(),
+                        () => controller.rejectBooking(),
                       ),
                       buildButton(
                         "Call",
                         const Color(0xFF114BCA),
                         Colors.white,
-                            () => controller.makePhoneCall("phoneNumber"),
+                        () => controller.makePhoneCall("phoneNumber"),
                       ),
                       buildButton(
                         "Chat",
                         const Color(0xFF114BCA),
                         Colors.white,
-                            () => Get.to(ChatView()),
+                        () => Get.to(ChatView()),
                       ),
                     ],
                   ),
@@ -799,30 +796,30 @@ class BookingView extends GetView<BookingController> {
           "Cancel Booking",
           AppColors.white,
           const Color(0xFF114BCA),
-              () => controller.rejectBooking(),
+          () => controller.rejectBooking(),
         ),
         buildButton(
           "Call",
           const Color(0xFF114BCA),
           Colors.white,
-              () => controller.makePhoneCall("phoneNumber"),
+          () => controller.makePhoneCall("phoneNumber"),
         ),
         buildButton(
           "Chat",
           const Color(0xFF114BCA),
           Colors.white,
-              () => Get.to(ChatView()),
+          () => Get.to(ChatView()),
         ),
       ],
     ),
   );
 
   Widget buildButton(
-      String text,
-      Color bgColor,
-      Color textColor,
-      VoidCallback onTap,
-      ) => Expanded(
+    String text,
+    Color bgColor,
+    Color textColor,
+    VoidCallback onTap,
+  ) => Expanded(
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: SizedBox(
@@ -889,9 +886,10 @@ class BookingView extends GetView<BookingController> {
                     // final createdAt = bookedFor['createdAt']??'';
 
                     if (booking != null) {
-                      Get.to(() => CompletejobView(), arguments: {
-                        'data': booking
-                      });
+                      Get.to(
+                        () => CompletejobView(),
+                        arguments: {'data': booking},
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -928,7 +926,6 @@ class RequestPendingBottomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomController = Get.find<BottomController>();
     return Container(
       height: MediaQuery.of(context).size.height,
       color: Color(0xFFEEF3FE),
@@ -964,10 +961,6 @@ class RequestPendingBottomCard extends StatelessWidget {
                     children: [
                       InkWell(
                         onTap: () {
-                          if (!authController.isLoggedIn.value) {
-                            bottomController.checkAndShowSignupSheet(context);
-                            return;
-                          }
                           Get.to(BookingConfirmView());
                         },
                         child: Card(
@@ -1005,7 +998,7 @@ class RequestPendingBottomCard extends StatelessWidget {
                                         ),
                                         TextSpan(
                                           text:
-                                          'to accept \n        your job request…',
+                                              'to accept \n        your job request…',
                                           style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.w500,
@@ -1091,7 +1084,7 @@ class RequestPendingBottomCard extends StatelessWidget {
                                   ),
                                   onPressed: () {
                                     final BottomController controller =
-                                    Get.find<BottomController>();
+                                        Get.find<BottomController>();
                                     controller.cancelRequest();
                                   },
                                   child: const Text(
@@ -1127,7 +1120,7 @@ class RequestPendingBottomCard extends StatelessWidget {
                                   ),
                                   onPressed: () {
                                     final BottomController controller =
-                                    Get.find<BottomController>();
+                                        Get.find<BottomController>();
                                     controller.selectedIndex.value = 0;
                                   },
                                   child: const Text(

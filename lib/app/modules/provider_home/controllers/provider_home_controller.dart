@@ -278,9 +278,8 @@ class ProviderHomeController extends GetxController {
 
   final RxList<types.Message> messages = <types.Message>[].obs;
   final Rxn<types.User> user = Rxn<types.User>();
-  var bookedBy=''.obs ;
+  var bookedBy = ''.obs;
   RxString bookedFor = ''.obs;
-
 
   late IO.Socket socket;
 
@@ -290,7 +289,7 @@ class ProviderHomeController extends GetxController {
 
   final List<Map<String, String>> jobs = List.generate(
     3,
-        (index) => {
+    (index) => {
       "title": "Plumbing job",
       "subtitle": "Pipe Repair",
       "amount": "₹8450",
@@ -305,9 +304,9 @@ class ProviderHomeController extends GetxController {
     loadUserInfo(); // Load user info and connect socket
     fetchCurrentBooking();
   }
+
   void connectSocketAccept() {
     print('444444: ${bookedBy}');
-
 
     print("❌ wdwcdtf :${userId}");
 
@@ -335,10 +334,7 @@ class ProviderHomeController extends GetxController {
     socket.onConnect((_) {
       print('✅ Connected to socket');
 
-      final payload = {
-        'receiver':bookedBy.trim(),
-
-      };
+      final payload = {'receiver': bookedBy.trim()};
 
       print('📤 Emitting acceptBooking payload: $payload');
       socket.emit('acceptBooking', payload);
@@ -355,12 +351,10 @@ class ProviderHomeController extends GetxController {
     socket.onError((err) {
       print('🔥 Socket Error: $err');
     });
-
   }
 
   void connectSocketReject() {
     print('55555: ${bookedBy}');
-
 
     print("❌ wdwcdtf55 :${userId}");
 
@@ -388,10 +382,7 @@ class ProviderHomeController extends GetxController {
     socket.onConnect((_) {
       print('✅ Connected to socket55');
 
-      final payload = {
-        'receiver':bookedBy.trim(),
-
-      };
+      final payload = {'receiver': bookedBy.trim()};
 
       print('📤 Emitting rejectBooking payload55: $payload');
       socket.emit('rejectBooking', payload);
@@ -408,8 +399,8 @@ class ProviderHomeController extends GetxController {
     socket.onError((err) {
       print('🔥 Socket Error: $err');
     });
-
   }
+
   var bookingData = {}.obs;
   void makePhoneCallFromSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -420,14 +411,12 @@ class ProviderHomeController extends GetxController {
       if (await canLaunchUrl(callUri)) {
         await launchUrl(callUri);
       } else {
-   //     Get.snackbar("Error", "Cannot make call to $phoneNumber");
+        //     Get.snackbar("Error", "Cannot make call to $phoneNumber");
       }
     } else {
-   //   Get.snackbar("Error", "Phone number not available");
+      //   Get.snackbar("Error", "Phone number not available");
     }
   }
-
-
 
   Future<void> fetchCurrentBooking() async {
     try {
@@ -438,10 +427,9 @@ class ProviderHomeController extends GetxController {
       print('servicenew:${userId}');
 
       if (userId == null) {
-      //  Get.snackbar("Error", "User not logged in");
+        //  Get.snackbar("Error", "User not logged in");
         return;
       }
-
 
       var headers = {'Content-Type': 'application/json'};
       var request = http.Request(
@@ -460,6 +448,7 @@ class ProviderHomeController extends GetxController {
 
       if (response.statusCode == 200) {
         var jsonRes = jsonDecode(responseBody);
+
         // bookedBy = jsonRes['data'][0]['bookedBy']['_id'];
         bookedBy.value = jsonRes['data'][0]['bookedBy']['_id'];
 
@@ -470,7 +459,7 @@ class ProviderHomeController extends GetxController {
 
           // Extract bookingId from first item (you can change index)
           String bookingId =
-          bookingDataList[0]['_id']; // assuming _id is bookingId
+              bookingDataList[0]['_id']; // assuming _id is bookingId
           String phone = bookingDataList[0]['userMobile'] ?? "";
           await prefs.setString('currentBookingId', bookingId);
           await prefs.setString('currentBookingPhone', phone);
@@ -487,11 +476,11 @@ class ProviderHomeController extends GetxController {
           bookingDataList.clear();
         }
       } else {
-      //  Get.snackbar("Error", "Failed to fetch booking");
+        //  Get.snackbar("Error", "Failed to fetch booking");
       }
     } catch (e) {
       print("❌ Exception in fetchCurrentBooking: $e");
-    //  Get.snackbar("Error", "Exception: $e");
+      //  Get.snackbar("Error", "Exception: $e");
     } finally {
       isLoading.value = false;
     }
@@ -503,7 +492,7 @@ class ProviderHomeController extends GetxController {
       String? bookingId = prefs.getString('currentBookingId');
 
       if (bookingId == null) {
-      //  Get.snackbar("Error", "Booking ID not found");
+        //  Get.snackbar("Error", "Booking ID not found");
         return;
       }
 
@@ -531,7 +520,7 @@ class ProviderHomeController extends GetxController {
       }
     } catch (e) {
       print("❌ Exception: $e");
-     // Get.snackbar("Error", "Exception: $e");
+      // Get.snackbar("Error", "Exception: $e");
     }
   }
 
@@ -608,10 +597,6 @@ class ProviderHomeController extends GetxController {
     });
   }
 
-
-
-
-
   Future<void> updateAvailability(bool status) async {
     try {
       final headers = {'Content-Type': 'application/json'};
@@ -627,7 +612,7 @@ class ProviderHomeController extends GetxController {
       );
 
       if (response.statusCode == 200) {
-       // Get.snackbar("Success", "Availability updated successfully");
+        // Get.snackbar("Success", "Availability updated successfully");
 
         // Emit availability status to socket server
         socket.emit("availabilityChange", {
@@ -635,11 +620,11 @@ class ProviderHomeController extends GetxController {
           "status": status ? 1 : 0,
         });
       } else {
-      //  Get.snackbar("Error", "Failed to update availability");
+        //  Get.snackbar("Error", "Failed to update availability");
         isAvailable2.value = !status;
       }
     } catch (e) {
-    //  Get.snackbar("Error", "Something went wrong");
+      //  Get.snackbar("Error", "Something went wrong");
       isAvailable2.value = !status;
     }
   }

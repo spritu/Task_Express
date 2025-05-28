@@ -46,8 +46,12 @@ class Bottom2View extends GetView<Bottom2Controller> {
 }
 
 final JobsController jobsController = Get.put(JobsController());
-final ProviderHomeController providerHomeController = Get.put(ProviderHomeController());
-final ProviderChatScreenController providerChatScreenController = Get.put(ProviderChatScreenController());
+final ProviderHomeController providerHomeController = Get.put(
+  ProviderHomeController(),
+);
+final ProviderChatScreenController providerChatScreenController = Get.put(
+  ProviderChatScreenController(),
+);
 Widget _buildBody(int index) {
   switch (index) {
     case 0:

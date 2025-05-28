@@ -7,11 +7,8 @@ import '../controllers/completejob_controller.dart';
 class CompletejobView extends GetView<CompletejobController> {
   const CompletejobView({super.key});
 
-
-
   @override
   Widget build(BuildContext context) {
-
     Get.put(CompletejobController());
 
     final Map<String, dynamic> booking = Get.arguments;
@@ -21,9 +18,7 @@ class CompletejobView extends GetView<CompletejobController> {
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(
-            gradient:AppColors.appGradient
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.appGradient),
         child: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
@@ -123,7 +118,9 @@ class CompletejobView extends GetView<CompletejobController> {
                               children: [
                                 TextSpan(text: "Date & Time: "),
                                 TextSpan(
-                                  text:controller.formatCreatedAt1234(booking['data']['createdAt']),
+                                  text: controller.formatCreatedAt1234(
+                                    booking['data']['createdAt'],
+                                  ),
                                   style: TextStyle(fontWeight: FontWeight.w700),
                                 ),
                               ],
@@ -224,9 +221,9 @@ class CompletejobView extends GetView<CompletejobController> {
                                 width: 160,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    controller.closeJob(controller.bookingId.value);
-
-
+                                    controller.closeJob(
+                                      controller.bookingId.value,
+                                    );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF114BCA),

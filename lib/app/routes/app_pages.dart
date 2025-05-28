@@ -46,6 +46,8 @@ import '../modules/chat_screen/bindings/chat_screen_binding.dart';
 import '../modules/chat_screen/views/chat_screen_view.dart';
 import '../modules/completejob/bindings/completejob_binding.dart';
 import '../modules/completejob/views/completejob_view.dart';
+import '../modules/confirm_payment_recived/bindings/confirm_payment_recived_binding.dart';
+import '../modules/confirm_payment_recived/views/confirm_payment_recived_view.dart';
 import '../modules/edit_profile/bindings/edit_profile_binding.dart';
 import '../modules/edit_profile/views/edit_profile_view.dart';
 import '../modules/helper_profile/bindings/helper_profile_binding.dart';
@@ -252,7 +254,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.EDIT_PROFILE,
-      page: () =>  EditProfileView(),
+      page: () => EditProfileView(),
       binding: EditProfileBinding(),
     ),
     GetPage(
@@ -415,6 +417,11 @@ class AppPages {
       name: _Paths.COMPLETEJOB,
       page: () => const CompletejobView(),
       binding: CompletejobBinding(),
+    ),
+    GetPage(
+      name: _Paths.CONFIRM_PAYMENT_RECIVED,
+      page: () => const ConfirmPaymentRecivedView(),
+      binding: ConfirmPaymentRecivedBinding(),
     ),
   ];
 }

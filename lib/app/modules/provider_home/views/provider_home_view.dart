@@ -1115,7 +1115,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
   const ProviderHomeView({super.key});
   @override
   Widget build(BuildContext context) {
-   Get.put(ProviderHomeController());
+    Get.put(ProviderHomeController());
     final locationController = Get.find<ProviderLocationController>();
     return Scaffold(
       body: Container(
@@ -1221,7 +1221,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                   ),
                                 ),
                                 Obx(
-                                      () => FlutterSwitch(
+                                  () => FlutterSwitch(
                                     width: 53.0,
                                     height: 26.18,
                                     toggleSize: 23.0,
@@ -1284,7 +1284,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                   ),
                                 ),
                                 Obx(
-                                      () => FlutterSwitch(
+                                  () => FlutterSwitch(
                                     width: 53.0,
                                     height: 26.18,
                                     toggleSize: 23.0,
@@ -1339,7 +1339,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Obx(
-                            () => Text(
+                        () => Text(
                           "Hello ${controller.firstName.value}",
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
@@ -1419,7 +1419,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                 final bookedBy = booking['bookedBy'] ?? {};
                                 final firstName =
                                     bookedBy['firstName']?.toString() ??
-                                        'Unknown';
+                                    'Unknown';
                                 final lastName =
                                     bookedBy['lastName']?.toString() ?? '';
                                 final city =
@@ -1428,10 +1428,10 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                 final bookServices =
                                     booking['bookServices'] ?? [];
                                 final serviceName =
-                                bookServices.isNotEmpty
-                                    ? bookServices[0]['name']?.toString() ??
-                                    'Service'
-                                    : 'Service';
+                                    bookServices.isNotEmpty
+                                        ? bookServices[0]['name']?.toString() ??
+                                            'Service'
+                                        : 'Service';
 
                                 final earning =
                                     booking['earning']?.toString() ?? '0';
@@ -1449,7 +1449,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                     elevation: 4,
                                     child: Container(
                                       width:
-                                      MediaQuery.of(context).size.width *
+                                          MediaQuery.of(context).size.width *
                                           0.9,
                                       padding: const EdgeInsets.all(10),
                                       decoration: BoxDecoration(
@@ -1458,20 +1458,20 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                       ),
                                       child: Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           // Top Row
                                           Row(
                                             crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                             mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               // Left Column
                                               Expanded(
                                                 child: Column(
                                                   crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Row(
                                                       children: [
@@ -1486,25 +1486,25 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                         Text(
                                                           "$firstName $lastName",
                                                           style:
-                                                          const TextStyle(
-                                                            fontFamily:
-                                                            "Poppins",
-                                                            fontWeight:
-                                                            FontWeight
-                                                                .w500,
-                                                            fontSize: 12,
-                                                            color: Color(
-                                                              0xFF7A7A7A,
-                                                            ),
-                                                          ),
+                                                              const TextStyle(
+                                                                fontFamily:
+                                                                    "Poppins",
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontSize: 12,
+                                                                color: Color(
+                                                                  0xFF7A7A7A,
+                                                                ),
+                                                              ),
                                                         ),
                                                       ],
                                                     ),
                                                     const SizedBox(height: 6),
                                                     Row(
                                                       crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .start,
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
                                                         const Icon(
                                                           Icons.location_on,
@@ -1518,17 +1518,17 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                           child: Text(
                                                             city,
                                                             style:
-                                                            const TextStyle(
-                                                              fontFamily:
-                                                              "Poppins",
-                                                              fontWeight:
-                                                              FontWeight
-                                                                  .w600,
-                                                              fontSize: 13,
-                                                              color:
-                                                              Colors
-                                                                  .black,
-                                                            ),
+                                                                const TextStyle(
+                                                                  fontFamily:
+                                                                      "Poppins",
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  fontSize: 13,
+                                                                  color:
+                                                                      Colors
+                                                                          .black,
+                                                                ),
                                                           ),
                                                         ),
                                                       ],
@@ -1543,7 +1543,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                         style: TextStyle(
                                                           fontFamily: "Poppins",
                                                           fontWeight:
-                                                          FontWeight.w600,
+                                                              FontWeight.w600,
                                                           fontSize: 12,
                                                           color: Color(
                                                             0xFFF67C0A,
@@ -1565,17 +1565,17 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                         Text(
                                                           serviceName,
                                                           style:
-                                                          const TextStyle(
-                                                            fontFamily:
-                                                            "Poppins",
-                                                            fontWeight:
-                                                            FontWeight
-                                                                .w500,
-                                                            fontSize: 12,
-                                                            color: Color(
-                                                              0xFF7A7A7A,
-                                                            ),
-                                                          ),
+                                                              const TextStyle(
+                                                                fontFamily:
+                                                                    "Poppins",
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontSize: 12,
+                                                                color: Color(
+                                                                  0xFF7A7A7A,
+                                                                ),
+                                                              ),
                                                         ),
                                                       ],
                                                     ),
@@ -1602,7 +1602,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                           // Action Buttons
                                           Row(
                                             mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               _actionButton(
                                                 "Reject",
@@ -1615,26 +1615,35 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                   Get.defaultDialog(
                                                     title: "Confirmation",
                                                     middleText:
-                                                    "Are you sure you want to reject?",
+                                                        "Are you sure you want to reject?",
                                                     textConfirm: "Yes",
                                                     textCancel: "Back",
                                                     confirmTextColor:
-                                                    Colors.white,
+                                                        Colors.white,
                                                     cancelTextColor:
-                                                    Colors.black,
+                                                        Colors.black,
                                                     buttonColor: const Color(
                                                       0xFFF67C0A,
                                                     ),
-                                                    onConfirm: () {
-                                                      Get.back(); // Close dialog
+                                                    onConfirm: () async {
+                                                      Get.back();
                                                       controller
+                                                          .isLoading
+                                                          .value = true;
+                                                      await controller
                                                           .updateBookingStatus(
-                                                        acceptStatus: "no",
-                                                      );
+                                                            acceptStatus: "no",
+                                                          ); // Close dialog
+                                                      controller.bookingDataList
+                                                          .clear();
                                                       controller
-                                                          .fetchCurrentBooking();
+                                                          .connectSocketReject();
+                                                      controller
+                                                          .isLoading
+                                                          .value = false;
 
-                                                      controller.connectSocketReject();
+                                                      await controller
+                                                          .fetchCurrentBooking();
                                                     },
                                                     onCancel: () {
                                                       Get.back(); // Just close dialog
@@ -1648,8 +1657,8 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                 const Color(0xFFF67C0A),
                                                 Colors.white,
                                                 onTap:
-                                                controller
-                                                    .makePhoneCallFromSharedPrefs, // Replace with dynamic number
+                                                    controller
+                                                        .makePhoneCallFromSharedPrefs, // Replace with dynamic number
                                               ),
 
                                               _actionButton(
@@ -1660,22 +1669,25 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                   Get.defaultDialog(
                                                     title: "Confirmation",
                                                     middleText:
-                                                    "Are you sure you want to accept?",
+                                                        "Are you sure you want to accept?",
                                                     textConfirm: "Yes",
                                                     textCancel: "Back",
                                                     confirmTextColor:
-                                                    Colors.white,
+                                                        Colors.white,
                                                     cancelTextColor:
-                                                    Colors.black,
+                                                        Colors.black,
                                                     buttonColor: const Color(
                                                       0xFFF67C0A,
                                                     ),
                                                     onConfirm: () {
+                                                      Get.back();
+                                                      controller.bookingDataList
+                                                          .clear();
                                                       // Set the selected index in Bottom2Controller before navigation
                                                       final bottomController =
-                                                      Get.put(
-                                                        Bottom2Controller(),
-                                                      );
+                                                          Get.put(
+                                                            Bottom2Controller(),
+                                                          );
                                                       bottomController
                                                           .selectedIndex
                                                           .value = 1;
@@ -1684,10 +1696,12 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                       ); // Close the dialog first
                                                       controller
                                                           .updateBookingStatus(
-                                                        acceptStatus: "yes",
-                                                      );
+                                                            acceptStatus: "yes",
+                                                          );
                                                       controller
-                                                          .fetchCurrentBooking();controller.connectSocketAccept();
+                                                          .fetchCurrentBooking();
+                                                      controller
+                                                          .connectSocketAccept();
                                                     },
                                                     onCancel: () {
                                                       Get.back(); // Just close the dialog
@@ -1917,12 +1931,12 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
   }
 
   Widget _actionButton(
-      String text,
-      Color bgColor,
-      Color borderColor, {
-        Color? textColor,
-        VoidCallback? onTap, // <-- Add this line
-      }) {
+    String text,
+    Color bgColor,
+    Color borderColor, {
+    Color? textColor,
+    VoidCallback? onTap, // <-- Add this line
+  }) {
     return GestureDetector(
       onTap: onTap, // <-- Add this line
       child: Container(
@@ -2111,11 +2125,11 @@ Widget _infoCard({required String title, required String value}) {
 }
 
 Widget _actionButton(
-    String text,
-    Color bgColor,
-    Color borderColor, {
-      Color? textColor,
-    }) {
+  String text,
+  Color bgColor,
+  Color borderColor, {
+  Color? textColor,
+}) {
   return Container(
     height: 30,
     width: 105,

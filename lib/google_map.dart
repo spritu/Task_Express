@@ -17,7 +17,10 @@ class _MapScreenState extends State<MapScreen> {
   final LatLng _defaultLatLng = LatLng(22.7196, 75.8577); // Indore
 
   // Hardcoded plumber location (example coordinates)
-  final LatLng _plumberLatLng = LatLng(22.7220, 75.8605); // Customize plumber location here
+  final LatLng _plumberLatLng = LatLng(
+    22.7220,
+    75.8605,
+  ); // Customize plumber location here
 
   @override
   void initState() {
@@ -87,37 +90,38 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Current Location & Plumber")),
-      body: _currentLatLng == null
-          ? const Center(child: CircularProgressIndicator())
-          : GoogleMap(
-        initialCameraPosition: CameraPosition(
-          target: _currentLatLng!,
-          zoom: 14,
-        ),
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
-        markers: {
-          Marker(
-            markerId: const MarkerId("currentLocation"),
-            position: _currentLatLng!,
-            infoWindow: const InfoWindow(title: "You are here"),
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueAzure,
-            ),
-          ),
-          Marker(
-            markerId: const MarkerId("plumberLocation"),
-            position: _plumberLatLng,
-            infoWindow: const InfoWindow(title: "Plumber"),
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueGreen,
-            ),
-          ),
-        },
-      ),
+      body:
+          _currentLatLng == null
+              ? const Center(child: CircularProgressIndicator())
+              : GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: _currentLatLng!,
+                  zoom: 14,
+                ),
+                myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                onMapCreated: (GoogleMapController controller) {
+                  _controller.complete(controller);
+                },
+                markers: {
+                  Marker(
+                    markerId: const MarkerId("currentLocation"),
+                    position: _currentLatLng!,
+                    infoWindow: const InfoWindow(title: "You are here"),
+                    icon: BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueAzure,
+                    ),
+                  ),
+                  Marker(
+                    markerId: const MarkerId("plumberLocation"),
+                    position: _plumberLatLng,
+                    infoWindow: const InfoWindow(title: "Plumber"),
+                    icon: BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueGreen,
+                    ),
+                  ),
+                },
+              ),
     );
   }
 }
