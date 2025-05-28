@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart'; // <-- ADD THIS
 import 'package:shared_preferences/shared_preferences.dart';
-
 // All your imports
 import 'app/modules/Activejob_screen/controllers/activejob_screen_controller.dart';
 import 'app/modules/Bottom2/controllers/bottom2_controller.dart';
@@ -39,6 +38,7 @@ import 'app/modules/provider_setting/controllers/provider_setting_controller.dar
 import 'app/modules/road_construction_helper/controllers/road_construction_helper_controller.dart';
 import 'app/modules/setting/controllers/setting_controller.dart';
 import 'app/modules/signUp/controllers/sign_up_controller.dart';
+import 'app/modules/signUp/views/sign_up_view.dart';
 import 'app/modules/splash1/views/splash1_view.dart';
 import 'app/modules/splash2/views/splash2_view.dart';
 import 'app/modules/splash3/views/splash3_view.dart';
@@ -53,9 +53,20 @@ void main() async {
   // SharedPreferences prefs = await SharedPreferences.getInstance();// <-- ADD THIS
   final box = GetStorage();
   // await prefs.clear();
+  final prefs = await SharedPreferences.getInstance();
+;
+
   final isLoggedIn = box.read('isLoggedIn') ?? false;
   final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
 
+  final isFirstRun = prefs.getBool('isFirstRun') ?? true;
+
+  if (isFirstRun) {
+    final box = GetStorage();
+    await box.erase(); // ✅ Clear GetStorage on first launch
+    await prefs.clear(); // ✅ Clear SharedPreferences on first launch
+    await prefs.setBool('isFirstRun', false); // Mark first run done
+  }
 
   //Get.put(WorknestController(),permanent: true);
   //Get.put(SignUpController(),permanent: true);
@@ -142,8 +153,10 @@ class _SplashScreenState extends State<SplashScreen> {
     final box = GetStorage();
     final isLoggedIn = box.read('isLoggedIn') ?? false;
     final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final isProfileCompleted = prefs.getBool('profileCompleted') ?? false;
 
-    final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
 
     print('isLoggedIn: $isLoggedIn');
@@ -151,15 +164,39 @@ class _SplashScreenState extends State<SplashScreen> {
     print('userId: $userId');
 
     await Future.delayed(Duration(seconds: 1));
+    final isFirstRun = prefs.getBool('isFirstRun') ?? true;
+
+    if (isFirstRun) {
+      final box = GetStorage();
+      await box.erase(); // ✅ Clear GetStorage on first launch
+      await prefs.clear(); // ✅ Clear SharedPreferences on first launch
+      await prefs.setBool('isFirstRun', false); // Mark first run done
+    }
 
     if (isLoggedIn2) {
-      Get.offAllNamed('/bottom2'); // 👈 Pehle Login2 check karo
+      Get.offAllNamed('/bottom2'); //
     } else if (isLoggedIn || userId != null) {
       Get.offAllNamed('/bottom');
     } else {
       startSplashFlow();
     }
   }
+
+  // void checkInitialFlow() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final token = prefs.getString('token');
+  //   final isProfileCompleted = prefs.getBool('profileCompleted') ?? false;
+  //
+  //   if (token != null && token.isNotEmpty) {
+  //     if (isProfileCompleted) {
+  //       Get.offAllNamed('/bottom'); // ✅ Profile completed
+  //     } else {
+  //       Get.offAll(() => SignUpView()); // ✅ Profile not completed
+  //     }
+  //   } else {
+  //     Get.offAll(() => SplashScreen()); // ✅ No token
+  //   }
+  // }
 
 
 
@@ -250,3 +287,4 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
+

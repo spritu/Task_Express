@@ -101,17 +101,15 @@ class HomeView extends GetView<HomeController> {
                               controller: controller.searchController,
                               onChanged: (value) {
                                 if (value.isEmpty) {
-                                  controller.searchResults.clear(); // ✅ Clear the results
-                                  FocusScope.of(context).unfocus(); // ✅ Hide keyboard
-                                  return; // 🛑 Stop here, don't call API
+                                  controller.searchResults.clear();
+                                  FocusScope.of(context).unfocus();
+                                  return;
                                 }
 
                                 if (bottomController.authController.isLoggedIn.value) {
-                                  controller.fetchServiceProviders(value); // ✅ Fetch new results
+                                  controller.fetchServiceProviders(value);
                                 }
                               },
-
-
                               decoration: InputDecoration(
                                 prefixIcon: Icon(Icons.search),
                                 hintText: "Search for ‘Plumber’",
@@ -126,37 +124,44 @@ class HomeView extends GetView<HomeController> {
                               ),
                             ),
                             const SizedBox(height: 10),
+                        Obx(() {
+                          if (controller.searchResults.isEmpty) return const SizedBox();
 
-// Search Results
-                            Obx(() {
-                              if (controller.searchResults.isEmpty) return const SizedBox();
+                          return ConstrainedBox(
+                            constraints: const BoxConstraints(maxHeight: 300),
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: controller.searchResults.length,
+                              itemBuilder: (context, index) {
+                                final item = controller.searchResults[index];
+                                print("🔍 Search Item: $item");
 
-                              return ConstrainedBox(
-                                constraints: const BoxConstraints(maxHeight: 300), // ✅ To prevent overflow
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: controller.searchResults.length,
-                                  itemBuilder: (context, index) {
-                                    final item = controller.searchResults[index];
-                                    return ListTile(
-                                      title: Text(item['name'] ?? 'No Name'),
-                                      onTap: () {    final categories = controller.categories;
-                                        final cat = categories[index];
-                                        controller
-                                            .fetchUsersListByCategory(
-                                          cat.catid,
-                                          categoryName: cat.label,
-                                        );
-                                        // Navigate to details screen with user data
-                                     //   Get.to(() => UserDetailScreen(user: item));
-                                      },
-                                    );
+                                return ListTile(
+                                  title: Text(item['name'] ?? 'No Name'),
+                                  onTap: () {
+                                    final catId = item['matchedIn'] == 'category'
+                                        ? item['_id']?.toString()
+                                        : item['parentId']?.toString();
+
+                                    final catName = item['name'] ?? 'Professionals';
+
+                                    if (catId != null && catId.isNotEmpty) {
+                                      controller.fetchUsersListByCategory(catId, categoryName: catName);
+                                    } else {
+                                      print("❌ Invalid or missing category ID in: $item");
+                                    }
                                   },
-                                ),
-                              );
-                            }),
-                          ],),),),),
+                                );
+                              },
+                            ),
+                          );
+                        }),
+
+
+
+
+                        ],),),),),
                   // Service Type Buttons
                   Expanded(
                     child: SingleChildScrollView(
@@ -303,7 +308,8 @@ class HomeView extends GetView<HomeController> {
                                               if (isExpanded &&
                                                   index == categories.length) {
                                                 return InkWell(
-                                                  onTap:(){bottomController.checkAndShowSignupSheet(context);
+                                                  onTap:(){
+                                                    bottomController.checkAndShowSignupSheet(context);
                                                       controller.toggleCategoryView;},
                                                   child: const Card(
                                                     color: Colors.white,

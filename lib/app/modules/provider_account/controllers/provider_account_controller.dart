@@ -139,7 +139,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     authController.isLoggedIn2.value = false;
 
     // Navigate to login screen
-    Get.offAllNamed('/provider-login');
+    Get.offAllNamed('/join');
   }
 
   var categoryOptions = <CategoryModel>[].obs;

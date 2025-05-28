@@ -78,12 +78,12 @@ class HomeController extends GetxController {
     }
   }
   Map<String, String> categoryNameMap = {};
-  void fetchUsersListByCategory(String catId, {String? categoryName}) async {
+  Future<void> fetchUsersListByCategory(String catId, {String? categoryName}) async {
     results.clear();
     isLoading.value = true;
 
     try {
-      fetchCategories(); // Step 1: load category name map
+       fetchCategories(); // Ensure categoryNameMap is populated
 
       var url = Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId');
       var request = http.Request('GET', url);
@@ -92,15 +92,12 @@ class HomeController extends GetxController {
       if (response.statusCode == 200) {
         final jsonString = await response.stream.bytesToString();
         final jsonData = json.decode(jsonString);
-        // 🔍 Debug print to show response data
-        print("API Response Data: $jsonData");
-        // Attach category name to each skill
         List<dynamic> users = jsonData['data'];
+
         for (var user in users) {
           if (user['skills'] != null) {
             for (var skill in user['skills']) {
-              skill['categoryName'] =
-                  categoryNameMap[skill['categoryId']] ?? 'Unknown';
+              skill['categoryName'] = categoryNameMap[skill['categoryId']] ?? 'Unknown';
             }
           }
         }
@@ -113,20 +110,69 @@ class HomeController extends GetxController {
             'title': categoryName ?? 'Professionals',
           });
         } else {
-          Get.to(() => ServiceproView(),arguments: {
+          Get.to(() => ServiceproView(), arguments: {
             'users': results,
             'title': categoryName ?? 'Professionals',
           });
         }
       } else {
-        print("Error: ${response.reasonPhrase}");
+        print("❌ Error: ${response.reasonPhrase}");
       }
     } catch (e) {
-      print("Exception: $e");
+      print("❗ Exception: $e");
     } finally {
       isLoading.value = false;
     }
   }
+  // void fetchUsersListByCategory(String catId, {String? categoryName}) async {
+  //   results.clear();
+  //   isLoading.value = true;
+  //
+  //   try {
+  //     fetchCategories(); // Step 1: load category name map
+  //
+  //     var url = Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId');
+  //     var request = http.Request('GET', url);
+  //     var response = await request.send();
+  //
+  //     if (response.statusCode == 200) {
+  //       final jsonString = await response.stream.bytesToString();
+  //       final jsonData = json.decode(jsonString);
+  //       // 🔍 Debug print to show response data
+  //       print("API Response Data: $jsonData");
+  //       // Attach category name to each skill
+  //       List<dynamic> users = jsonData['data'];
+  //       for (var user in users) {
+  //         if (user['skills'] != null) {
+  //           for (var skill in user['skills']) {
+  //             skill['categoryName'] =
+  //                 categoryNameMap[skill['categoryId']] ?? 'Unknown';
+  //           }
+  //         }
+  //       }
+  //
+  //       results.assignAll(users);
+  //
+  //       if (results.isNotEmpty) {
+  //         Get.to(() => ProfessionalPlumberView(), arguments: {
+  //           'users': results,
+  //           'title': categoryName ?? 'Professionals',
+  //         });
+  //       } else {
+  //         Get.to(() => ServiceproView(),arguments: {
+  //           'users': results,
+  //           'title': categoryName ?? 'Professionals',
+  //         });
+  //       }
+  //     } else {
+  //       print("Error: ${response.reasonPhrase}");
+  //     }
+  //   } catch (e) {
+  //     print("Exception: $e");
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
 
 
 
@@ -427,32 +473,27 @@ class HomeController extends GetxController {
   /// Fetch service providers from API
   Future<void> fetchServiceProviders(String keyword) async {
     try {
-      // Constructing the URL with the search keyword
       var url = Uri.parse('https://jdapi.youthadda.co/user/searchServiceProviders?name=$keyword');
       var request = http.Request('GET', url);
 
-      // Sending the HTTP request
       http.StreamedResponse response = await request.send();
 
-      // Checking if the response status code is 200 (OK)
       if (response.statusCode == 200) {
-        // Converting the response body to a string
         String responseBody = await response.stream.bytesToString();
-
-        // Decoding the response body (JSON)
         var jsonData = jsonDecode(responseBody);
 
-        // Checking if 'data' is a list and updating the searchResults
         if (jsonData['data'] is List) {
-          searchResults.value = jsonData['data'];  // Update the observable list with data
+          searchResults.value = jsonData['data'];
         } else {
-          searchResults.clear();  // Clear results if data is not in the expected format
+          searchResults.clear();
         }
-      } else { searchResults.clear();
-      print("❌ Failed: ${response.reasonPhrase}");  // Log failure if status code isn't 200
+      } else {
+        searchResults.clear();
+        print("❌ Failed: ${response.reasonPhrase}");
       }
-    } catch (e) { searchResults.clear();
-    print("❗ Error: $e");  // Catch and log any errors
+    } catch (e) {
+      searchResults.clear();
+      print("❗ Error: $e");
     }
   }
 

@@ -368,6 +368,8 @@ import '../../login/views/login_view.dart';
 class BookingController extends GetxController {
   //TODO: Implement BookingController
   var isLoading = false.obs;
+  var userList = <UserModel>[].obs;
+
   // var bookings = <BookingModel>[].obs;
   var bookingList = [].obs;
   var bookinged = <String, dynamic>{}.obs;
@@ -380,10 +382,59 @@ class BookingController extends GetxController {
     super.onInit();
     fetchCurrentBookings();
     connectSocketAccept();
-    connectSocketReject();
+    connectSocketReject();fetchUserPastBooking();
 
     //  fetchUserCurrentBooking();
   }
+  Future<void> fetchUserPastBooking() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId2 = prefs.getString('userId');
+
+      if (userId2 == null) {
+        print("User ID not found in SharedPreferences.");
+        return;
+      }
+
+      isLoading.value = true;
+
+      var headers = {
+        'Content-Type': 'application/json',
+      };
+      var request = http.Request(
+        'POST',
+        Uri.parse('https://jdapi.youthadda.co/getuserpastbooking'),
+      );
+      request.body = json.encode({"userId": userId2});
+      request.headers.addAll(headers);
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        print("API Response: $responseBody");
+
+        final data = json.decode(responseBody);
+
+        if (data['data'] != null) {
+          var users = data['data'] as List;
+          userList.value = users.map((e) => UserModel.fromJson(e)).toList();
+        } else {
+          userList.clear();
+        }
+      } else {
+        print("Error: ${response.reasonPhrase}");
+        userList.clear();
+      }
+    } catch (e) {
+      print("Exception: $e");
+      userList.clear();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
 
   // Inside your controller
   //var bookingList = <dynamic>[].obs;
@@ -885,6 +936,133 @@ class Booking {
       bookedFor: User.fromJson(json['bookedFor']),
       completeJob: json['completeJob'] ?? 0,
       createdAt: DateTime.parse(json['createdAt']),
+    );
+  }
+}
+
+String formatDate(String isoDate) {
+  final DateTime dateTime = DateTime.parse(isoDate).toLocal(); // convert to local time
+  final DateFormat formatter = DateFormat('dd MMM yyyy, hh:mm a'); // e.g., 22 May 2025, 12:09 PM
+  return formatter.format(dateTime);
+}
+
+class UserModel {
+  final String id;
+  final Map<String, dynamic> bookedBy;
+  final Map<String, dynamic> bookedFor;
+  final List<dynamic> bookServices;
+  final int completeJob;
+  final String accept;
+  final bool paymentDoneBySp;
+  final bool paymentDoneByUser;
+  final String jobStartTime;
+  final String jobEndTime;
+  final int pay;
+  final String? userImg;
+  final String spType; // 👈 ADD THIS
+
+  UserModel({
+    required this.id,
+    required this.bookedBy,
+    required this.bookedFor,
+    required this.bookServices,
+    required this.completeJob,
+    required this.accept,
+    this.userImg,
+    required this.paymentDoneBySp,
+    required this.paymentDoneByUser,
+    required this.jobStartTime,
+    required this.jobEndTime,
+    required this.pay,
+    required this.spType, // 👈 ADD THIS
+  });
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    String spTypeValue = '1'; // default if not found
+
+    // Extract spType from first bookService if available
+    if (json['bookServices'] != null && (json['bookServices'] as List).isNotEmpty) {
+      final firstService = (json['bookServices'] as List).first;
+      spTypeValue = firstService['spType']?.toString() ?? '1';
+    }
+
+    print("spType from API extracted: $spTypeValue");
+
+    // 👇 Extract userImg from bookedFor object
+    final userImgPath = json['bookedFor']?['userImg'];
+    print("Extracted userImg: $userImgPath");
+
+    return UserModel(
+      id: json['_id'] ?? '',
+      userImg: userImgPath,
+      bookedBy: json['bookedBy'] ?? {},
+      bookedFor: json['bookedFor'] ?? {},
+      bookServices: json['bookServices'] ?? [],
+      completeJob: json['completeJob'] ?? 0,
+      accept: json['accept'] ?? '',
+      paymentDoneBySp: json['paymentdonebysp'] ?? false,
+      paymentDoneByUser: json['paymentdonebyuser'] ?? false,
+      jobStartTime: json['jobStartTime'] ?? '',
+      jobEndTime: json['jobEndTime'] ?? '',
+      pay: json['pay'] ?? 0,
+      spType: spTypeValue,
+    );
+  }
+
+  // factory UserModel.fromJson(Map<String, dynamic> json) {
+  //   String spTypeValue = '1'; // default if not found
+  //
+  //   // Check if bookServices list exists and is not empty
+  //   if (json['bookServices'] != null && (json['bookServices'] as List).isNotEmpty) {
+  //     final firstService = (json['bookServices'] as List).first;
+  //     spTypeValue = firstService['spType']?.toString() ?? '1';
+  //   }
+  //
+  //
+  //   print("spType from API extracted: $spTypeValue");  // Debug print
+  //
+  //   return UserModel(
+  //     id: json['_id'] ?? '',
+  //     userImg: json['bookedFor']?['userImg'],
+  //
+  //     bookedBy: json['bookedBy'] ?? {},
+  //     bookedFor: json['bookedFor'] ?? {},
+  //     bookServices: json['bookServices'] ?? [],
+  //     completeJob: json['completeJob'] ?? 0,
+  //     accept: json['accept'] ?? '',
+  //     paymentDoneBySp: json['paymentdonebysp'] ?? false,
+  //     paymentDoneByUser: json['paymentdonebyuser'] ?? false,
+  //     jobStartTime: json['jobStartTime'] ?? '',
+  //     jobEndTime: json['jobEndTime'] ?? '',
+  //     pay: json['pay'] ?? 0,
+  //     spType: spTypeValue,
+  //   );
+  // }
+
+}
+
+
+
+
+
+class SkillModel {
+  final String categoryId;
+  final String? subcategoryId;
+  final int? charge;
+  final String id;
+
+  SkillModel({
+    required this.categoryId,
+    this.subcategoryId,
+    this.charge,
+    required this.id,
+  });
+
+  factory SkillModel.fromJson(Map<String, dynamic> json) {
+    return SkillModel(
+      categoryId: json['categoryId'] ?? '',
+      subcategoryId: json['sucategoryId'],
+      charge: json['charge'],
+      id: json['_id'] ?? '',
     );
   }
 }
