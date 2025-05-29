@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:geocoding/geocoding.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:uuid/uuid.dart';
 import 'package:get/get.dart';
@@ -50,8 +51,22 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
   var selectedIndex = 0.obs;
   final selectedUser = Rxn<Map<String, dynamic>>();
 
+  var userAddresses = <String, String>{}.obs;
 
-
+  Future<void> fetchAddress(String userId, double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        final address = "${place.name}, ${place.locality}, ${place.administrativeArea}";
+        userAddresses[userId] = address;
+      } else {
+        userAddresses[userId] = "Address not found";
+      }
+    } catch (e) {
+      userAddresses[userId] = "Error fetching address";
+    }
+  }
 
   @override
   void onInit() {
@@ -181,7 +196,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
       Get.snackbar('Error', 'Something went wrong: $e');
     }
   }
-
+  String address = "Loading...";
 
   void connectSocket() {
     print("❌ wdwcdtf");
@@ -250,6 +265,21 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
     });
   }
 
+  Future<String> getAddressFromCoordinates(double latitude, double longitude) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        return "${place.name}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}, ${place.country}";
+      } else {
+        return "Address not found";
+      }
+    } catch (e) {
+      print("❗ Error in reverse geocoding: $e");
+      return "Address not available";
+    }
+  }
 
 
   // Widget to show bottom sheet after call ends

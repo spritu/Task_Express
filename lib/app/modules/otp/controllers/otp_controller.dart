@@ -11,7 +11,8 @@ import '../../signUp/views/sign_up_view.dart';
 
 class OtpController extends GetxController {
   TextEditingController otpController = TextEditingController();
-  String? mobileNumber;
+  final RxString mobileNumber = ''.obs;
+
   var userId = ''.obs;
   var token = ''.obs;
   var email = ''.obs;
@@ -50,10 +51,11 @@ class OtpController extends GetxController {
   }
   Future<void> loadMobileNumber() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    mobileNumber = prefs.getString('mobileNumber');
-
+    final number = prefs.getString('mobileNumber') ?? '';
+    mobileNumber.value = number;
+    print("📱 Loaded mobile number: $number");
   }
+
   // Move focus on pin code fields
   void moveToNext(int index, String value) {
     if (value.length == 1) {
@@ -229,7 +231,7 @@ class OtpController extends GetxController {
     final headers = {
       'Content-Type': 'application/json',
     };
-    final body = json.encode({"phone": mobileNumber});
+    final body = json.encode({"phone": mobileNumber.value});
     final url = Uri.parse('https://jdapi.youthadda.co/user/sendotp');
 
     try {
@@ -242,6 +244,19 @@ class OtpController extends GetxController {
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
         print("OTP resent successfully: $responseBody");
+        final data = json.decode(responseBody);
+
+        final otp = data['otp'] ?? '';
+        if (otp.isNotEmpty) {
+          Get.snackbar(
+            "🔐 OTP Received",
+            "Your OTP is: $otp",
+            duration: Duration(seconds: 10),
+            backgroundColor: Colors.black87,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
       //  Get.snackbar("Success", "OTP resent successfully to +91 $mobileNumber");
       } else {
         print("Failed to resend OTP: ${response.reasonPhrase}");

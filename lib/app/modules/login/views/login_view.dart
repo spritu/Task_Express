@@ -32,10 +32,9 @@ class LoginView extends GetView<LoginController> {
             child: Column(
             //  crossAxisAlignment: CrossAxisAlignment.center,
 
-              children: [SizedBox(height: 40),InkWell(
+              children: [SizedBox(height: 50),InkWell(
                 onTap: () async {
                   final authController = Get.find<AuthController>();
-
                   // Update GetStorage and observable state
                   authController.box.write('isLoggedIn', false);
                   authController.isLoggedIn.value = false;
@@ -49,13 +48,17 @@ class LoginView extends GetView<LoginController> {
                   children: [
                     Text(
                       "Skip for now",
+                      textAlign: TextAlign.center, // text-align: center;
                       style: TextStyle(
-                        fontSize: 12,
-                        fontFamily: "Poppins",
-                        fontWeight: FontWeight.w500,
+                        fontSize: 12, // font-size: 12px;
+                        fontFamily: "Poppins", // font-family: Poppins;
+                        fontWeight: FontWeight.w500, // font-weight: 500;
+                        height: 20 / 12, // line-height: 20px -> height = lineHeight / fontSize
+                        letterSpacing: 1.2, // letter-spacing: 10% of font-size (12 * 0.10 = 1.2)
                         color: AppColors.blue,
                       ),
-                    ),
+                    )
+
                   ],
                 ),
               ),
@@ -96,12 +99,12 @@ class LoginView extends GetView<LoginController> {
                   'Find Trusted Service Providers\n Instantly!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                    height: 1.857, // line-height equivalent
-                    letterSpacing: 1.54, // 11% of 14px
-                    color: Color(0xff2D2D2D),
+                    fontFamily: 'Poppins',               // font-family: Poppins
+                    fontWeight: FontWeight.w600,         // font-weight: 600
+                    fontSize: 14,                         // font-size: 14px
+                    height: 26 / 14,                      // line-height: 26px → height factor
+                    letterSpacing: 1.54,                 // 11% of 14px → 14 * 0.11 = 1.54
+                    color: Color(0xff2D2D2D),             // color
                   ),
                 ),
 
@@ -169,20 +172,22 @@ class LoginView extends GetView<LoginController> {
                   onTap: () {
                     controller.sendOtp(); // ✅ Already updated
                   },
-                  child: Container(
-                    height: 64,
-                    width: MediaQuery.of(context).size.width * 0.6,
-                    decoration: BoxDecoration(
-                      color: const Color(0xff235CD7),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        "Get Verification Code",
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: AppColors.white,
-                          fontWeight: FontWeight.w400,
+                  child: Card(
+                    child: Container(
+                      height: 64,
+                      width: 262,
+                      decoration: BoxDecoration(
+                        color: const Color(0xff235CD7),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "Get Verification Code",
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: AppColors.white,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
                     ),
@@ -193,7 +198,7 @@ class LoginView extends GetView<LoginController> {
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    style: const TextStyle(color: Colors.black, fontSize: 14),
+                    style: const TextStyle(color: Colors.black, fontSize: 14, letterSpacing: 1,),
                     children: [
                       const TextSpan(text: 'By continuing, you agree to our'),
                       TextSpan(

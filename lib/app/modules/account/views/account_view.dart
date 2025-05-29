@@ -76,22 +76,29 @@ class AccountView extends GetView<AccountController> {
 
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
+                                   horizontal: 8.0,
                                   vertical: 10,
                                 ),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Obx(() {
+                                      String capitalize(String s) =>
+                                          s.isNotEmpty ? s[0].toUpperCase() + s.substring(1).toLowerCase() : '';
+
+                                      final firstName = capitalize(controller.firstName.value);
+                                      final lastName = capitalize(controller.lastName.value);
+
                                       return Text(
-                                        '${controller.firstName} ${controller.lastName}',
-                                        style: TextStyle(
+                                        '$firstName $lastName',
+                                        style: const TextStyle(
                                           fontSize: 14,
                                           fontFamily: "poppins",
                                           fontWeight: FontWeight.w500,
                                         ),
                                       );
                                     }),
+
 
                                     Obx(() {
                                       return Text(
@@ -130,14 +137,14 @@ class AccountView extends GetView<AccountController> {
                           color: Colors.white,
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14),
                           child: Row(
                             children: [
                               Image.asset(
                                 "assets/images/service_provider.png",
                                 color: AppColors.orage,
-                                height: 16,
-                                width: 16,
+                                height: 20,
+                                width: 20,
                               ),
                               SizedBox(width: 5),
                               Padding(
@@ -147,13 +154,17 @@ class AccountView extends GetView<AccountController> {
                                 ),
                                 child: Text(
                                   'Join as a Service provider',
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w500,
                                     fontSize: 13,
-                                    fontFamily: "poppins",
-                                    fontWeight: FontWeight.w400,
+                                    height: 20 / 13, // line-height = 20px
+                                    letterSpacing: 0.06 * 13, // 6% of font-size = 0.78
                                     color: AppColors.orage,
                                   ),
                                 ),
+
                               ),
                               Spacer(),
                               InkWell(
@@ -204,8 +215,30 @@ class AccountView extends GetView<AccountController> {
                                 "Manage addresses",
                                 Icons.arrow_forward_ios,
                               ),
+                            ), Divider(thickness: 1),
+                            InkWell(
+                              onTap: () {
+                                Get.to(AddAddressView());
+                              },
+                              child: buildList(
+                                context,
+                                Icons.sign_language,
+                                "Language",
+                                Icons.arrow_forward_ios,
+                              ),
                             ),
-
+                            Divider(thickness: 1),
+                            InkWell(
+                              onTap: () {
+                                Get.to(AddAddressView());
+                              },
+                              child: buildList(
+                                context,
+                                Icons.privacy_tip_outlined,
+                                "Privacy & Data",
+                                Icons.arrow_forward_ios,
+                              ),
+                            ),
                             Divider(thickness: 1),
                             InkWell(
                               onTap: () {

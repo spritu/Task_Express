@@ -100,6 +100,12 @@ class HomeController extends GetxController {
               skill['categoryName'] = categoryNameMap[skill['categoryId']] ?? 'Unknown';
             }
           }
+          if (user['location'] != null &&
+              user['location']['coordinates'] != null &&
+              user['location']['coordinates'].length == 2) {
+            user['longitude'] = user['location']['coordinates'][0];
+            user['latitude'] = user['location']['coordinates'][1];
+          }
         }
 
         results.assignAll(users);

@@ -29,22 +29,51 @@ class BottomView extends GetView<BottomController> {
         );
       }),
       bottomNavigationBar: Obx(
-            () => BottomNavigationBar(
-          backgroundColor: AppColors.white,
-          currentIndex: controller.selectedIndex.value,
-          onTap: (index) => controller.selectedIndex.value = index,
-          selectedItemColor: const Color(0xFF114BCA),
-          unselectedItemColor: const Color(0xFF9F9F9F),
-          type: BottomNavigationBarType.fixed,
-          showUnselectedLabels: true,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Bookings'),
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
-            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
-          ],
-        ),
+            () => BottomNavigationBar( backgroundColor: AppColors.white,
+              selectedItemColor:AppColors.blue, unselectedItemColor: Colors.grey,
+              selectedLabelStyle: const TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w500,
+                fontSize: 9,color: Colors.grey,
+                height: 20 / 9, // line-height equivalent
+                letterSpacing: 0.05, // 5% of 1em = ~0.05
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w500,
+                fontSize: 9,
+                height: 20 / 9,
+                letterSpacing: 0.05,
+              ),
+              type: BottomNavigationBarType.fixed, // Needed for more than 3 items
+              currentIndex: controller.selectedIndex.value,showUnselectedLabels: true,
+              onTap: (index) => controller.selectedIndex.value = index,
+              items: const [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+                BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Bookings'),
+                BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
+                BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
+                BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
+              ],
+            )
+
+
+        //         BottomNavigationBar(
+        //   backgroundColor: AppColors.white,
+        //   currentIndex: controller.selectedIndex.value,
+        //   onTap: (index) => controller.selectedIndex.value = index,
+        //   selectedItemColor: const Color(0xFF114BCA),
+        //   unselectedItemColor: const Color(0xFF9F9F9F),
+        //   type: BottomNavigationBarType.fixed,
+        //   showUnselectedLabels: true,
+        //   items: const [
+        //     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+        //     BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Bookings'),
+        //     BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
+        //     BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
+        //     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
+        //   ],
+        // ),
       ),
     );
   }

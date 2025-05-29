@@ -118,7 +118,7 @@ class JoinView extends GetView<JoinController> {
 
                     // Top info text
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Text(
@@ -151,7 +151,7 @@ class JoinView extends GetView<JoinController> {
                       ),
                       child: TextButton.icon(
                         onPressed: () => Get.to(LoginView()),
-                        icon: Icon(Icons.person, color: Colors.white, size: 20),
+                        icon: Icon(Icons.person, color: Colors.white, size: 28),
                         label: Text(
                           "Join as a User",
                           style: TextStyle(
@@ -172,7 +172,7 @@ class JoinView extends GetView<JoinController> {
 
                     // Bottom info text
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Text(
@@ -207,8 +207,8 @@ class JoinView extends GetView<JoinController> {
                         onPressed: () => Get.to(ProviderLoginView()),
                         icon: Image.asset(
                           "assets/images/service_provider.png",
-                          height: 20,
-                          width: 20,
+                          height: 24,
+                          width: 24,
                           color: Colors.white,
                         ),
                         label: Text(

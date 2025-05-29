@@ -18,7 +18,6 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
     final arguments = Get.arguments as Map<String, dynamic>;
     final List users = arguments['users'];
     final String title = arguments['title'] ?? 'Professionals';
-    print('12345:${users}');
 
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
@@ -156,12 +155,12 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Column(
+                            child: Column(mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   children: [
-                                    Column(
+                                    Column(mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Text(
                                           "${user['firstName'] ?? 'No'} ${user['lastName'] ?? 'Name'}",
@@ -173,7 +172,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           ),
                                         ),
                                         SizedBox(height: 3),
-                                        Row(
+                                        Row(mainAxisAlignment: MainAxisAlignment.start,
                                           crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                           children: [
@@ -273,15 +272,15 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           ],
                                         ),
                                         SizedBox(height: 3),
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.access_time,
-                                              size: 14,
-                                              color: AppColors.grey,
-                                            ),
-                                          ],
-                                        ),
+                                        // Row(
+                                        //   children: [
+                                        //     Icon(
+                                        //       Icons.access_time,
+                                        //       size: 14,
+                                        //       color: AppColors.grey,
+                                        //     ),
+                                        //   ],
+                                        // ),
                                       ],
                                     ),
                                     Card(

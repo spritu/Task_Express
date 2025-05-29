@@ -40,15 +40,17 @@ class OtpView extends GetView<OtpController> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    'Please enter the 4-digit code sent on\n+91 ${controller.mobileNumber}',
+                  Obx(() => Text(
+                    'Please enter the 4-digit code sent on\n+91 ${controller.mobileNumber.value}',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
                       color: Colors.black54,
                       fontFamily: 'Poppins',
                     ),
-                  ),
+                  )),
+
                   const SizedBox(height: 30),
                   Center(
                     child: SizedBox(
@@ -59,7 +61,8 @@ class OtpView extends GetView<OtpController> {
                         controller: controller.otpController,
                         autoDisposeControllers: false,
                         keyboardType: TextInputType.number,
-                      //  animationType: AnimationType.fade,
+                        enableActiveFill: true, // enables box background color
+                        cursorColor: Colors.black, // ✅ sets the cursor (blinking line) color
                         pinTheme: PinTheme(
                           shape: PinCodeFieldShape.box,
                           borderRadius: BorderRadius.circular(8),
@@ -73,10 +76,10 @@ class OtpView extends GetView<OtpController> {
                           inactiveColor: Colors.grey,
                         ),
                         onChanged: (value) {
-                          // Track changes (if necessary)
+                          // handle change
                         },
                         onCompleted: (otp) {
-                          controller.verifyOtp(otp); // Call verifyOtp when OTP is completed
+                          controller.verifyOtp(otp);
                         },
                       ),
                     ),
@@ -86,11 +89,14 @@ class OtpView extends GetView<OtpController> {
                     onPressed: controller.resendOtp,
                     child: const Text(
                       'Resend',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Color(0xFF114BCA),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
                         fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        height: 1.0, // 100% line-height
+                        letterSpacing: 0.72, // 6% of 12px = 0.72
+                        color: Color(0xFF114BCA),
                       ),
                     ),
                   ),

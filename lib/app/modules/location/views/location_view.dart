@@ -26,13 +26,13 @@ class LocationView extends GetView<LocationController> {
                   height: 1.0,
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 14),
               Text(
                 "Hey there! How’s it going today?",
                 style: TextStyle(
                   fontFamily: "poppins",
                   fontWeight: FontWeight.w400,
-                  fontSize: 14,
+                  fontSize: 14,letterSpacing: 1,
                   height: 1.0,
                 ),
               ),
@@ -50,10 +50,10 @@ class LocationView extends GetView<LocationController> {
               Image.asset(
                 "assets/images/Address.png",
                 height: 308,
-                width: 308,
+                width: 276,
               ),
               SizedBox(height: 20),
-              SizedBox(height: 54,
+              SizedBox(height: 54,width: 250,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.blue,
@@ -90,7 +90,7 @@ class LocationView extends GetView<LocationController> {
                 ),
               ),
               SizedBox(height: 20),
-              SizedBox(height: 54,
+              SizedBox(height: 54,width: 250,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.white,
