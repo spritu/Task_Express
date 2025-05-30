@@ -10,8 +10,6 @@ import '../controllers/chat_screen_controller.dart';
 class ChatScreenView extends GetView<ChatScreenController> {
   const ChatScreenView({super.key});
 
-
-
   @override
   Widget build(BuildContext context) {
   Get.put(ChatScreenController());
@@ -31,7 +29,6 @@ class ChatScreenView extends GetView<ChatScreenController> {
               child: Column(
                 children: [
                   SizedBox(height: 20),
-
                   // Header
                   const Text(
                     " Chats",

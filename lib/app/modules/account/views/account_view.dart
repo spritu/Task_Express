@@ -62,12 +62,12 @@ class AccountView extends GetView<AccountController> {
                                 return CircleAvatar(
                                   radius: 40,
                                   backgroundImage:
-                                      imageUrl.isNotEmpty
-                                          ? NetworkImage(imageUrl)
-                                          : const AssetImage(
-                                                'assets/images/account.png',
-                                              )
-                                              as ImageProvider,
+                                  imageUrl.isNotEmpty
+                                      ? NetworkImage(imageUrl)
+                                      : const AssetImage(
+                                    'assets/images/account.png',
+                                  )
+                                  as ImageProvider,
                                   onBackgroundImageError: (_, __) {
                                     print("❌ Image failed to load.");
                                   },
@@ -76,7 +76,7 @@ class AccountView extends GetView<AccountController> {
 
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                   horizontal: 8.0,
+                                  horizontal: 8.0,
                                   vertical: 10,
                                 ),
                                 child: Column(
@@ -170,12 +170,12 @@ class AccountView extends GetView<AccountController> {
                               InkWell(
                                 onTap: () async {
                                   final prefs =
-                                      await SharedPreferences.getInstance();
+                                  await SharedPreferences.getInstance();
                                   final userId =
                                       prefs.getString('user_id') ?? '';
 
                                   Get.to(
-                                    () => ProviderProfileView(),
+                                        () => ProviderProfileView(),
                                     arguments: {'userId': userId},
                                   );
                                 },
@@ -277,7 +277,7 @@ class AccountView extends GetView<AccountController> {
                         ),
                       ),
                     ),
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                     InkWell(
                       onTap: () {
                         controller.logout();
@@ -315,49 +315,49 @@ class AccountView extends GetView<AccountController> {
 }
 
 Widget buildList(
-  BuildContext context,
-  IconData leadingIcon,
-  String name,
-  IconData trailingIcon, {
-  TextSpan? richText,
-  Color textColor = Colors.black,
-  String? leadingImagePath, // 👈 for image instead of icon
-}) {
+    BuildContext context,
+    IconData leadingIcon,
+    String name,
+    IconData trailingIcon, {
+      TextSpan? richText,
+      Color textColor = Colors.black,
+      String? leadingImagePath, // 👈 for image instead of icon
+    }) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14),
     child: Row(
       children: [
         leadingImagePath != null
             ? Image.asset(
-              leadingImagePath,
-              width: 20,
-              height: 20,
-              color: Colors.black87, // optional: match icon color
-            )
+          leadingImagePath,
+          width: 20,
+          height: 20,
+          color: Colors.black87, // optional: match icon color
+        )
             : Icon(leadingIcon, color: Colors.black87, size: 20),
         const SizedBox(width: 12),
         Expanded(
           child:
-              richText != null
-                  ? RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontFamily: "Poppins",
-                        color: textColor,
-                      ),
-                      children: [TextSpan(text: name), richText],
-                    ),
-                  )
-                  : Text(
-                    name,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontFamily: "Poppins",
-                      color: textColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+          richText != null
+              ? RichText(
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: 14,
+                fontFamily: "Poppins",
+                color: textColor,
+              ),
+              children: [TextSpan(text: name), richText],
+            ),
+          )
+              : Text(
+            name,
+            style: TextStyle(
+              fontSize: 13,
+              fontFamily: "Poppins",
+              color: textColor,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
         Icon(trailingIcon, size: 16, color: Colors.black54),
       ],

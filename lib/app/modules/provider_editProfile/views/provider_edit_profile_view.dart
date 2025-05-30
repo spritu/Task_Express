@@ -80,6 +80,7 @@ class ProviderEditProfileView extends GetView<ProviderEditProfileController> {
                         _buildEditableField("Email", controller.emailController, controller),
                       ],
                     ),
+
                   ),
                 ),
 

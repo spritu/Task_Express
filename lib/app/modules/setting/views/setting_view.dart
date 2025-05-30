@@ -18,198 +18,91 @@ class SettingView extends GetView<SettingController> {
         Get.offAll(() => BottomView());
         return false;
       },
-      child: Scaffold(backgroundColor: Colors.white,
-        body: Container( height:MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.center,
-            colors: [Color(0xFF87AAF6), Colors.white],
+      child: Scaffold(
+        backgroundColor: const Color(0xfff4f7ff),
+        appBar: AppBar(
+          backgroundColor: const Color(0xfff4f7ff),
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Navigator.pop(context),
           ),
-        ),child: SingleChildScrollView(child: Column(children: [ SizedBox(height: 40),
-            Text(
-            "Settings",
-            style: TextStyle(
-              color: Colors.black,
-              fontFamily: "poppins",
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+          title: Center(
+            child: const Text(
+              "Notification",
+              style: TextStyle(
+                color: Colors.black,fontSize: 16,
+                fontWeight: FontWeight.w500,
+                fontFamily: "poppins",
+              ),
             ),
           ),
-           SizedBox(height: 30),
-            Padding(
-              padding: const EdgeInsets.only(left: 12, right: 12),
-              child: Card(
-                color: Colors.white,
-                child: Column(
+          actions: [
+            TextButton(
+              onPressed: () {},
+              child: const Text(
+                "Clear All",
+                style: TextStyle(
+                  color: Color(0xff6055D8),
+                  fontFamily: "poppins",fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+        body: ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: 5,
+          itemBuilder: (context, index) {
+            return Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: 56,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 12, right: 12),
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              "assets/images/moon.png",
-                              color: AppColors.textColor,
-                            ),
-                            SizedBox(width: 20),
-                            Text(
-                              "Dark mode",
-                              style: TextStyle(
-                                fontFamily: "poppins",
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            Spacer(),
-                            Obx(
-                                  () => FlutterSwitch(
-                                width: 33.0,
-                                height: 18.0,
-                                toggleSize: 21.0,
-                                value: controller.isDarkMode.value,
-                                borderRadius: 30.0,
-                                padding: 1,
-                                activeColor: AppColors.blue,
-                                inactiveColor: AppColors.grey,
-                                onToggle: (val) {
-                                  controller.toggleTheme();
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    const Icon(
+                      Icons.notifications,
+                      color: Color(0xff6055D8),
+                      size: 22,
                     ),
-                    Divider(thickness: 1),
-                    SizedBox(
-                      height: 56,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 12, right: 12),
-                        child: Row(
-                          children: [
-                            Image.asset("assets/images/msg.png"),
-                            SizedBox(width: 20),
-                            Text(
-                              "Updates on SMS",
-                              style: TextStyle(
-                                fontFamily: "poppins",
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                              ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            "We know that—for children AND adults—learning is most effective when it is",
+                            style: TextStyle(
+                              fontFamily: "poppins",
+                              fontSize: 14,
+                              color: Color(0xff091C3F),
+                              fontWeight: FontWeight.w400,
                             ),
-                            Spacer(),
-                            Obx(
-                                  () => FlutterSwitch(
-                                width: 33.0,
-                                height: 18.0,
-                                toggleSize: 21.0,
-                                value: controller.isSmsUpdates.value,
-                                borderRadius: 30.0,
-                                padding: 1.0,
-                                activeColor: AppColors.blue,
-                                inactiveColor: AppColors.grey,
-                                onToggle: (val) {
-                                  controller.toggleSmsUpdates();
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Divider(thickness: 1),
-                    SizedBox(
-                      height: 56,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 12, right: 12),
-                        child: Row(
-                          children: [
-                            Image.asset("assets/images/whatapp.png"),
-                            SizedBox(width: 20),
-                            Text(
-                              "Updates on WhatsApp",
-                              style: TextStyle(
-                                fontFamily: "Poppins",
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            Spacer(),
-                            Obx(
-                                  () => FlutterSwitch(
-                                width: 33.0,
-                                height: 18.0,
-                                toggleSize: 21.0,
-                                value: controller.isWhatsappUpdates.value,
-                                borderRadius: 30.0,
-                                padding: 1.0,
-                                activeColor: AppColors.blue,
-                                inactiveColor: AppColors.grey,
-                                onToggle: (val) {
-                                  controller.toggleWhatsappUpdates();
-                                  // Toggle theme
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Divider(thickness: 1),
-                    InkWell(onTap: (){
-                      Get.to(PrivacydataViewView());
-                    },
-                      child: SizedBox(
-                        height: 56,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 12, right: 12),
-                          child: Row(
-                            children: [
-                              Image.asset("assets/images/privacy.png"),
-                              SizedBox(width: 20),
-                              Text(
-                                "Privacy & Data",
-                                style: TextStyle(
-                                  fontFamily: "poppins",
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
                           ),
-                        ),
-                      ),
-                    ),
-                    Divider(thickness: 1),
-                    SizedBox(
-                      height: 56,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 12, right: 12),
-                        child: Row(
-                          children: [
-                            Image.asset("assets/images/delete.png"),
-                            SizedBox(width: 20),
-                            Text(
-                              "Delete account",
-                              style: TextStyle(
-                                fontFamily: "poppins",
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.blue,
-                              ),
+                          SizedBox(height: 6),
+                          Text(
+                            "Aug 12, 2020 at 12:08 PM",
+                            style: TextStyle(
+                              fontFamily: "poppins",
+                              fontSize: 13,fontWeight: FontWeight.w400,
+                              color: Colors.grey,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              ),
-            ),
-          ],),),)
-      ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Divider(height: 1),
+                ),
+              ],
+            );
+          },
+        ),
+
+      )
     );
   }
 }

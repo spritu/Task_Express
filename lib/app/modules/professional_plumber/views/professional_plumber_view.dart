@@ -74,7 +74,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   final user = users[index];
 
                   final imagePath = user['userImg'] ?? '';
-                  final imageUrl = 'https://jdapi.youthadda.co/$imagePath';
+                  final imageUrl = imagePath.isNotEmpty ? 'https://jdapi.youthadda.co/$imagePath' : '';
 
                   final charge =
                   user['skills'] != null && user['skills'].isNotEmpty
@@ -84,22 +84,32 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
 
                   return InkWell(
                     onTap: () async {
-                      // Passing only the relevant data to the bottom sheet
-                      Get.bottomSheet(
-                        showAfterCallSheet(
-                          context,
-                          name: user['firstName']?.toString() ?? 'No Name',
-                          imageUrl: user['userImg']?.toString() ?? '',
-                          experience: user['experience']?.toString() ?? '',
-                          phone: user['phone']?.toString() ?? '',
-                          userId: user['_id'],
-                          title: title,
-                          skills: List<Map<String, dynamic>>.from(
-                            user['skills'] ?? [],
-                          ),
-                        ),
-                        isScrollControlled: true,
+                      Get.to(
+                            () => ProfessionalProfileView(),
+                        arguments: {
+                          'name': user['firstName'],
+                          'image': user['userImg'],
+                          'experience': user['experience'],
+                          'phone': user['phone'],
+                          'id': user['_id'],
+                        },
                       );
+                      // Passing only the relevant data to the bottom sheet
+                      // Get.bottomSheet(
+                      //   showAfterCallSheet(
+                      //     context,
+                      //     name: user['firstName']?.toString() ?? 'No Name',
+                      //     imageUrl: user['userImg']?.toString() ?? '',
+                      //     experience: user['experience']?.toString() ?? '',
+                      //     phone: user['phone']?.toString() ?? '',
+                      //     userId: user['_id'],
+                      //     title: title,
+                      //     skills: List<Map<String, dynamic>>.from(
+                      //       user['skills'] ?? [],
+                      //     ),
+                      //   ),
+                      //   isScrollControlled: true,
+                      // );
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width,
@@ -126,8 +136,8 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Image.asset(
-                                        'assets/images/account.png',
-                                        fit: BoxFit.contain,
+                                        'assets/images/rajesh.png',
+                                       // fit: BoxFit.contain,
                                       );
                                     },
                                   ),
@@ -141,7 +151,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                     ],
                                   ),
                                   Text(
-                                    "${user['experience']} year Experience",
+                                    "${user['experience'] ?? 0} year Experience",
                                     style: const TextStyle(
                                       color: Color(0xff7C7C7C),
                                       fontSize: 10,
@@ -158,9 +168,10 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                             child: Column(mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
+                                Row( crossAxisAlignment: CrossAxisAlignment.start,
+
                                   children: [
-                                    Column(mainAxisAlignment: MainAxisAlignment.start,
+                                    Column(crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           "${user['firstName'] ?? 'No'} ${user['lastName'] ?? 'Name'}",
@@ -177,8 +188,8 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           CrossAxisAlignment.start,
                                           children: [
                                             Container(
-                                              width: 10,
-                                              height: 10,
+                                              width: 15,
+                                              height: 15,
                                               decoration: const BoxDecoration(
                                                 color: Colors.green,
                                                 shape: BoxShape.circle,
@@ -196,7 +207,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                               style: TextStyle(
                                                 color: Colors.green,
                                                 fontWeight: FontWeight.w500,
-                                                fontSize: 8,
+                                                fontSize: 12,
                                               ),
                                             ),
                                           ],
@@ -268,7 +279,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                                 size: 14,
                                                 color: Colors.grey,
                                               ),
-                                            ),
+                                            ),Text("2 km",style: TextStyle(fontSize: 12,color: AppColors.grey),)
                                           ],
                                         ),
                                         SizedBox(height: 3),

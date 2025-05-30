@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../colors.dart';
+import '../../account/controllers/account_controller.dart';
 import '../controllers/edit_profile_controller.dart';
 
 class EditProfileView extends StatelessWidget {

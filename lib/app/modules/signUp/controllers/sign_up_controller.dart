@@ -157,7 +157,19 @@ class SignUpController extends GetxController {
         final box = GetStorage();
         box.write('isLoggedIn', true);
         final userData = decodedResponse['data'] ?? decodedResponse['user'] ?? decodedResponse;
+        final rawImg = userData?['userImg'] ?? '';
+        String finalImage = '';
 
+        if (rawImg.isNotEmpty) {
+          finalImage = rawImg.startsWith('http')
+              ? rawImg
+              : 'https://jdapi.youthadda.co/$rawImg';
+        }
+
+// Save using a consistent key like 'image'
+        await prefs.setString('image', finalImage);
+
+        print("🖼️ Final User Image URL: $finalImage");
         if (userData != null) {
           await prefs.setString('userId', userData['_id'] ?? '');
           await prefs.setString('firstName', userData['firstName'] ?? '');
@@ -165,19 +177,25 @@ class SignUpController extends GetxController {
           await prefs.setString('dob', userData['dateOfBirth'] ?? '');
           await prefs.setString('email', userData['email'] ?? '');
           await prefs.setString('gender', userData['gender'] ?? '');
+          await prefs.setString('image', finalImage);
 
-          if (userData['userImg'] != null) {
-            await prefs.setString('userImg', userData['userImg']);
-          }
+          // Confirm
+          print("✅ Image saved to SharedPreferences: ${prefs.getString('image')}");
+
+          // if (userData['userImg'] != null) {
+          //   await prefs.setString('userImg', userData['userImg']);
+          // }
 
           // Optional: Reset controllers
-          Get.delete<AccountController>();
-          Get.put(AccountController());
-          Get.delete<EditProfileController>();
-          Get.put(EditProfileController());
+          // Get.delete<AccountController>();
+          // Get.put(AccountController());
+          // Get.delete<EditProfileController>();
+          // Get.put(EditProfileController());
 
         //  Get.snackbar('Success', 'Registration Successful');
           clearFields();
+          final box = GetStorage();
+          box.write('isLoggedIn', true);
           Get.to(() => LocationView());
         } else {
           print("❗ Missing 'data' in response");

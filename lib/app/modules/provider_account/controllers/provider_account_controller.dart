@@ -14,8 +14,11 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   var lastName = ''.obs;
   var mobileNumber = ''.obs;
   RxString userId = ''.obs;
-
+  var skillList = <Map<String, dynamic>>[].obs;
   var selectedProfessionName = ''.obs;
+  var spType = ''.obs;
+
+
   var selectedCategoryName = ''.obs;
   var selectedSubCategoryName = ''.obs;
   var charge = ''.obs;
@@ -59,6 +62,36 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
       charge: "₹500",
     ));
   }
+  Future<void> loadCompleteUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    firstName.value = prefs.getString('firstName') ?? '';
+    lastName.value = prefs.getString('lastName') ?? '';
+    mobileNumber.value = prefs.getString('mobile') ?? '';
+    email.value = prefs.getString('email') ?? '';
+    selectedProfessionName.value = prefs.getString('profession') ?? '';
+    selectedCategoryName.value = prefs.getString('category') ?? '';
+    selectedSubCategoryName.value = prefs.getString('subcategory') ?? '';
+    charge.value = prefs.getString('charge') ?? '';
+    userId.value = prefs.getString('userId') ?? '';
+
+    String? image = prefs.getString('image');
+    if (image != null && !image.startsWith('http')) {
+      image = 'https://jdapi.youthadda.co/$image';
+    }
+
+    imagePath.value = image ?? '';
+    await prefs.setString('image', imagePath.value);
+
+    String? base64Image = prefs.getString('userImgBase64');
+    if (base64Image != null && base64Image.isNotEmpty) {
+      final bytes = base64Decode(base64Image);
+      final tempFile = await File('${Directory.systemTemp.path}/profile.jpg').writeAsBytes(bytes);
+      imagePath.value = tempFile.path;
+    }
+
+    print("✅ Loaded full user data: ${firstName.value} ${lastName.value}, 📱: ${mobileNumber.value}");
+  }
+
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? storedImage = prefs.getString('image') ?? '';
@@ -147,13 +180,34 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
 
 
   var isLoading = true.obs;
-
+  String get spTypeLabel {
+    switch (spType.value) {
+      case '1':
+        return 'Visiting Professional';
+      case '2':
+        return 'Fixed Charge Helper';
+      default:
+        return 'Unknown';
+    }
+  }
   Future<void> loadUserInfo1() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    spType.value = prefs.getString('spType') ?? '';
+    print("📥 Loaded spType: ${spType.value}");
+
+    if (spType == "1") {
+      print("🧑 Visiting Professional");
+    } else if (spType == "2") {
+      print("🛠️ Fixed Charge Helper");
+    } else {
+      print("❌ spType not found or invalid");
+    }
+    selectedProfessionName.value = prefs.getString('profession') ?? '';
+    print("🧾 selectedProfessionName: ${selectedProfessionName.value}");
     userId.value = prefs.getString('userId') ?? '';
     selectedProfessionName.value = prefs.getString('profession') ?? '';
     selectedCategoryName.value = prefs.getString('category') ?? '';
-    selectedSubCategoryName.value = prefs.getString('subcategory') ?? '';
+    selectedSubCategoryName.value = prefs.getString('subCategory') ?? ''; // <- fixed key
     charge.value = prefs.getString('charge') ?? '';
     isLoading.value = false;
 
@@ -163,6 +217,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     print("📁 Subcategory: ${selectedSubCategoryName.value}");
     print("💰 Charge: ${charge.value}");
   }
+
 
 
   void toggleEditState() {

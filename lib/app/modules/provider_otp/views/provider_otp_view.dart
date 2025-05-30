@@ -47,10 +47,11 @@ class ProviderOtpView extends GetView<ProviderOtpController> {
                     width: MediaQuery.of(context).size.width * 0.7,
                     child: PinCodeTextField(
                       appContext: context,
-                      length: 4,
+                      length: 4,   cursorColor: Colors.black,
                       controller: controller.otpTextController,
                       autoDisposeControllers: false,
                       keyboardType: TextInputType.number,
+                      enableActiveFill: true,
                       animationType: AnimationType.fade,
                       pinTheme: PinTheme(
                         shape: PinCodeFieldShape.box,

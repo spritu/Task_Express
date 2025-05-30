@@ -549,6 +549,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -915,7 +916,9 @@ class ProviderProfileController extends GetxController {
       'state': state.value,
       'referralCode': referralCode.value,
       'skills': jsonEncode(skills),
-      'aadharNo': aadharNo.text, 'experience': selectedWorkExperience.value,
+      'aadharNo': aadharNo.text,
+      'experience': selectedWorkExperience.value.replaceAll(RegExp(r'[^0-9]'), ''),
+
     });
 
     // ✅ Optional subcategory fields in SharedPreferences
@@ -957,9 +960,25 @@ class ProviderProfileController extends GetxController {
         final jsonRes = json.decode(body);
         print('✅ JSON Response: $jsonRes');
 
+        final box = GetStorage();
+        box.remove('isLoggedIn');
+        box.write('isLoggedIn2', true);
         final message = jsonRes['msg'] ?? 'Service provider registered';
         Get.snackbar('Success', message);
+        final userData = jsonRes['data'] ?? jsonRes['user'] ?? jsonRes;
+        final rawImg = userData?['userImg'] ?? '';
+        String finalImage = '';
 
+        if (rawImg.isNotEmpty) {
+          finalImage = rawImg.startsWith('http')
+              ? rawImg
+              : 'https://jdapi.youthadda.co/$rawImg';
+        }
+
+// Save using a consistent key like 'image'
+        await prefs.setString('image', finalImage);
+
+        print("🖼️ Final User Image URL: $finalImage");
         // 🔸 Save required data to SharedPreferences
         await prefs.setString('categoryId', selectedCategoryId.value);
         await prefs.setString('category', selectedCategoryName.value);
@@ -976,12 +995,15 @@ class ProviderProfileController extends GetxController {
         await prefs.setString('referralCode', referralCode.value);
         await prefs.setString('aadharNo', aadharNo.text);
         await prefs.setString('charge', chargesController.text);
+        await prefs.setString('image', finalImage);
 
+        // Confirm
+        print("✅ Image saved to SharedPreferences: ${prefs.getString('image')}");
         await prefs.reload();
 
-        final accountController = Get.find<ProviderAccountController>();
-        await accountController.loadUserInfo();
-        await accountController.loadMobileNumber();
+       // final accountController = Get.find<ProviderAccountController>();
+       // await accountController.loadUserInfo();
+       // await accountController.loadMobileNumber();
 
         clearFields();
         Get.to(() => ProviderLocationView());
