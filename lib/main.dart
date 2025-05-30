@@ -78,14 +78,14 @@ void main() async {
   Get.put(BricklayingHelperController(),permanent: true);
   Get.put(BookingController(),permanent: true);
   Get.put(ScaffoldingHelperController(),permanent: true);
-  Get.put(ProviderAccountController());
+ // Get.put(ProviderAccountController());
   Get.put(AuthController(),permanent: true);
   Get.put(TileFixingHelperController(),permanent: true);
   Get.put(JobsDetailsController(),permanent: true);
   Get.put(RoadConstructionHelperController(),permanent: true);
   Get.put(ProfessionalPlumberController(),permanent: true);
   Get.put(SettingController(),permanent: true);
-  Get.put(EditProfileController(),permanent: true);
+ // Get.put(EditProfileController(),permanent: true);
   Get.put(JobsController(),permanent: true);
   Get.lazyPut(() => ChatController(),fenix: true);
   Get.put(ProviderSettingController(),permanent: true);

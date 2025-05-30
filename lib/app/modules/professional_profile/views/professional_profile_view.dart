@@ -14,13 +14,12 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
     final args = Get.arguments as Map<String, dynamic>;
     final arguments = Get.arguments as Map<String, dynamic>;
     final String appBarTitle = arguments['title'] ?? 'Professional Profile';
-
     final String name = args['name'] ?? '';
     final imagePath = arguments['image'] ?? '';
     final imageUrl = 'https://jdapi.youthadda.co/$imagePath';
     final String experience = args['experience']?.toString() ?? '';
     final String phone = args['phone'] ?? '';
-    return Scaffold(
+    return Scaffold(backgroundColor: AppColors.white,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -40,7 +39,7 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.black),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Get.back(),
                   ),
                   Text(
                     appBarTitle,
@@ -64,8 +63,8 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        'assets/images/account.png',
-                        fit: BoxFit.contain,
+                        'assets/images/detail.png',
+                        fit: BoxFit.fill,
                       );
                     },
                   ),
@@ -199,7 +198,7 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
               ),
 
               const SizedBox(height: 10),
-              Container(
+              Container(width: MediaQuery.of(context).size.width,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: const Color(0xFFD9E4FC),
@@ -249,19 +248,30 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
               ),
 
               const SizedBox(height: 8),
-              Card(
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      customCheckbox("Plumber", 300),
-                      customCheckbox("Electrician", 300),
-                      customCheckbox("Carpenter", 300),
-                    ],
+              Center(
+                child: SizedBox(width: 287,height: 152,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 1,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      child: Column(
+                        children: [
+                          serviceRow("Plumber", 300),
+                          const Divider(),
+                          serviceRow("Electrician", 300),
+                          const Divider(),
+                          serviceRow("Carpenter", 300),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
+
               const SizedBox(height: 16),
               const Text(
                 "Work Expertise:",
@@ -539,6 +549,42 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
     );
   }
 
+  Widget serviceRow(String title, int price) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              fontFamily: "poppins",
+              color: Colors.black,
+            ),
+          ),Spacer(),
+          Text(
+            "Charge ",
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              fontFamily: "poppins",
+              color: Colors.black54,
+            ),
+          ),  Text(
+            "₹ $price",
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              fontFamily: "poppins",
+              color: Colors.black54,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   List<Widget> _buildReviews() {
     List<Map<String, dynamic>> reviews = [
@@ -604,16 +650,16 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
                     ),
                   ],
                 ),
-                trailing: Container(decoration: BoxDecoration(border: Border.all(width: 0.5,color: AppColors.grey)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text("5", style: TextStyle(fontWeight: FontWeight.bold)),SizedBox(width: 3),
-                        Icon(Icons.star, color: Colors.amber),
-                      ],
-                    ),
+                trailing: Container(height: 19,width: 33,
+                  decoration: BoxDecoration(border: Border.all(width: 0.5,color: AppColors.grey),
+                borderRadius: BorderRadius.circular(3)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text("5", style: TextStyle(fontWeight: FontWeight.w400,fontSize: 12)),SizedBox(width: 3),
+                      Icon(Icons.star, color: Colors.amber,size: 12,),
+                    ],
                   ),
                 ),
               ),

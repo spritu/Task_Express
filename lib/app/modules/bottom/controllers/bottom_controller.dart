@@ -26,7 +26,7 @@ class BottomController extends GetxController {
     // TODO: implement onInit
     super.onInit();
     connectSocketCancel();
-    Get.put(RecompleteJobPayController().fetchPendingPaymentsUser());
+   // Get.put(RecompleteJobPayController().fetchPendingPaymentsUser());
   }
 
   void connectSocketCancel() async {

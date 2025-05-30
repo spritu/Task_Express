@@ -65,6 +65,7 @@ class ProviderEditProfileController extends GetxController {
     update();
   }
 
+
   Future<void> getImage(ImageSource source) async {
     final XFile? image = await _picker.pickImage(source: source);
     if (image != null) {

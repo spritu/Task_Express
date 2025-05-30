@@ -64,31 +64,16 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                   final imageUrl = controller.imagePath.value;
                                   return CircleAvatar(
                                     radius: 40,
-                                    backgroundColor: Colors.grey[200],
-                                    child: ClipOval(
-                                      child: imageUrl.isNotEmpty
-                                          ? Image.network(
-                                        imageUrl,
-                                        width: 80,
-                                        height: 80,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          print("❌ Image failed to load: $error");
-                                          return Image.asset(
-                                            'assets/images/account.png',
-                                            width: 80,
-                                            height: 80,
-                                            fit: BoxFit.cover,
-                                          );
-                                        },
-                                      )
-                                          : Image.asset(
-                                        'assets/images/account.png',
-                                        width: 80,
-                                        height: 80,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
+                                    backgroundImage:
+                                    imageUrl.isNotEmpty
+                                        ? NetworkImage(imageUrl)
+                                        : const AssetImage(
+                                      'assets/images/account.png',
+                                    )
+                                    as ImageProvider,
+                                    onBackgroundImageError: (_, __) {
+                                      print("❌ Image failed to load.");
+                                    },
                                   );
                                 }),
                                 SizedBox(width: 8),
@@ -171,13 +156,17 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                   ),
                                   child: Column(
                                     children: [
-                                      Obx(
-                                        () => _buildRow(
-                                          "Profession",
-                                          controller.selectedProfessionName.value,
-                                          isDropdown: false,
-                                        ),
-                                      ),
+                                      Obx(() => _buildRow(
+                                        "Profession",
+                                        controller.isLoading.value
+                                            ? "Loading..."
+                                            : controller.selectedProfessionName.value.isNotEmpty
+                                            ? controller.selectedProfessionName.value
+                                            : controller.spTypeLabel,
+                                        isDropdown: false,
+                                      )),
+
+
                                       Divider(thickness: 1),
 
                                       Obx(
