@@ -1,16 +1,21 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../views/confirm_payment_recived_view.dart';
 
 class ConfirmPaymentRecivedController extends GetxController {
-  //TODO: Implement ConfirmPaymentRecivedController
-
   final count = 0.obs;
+  var payment = ''.obs;
+  var selectedPayment = {}.obs;
+  late IO.Socket socket;
+  final RxList<types.Message> messages = <types.Message>[].obs;
+  final Rxn<types.User> user = Rxn<types.User>();
 
   RxList<Map<String, dynamic>> pendingPayments = <Map<String, dynamic>>[].obs;
 
@@ -36,11 +41,14 @@ class ConfirmPaymentRecivedController extends GetxController {
         for (var payment in responseData['data']) {
           print('12121212:${payment}');
           pendingPayments.add(payment);
+          //  Set the globally accessible payment here
+          selectedPayment.value = payment;
+          print("xxxxxxxxxxxx: ${selectedPayment.value}");
           showConfirmPopup(payment);
         }
       }
     } else {
-      print("❌ Error: ${response.reasonPhrase}");
+      print("Error: ${response.reasonPhrase}");
     }
   }
 
@@ -67,10 +75,10 @@ class ConfirmPaymentRecivedController extends GetxController {
 
     final Map<String, dynamic> bodyData = {
       "bookingId": bookingId.trim(),
-      "acceptbysp": acceptBySp, // ✅ convert to string "true"/"false"
+      "acceptbysp": acceptBySp, // convert to string "true"/"false"
     };
 
-    print("📤 Sending payment confirmation...");
+    print(" Sending payment confirmation...");
     print("Request body: $bodyData");
 
     final response = await http.post(
@@ -79,45 +87,65 @@ class ConfirmPaymentRecivedController extends GetxController {
       body: jsonEncode(bodyData),
     );
 
-    print("📥 Status Code: ${response.statusCode}");
-    print("📥 Response Body: ${response.body}");
+    print(" Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
 
     if (response.statusCode == 200) {
-      print("✅ Payment confirmation sent: $acceptBySp");
+      print("Payment confirmation sent: $acceptBySp");
       fetchPendingPayments(); // refresh the list
       Get.back(); // close popup
     } else {
-      print("❌ Failed to send payment confirmation");
+      print(" Failed to send payment confirmation");
     }
   }
 
-  // var bookingId = ''.obs;
-  //
-  // Future<void> acceptBooking() async {
-  //   print('api called');
-  //
-  //   var url = Uri.parse('https://jdapi.youthadda.co/spaccept');
-  //
-  //   var headers = {'Content-Type': 'application/json'};
-  //
-  //   var body = json.encode({"bookingId": bookingId, "acceptbysp": true});
-  //   print('api body${bookingId}');
-  //
-  //   try {
-  //     print('api body${body}');
-  //
-  //     var response = await http.post(url, headers: headers, body: body);
-  //     print('api resp${response}');
-  //
-  //     if (response.statusCode == 200) {
-  //       print('Success12345: ${response.body}');
-  //     } else {
-  //       print('Failed: ${response.statusCode} - ${response.reasonPhrase}');
-  //     }
-  //   } catch (e) {
-  //     print('Error: $e');
-  //   }
-  // }
+  void connectSocketCancel() async {
+    final userId = selectedPayment['bookedBy']['_id'];
+
+    print(" CancelUser:${userId}");
+
+    if (userId == null) {
+      print("User ID or BookedFor missing cancel");
+      return;
+    }
+
+    print('🔌 Connecting socket for user cancel: ${userId}');
+
+    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+      'forceNew': true,
+      'auth': {
+        'user': {
+          '_id': userId,
+          'firstName': 'plumber naman', // Optional, can be dynamic
+        },
+      },
+    });
+
+    socket.connect();
+
+    socket.onConnect((_) {
+      print('Connected to socket cancelby sp');
+
+      final payload = {'receiver': userId.trim()};
+
+      print('📤 Emitting paybyuserconfirm payload55: $payload');
+      socket.emit('paybyuserconfirm', payload);
+    });
+
+    socket.onDisconnect((_) {
+      print(' Disconnected from socket');
+    });
+
+    socket.onConnectError((err) {
+      print(' Connect Error: $err');
+    });
+
+    socket.onError((err) {
+      print(' Socket Error: $err');
+    });
+  }
 
   @override
   void onInit() {

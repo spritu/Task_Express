@@ -96,6 +96,8 @@ import '../modules/provider_profile/bindings/provider_profile_binding.dart';
 import '../modules/provider_profile/views/provider_profile_view.dart';
 import '../modules/provider_setting/bindings/provider_setting_binding.dart';
 import '../modules/provider_setting/views/provider_setting_view.dart';
+import '../modules/recomplete_job_pay/bindings/recomplete_job_pay_binding.dart';
+import '../modules/recomplete_job_pay/views/recomplete_job_pay_view.dart';
 import '../modules/road_construction_helper/bindings/road_construction_helper_binding.dart';
 import '../modules/road_construction_helper/views/road_construction_helper_view.dart';
 import '../modules/servicepro/bindings/servicepro_binding.dart';
@@ -413,6 +415,11 @@ class AppPages {
       name: _Paths.CONFIRM_PAYMENT_RECIVED,
       page: () => ConfirmPaymentRecivedView(paymentData: {}),
       binding: ConfirmPaymentRecivedBinding(),
+    ),
+    GetPage(
+      name: _Paths.RECOMPLETE_JOB_PAY,
+      page: () => RecompleteJobPayView(paymentData: {}),
+      binding: RecompleteJobPayBinding(),
     ),
   ];
 }

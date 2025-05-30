@@ -15,36 +15,7 @@ class ConfirmPaymentRecivedView
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ConfirmPaymentRecivedController>();
-    // String amount = paymentData["pay"].toString();
-    // String bookingId = paymentData["_id"];
-    // print("paymentData1212${paymentData}");
-    // print(
-    //   "User: ${paymentData['bookedBy']?['firstName']} ${paymentData['bookedBy']?['lastName']}",
-    // );
-    // final String firstName = paymentData['bookedBy']?['firstName'] ?? '';
-    // final String lastName = paymentData['bookedBy']?['lastName'] ?? '';
-    // final String fullName = '$firstName $lastName';
-    //
-    // // Parse createdAt and updatedAt
-    // final createdAt = DateTime.parse(paymentData['createdAt']);
-    // final updatedAt = DateTime.parse(paymentData['updatedAt']);
-    //
-    // // Format date and time
-    // final formattedDate = DateFormat('d MMM, yyyy').format(createdAt);
-    // final startTime = DateFormat('hh:mm a').format(createdAt);
-    // final endTime = DateFormat('hh:mm a').format(updatedAt);
-    //
-    // // Calculate duration
-    // final duration = updatedAt.difference(createdAt);
-    // final durationHours = duration.inHours;
-    // final durationMinutes = duration.inMinutes % 60;
-    // String durationString;
-    // if (durationHours > 0) {
-    //   durationString =
-    //       '$durationHours Hours${durationMinutes > 0 ? " $durationMinutes Minutes" : ""}';
-    // } else {
-    //   durationString = '$durationMinutes Minutes';
-    // }
+
     final String bookingId = paymentData["_id"]?.toString() ?? 'N/A';
     final String amount = paymentData["pay"]?.toString() ?? '0';
     final String firstName = paymentData['bookedBy']?['firstName'] ?? 'User';
@@ -174,6 +145,7 @@ class ConfirmPaymentRecivedView
                     child: OutlinedButton(
                       onPressed: () {
                         print('button pressed');
+                        controller.connectSocketCancel();
                         controller.sendPaymentConfirmation(
                           bookingId: bookingId,
                           acceptBySp: false,
