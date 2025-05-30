@@ -14,6 +14,21 @@ class RecompleteJobPayView extends GetView<RecompleteJobPayController> {
   Widget build(BuildContext context) {
     Get.put(RecompleteJobPayController());
     final id = paymentData['_id']?.toString();
+    final firstName = paymentData['bookedFor']['firstName'];
+    final lastName = paymentData['bookedFor']['lastName'];
+    final fullname = "$firstName $lastName";
+    final userImg = paymentData['bookedFor']['userImg'];
+    print("suv:${paymentData['jobStartTime']}");
+
+    Future<void> manageapi(String id) async {
+      if (id.isEmpty) {
+        print("❌ Booking ID is empty in manageapi");
+        return;
+      }
+
+      print("✅ functioncalled34 with bookingId: $id");
+      await controller.closeJob(id); // Pass ID to controller
+    }
 
     return SingleChildScrollView(
       child: Container(
@@ -53,7 +68,7 @@ class RecompleteJobPayView extends GetView<RecompleteJobPayController> {
                     const SizedBox(width: 24), // Placeholder for symmetry
                   ],
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
 
                 /// Main Container
                 Card(
@@ -70,28 +85,27 @@ class RecompleteJobPayView extends GetView<RecompleteJobPayController> {
                     ),
                     child: Column(
                       children: [
-                        Text(""),
                         Text(
-                          "Service provider has been cancelled last amount request Please confirm the amount you paid to the service provider.",
+                          "Service provider has cancelled last amount request Please confirm the amount you paid to the service provider.",
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             fontFamily: "poppins",
                             color: Color(0xFF474747),
                           ),
-                          textAlign: TextAlign.start,
+                          textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
-                        const CircleAvatar(
+                        CircleAvatar(
                           radius: 47.5,
-                          backgroundImage: AssetImage(
-                            "assets/images/rajesh.png",
+                          backgroundImage: NetworkImage(
+                            'https://jdapi.youthadda.co/$userImg',
                           ),
                           backgroundColor: Colors.transparent,
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          " ",
+                          fullname,
                           style: TextStyle(
                             fontFamily: "poppins",
                             fontWeight: FontWeight.w500,
@@ -122,7 +136,9 @@ class RecompleteJobPayView extends GetView<RecompleteJobPayController> {
                             children: [
                               TextSpan(text: "Date & Time: "),
                               TextSpan(
-                                text: "",
+                                text: controller.formatJobTime(
+                                  paymentData['jobStartTime'],
+                                ),
 
                                 style: TextStyle(fontWeight: FontWeight.w700),
                               ),
@@ -223,48 +239,9 @@ class RecompleteJobPayView extends GetView<RecompleteJobPayController> {
                               height: 42,
                               width: 160,
                               child: ElevatedButton(
-                                // onPressed: () {
-                                //   final completejobController = Get.put(
-                                //     CompletejobController(),
-                                //   );
-                                //   print("09909111:${paymentData['_id']}");
-                                //   completejobController.closeJob(
-                                //     controller.bookingId1.value,
-                                //   );
-                                // },
-                                // onPressed: () {
-                                //   print("✅ Button pressed!");
-                                //   print('1234321: ${paymentData['_id']}');
-                                //   final bookingId = paymentData['_id'];
-                                //
-                                //   final completejobController = Get.put(
-                                //     CompletejobController(),
-                                //   );
-                                //   print(
-                                //     "09909111: ${paymentData['_id']?.toString()}",
-                                //   );
-                                //   completejobController.closeJob(
-                                //     bookingId.value,
-                                //   );
-                                // },
                                 onPressed: () {
-                                  print("✅ Button pressed!");
-                                  print('1234321: ${paymentData['_id']}');
-
-                                  final bookingId = paymentData['_id'];
-
-                                  try {
-                                    final completejobController = Get.put(
-                                      CompletejobController(),
-                                    );
-                                    print(
-                                      "📦 Booking ID for closeJob: $bookingId",
-                                    );
-                                    completejobController.closeJob(bookingId);
-                                  } catch (e, stack) {
-                                    print("🔥 Exception occurred: $e");
-                                    print("📛 Stack Trace:\n$stack");
-                                  }
+                                  print("🟡 opay $id"); // Debug log
+                                  manageapi(id.toString());
                                 },
 
                                 style: ElevatedButton.styleFrom(

@@ -275,11 +275,11 @@ class ProviderHomeController extends GetxController {
   var isLoading = false.obs;
   var bookingDataList = <Map<String, dynamic>>[].obs;
   var DataList = <Map<String, dynamic>>[].obs;
-
   final RxList<types.Message> messages = <types.Message>[].obs;
   final Rxn<types.User> user = Rxn<types.User>();
   var bookedBy = ''.obs;
   RxString bookedFor = ''.obs;
+  var dashboardData = {}.obs;
 
   late IO.Socket socket;
 
@@ -303,6 +303,7 @@ class ProviderHomeController extends GetxController {
     connectSocket();
     loadUserInfo(); // Load user info and connect socket
     fetchCurrentBooking();
+    fetchDashboardData();
   }
 
   void connectSocketAccept() {
@@ -626,6 +627,36 @@ class ProviderHomeController extends GetxController {
     } catch (e) {
       //  Get.snackbar("Error", "Something went wrong");
       isAvailable2.value = !status;
+    }
+  }
+
+  // dashboard api
+
+  Future<void> fetchDashboardData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+
+    if (userId == null) {
+      print('User ID not found in SharedPreferences');
+      return;
+    }
+
+    final url = Uri.parse(
+      'https://jdapi.youthadda.co/dashboarddata?userId=$userId',
+    );
+    final request = http.Request('GET', url);
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      final body = await response.stream.bytesToString();
+      print('Response: $body');
+
+      // Decode the JSON and store it directly in the observable
+      dashboardData.value = jsonDecode(body);
+
+      print("Dashboard Data: $dashboardData");
+    } else {
+      print('Error: ${response.reasonPhrase}');
     }
   }
 

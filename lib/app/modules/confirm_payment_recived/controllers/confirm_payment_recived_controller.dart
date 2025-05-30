@@ -12,16 +12,71 @@ import '../views/confirm_payment_recived_view.dart';
 class ConfirmPaymentRecivedController extends GetxController {
   final count = 0.obs;
   var payment = ''.obs;
-  var selectedPayment = {}.obs;
+  var pendingPayments = <Map<String, dynamic>>[].obs;
+  var selectedPayment = <String, dynamic>{}.obs;
   late IO.Socket socket;
   final RxList<types.Message> messages = <types.Message>[].obs;
   final Rxn<types.User> user = Rxn<types.User>();
+  var isPopupShown = false.obs;
 
-  RxList<Map<String, dynamic>> pendingPayments = <Map<String, dynamic>>[].obs;
+  //RxList<Map<String, dynamic>> pendingPayments = <Map<String, dynamic>>[].obs;
+
+  // Future<void> fetchPendingPayments() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? serviceProId = prefs.getString("userId");
+  //
+  //   var headers = {'Content-Type': 'application/json'};
+  //   var request = http.Request(
+  //     'POST',
+  //     Uri.parse('https://jdapi.youthadda.co/pendingpaymentsp'),
+  //   );
+  //
+  //   request.body = json.encode({"serviceProId": serviceProId});
+  //   request.headers.addAll(headers);
+  //
+  //   http.StreamedResponse response = await request.send();
+  //   if (response.statusCode == 200) {
+  //     String res = await response.stream.bytesToString();
+  //     var responseData = json.decode(res);
+  //
+  //     if (responseData['count'] > 0) {
+  //       for (var payment in responseData['data']) {
+  //         print('12121212:${payment}');
+  //         pendingPayments.add(payment);
+  //         //  Set the globally accessible payment here
+  //         selectedPayment.value = payment;
+  //         print("xxxxxxxxxxxx: ${selectedPayment.value}");
+  //         showConfirmPopup(payment);
+  //       }
+  //     }
+  //   } else {
+  //     print("Error: ${response.reasonPhrase}");
+  //   }
+  // }
+  //
+  // void showConfirmPopup(Map<String, dynamic> paymentData) {
+  //   Get.showSnackbar(
+  //     GetSnackBar(
+  //       messageText: ConfirmPaymentRecivedView(paymentData: paymentData),
+  //       isDismissible: false,
+  //       snackPosition: SnackPosition.BOTTOM,
+  //       backgroundColor: Colors.transparent,
+  //       //  duration: const Duration(hours: 1),
+  //       margin: EdgeInsets.zero,
+  //       padding: EdgeInsets.zero,
+  //       borderRadius: 30,
+  //     ),
+  //   );
+  // }
 
   Future<void> fetchPendingPayments() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? serviceProId = prefs.getString("userId");
+
+    if (serviceProId == null) {
+      print("User ID not found");
+      return;
+    }
 
     var headers = {'Content-Type': 'application/json'};
     var request = http.Request(
@@ -33,19 +88,27 @@ class ConfirmPaymentRecivedController extends GetxController {
     request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
+
     if (response.statusCode == 200) {
       String res = await response.stream.bytesToString();
       var responseData = json.decode(res);
 
       if (responseData['count'] > 0) {
+        pendingPayments.clear();
+
         for (var payment in responseData['data']) {
-          print('12121212:${payment}');
           pendingPayments.add(payment);
-          //  Set the globally accessible payment here
-          selectedPayment.value = payment;
-          print("xxxxxxxxxxxx: ${selectedPayment.value}");
-          showConfirmPopup(payment);
         }
+
+        // ✅ Only show if not already shown
+        if (!isPopupShown.value) {
+          selectedPayment.value = pendingPayments.first;
+          isPopupShown.value = true; // ✅ Set flag
+          showConfirmPopup(selectedPayment.value);
+        }
+      } else {
+        // Reset if no pending payments
+        isPopupShown.value = false;
       }
     } else {
       print("Error: ${response.reasonPhrase}");
@@ -59,7 +122,6 @@ class ConfirmPaymentRecivedController extends GetxController {
         isDismissible: false,
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.transparent,
-        //  duration: const Duration(hours: 1),
         margin: EdgeInsets.zero,
         padding: EdgeInsets.zero,
         borderRadius: 30,

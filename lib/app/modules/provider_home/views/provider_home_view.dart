@@ -1739,14 +1739,17 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                 Expanded(
                                   child: _dashboardCard(
                                     title: "Today's\n Jobs",
-                                    value: "2",
+                                    value:
+                                        controller.dashboardData['todayJobs']
+                                            .toString(),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: _dashboardCard(
                                     title: "Earnings\n Today",
-                                    value: "₹750",
+                                    value:
+                                        "₹${controller.dashboardData['todayEarnings'].toString()}",
                                   ),
                                 ),
                               ],
@@ -1758,14 +1761,20 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                 Expanded(
                                   child: _dashboardCard(
                                     title: " Hour’s\nWorked",
-                                    value: "5",
+                                    value:
+                                        controller
+                                            .dashboardData['todayHoursWorked']
+                                            .toString(),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: _dashboardCard(
                                     title: "Average\n Rating",
-                                    value: "4.7",
+                                    value:
+                                        controller
+                                            .dashboardData['averageRating']
+                                            .toString(),
                                     icon: Icons.star,
                                   ),
                                 ),
@@ -1795,15 +1804,18 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                               children: [
                                 _earningsCard(
                                   title: "This Week",
-                                  amount: "₹2450",
+                                  amount:
+                                      "₹${controller.dashboardData['weekEarnings'].toString()}",
                                 ),
                                 _earningsCard(
                                   title: "This Month",
-                                  amount: "₹8450",
+                                  amount:
+                                      "₹${controller.dashboardData['monthEarnings'].toString()}",
                                 ),
                                 _earningsCard(
                                   title: "Total",
-                                  amount: "₹34,450",
+                                  amount:
+                                      "₹${controller.dashboardData['totalEarnings'].toString()}",
                                 ),
                               ],
                             ),
