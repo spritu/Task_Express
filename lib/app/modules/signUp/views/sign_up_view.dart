@@ -26,7 +26,7 @@ class SignUpView extends GetView<SignUpController> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+              end: Alignment.center,
               colors: [Color(0xFF87AAF6), Colors.white],
             ),
           ),
@@ -36,38 +36,49 @@ class SignUpView extends GetView<SignUpController> {
                 const SizedBox(height: 10),
                 const Text(
                   "Your Profile",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600,letterSpacing: 2),
                 ),
                 const SizedBox(height: 20),
                 Obx(
                       () => Stack(
                     alignment: Alignment.bottomRight,
                     children: [
-                      CircleAvatar(
-                        radius: 45,
-                        backgroundColor: Colors.white,
-                        backgroundImage: controller.imagePath.value.isNotEmpty
-                            ? FileImage(File(controller.imagePath.value))
-                            : null,
-                        child: controller.imagePath.value.isEmpty
-                            ? const Icon(Icons.person, size: 60, color: Colors.grey)
-                            : null,
+                      Container(
+
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            width: 2,
+                            color: AppColors.white,
+                          ),
+                        ),
+                        child: CircleAvatar(
+                          radius: 45,
+                          backgroundColor: Colors.grey.shade200,
+                          backgroundImage: controller.imagePath.value.isNotEmpty
+                              ? FileImage(File(controller.imagePath.value))
+                              : null,
+                          child: controller.imagePath.value.isEmpty
+                              ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                              : null,
+                        ),
                       ),
                       Positioned(
                         bottom: 0,
                         right: 4,
                         child: InkWell(
                           onTap: () => _showImagePicker(context, controller),
-                          child: const CircleAvatar(
+                          child:  CircleAvatar(
                             radius: 16,
                             backgroundColor: Colors.white,
-                            child: Icon(Icons.edit, size: 16, color: Colors.black),
+                            child:Image.asset("assets/images/edit.png")
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
+
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -76,14 +87,14 @@ class SignUpView extends GetView<SignUpController> {
                       child: Column(
                         children: [
                           buildTextField("First Name", "Enter first name", onChanged: (val) => controller.firstName.value = val, validator: (val) => val?.isEmpty ?? true ? 'First name is required' : null),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 17),
                           buildTextField("Last Name", "Enter last name", onChanged: (val) => controller.lastName.value = val, validator: (val) => val?.isEmpty ?? true ? 'Last name is required' : null),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 17),
                           const Align(
                             alignment: Alignment.centerLeft,
                             child: Text("Gender", style: TextStyle(fontSize: 12)),
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 5),
                           Obx(
                                 () => Row(
                               children: ["Female", "Male", "Other"].map((e) {
@@ -108,18 +119,18 @@ class SignUpView extends GetView<SignUpController> {
                               }).toList(),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 17),
                           buildTextField("Date Of Birth", "DD/MM/YYYY",
                               icon: Icons.calendar_month,
                               isDate: true,
                               controller: controller.dobController,
                               onChanged: (val) => controller.dateOfBirth.value = val, validator: (val) => val?.isEmpty ?? true ? 'Date of birth is required' : null),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 17),
                           buildTextField("Email", "Enter email",
                               onChanged: (val) => controller.email.value = val,
                               keyboardType: TextInputType.emailAddress,
                               validator: (val) => val?.isEmpty ?? true ? 'Email is required' : null),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 17),
                           buildDropdown(
                             "State",
                             controller.stateCityMap.keys.toList(),
@@ -127,7 +138,7 @@ class SignUpView extends GetView<SignUpController> {
                             validator: (val) => val?.isEmpty ?? true ? 'State is required' : null,
                             onChanged: controller.onStateChanged, // 👈 triggers city reset
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 17),
 
                           Row(
                             children: [
@@ -154,7 +165,7 @@ class SignUpView extends GetView<SignUpController> {
                           ),
 
 
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 17),
                           buildTextField("Referral Code", "Enter referral code",
                               keyboardType: TextInputType.number,
                               onChanged: (val) => controller.referralCode.value = val,
@@ -162,10 +173,10 @@ class SignUpView extends GetView<SignUpController> {
                             ),
                           const SizedBox(height: 30),
                           Container(
-                            width: MediaQuery.of(context).size.width * 0.6,
+                            width: 262,
                             height: 56,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(8),
                               color: AppColors.blue,
                             ),
                             child: TextButton(
@@ -206,7 +217,7 @@ class SignUpView extends GetView<SignUpController> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
-        const SizedBox(height: 8),
+        const SizedBox(height: 5),
         TextFormField(
           controller: controller,
           readOnly: isDate,

@@ -78,7 +78,7 @@ void main() async {
   Get.put(BricklayingHelperController(),permanent: true);
   Get.put(BookingController(),permanent: true);
   Get.put(ScaffoldingHelperController(),permanent: true);
-
+  Get.put(ProviderAccountController());
   Get.put(AuthController(),permanent: true);
   Get.put(TileFixingHelperController(),permanent: true);
   Get.put(JobsDetailsController(),permanent: true);

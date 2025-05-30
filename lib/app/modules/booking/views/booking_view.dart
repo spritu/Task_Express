@@ -50,7 +50,6 @@ class BookingView extends GetView<BookingController> {
                             fontFamily: "poppins",
                           ),
                         ),
-
                         /// Location Row
                         const SizedBox(height: 20),
 

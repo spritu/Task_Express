@@ -44,6 +44,8 @@ class ProviderLoginController extends GetxController {
       final response = await request.send();
 
       if (response.statusCode == 200) {
+        final box = GetStorage();
+        box.remove('isLoggedIn');
         final responseBody = await response.stream.bytesToString();
         print("✅ OTP sent successfully: $responseBody");
 
@@ -66,6 +68,7 @@ class ProviderLoginController extends GetxController {
         await prefs.reload();
         final authController = Get.find<AuthController>();
         authController.isLoggedIn2.value = true;
+
         //
         // await box.write('isLoggedIn2', true);
         // await box.write('mobile', phone);

@@ -56,7 +56,8 @@ class HomeView extends GetView<HomeController> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [Color(0xad87AAF6), Colors.white],),),
-                      child: Padding(
+                      child:
+                      Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           children: [SizedBox(height: 20),
@@ -66,7 +67,18 @@ class HomeView extends GetView<HomeController> {
                                 const SizedBox(width: 8),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [Obx(() => Text(
+                                  children: [  Row(
+                                    children: const [
+                                    //  Icon(Icons.location_on, color: Colors.black),
+                                      SizedBox(width: 5),
+                                      Text(
+                                        "Address",
+                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                      Icon(Icons.keyboard_arrow_down),
+                                    ],
+                                  ),
+                                    Obx(() => Text(
                                         controller.landMark.value.isNotEmpty ? '${controller.houseNo.value} ${controller.landMark.value}'
                                             : locationController
                                                 .currentAddress
@@ -111,9 +123,9 @@ class HomeView extends GetView<HomeController> {
                                 }
                               },
                               decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.search),
+                                prefixIcon: Icon(Icons.search,size: 24,),
                                 hintText: "Search for ‘Plumber’",
-                                isDense: true,
+                                isDense: true,hintStyle: TextStyle(fontSize: 12,fontWeight: FontWeight.w400,color: Color(0xff9B9999)),
                                 contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(25),
@@ -161,11 +173,13 @@ class HomeView extends GetView<HomeController> {
 
 
 
-                        ],),),),),
+                        ],),),
+                    ),),
                   // Service Type Buttons
                   Expanded(
                     child: SingleChildScrollView(
-                      child: Column(children: [Padding(
+                      child: Column(children: [
+                        Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Obx(() {
                               return Column(crossAxisAlignment: CrossAxisAlignment.stretch,

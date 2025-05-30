@@ -213,7 +213,7 @@ class CustomSearchBar extends StatelessWidget {
       ),
       child: Row(
         children: const [
-          Icon(Icons.search, color: Color(0xFF5F5D5D)),
+          Icon(Icons.search, color: Color(0xFF5F5D5D),size: 24,),
           SizedBox(width: 8),
           Expanded(
             child: TextField(

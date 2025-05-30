@@ -47,7 +47,7 @@ class ProviderOtpController extends GetxController {
   var imagePath = ''.obs;
   Future<void> verifyOtp(String otp) async {
     if (otp.isEmpty || otp.length != 4) {
-    //  Get.snackbar("Error", "Please enter a valid 4-digit OTP", colorText: Colors.red);
+      print("❌ Invalid OTP");
       return;
     }
 
@@ -55,7 +55,7 @@ class ProviderOtpController extends GetxController {
     String? mobileNumber = prefs.getString('mobileNumber');
 
     if (mobileNumber == null || mobileNumber.isEmpty) {
-    //  Get.snackbar("Error", "Mobile number not found. Please try again.", colorText: Colors.red);
+      print("❌ Mobile number not found");
       return;
     }
 
@@ -68,81 +68,60 @@ class ProviderOtpController extends GetxController {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
-        final userId = responseData['id'] ?? '';
-        await prefs.setString('userId', userId.toString()); // ✅ Save it properly
-        String? image = prefs.getString('image');
-        if (image != null && !image.startsWith('http')) {
-          image = 'https://jdapi.youthadda.co/$image';
-        }
-        imagePath.value = image ?? '';
+        print("✅ OTP Verified: ${jsonEncode(responseData)}");
+
         final token = responseData['token'] ?? '';
         final userType = responseData['userType'] ?? 0;
-        final userData = responseData['userData'] ?? {};
+        final userId = responseData['id']?.toString() ?? '';
 
-        // Extract individual user fields safely
+        final userData = responseData['userData'] ?? {};
         final firstName = userData['firstName']?.toString() ?? '';
         final lastName = userData['lastName']?.toString() ?? '';
         final email = userData['email']?.toString() ?? '';
         final phone = userData['phone']?.toString() ?? '';
+        final profileImage = userData['userImg'] ?? '';
 
         otpTextController.clear();
+
+        // Save profession details if available
         final skills = userData['skills'];
         if (skills != null && skills.isNotEmpty) {
-          final skill = skills[0]; // assuming single skill for now
+          final skill = skills[0];
           await prefs.setString('profession', skill['professionName'] ?? '');
           await prefs.setString('category', skill['categoryName'] ?? '');
           await prefs.setString('subCategory', skill['subCategoryName'] ?? '');
           await prefs.setString('charge', skill['charge']?.toString() ?? '');
         }
-        final profileImage = userData['userImg'] ?? '';
+        // Save to SharedPreferences
+        await prefs.setString('userId', userId);
+        await prefs.setString('token', token);
+        await prefs.setInt('userType', userType);
+        await prefs.setString('firstName', firstName);
+        await prefs.setString('lastName', lastName);
+        await prefs.setString('email', email);
+        await prefs.setString('mobile', phone);
         await prefs.setString('profileImage', profileImage);
-        if (token.isNotEmpty) {
-          // ✅ Save all details in SharedPreferences
-          await prefs.setString('userId', userId);
 
-          await prefs.setString('token', token);
-          await prefs.setInt('userType', userType);
-          await prefs.setString('firstName', firstName);
-          await prefs.setString('lastName', lastName);
-          await prefs.setString('email', email);
-          await prefs.setString('mobile', phone);
-          print("✅ Saved userId: $userId");
+        final box = GetStorage();
+        box.remove('isLoggedIn');
+        box.write('isLoggedIn2', true);
 
-          // ✅ Mark as logged in
-          final box = GetStorage();
-          box.write('isLoggedIn2', true); // ✅ ONLY THIS
-          box.remove('isLoggedIn');       // ❌ Remove old login flag if set
+        print("🔐 Saved userType: $userType");
 
-
-          prefs.remove('userId2');
-
-          print("📦 Saved User Data:");
-          print("👤 First Name: $firstName");
-          print("👤 Last Name: $lastName");
-          print("📧 Email: $email");
-          print("📱 Phone: $phone");
-
-          if (firstName.isNotEmpty && email.isNotEmpty) {
-           // Get.snackbar("✅ Success", responseData['msg'], colorText: Colors.green);
-            Get.offAllNamed('/bottom2'); // Navigate to home screen
-          } else {
-          //  Get.snackbar("Complete Signup", "Please complete your profile", colorText: Colors.orange);
-            Get.offAll(() => ProviderProfileView());
-          }
+        // Navigate based on profile completeness
+        if (firstName.isNotEmpty && email.isNotEmpty) {
+          Get.offAllNamed('/bottom2'); // Home
         } else {
-       //   Get.snackbar("Error", "Token not received. Please complete your registration.", colorText: Colors.orange);
-          Get.offAll(() => ProviderProfileView());
+          Get.offAll(() => ProviderProfileView()); // Complete profile
         }
       } else {
         print("❌ OTP Verification Failed: ${response.body}");
-       // Get.snackbar("Error", "❌ Invalid OTP", colorText: Colors.red);
       }
     } catch (e) {
-      print("❌ Exception: $e");
-    //  Get.snackbar("Error", "❌ Something went wrong", colorText: Colors.red);
+      print("❌ Exception during OTP verification: $e");
     }
   }
+
 
 
   // Resend OTP
