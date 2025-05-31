@@ -10,7 +10,11 @@ class AccountController extends GetxController {
   var count = 0.obs;
   var firstName = ''.obs;
   var lastName = ''.obs;
-  var imagePath = ''.obs;
+ // var imagePath = ''.obs;
+
+
+
+  final RxString imagePath = ''.obs;
 
 
 
@@ -24,11 +28,12 @@ class AccountController extends GetxController {
 
   Future<void> loadProfileImage() async {
     final prefs = await SharedPreferences.getInstance();
-    String? storedImage = prefs.getString('image');
+    String? storedImage = prefs.getString('userImg'); // 👈 use same key
     if (storedImage != null && storedImage.isNotEmpty) {
       imagePath.value = storedImage;
     }
   }
+
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 

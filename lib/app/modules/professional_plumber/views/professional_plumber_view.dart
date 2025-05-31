@@ -129,17 +129,20 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                               padding: const EdgeInsets.all(12.0),
                               child: Column(
                                 children: [
-                                  Image.network(
-                                    imageUrl,
-                                    height: 80,
+                                  Container(  height: 80,
                                     width: 80,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Image.asset(
-                                        'assets/images/rajesh.png',
-                                       // fit: BoxFit.contain,
-                                      );
-                                    },
+                                    child: Image.network(
+                                      imageUrl,
+                                      height: 80,
+                                      width: 80,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Image.asset(
+                                          'assets/images/person.jpeg',
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    ),
                                   ),
                                   Row(
                                     children: [
@@ -395,33 +398,33 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         width: 100,
                                         child: ElevatedButton(
                                           onPressed: () {
-                                            final receiverId =
-                                            user['_id'].toString();
+                                            final receiverId = user['_id'].toString();
+                                            final receiverName = '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'.trim();
+                                            final receiverImage = user['userImg'] ?? '';
+                                            final phoneNumber = user['phone'] ?? '';
+
                                             if (receiverId.isNotEmpty) {
                                               Get.to(
                                                 ChatView(),
                                                 arguments: {
                                                   'receiverId': receiverId,
-                                                  'receiverName': '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'.trim().isNotEmpty
-                                                      ? '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'.trim()
-                                                      : 'No Name',
-                                                  'receiverImage':
-                                                  user['userImg'] ?? '',
+                                                  'receiverName': receiverName.isNotEmpty ? receiverName : 'No Name',
+                                                  'receiverImage': receiverImage,
+                                                  'phoneNumber': phoneNumber,
                                                 },
                                               );
                                             } else {
                                               Get.snackbar(
                                                 'Error',
                                                 'Receiver ID not available',
-                                                snackPosition:
-                                                SnackPosition.BOTTOM,
+                                                snackPosition: SnackPosition.BOTTOM,
                                                 backgroundColor: Colors.red,
                                                 colorText: Colors.white,
                                               );
                                             }
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: Color(0xff114BCA),
+                                            backgroundColor: const Color(0xff114BCA),
                                           ),
                                           child: const Text(
                                             "Chat",
@@ -435,6 +438,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         ),
                                       ),
                                     ),
+
                                   ],
                                 ),
                                 SizedBox(height: 10),

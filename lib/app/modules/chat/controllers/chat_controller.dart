@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../chat_screen/controllers/chat_screen_controller.dart';
@@ -20,11 +21,17 @@ class ChatController extends GetxController {
   RxString userId = ''.obs;
   RxString userImg = ''.obs;
   RxString receiverName = ''.obs;
-  RxString receiverImage = ''.obs;
-
+  var receiverImage = ''.obs;
+  final arguments = Get.arguments;
+  final phoneNumber = ''.obs;
   // late String receiverName;
   // late String receiverImage;
   late final Map<String, dynamic> _arguments;
+  var selectedIndex = 0.obs;
+  //var receiverImage =''.obs;
+  void changeTab(int index) {
+    selectedIndex.value = index;
+  }
 
 
 
@@ -34,6 +41,10 @@ class ChatController extends GetxController {
   void onInit() {
     super.onInit();
     initializeChat();
+    final args = Get.arguments ?? {};
+    receiverImage.value = args['receiverImage'] ?? '';
+    print("🟢 RECEIVER IMAGE: ${receiverImage.value}");
+
     // Future.delayed(Duration(milliseconds: 500), () async {
     //   await initializeChat();
     // });
@@ -134,7 +145,19 @@ class ChatController extends GetxController {
       print("⚠️ Error fetching chat: $e");
     }
   }
+  void makePhoneCall(String phoneNumber) async {
+    final Uri url = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      Get.snackbar(
+        'Error',
+        'Could not launch phone dialer',
+        snackPosition: SnackPosition.BOTTOM,
 
+      );
+    }
+  }
   void connectSocket() {
     if (user.value == null) return;
     socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{

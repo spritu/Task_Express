@@ -18,7 +18,8 @@ import '../../tile_fixing_helper/views/tile_fixing_helper_view.dart';
 
 class HomeController extends GetxController {
   // TODO: Implement WorknestController
-
+  final TextEditingController plumberController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
   RxList<UserModel> usersByCategory = <UserModel>[].obs;
   RxList<CategoryModel> allCategories = <CategoryModel>[].obs;
   RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
@@ -29,7 +30,13 @@ class HomeController extends GetxController {
   final addressType = Rx<String>('');
   final contactNo = Rx<String>('');
   final RxList<dynamic> searchResults = <dynamic>[].obs;
+  var isFirstFocused = true.obs;
+  FocusNode plumberFocusNode = FocusNode();
+  FocusNode nameFocusNode = FocusNode();
+  bool isFirstActive = true;
 
+  final TextEditingController searchPlumberController = TextEditingController();
+  final TextEditingController searchNameController = TextEditingController();
 
   RxList<dynamic> results = RxList([]);
   var expandedServiceType = ''.obs;
@@ -468,8 +475,21 @@ class HomeController extends GetxController {
       expandedServiceType.value = serviceTypes.first['title']!;
       fetchAddress();
     }
+
     update();
   //  fetchUsersListByCategory("catId");
+    plumberFocusNode.addListener(() {
+      if (plumberFocusNode.hasFocus) {
+        isFirstFocused.value = true;
+      }
+    });
+
+    nameFocusNode.addListener(() {
+      if (nameFocusNode.hasFocus) {
+        isFirstFocused.value = false;
+      }
+    });
+
     super.onInit();
   }
 

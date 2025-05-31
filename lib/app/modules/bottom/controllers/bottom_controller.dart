@@ -21,6 +21,10 @@ class BottomController extends GetxController {
 
   final AuthController authController = Get.find<AuthController>();
 
+
+  void changeTab(int index) {
+    selectedIndex.value = index;
+  }
   @override
   void onInit() {
     // TODO: implement onInit

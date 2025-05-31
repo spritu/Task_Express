@@ -7,6 +7,7 @@ import '../../AboutTaskexpress/views/about_taskexpress_view.dart';
 import '../../add_address/views/add_address_view.dart';
 import '../../bottom/controllers/bottom_controller.dart';
 import '../../bottom/views/bottom_view.dart';
+import '../../edit_profile/controllers/edit_profile_controller.dart';
 import '../../edit_profile/views/edit_profile_view.dart';
 import '../../provider_profile/views/provider_profile_view.dart';
 import '../controllers/account_controller.dart';
@@ -16,8 +17,7 @@ class AccountView extends GetView<AccountController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(AccountController());
-
+    Get.put(AccountController());  Get.put(EditProfileController());
     return WillPopScope(
       onWillPop: () async {
         Get.find<BottomController>().selectedIndex.value = 0;
@@ -45,148 +45,187 @@ class AccountView extends GetView<AccountController> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    Card(
-                      child: Container(
-                        height: 80,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              Obx(() {
-                                final imageUrl = controller.imagePath.value;
-                                return CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage:
-                                  imageUrl.isNotEmpty
-                                      ? NetworkImage(imageUrl)
-                                      : const AssetImage(
-                                    'assets/images/account.png',
-                                  )
-                                  as ImageProvider,
-                                  onBackgroundImageError: (_, __) {
-                                    print("❌ Image failed to load.");
+                    InkWell(onTap: (){
+                      Get.to(EditProfileView());
+                    },
+                      child: Card(
+                        child: Container(
+                          height: 80,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                // Obx(() {
+                                //   final imageUrl = controller.imagePath.value;
+                                //   return CircleAvatar(
+                                //     radius: 40,
+                                //     backgroundImage: imageUrl.isNotEmpty
+                                //         ? NetworkImage(imageUrl)
+                                //         : const AssetImage('assets/images/account.png') as ImageProvider,
+                                //     onBackgroundImageError: (_, __) {
+                                //       print("❌ Image failed to load.");
+                                //     },
+                                //   );
+                                // }),
+
+                                Obx(() {
+                                  final controller = Get.find<EditProfileController>();
+                                  final localImagePath = controller.selectedImagePath.value;
+                                  final serverImageUrl = controller.imagePath.value;
+
+                                  ImageProvider imageProvider;
+
+                                  if (localImagePath.isNotEmpty && File(localImagePath).existsSync()) {
+                                    // ✅ Show local image (when edited)
+                                    imageProvider = FileImage(File(localImagePath));
+                                  } else if (serverImageUrl.isNotEmpty) {
+                                    // ✅ Show server image (initial load)
+                                    imageProvider = NetworkImage(serverImageUrl);
+                                  } else {
+                                    // ✅ Fallback image
+                                    imageProvider = const AssetImage('assets/images/account.png');
+                                  }
+
+                                  return CircleAvatar(
+                                    radius: 40,
+                                    backgroundImage: imageProvider,
+                                    onBackgroundImageError: (_, __) => print("❌ Failed to load image."),
+                                  );
+                                }),
+
+
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                    vertical: 10,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Obx(() {
+                                        String capitalize(String s) =>
+                                            s.isNotEmpty ? s[0].toUpperCase() + s.substring(1).toLowerCase() : '';
+
+                                        final firstName = capitalize(controller.firstName.value);
+                                        final lastName = capitalize(controller.lastName.value);
+
+                                        return Text(
+                                          '$firstName $lastName',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontFamily: "poppins",
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        );
+                                      }),
+
+
+                                      Obx(() {
+                                        return Text(
+                                          controller.mobileNumber.isEmpty
+                                              ? "Mobile number not found"
+                                              : "+91 ${controller.mobileNumber.value}",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontFamily: "poppins",
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        );
+                                      }),
+                                    ],
+                                  ),
+                                ),
+                                Spacer(),
+                                InkWell(
+                                  onTap: () {
+                                    Get.to(EditProfileView());
                                   },
-                                );
-                              }),
-
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
-                                  vertical: 10,
+                                  child: Icon(Icons.arrow_forward_ios, size: 16),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Obx(() {
-                                      String capitalize(String s) =>
-                                          s.isNotEmpty ? s[0].toUpperCase() + s.substring(1).toLowerCase() : '';
-
-                                      final firstName = capitalize(controller.firstName.value);
-                                      final lastName = capitalize(controller.lastName.value);
-
-                                      return Text(
-                                        '$firstName $lastName',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontFamily: "poppins",
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      );
-                                    }),
-
-
-                                    Obx(() {
-                                      return Text(
-                                        controller.mobileNumber.isEmpty
-                                            ? "Mobile number not found"
-                                            : "+91 ${controller.mobileNumber.value}",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontFamily: "poppins",
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      );
-                                    }),
-                                  ],
-                                ),
-                              ),
-                              Spacer(),
-                              InkWell(
-                                onTap: () {
-                                  Get.to(EditProfileView());
-                                },
-                                child: Icon(Icons.arrow_forward_ios, size: 16),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                     SizedBox(height: 20),
-                    Card(
-                      child: Container(
-                        // height: 80,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14),
-                          child: Row(
-                            children: [
-                              Image.asset(
-                                "assets/images/service_provider.png",
-                                color: AppColors.orage,
-                                height: 20,
-                                width: 20,
-                              ),
-                              SizedBox(width: 5),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
-                                  vertical: 3,
+                    InkWell(
+    onTap: () async {
+      final prefs =
+      await SharedPreferences.getInstance();
+      final userId =
+          prefs.getString('user_id') ?? '';
+
+      Get.to(
+            () => ProviderProfileView(),
+        arguments: {'userId': userId},
+      );
+    },
+                      child: Card(
+                        child: Container(
+                          // height: 80,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14),
+                            child: Row(
+                              children: [
+                                Image.asset(
+                                  "assets/images/service_provider.png",
+                                  color: AppColors.orage,
+                                  height: 20,
+                                  width: 20,
                                 ),
-                                child: Text(
-                                  'Join as a Service provider',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 13,
-                                    height: 20 / 13, // line-height = 20px
-                                    letterSpacing: 0.06 * 13, // 6% of font-size = 0.78
+                                SizedBox(width: 5),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                    vertical: 3,
+                                  ),
+                                  child: Text(
+                                    'Join as a Service provider',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13,
+                                      height: 20 / 13, // line-height = 20px
+                                      letterSpacing: 0.06 * 13, // 6% of font-size = 0.78
+                                      color: AppColors.orage,
+                                    ),
+                                  ),
+
+                                ),
+                                Spacer(),
+                                InkWell(
+                                  onTap: () async {
+                                    final prefs =
+                                    await SharedPreferences.getInstance();
+                                    final userId =
+                                        prefs.getString('user_id') ?? '';
+
+                                    Get.to(
+                                          () => ProviderProfileView(),
+                                      arguments: {'userId': userId},
+                                    );
+                                  },
+
+                                  child: Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 16,
                                     color: AppColors.orage,
                                   ),
                                 ),
-
-                              ),
-                              Spacer(),
-                              InkWell(
-                                onTap: () async {
-                                  final prefs =
-                                  await SharedPreferences.getInstance();
-                                  final userId =
-                                      prefs.getString('user_id') ?? '';
-
-                                  Get.to(
-                                        () => ProviderProfileView(),
-                                    arguments: {'userId': userId},
-                                  );
-                                },
-
-                                child: Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 16,
-                                  color: AppColors.orage,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
