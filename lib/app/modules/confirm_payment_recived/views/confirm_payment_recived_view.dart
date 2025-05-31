@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../colors.dart';
 import '../../Bottom2/controllers/bottom2_controller.dart';
+import '../../provider_home/controllers/provider_home_controller.dart';
 import '../controllers/confirm_payment_recived_controller.dart';
 
 class ConfirmPaymentRecivedView
@@ -97,7 +98,7 @@ class ConfirmPaymentRecivedView
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        InfoRow(label: 'User', value: "$fullName"),
+                        InfoRow(label: 'User', value: fullName),
                         InfoRow(label: 'Duration', value: durationString),
                         InfoRow(label: 'Date', value: formattedDate),
                         InfoRow(label: 'Time', value: '$startTime - $endTime'),
@@ -177,6 +178,11 @@ class ConfirmPaymentRecivedView
                     width: 147,
                     child: ElevatedButton(
                       onPressed: () {
+                        final ProviderHomeController proController = Get.put(
+                          ProviderHomeController(),
+                        );
+                        proController.enableAvailabilityAfterPayment();
+
                         controller.sendPaymentConfirmation(
                           bookingId: bookingId,
                           acceptBySp: true,
@@ -188,7 +194,7 @@ class ConfirmPaymentRecivedView
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Accept Payment',
                         style: TextStyle(
                           fontFamily: 'poppins',

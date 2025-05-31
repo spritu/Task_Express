@@ -1115,7 +1115,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
   const ProviderHomeView({super.key});
   @override
   Widget build(BuildContext context) {
-    Get.put(ProviderHomeController());
+    Get.put(ProviderHomeController()).fetchDashboardData();
     final locationController = Get.find<ProviderLocationController>();
     return Scaffold(
       body: Container(
@@ -1212,7 +1212,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
+                                Text(
                                   "Available",
                                   style: TextStyle(
                                     fontSize: 12,
@@ -1221,20 +1221,26 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                   ),
                                 ),
                                 Obx(
-                                  () => FlutterSwitch(
-                                    width: 53.0,
-                                    height: 26.18,
-                                    toggleSize: 23.0,
-                                    value: controller.isAvailable.value,
-                                    borderRadius: 20.0,
-                                    activeColor: Colors.green,
-                                    inactiveColor: Colors.grey.shade400,
-                                    toggleColor: Colors.white,
-                                    padding: 1.0,
-                                    onToggle: (val) {
-                                      controller.isAvailable.value = val;
-                                      controller.updateAvailability(val);
-                                    },
+                                  () => IgnorePointer(
+                                    ignoring:
+                                        !controller
+                                            .canToggleAvailability
+                                            .value, // disable jab false ho
+                                    child: FlutterSwitch(
+                                      width: 53.0,
+                                      height: 26.18,
+                                      toggleSize: 23.0,
+                                      value: controller.isAvailable.value,
+                                      borderRadius: 20.0,
+                                      activeColor: Colors.green,
+                                      inactiveColor: Colors.grey.shade400,
+                                      toggleColor: Colors.white,
+                                      padding: 1.0,
+                                      onToggle: (val) {
+                                        controller.isAvailable.value = val;
+                                        controller.updateAvailability(val);
+                                      },
+                                    ),
                                   ),
                                 ),
                               ],
@@ -1695,6 +1701,8 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                         Bottom2View(),
                                                       ); // Close the dialog first
                                                       controller
+                                                          .disableAvailabilityUntilPayment();
+                                                      controller
                                                           .updateBookingStatus(
                                                             acceptStatus: "yes",
                                                           );
@@ -1793,32 +1801,30 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                           ),
                         ),
                         SizedBox(height: 5),
-                        InkWell(
-                          onTap: () {
-                            Get.to(YourEarningView());
-                          },
-                          child: Card(
-                            color: Colors.white,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                _earningsCard(
-                                  title: "This Week",
-                                  amount:
-                                      "₹${controller.dashboardData['weekEarnings'].toString()}",
-                                ),
-                                _earningsCard(
-                                  title: "This Month",
-                                  amount:
-                                      "₹${controller.dashboardData['monthEarnings'].toString()}",
-                                ),
-                                _earningsCard(
-                                  title: "Total",
-                                  amount:
-                                      "₹${controller.dashboardData['totalEarnings'].toString()}",
-                                ),
-                              ],
-                            ),
+                        Card(
+                          color: Colors.white,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _earningsCard(
+                                title: "This Week",
+                                amount:
+                                    "₹${controller.dashboardData['weekEarnings'].toString()}",
+                                filter: 'week',
+                              ),
+                              _earningsCard(
+                                title: "This Month",
+                                amount:
+                                    "₹${controller.dashboardData['monthEarnings'].toString()}",
+                                filter: 'month',
+                              ),
+                              _earningsCard(
+                                title: "Total",
+                                amount:
+                                    "₹${controller.dashboardData['totalEarnings'].toString()}",
+                                filter: 'all',
+                              ),
+                            ],
                           ),
                         ),
                         SizedBox(height: 10),
@@ -1975,13 +1981,16 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
     );
   }
 
-  Widget _earningsCard({required String title, required String amount}) {
+  Widget _earningsCard({
+    required String title,
+    required String amount,
+    required String filter, // 👈 add this
+  }) {
     return Expanded(
       child: Container(
         height: 119,
         margin: EdgeInsets.symmetric(horizontal: 6),
         padding: EdgeInsets.symmetric(vertical: 12),
-
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -2011,26 +2020,58 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
             ),
             SizedBox(height: 15),
             // Details button
-            Container(
-              height: 24,
-              width: 54,
-              decoration: BoxDecoration(
-                border: Border.all(color: Color(0xFFF67C0A)),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Center(
-                child: Text(
-                  "Details",
-                  style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontSize: 10,
-
-                    fontWeight: FontWeight.w400,
+            InkWell(
+              onTap: () {
+                // ✅ Pass filter as argument
+                Get.to(() => YourEarningView(), arguments: {'filter': filter});
+              },
+              child: Container(
+                height: 24,
+                width: 54,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Color(0xFFF67C0A)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    "Details",
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _detailsButton() {
+    return InkWell(
+      onTap: () {
+        Get.to(YourEarningView());
+      },
+      child: Container(
+        height: 24,
+        width: 54,
+        decoration: BoxDecoration(
+          border: Border.all(color: Color(0xFFF67C0A)),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Center(
+          child: Text(
+            "Details",
+            style: TextStyle(
+              fontFamily: "Poppins",
+              fontSize: 10,
+
+              fontWeight: FontWeight.w400,
+            ),
+          ),
         ),
       ),
     );

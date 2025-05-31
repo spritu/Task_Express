@@ -54,7 +54,7 @@ void main() async {
   final box = GetStorage();
   // await prefs.clear();
   final prefs = await SharedPreferences.getInstance();
-;
+  ;
 
   final isLoggedIn = box.read('isLoggedIn') ?? false;
   final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
@@ -74,34 +74,34 @@ void main() async {
   // Get.put(HomeController(),permanent: true);
   //Get.put(CancelBookingController(),permanent: true);
 
-  Get.put(PlasteringHelperController(),permanent: true);
-  Get.put(BricklayingHelperController(),permanent: true);
-  Get.put(BookingController(),permanent: true);
-  Get.put(ScaffoldingHelperController(),permanent: true);
- // Get.put(ProviderAccountController());
-  Get.put(AuthController(),permanent: true);
-  Get.put(TileFixingHelperController(),permanent: true);
-  Get.put(JobsDetailsController(),permanent: true);
-  Get.put(RoadConstructionHelperController(),permanent: true);
-  Get.put(ProfessionalPlumberController(),permanent: true);
-  Get.put(SettingController(),permanent: true);
- // Get.put(EditProfileController(),permanent: true);
-  Get.put(JobsController(),permanent: true);
-  Get.lazyPut(() => ChatController(),fenix: true);
-  Get.put(ProviderSettingController(),permanent: true);
-  Get.lazyPut(()=>ProviderChatController(),fenix: true);
-  Get.put(OtpController(),permanent: true);
+  Get.put(PlasteringHelperController(), permanent: true);
+  Get.put(BricklayingHelperController(), permanent: true);
+  Get.put(BookingController(), permanent: true);
+  Get.put(ScaffoldingHelperController(), permanent: true);
+  // Get.put(ProviderAccountController());
+  Get.put(AuthController(), permanent: true);
+  Get.put(TileFixingHelperController(), permanent: true);
+  Get.put(JobsDetailsController(), permanent: true);
+  Get.put(RoadConstructionHelperController(), permanent: true);
+  Get.put(ProfessionalPlumberController(), permanent: true);
+  Get.put(SettingController(), permanent: true);
+  // Get.put(EditProfileController(),permanent: true);
+  Get.put(JobsController(), permanent: true);
+  Get.lazyPut(() => ChatController(), fenix: true);
+  Get.put(ProviderSettingController(), permanent: true);
+  Get.lazyPut(() => ProviderChatController(), fenix: true);
+  Get.put(OtpController(), permanent: true);
   // Get.put(ProviderHomeController(),permanent: true);  //auto referesh
   // Get.put(ProviderEditProfileController(),permanent: true);
-  Get.put(ProviderLoginController(),permanent: true);
-  Get.put(ActivejobScreenController(),permanent: true);
-  Get.put(ProviderChatScreenController(),permanent: true);
-  Get.put(ProviderOtpController(),permanent: true);
-  Get.put(Bottom2Controller(),permanent: true);
-  Get.put(AddAddressController(),permanent: true);
-  Get.put(ProfessionalProfileController(),permanent: true);
-  Get.put(LocationController(),permanent: true);
-  Get.put(ProviderLocationController(),permanent: true);
+  Get.put(ProviderLoginController(), permanent: true);
+  Get.put(ActivejobScreenController(), permanent: true);
+  Get.put(ProviderChatScreenController(), permanent: true);
+  Get.put(ProviderOtpController(), permanent: true);
+  // Get.put(Bottom2Controller(),permanent: true);
+  Get.put(AddAddressController(), permanent: true);
+  Get.put(ProfessionalProfileController(), permanent: true);
+  Get.put(LocationController(), permanent: true);
+  Get.put(ProviderLocationController(), permanent: true);
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
@@ -198,17 +198,21 @@ class _SplashScreenState extends State<SplashScreen> {
   //   }
   // }
 
-
-
   void startSplashFlow() async {
     await Future.delayed(Duration(seconds: 2));
     if (_controller.hasClients) {
-      _controller.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+      _controller.nextPage(
+        duration: Duration(milliseconds: 500),
+        curve: Curves.ease,
+      );
     }
 
     await Future.delayed(Duration(seconds: 2));
     if (_controller.hasClients) {
-      _controller.nextPage(duration: Duration(milliseconds: 500), curve: Curves.ease);
+      _controller.nextPage(
+        duration: Duration(milliseconds: 500),
+        curve: Curves.ease,
+      );
     }
 
     await Future.delayed(Duration(seconds: 2));
@@ -216,7 +220,9 @@ class _SplashScreenState extends State<SplashScreen> {
     final userId = prefs.getString('userId');
 
     if (mounted && userId == null) {
-      Get.offAll(() => JoinView()); // Show JoinView only if user never logged in
+      Get.offAll(
+        () => JoinView(),
+      ); // Show JoinView only if user never logged in
     }
   }
 
@@ -230,11 +236,7 @@ class _SplashScreenState extends State<SplashScreen> {
             onPageChanged: (index) {
               setState(() => _currentPage = index);
             },
-            children: const [
-              Splash1View(),
-              Splash2View(),
-              Splash3View(),
-            ],
+            children: const [Splash1View(), Splash2View(), Splash3View()],
           ),
           if (_currentPage != 0)
             Positioned(
@@ -248,21 +250,25 @@ class _SplashScreenState extends State<SplashScreen> {
                     onPressed: () {
                       Get.offAll(() => JoinView());
                     },
-                    child: Text("Skip", style: TextStyle(color: Color(0xff090F47), fontSize: 16)),
+                    child: Text(
+                      "Skip",
+                      style: TextStyle(color: Color(0xff090F47), fontSize: 16),
+                    ),
                   ),
                   Row(
                     children: List.generate(
                       2,
-                          (index) => AnimatedContainer(
+                      (index) => AnimatedContainer(
                         duration: Duration(milliseconds: 300),
                         margin: EdgeInsets.symmetric(horizontal: 5),
                         height: 10,
                         width: 10,
                         decoration: BoxDecoration(
-                          color: (_currentPage == 1 && index == 0) ||
-                              (_currentPage == 2 && index == 1)
-                              ? Color(0xff235CD7)
-                              : Colors.grey,
+                          color:
+                              (_currentPage == 1 && index == 0) ||
+                                      (_currentPage == 2 && index == 1)
+                                  ? Color(0xff235CD7)
+                                  : Colors.grey,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -272,12 +278,17 @@ class _SplashScreenState extends State<SplashScreen> {
                     onPressed: () {
                       if (_currentPage < 2) {
                         _controller.nextPage(
-                            duration: Duration(milliseconds: 300), curve: Curves.easeIn);
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeIn,
+                        );
                       } else {
                         Get.offAll(() => JoinView());
                       }
                     },
-                    child: Text("Next", style: TextStyle(color: Color(0xff090F47), fontSize: 16)),
+                    child: Text(
+                      "Next",
+                      style: TextStyle(color: Color(0xff090F47), fontSize: 16),
+                    ),
                   ),
                 ],
               ),
@@ -287,4 +298,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-

@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:uuid/uuid.dart';
 import 'package:worknest/app/modules/confirm_payment_recived/views/confirm_payment_recived_view.dart';
+import 'package:worknest/app/modules/provider_home/controllers/provider_home_controller.dart';
 
 import '../../../../colors.dart';
 import '../../confirm_payment_recived/controllers/confirm_payment_recived_controller.dart';
@@ -139,6 +140,7 @@ class Bottom2Controller extends GetxController {
   void onInit() {
     super.onInit();
     connectSocketjobpay();
+    // Get.put(ProviderHomeController()).fetchDashboardData();
     Get.put(ConfirmPaymentRecivedController()).fetchPendingPayments();
     //fetchPendingPayments();
   }

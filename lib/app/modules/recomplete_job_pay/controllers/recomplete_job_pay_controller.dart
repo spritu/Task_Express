@@ -40,7 +40,7 @@ class RecompleteJobPayController extends GetxController {
         jobTime.day == now.day;
 
     if (isToday) {
-      return "  $formattedTime";
+      return " $formattedTime";
     } else {
       String formattedDate = DateFormat('dd MMM yyyy').format(jobTime);
       return " $formattedDate, $formattedTime";

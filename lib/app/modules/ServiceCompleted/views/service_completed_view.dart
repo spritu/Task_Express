@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../../../../colors.dart';
 import '../../ServiceCompletedSuccessfully/views/service_completed_successfully_view.dart';
 import '../../bottom/controllers/bottom_controller.dart';
@@ -14,7 +15,22 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
   Widget build(BuildContext context) {
     final Map<String, dynamic> booking = Get.arguments;
 
-    print('completed data : ${booking}');
+    DateTime createdAt =
+        DateTime.tryParse(booking['createdAt'] ?? '') ?? DateTime.now();
+    DateTime updatedAt =
+        DateTime.tryParse(booking['updatedAt'] ?? '') ?? DateTime.now();
+
+    final formattedDate = DateFormat('d MMM, yyyy').format(createdAt);
+    final startTime = DateFormat('hh:mm a').format(createdAt);
+    final endTime = DateFormat('hh:mm a').format(updatedAt);
+    final duration = updatedAt.difference(createdAt);
+    final durationHours = duration.inHours;
+    final durationMinutes = duration.inMinutes % 60;
+    final String durationString =
+        durationHours > 0
+            ? '$durationHours Hours${durationMinutes > 0 ? " $durationMinutes Minutes" : ""}'
+            : '$durationMinutes Minutes';
+
     Get.put(ServiceCompletedController());
 
     return WillPopScope(
@@ -67,11 +83,13 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                         ),
                         color: Colors.white,
                       ),
-                      child: const Text.rich(
+                      child: Text.rich(
                         TextSpan(
                           children: [
                             TextSpan(
-                              text: "Suraj Sen",
+                              text:
+                                  "${booking['data']['bookedFor']['firstName']} ${booking['data']['bookedFor']['lastName']}",
+
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 12,
@@ -129,13 +147,13 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                             "${booking['data']['bookedFor']['firstName']} ${booking['data']['bookedFor']['lastName']}",
                             valueColor: const Color(0xFF114BCA),
                           ),
-                          summaryRow("Duration", "3 Hours"),
+                          summaryRow("Duration", durationString),
                           summaryRow(
                             "Charge",
-                            "${booking['data']['bookedFor']['charge']}",
+                            "${booking['data']['bookedFor']['skills'].isNotEmpty ? booking['data']['bookedFor']['skills'][0]['charge'] : 'N/A'}",
                           ),
-                          summaryRow("Date", "7 April, 2025"),
-                          summaryRow("Time", "10:30 AM – 01:30 PM"),
+                          summaryRow("Date", formattedDate),
+                          summaryRow("Time", '$startTime - $endTime'),
                         ],
                       ),
                     ),

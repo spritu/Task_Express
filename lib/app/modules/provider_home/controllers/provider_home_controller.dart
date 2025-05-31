@@ -282,10 +282,28 @@ class ProviderHomeController extends GetxController {
   var dashboardData = {}.obs;
 
   late IO.Socket socket;
-
   var count = 0.obs;
   var isAvailable = true.obs;
   var isServiceProfile = false.obs;
+
+  RxBool isAvailable1 = true.obs;
+  RxBool canToggleAvailability = true.obs; // ✅ Add this
+
+  void wupdateAvailability(bool value) {
+    // API call ya jo bhi logic ho yahan kare
+    print("Availability updated to $value");
+  }
+
+  void disableAvailabilityUntilPayment() {
+    isAvailable.value = false;
+    canToggleAvailability.value = false;
+  }
+
+  void enableAvailabilityAfterPayment() {
+    canToggleAvailability.value = true;
+    isAvailable.value = true; // toggle ko ON bhi kar do
+    updateAvailability(true);
+  }
 
   final List<Map<String, String>> jobs = List.generate(
     3,
@@ -659,6 +677,8 @@ class ProviderHomeController extends GetxController {
       print('Error: ${response.reasonPhrase}');
     }
   }
+
+  // total earning api
 
   @override
   void onClose() {
