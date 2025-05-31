@@ -5,6 +5,10 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:get/get.dart';
 
 import '../../../../colors.dart';
+import '../../HelpSupport/views/help_support_view.dart';
+import '../../account/views/account_view.dart';
+import '../../bottom/controllers/bottom_controller.dart';
+import '../../user_help/views/user_help_view.dart';
 import '../controllers/chat_controller.dart';
 
 class ChatView extends GetView<ChatController> {
@@ -14,36 +18,78 @@ class ChatView extends GetView<ChatController> {
   @override
   Widget build(BuildContext context) {
     final TextEditingController messageController = TextEditingController();
+    final BottomController navController = Get.find();
+
     Get.put(ChatController());
     return Scaffold(
-      appBar: AppBar(
-        title: Obx(
-              () => Row(
-            children: [
-              CircleAvatar(
-                backgroundImage:
-                controller.imagePath.value.isNotEmpty
-                    ? FileImage(File(controller.imagePath.value))
-                    : const AssetImage('assets/images/account.png'),
-              ),
-              const SizedBox(width: 10),
-              Obx(() => Text(controller.receiverName.value)),
-              Spacer(),
-              IconButton(onPressed: () {}, icon: Icon(Icons.info_outline)),
-              IconButton(onPressed: () {}, icon: Icon(Icons.person)),
-              IconButton(onPressed: () {}, icon: Icon(Icons.call)),
-            ],
-          ),
-        ),
+      appBar:AppBar(
         backgroundColor: Color(0xFFAEC6F9),
+        automaticallyImplyLeading: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
         ),
+        titleSpacing: 0, // 👈 This removes space between back icon and title
+        title: Obx(
+              () => Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Chat with ${controller.receiverName.value}",
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: "poppins",
+                ),
+              ),
+
+              Row(
+                children: [InkWell(onTap: (){
+                  Get.to(UserHelpView());
+                },
+                    child: Icon(Icons.info_outline)),SizedBox(width: 5,),
+                  InkWell(onTap: (){
+                   // navController.changeTab(3);
+                  },
+                      child: Icon(Icons.person)),SizedBox(width: 5,),
+                  Row(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          // Get arguments passed from previous screen
+                          final Map<String, dynamic> data = Get.arguments ?? {};
+                          final phoneNumber = data['phoneNumber'] ?? '';
+
+                          if (phoneNumber.isNotEmpty) {
+                            controller.makePhoneCall(phoneNumber);
+                          } else {
+                            Get.snackbar(
+                              'Error',
+                              'Phone number not available',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
+                          }
+                        },
+                        child: Icon(Icons.call),
+                      ),
+                      SizedBox(width: 5),
+                    ],
+                  ),
+
+
+                ],
+              ),
+
+            ],
+          ),
+        ),
       ),
+
+
       body: Container(
         decoration: BoxDecoration(color: Color(0xFFAEC6F9)),
-        child: Column(
+    child: Column(
           children: [
             Expanded(
               child: Obx(() {
@@ -57,17 +103,13 @@ class ChatView extends GetView<ChatController> {
                     final name =
                     isSender ? "You" : controller.receiverName.value;
                     print('object121 ${controller.receiverImage.value}');
-                    final imageUrl =
-                    (isSender
+                    final imageUrl = (isSender
                         ? controller.user.value?.imageUrl
-                        : controller.receiverImage.value)
-                        ?.trim();
+                        : controller.receiverImage.value)?.trim();
 
-                    final ImageProvider displayImage =
-                    (imageUrl != null && imageUrl.isNotEmpty)
+                    final ImageProvider displayImage = (imageUrl != null && imageUrl.isNotEmpty)
                         ? NetworkImage(imageUrl)
                         : const AssetImage('assets/images/account.png');
-
                     final time =
                     msg.createdAt != null
                         ? TimeOfDay.fromDateTime(
@@ -114,49 +156,6 @@ class ChatView extends GetView<ChatController> {
                 );
               }),
             ),
-
-            /// Message Input
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              color: Colors.grey[100],
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.photo),
-                    onPressed: controller.handleImagePick,
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: messageController,
-                      decoration: const InputDecoration(
-                        hintText: 'Type a message...',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () {
-                      final text = messageController.text.trim();
-                      if (text.isNotEmpty) {
-                        controller.handleSendPressed(
-                          types.PartialText(text: text),
-                        );
-                        messageController.clear();
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-
-            /// Book Now Section
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 20.0,
@@ -213,6 +212,49 @@ class ChatView extends GetView<ChatController> {
                 ),
               ),
             ),
+            /// Message Input
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              color: Colors.grey[100],
+              child: Row(
+                children: [
+                  // IconButton(
+                  //   icon: const Icon(Icons.photo),
+                  //   onPressed: controller.handleImagePick,
+                  // ),
+                  Expanded(
+                    child: TextField(
+                      controller: messageController,
+                      decoration: const InputDecoration(
+                        hintText: 'Type a message...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: () {
+                      final text = messageController.text.trim();
+                      if (text.isNotEmpty) {
+                        controller.handleSendPressed(
+                          types.PartialText(text: text),
+                        );
+                        messageController.clear();
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            /// Book Now Section
+
           ],
         ),
       ),
@@ -271,13 +313,13 @@ class ChatView extends GetView<ChatController> {
                   children: [
                     Text(
                       name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                      style: TextStyle(fontSize: 14,
+                        fontWeight: FontWeight.w600,
                         color: textColor,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(message, style: TextStyle(color: textColor)),
+                    Text(message, style: TextStyle(color: textColor,fontSize: 12,fontWeight: FontWeight.w300)),
                   ],
                 ),
               ),

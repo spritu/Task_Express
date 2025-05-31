@@ -63,7 +63,7 @@ class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return Image.asset(
-                        'assets/images/detail.png',
+                        'assets/images/person.jpeg',
                         fit: BoxFit.fill,
                       );
                     },

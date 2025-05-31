@@ -70,8 +70,9 @@ class EditProfileController extends GetxController {
       update();
     }
   }
+  RxString selectedImagePath = ''.obs; // ⬅️ Add this in your controller
 
-  Future<void> updateUser() async {
+  Future<void> updateUser({required String imageFilePath}) async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
 
@@ -99,8 +100,15 @@ class EditProfileController extends GetxController {
       "dob": dobController.text,
     });
 
-    if (imagePath.value.isNotEmpty && !imagePath.value.startsWith("http")) {
-      request.files.add(await http.MultipartFile.fromPath('userImg', imagePath.value));
+    // ✅ Image attach karo agar diya gaya ho
+    if (imageFilePath.isNotEmpty && File(imageFilePath).existsSync()) {
+      request.files.add(
+        await http.MultipartFile.fromPath('profileImg', imageFilePath),
+      );
+
+      // ✅ Immediately update UI with selected image
+      selectedImagePath.value = imageFilePath;
+      await prefs.setString('userImg', imageFilePath); // save locally if needed
     }
 
     try {
@@ -109,53 +117,42 @@ class EditProfileController extends GetxController {
       final responseJson = jsonDecode(responseBody);
 
       if (response.statusCode == 200 && responseJson['code'] == 200) {
-        // Save updated data into SharedPreferences immediately
         await prefs.setString('firstName', firstName);
         await prefs.setString('lastName', lastName);
         await prefs.setString('email', emailController.text);
         await prefs.setString('gender', genderController.text);
         await prefs.setString('dob', dobController.text);
-
-        if (imagePath.value.isNotEmpty) {
-          if (imagePath.value.startsWith("http")) {
-            await prefs.setString('userImg', imagePath.value);
-          } else {
-            // For local path, you might want to upload first or handle differently.
-            // Here just save the local path temporarily.
-            await prefs.setString('userImg', imagePath.value);
-          }
-        }
-
-        // Update userData observable for immediate UI refresh
         userData.value = {
-          "firstName": firstName,
-          "lastName": lastName,
-          "email": emailController.text,
-          "gender": genderController.text,
-          "dob": dobController.text,
-          "userImg": prefs.getString('userImg') ?? '',
-        };
+                  "firstName": firstName,
+                  "lastName": lastName,
+                  "email": emailController.text,
+                  "gender": genderController.text,
+                  "dob": dobController.text,
+                  "userImg": prefs.getString('userImg') ?? '',
+                };
 
-        // Update controllers (optional, but useful if server might change data)
-        nameController.text = "$firstName $lastName".trim();
-        genderController.text = genderController.text;
-        dobController.text = dobController.text;
-        emailController.text = emailController.text;
+                // Update controllers (optional, but useful if server might change data)
+                nameController.text = "$firstName $lastName".trim();
+                genderController.text = genderController.text;
+                dobController.text = dobController.text;
+                emailController.text = emailController.text;
 
-        update(); // refresh UI
+                update(); // refresh UI
 
-        // Also update AccountController's info to keep app consistent
-        final accountController = Get.find<AccountController>();
-        await accountController.loadUserInfo();
-        await accountController.loadMobileNumber();
-
+                // Also update AccountController's info to keep app consistent
+                final accountController = Get.find<AccountController>();
+                await accountController.loadUserInfo();
+                await accountController.loadMobileNumber();
         Get.snackbar("Success", responseJson['msg'] ?? "Profile updated successfully");
+
       } else {
         Get.snackbar("Error", responseJson['msg'] ?? "Failed to update profile");
       }
     } catch (e) {
+      print("❌ Exception during update: $e");
       Get.snackbar("Error", "Something went wrong. Please try again.");
     }
   }
+
 
 }

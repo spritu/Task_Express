@@ -177,7 +177,7 @@ class SignUpController extends GetxController {
           await prefs.setString('dob', userData['dateOfBirth'] ?? '');
           await prefs.setString('email', userData['email'] ?? '');
           await prefs.setString('gender', userData['gender'] ?? '');
-          await prefs.setString('image', finalImage);
+          await prefs.setString('userImg', userData?['userImg'] ?? '');
 
           // Confirm
           print("✅ Image saved to SharedPreferences: ${prefs.getString('image')}");

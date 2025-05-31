@@ -11,7 +11,7 @@ class JoinView extends GetView<JoinController> {
   Widget build(BuildContext context) {
     Get.put(JoinController());
     return  Scaffold(
-      //backgroundColor: AppColors.white,
+      backgroundColor: AppColors.white,
       body: SingleChildScrollView(
         child: Container(width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,

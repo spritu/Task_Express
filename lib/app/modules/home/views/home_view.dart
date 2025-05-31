@@ -109,71 +109,158 @@ class HomeView extends GetView<HomeController> {
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.orage,),),],),
                             SizedBox(height: 20),
-                            TextField(
-                              controller: controller.searchController,
-                              onChanged: (value) {
-                                if (value.isEmpty) {
-                                  controller.searchResults.clear();
-                                  FocusScope.of(context).unfocus();
-                                  return;
-                                }
+                            // TextField(
+                            //   controller: controller.searchController,
+                            //   onChanged: (value) {
+                            //     if (value.isEmpty) {
+                            //       controller.searchResults.clear();
+                            //       FocusScope.of(context).unfocus();
+                            //       return;
+                            //     }
+                            //
+                            //     if (bottomController.authController.isLoggedIn.value) {
+                            //       controller.fetchServiceProviders(value);
+                            //     }
+                            //   },
+                            //   decoration: InputDecoration(
+                            //     prefixIcon: Icon(Icons.search,size: 24,),
+                            //     hintText: "Search for ‘Plumber’",
+                            //     isDense: true,hintStyle: TextStyle(fontSize: 12,fontWeight: FontWeight.w400,color: Color(0xff9B9999)),
+                            //     contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                            //     border: OutlineInputBorder(
+                            //       borderRadius: BorderRadius.circular(25),
+                            //       borderSide: BorderSide.none,
+                            //     ),
+                            //     filled: true,
+                            //     fillColor: Colors.white,
+                            //   ),
+                            // ),
+                            Obx(() => Row(
+                              children: [
+                                AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
+                                  width: controller.isFirstFocused.value ? 190 : 120,
+                                  child: TextField(  onChanged: (value) {
+                                      if (value.isEmpty) {
+                                        controller.searchResults.clear();
+                                        FocusScope.of(context).unfocus();
+                                        return;
+                                      }
 
-                                if (bottomController.authController.isLoggedIn.value) {
-                                  controller.fetchServiceProviders(value);
-                                }
-                              },
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.search,size: 24,),
-                                hintText: "Search for ‘Plumber’",
-                                isDense: true,hintStyle: TextStyle(fontSize: 12,fontWeight: FontWeight.w400,color: Color(0xff9B9999)),
-                                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(25),
-                                  borderSide: BorderSide.none,
+                                      if (bottomController.authController.isLoggedIn.value) {
+                                        controller.fetchServiceProviders(value);
+                                      }
+                                    },
+                                    controller: controller.plumberController,
+                                    focusNode: controller.plumberFocusNode,
+                                    decoration: InputDecoration(
+                                      prefixIcon: controller.isFirstFocused.value
+                                          ? Icon(Icons.search, size: 20)
+                                          : null,
+                                      hintText: "Search for Category",
+                                      hintStyle: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff9B9999),
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(25),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                    ),
+                                  ),
                                 ),
-                                filled: true,
-                                fillColor: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                        Obx(() {
-                          if (controller.searchResults.isEmpty) return const SizedBox();
+                                SizedBox(width: 10),
+                                AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
+                                  width: controller.isFirstFocused.value ? 120 : 190,
+                                  child: TextField(
+                                    controller: controller.nameController,
+                                    focusNode: controller.nameFocusNode,
+                                    decoration: InputDecoration(
+                                      prefixIcon: !controller.isFirstFocused.value
+                                          ? Icon(Icons.search, size: 20)
+                                          : null,
+                                      hintText: "Search by Name",
+                                      hintStyle: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xff9B9999),
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(25),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),),
+                             SizedBox(height: 10),
+                            Obx(() {
+                              if (controller.searchResults.isEmpty) return const SizedBox();
 
-                          return ConstrainedBox(
-                            constraints: const BoxConstraints(maxHeight: 300),
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: controller.searchResults.length,
-                              itemBuilder: (context, index) {
-                                final item = controller.searchResults[index];
-                                print("🔍 Search Item: $item");
+                              return Container(
+                                margin: EdgeInsets.only(top: 8),
+                                padding: EdgeInsets.symmetric(vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 8,
+                                      offset: Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                constraints: BoxConstraints(maxHeight: 300),
+                                child: ListView.separated(
+                                  shrinkWrap: true,
+                                  itemCount: controller.searchResults.length,
+                                  separatorBuilder: (_, __) => Divider(height: 1, color: Colors.grey[200]),
+                                  itemBuilder: (context, index) {
+                                    final item = controller.searchResults[index];
 
-                                return ListTile(
-                                  title: Text(item['name'] ?? 'No Name'),
-                                  onTap: () {
-                                    final catId = item['matchedIn'] == 'category'
-                                        ? item['_id']?.toString()
-                                        : item['parentId']?.toString();
+                                    return ListTile(
+                                      dense: true,
+                                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                                      title: Text(
+                                        item['name'] ?? 'No Name',
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      onTap: () {
+                                        final catId = item['matchedIn'] == 'category'
+                                            ? item['_id']?.toString()
+                                            : item['parentId']?.toString();
 
-                                    final catName = item['name'] ?? 'Professionals';
+                                        final catName = item['name'] ?? 'Professionals';
 
-                                    if (catId != null && catId.isNotEmpty) {
-                                      controller.fetchUsersListByCategory(catId, categoryName: catName);
-                                    } else {
-                                      print("❌ Invalid or missing category ID in: $item");
-                                    }
+                                        if (catId != null && catId.isNotEmpty) {
+                                          controller.fetchUsersListByCategory(catId, categoryName: catName);
+                                          controller.searchResults.clear(); // Hide dropdown after selection
+                                          FocusScope.of(context).unfocus();
+                                        } else {
+                                          print("❌ Invalid or missing category ID in: $item");
+                                        }
+                                      },
+                                    );
                                   },
-                                );
-                              },
-                            ),
-                          );
-                        }),
+                                ),
+                              );
+                            })
 
 
 
 
-                        ],),),
+
+                          ],),),
                     ),),
                   // Service Type Buttons
                   Expanded(

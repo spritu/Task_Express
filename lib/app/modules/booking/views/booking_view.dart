@@ -162,19 +162,20 @@ class BookingView extends GetView<BookingController> {
                                           ],
                                         ),
                                         SizedBox(height: 10),
-                                        Obx(() {
-                                          if (controller.isLoading.value) {
-                                            return Center(child: CircularProgressIndicator());
-                                          }
-
-                                          if (controller.userList.isEmpty) {
-                                            return Center(child: Text("No users found."));
-                                          }
-
-                                          return SizedBox(height: 300,
-                                            child: ListView.builder(
+                                       // Obx(() {
+                                          // if (controller.isLoading.value) {
+                                          //   return Center(child: CircularProgressIndicator());
+                                          // }
+                                          //
+                                          // if (controller.userList.isEmpty) {
+                                          //   return Center(child: Text("No users found."));
+                                          // }
+                                          //
+                                          // return SizedBox(height: 300,
+                                          // child:
+                                            ListView.builder(
                                               itemCount: controller.userList.length,
-
+                                              shrinkWrap: true,
                                               itemBuilder: (context, index) {
                                                   final item = controller.userList[index];
                                                   print("Image URL: https://jdapi.youthadda.co/${item.userImg}");
@@ -205,7 +206,7 @@ class BookingView extends GetView<BookingController> {
                                                                 Row(
                                                                   children: [
                                                                     CircleAvatar(
-                                                                      radius: 30,
+                                                                      radius: 25,
                                                                       backgroundImage: item.userImg != null && item.userImg!.isNotEmpty
                                                                           ? NetworkImage("https://jdapi.youthadda.co/${item.userImg}")
                                                                           : AssetImage("assets/images/account.png") as ImageProvider,
@@ -236,7 +237,7 @@ class BookingView extends GetView<BookingController> {
                                                                         ),
                                                                         const SizedBox(
                                                                           height:
-                                                                          4,
+                                                                          3,
                                                                         ),
 
                                                                         /// Subtitle
@@ -281,7 +282,7 @@ class BookingView extends GetView<BookingController> {
                                                                 ),
 
                                                                 const SizedBox(
-                                                                  height: 15,
+                                                                  height: 8,
                                                                 ),
 
                                                                 /// Booked (optional additional line)
@@ -297,7 +298,7 @@ class BookingView extends GetView<BookingController> {
                                                                           fontWeight:
                                                                           FontWeight.w400, // 400 = regular
                                                                           fontSize:
-                                                                          14,
+                                                                          11,
 
                                                                           letterSpacing:
                                                                           0,
@@ -314,7 +315,7 @@ class BookingView extends GetView<BookingController> {
                                                                           fontWeight:
                                                                           FontWeight.w500, // 500 = medium
                                                                           fontSize:
-                                                                          11,
+                                                                          14,
 
                                                                           letterSpacing:
                                                                           0,
@@ -435,8 +436,8 @@ class BookingView extends GetView<BookingController> {
                                                         SizedBox(height: 5),
                                                       ],
                                                     ),
-                                                  ));
-                                                },
+                                                  //));
+                                               // },
                                             ),
                                           );
                                         }),
@@ -845,60 +846,60 @@ class BookingView extends GetView<BookingController> {
     ),
   );
 
-  Widget buildCloseJobCard(Map<String, dynamic> booking) => Container(
-    height: 120,
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(8),
-      color: Colors.white,
-      boxShadow: [BoxShadow(blurRadius: 4, color: Colors.grey.shade400)],
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Task finished? Tap ‘Close Job’ to complete the process and pay your worker.",
-            style: TextStyle(
-              fontFamily: "poppins",
-              fontSize: 13,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(height: 10),
+  Widget buildCloseJobCard(Map<String, dynamic> booking) {
+    final accept = booking['accept'];
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 36,
-                width: 135,
+    // Only show the card if the booking is accepted
+    if (accept != null && accept.toString().toLowerCase() == 'yes') {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Task finished? Tap ‘Close Job’ to complete the process and pay your worker.",
+              style: TextStyle(
+                fontFamily: "poppins",
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: SizedBox(
+                width: 160,
+                height: 40,
                 child: ElevatedButton(
                   onPressed: () {
-                    final newData = booking;
-                    // final fullName = '${bookedFor['firstName']} ${bookedFor['lastName']}';
-                    // final bookedForImage = bookedFor['userImg'] ?? '';
-                    // final createdAt = bookedFor['createdAt']??'';
-
-                    if (booking != null) {
-                      Get.to(
-                        () => CompletejobView(),
-                        arguments: {'data': booking},
-                      );
-                    }
+                    Get.to(
+                          () => CompletejobView(),
+                      arguments: {'data': booking},
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF114BCA),
-                    elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    padding: EdgeInsets.zero,
+                    elevation: 2,
                   ),
                   child: const Text(
                     "Close Job & Pay",
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: FontWeight.w500,
                       fontFamily: "poppins",
                       color: Colors.white,
@@ -906,12 +907,14 @@ class BookingView extends GetView<BookingController> {
                   ),
                 ),
               ),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
+            ),
+          ],
+        ),
+      );
+    } else {
+      return const SizedBox.shrink(); // Do not render anything if not accepted
+    }
+  }
 }
 
 class RequestPendingBottomCard extends StatelessWidget {
