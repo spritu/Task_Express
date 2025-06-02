@@ -1101,6 +1101,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:worknest/app/modules/Bottom2/views/bottom2_view.dart';
 import 'package:worknest/app/modules/jobs/views/jobs_view.dart';
 
@@ -1115,7 +1116,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
   const ProviderHomeView({super.key});
   @override
   Widget build(BuildContext context) {
-    Get.put(ProviderHomeController()).fetchDashboardData();
+    Get.put(ProviderHomeController(), permanent: true).fetchDashboardData();
     final locationController = Get.find<ProviderLocationController>();
     return Scaffold(
       body: Container(
@@ -1739,57 +1740,61 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                           ),
                         ),
                         SizedBox(height: 10),
-                        Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: _dashboardCard(
-                                    title: "Today's\n Jobs",
-                                    value:
-                                        controller.dashboardData['todayJobs']
-                                            .toString(),
+                        Obx(() {
+                          return Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: _dashboardCard(
+                                      title: "Today's\n Jobs",
+                                      value:
+                                          controller.dashboardData['todayJobs']
+                                              .toString(),
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _dashboardCard(
-                                    title: "Earnings\n Today",
-                                    value:
-                                        "₹${controller.dashboardData['todayEarnings'].toString()}",
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: _dashboardCard(
+                                      title: "Earnings\n Today",
+                                      value:
+                                          "₹${controller.dashboardData['todayEarnings'].toString()}",
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: _dashboardCard(
-                                    title: " Hour’s\nWorked",
-                                    value:
-                                        controller
-                                            .dashboardData['todayHoursWorked']
-                                            .toString(),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: _dashboardCard(
+                                      title: " Hour’s\nWorked",
+                                      value:
+                                          controller
+                                              .dashboardData['todayHoursWorked']
+                                              .toString(),
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _dashboardCard(
-                                    title: "Average\n Rating",
-                                    value:
-                                        controller
-                                            .dashboardData['averageRating']
-                                            .toString(),
-                                    icon: Icons.star,
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: _dashboardCard(
+                                      title: "Average\n Rating",
+                                      value:
+                                          controller
+                                              .dashboardData['averageRating']
+                                              .toString(),
+                                      icon: Icons.star,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                ],
+                              ),
+                            ],
+                          );
+                        }),
                         SizedBox(height: 10),
                         Text(
                           "Your Earnings",
@@ -1801,32 +1806,34 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                           ),
                         ),
                         SizedBox(height: 5),
-                        Card(
-                          color: Colors.white,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              _earningsCard(
-                                title: "This Week",
-                                amount:
-                                    "₹${controller.dashboardData['weekEarnings'].toString()}",
-                                filter: 'week',
-                              ),
-                              _earningsCard(
-                                title: "This Month",
-                                amount:
-                                    "₹${controller.dashboardData['monthEarnings'].toString()}",
-                                filter: 'month',
-                              ),
-                              _earningsCard(
-                                title: "Total",
-                                amount:
-                                    "₹${controller.dashboardData['totalEarnings'].toString()}",
-                                filter: 'all',
-                              ),
-                            ],
-                          ),
-                        ),
+                        Obx(() {
+                          return Card(
+                            color: Colors.white,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _earningsCard(
+                                  title: "This Week",
+                                  amount:
+                                      "₹${controller.dashboardData['weekEarnings'].toString()}",
+                                  filter: 'week',
+                                ),
+                                _earningsCard(
+                                  title: "This Month",
+                                  amount:
+                                      "₹${controller.dashboardData['monthEarnings'].toString()}",
+                                  filter: 'month',
+                                ),
+                                _earningsCard(
+                                  title: "Total",
+                                  amount:
+                                      "₹${controller.dashboardData['totalEarnings'].toString()}",
+                                  filter: 'all',
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
                         SizedBox(height: 10),
                         Text(
                           "Recent Jobs",
@@ -1846,24 +1853,53 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.grey.shade300),
                           ),
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: 5, // or your dynamic length
-                            padding: const EdgeInsets.symmetric(horizontal: 0),
-                            physics: BouncingScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              return Column(
-                                children: [
-                                  _jobItem(),
-                                  if (index != 4) // itemCount - 1
-                                    Divider(
-                                      color: Colors.grey.shade300,
-                                      height: 1,
+                          child: Obx(() {
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: controller.pastBookings.length,
+                              physics: const BouncingScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                final booking = controller.pastBookings[index];
+
+                                final serviceName =
+                                    booking['bookServices'] != null &&
+                                            booking['bookServices'] is List &&
+                                            booking['bookServices'].isNotEmpty
+                                        ? booking['bookServices'][0]['name'] ??
+                                            'N/A'
+                                        : 'N/A';
+
+                                final jobStartTimeStr = booking['jobStartTime'];
+                                final jobStartTime =
+                                    jobStartTimeStr != null
+                                        ? DateTime.tryParse(jobStartTimeStr)
+                                        : null;
+                                final pay = booking['pay'];
+
+                                return Column(
+                                  children: [
+                                    _jobItem(
+                                      serviceName: serviceName,
+                                      pay:
+                                          pay, // Replace with actual field if available
+                                      date:
+                                          jobStartTime != null
+                                              ? DateFormat(
+                                                'dd MMM yyyy',
+                                              ).format(jobStartTime)
+                                              : 'N/A',
                                     ),
-                                ],
-                              );
-                            },
-                          ),
+                                    if (index !=
+                                        controller.pastBookings.length - 1)
+                                      Divider(
+                                        color: Colors.grey.shade300,
+                                        height: 1,
+                                      ),
+                                  ],
+                                );
+                              },
+                            );
+                          }),
                         ),
 
                         const SizedBox(height: 8),
@@ -2050,34 +2086,11 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
     );
   }
 
-  Widget _detailsButton() {
-    return InkWell(
-      onTap: () {
-        Get.to(YourEarningView());
-      },
-      child: Container(
-        height: 24,
-        width: 54,
-        decoration: BoxDecoration(
-          border: Border.all(color: Color(0xFFF67C0A)),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Center(
-          child: Text(
-            "Details",
-            style: TextStyle(
-              fontFamily: "Poppins",
-              fontSize: 10,
-
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _jobItem() {
+  Widget _jobItem({
+    required String serviceName,
+    required int pay,
+    required String date,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       child: Row(
@@ -2086,9 +2099,9 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  "Plumbing job",
+                  serviceName,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -2096,9 +2109,9 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                     color: Colors.black,
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  "Pipe Repair",
+                  "Past Booking",
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -2111,9 +2124,9 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
           ),
 
           // Amount
-          const Text(
-            "₹8450",
-            style: TextStyle(
+          Text(
+            "₹$pay",
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               fontFamily: "Poppins",
@@ -2124,9 +2137,9 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
           const SizedBox(width: 12),
 
           // Date
-          const Text(
-            "10 Apr 2025",
-            style: TextStyle(
+          Text(
+            date,
+            style: const TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w500,
               fontFamily: "Poppins",

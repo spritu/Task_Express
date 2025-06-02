@@ -16,7 +16,7 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
   @override
   Widget build(BuildContext context) {
     Get.put(ProviderChatScreenController());
-    return  WillPopScope(
+    return WillPopScope(
       onWillPop: () async {
         Get.find<BottomController>().selectedIndex.value = 0; // 👈 Home tab
         Get.offAll(() => BottomView());
@@ -24,25 +24,21 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
       },
       child: Scaffold(
         body: Container(
-          height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(gradient: AppColors.appGradient2),
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: [
-                  SizedBox(height: 20),
-
-                  // Header
+                  const SizedBox(height: 20),
                   const Text(
-                    " Chats",
+                    "Chats",
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 16,
                       fontFamily: "poppins",
                     ),
                   ),
-                  const Text("         "),
                   const SizedBox(height: 10),
                   const CustomSearchBar(),
                   const SizedBox(height: 20),
@@ -54,21 +50,56 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                         itemCount: controller.chats.length,
                         itemBuilder: (context, index) {
                           final chat = controller.chats[index];
+                          final isUnread = !chat.isRead;
+
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: InkWell(
-                              onTap: () {
+                              onTap: () async {
+                                await controller.markChatAsRead(chat.reciverId);
                                 Get.to(
                                   ProviderChatView(),
                                   arguments: {
                                     'receiverId': chat.reciverId,
                                     'receiverName':
-                                    '${chat.firstName} ${chat.lastName}',
+                                        '${chat.firstName} ${chat.lastName}',
                                     'receiverImage': chat.profilePic,
                                   },
                                 )?.then((_) async {
                                   await controller.fetchLastMessages();
                                 });
+                              },
+                              onLongPress: () {
+                                showDialog(
+                                  context: context,
+                                  builder:
+                                      (context) => AlertDialog(
+                                        title: const Text('Delete Chat'),
+                                        content: const Text(
+                                          'Are you sure you want to delete this chat?',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed:
+                                                () => Navigator.pop(context),
+                                            child: const Text('Cancel'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              Navigator.pop(context);
+                                              // await controller.deleteChat(chat.reciverId);
+                                              // await controller.fetchLastMessages();
+                                            },
+                                            child: const Text(
+                                              'Delete',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                );
                               },
                               child: Column(
                                 children: [
@@ -79,70 +110,100 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                                     ),
                                     child: Row(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         // Profile Image
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            25,
-                                          ),
-                                          child:
-                                          chat.profilePic.isNotEmpty
-                                              ? Image.network(
-                                            chat.profilePic,
-                                            width: 50,
-                                            height: 50,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (
-                                                context,
-                                                error,
-                                                stack,
-                                                ) => Image.asset(
-                                              "assets/images/account.png",
-                                              width: 50,
-                                              height: 50,
+                                        Stack(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(25),
+                                              child:
+                                                  chat.profilePic.isNotEmpty
+                                                      ? Image.network(
+                                                        chat.profilePic,
+                                                        width: 50,
+                                                        height: 50,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder:
+                                                            (
+                                                              context,
+                                                              error,
+                                                              stack,
+                                                            ) => Image.asset(
+                                                              "assets/images/account.png",
+                                                              width: 50,
+                                                              height: 50,
+                                                            ),
+                                                      )
+                                                      : Image.asset(
+                                                        "assets/images/account.png",
+                                                        width: 50,
+                                                        height: 50,
+                                                      ),
                                             ),
-                                          )
-                                              : Image.asset(
-                                            "assets/images/account.png",
-                                            width: 50,
-                                            height: 50,
-                                          ),
+                                            if (chat.unreadCount > 0)
+                                              Positioned(
+                                                right: 0,
+                                                top: 0,
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(
+                                                    4,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  constraints:
+                                                      const BoxConstraints(
+                                                        minWidth: 20,
+                                                        minHeight: 20,
+                                                      ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      '${chat.unreadCount}',
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
                                         ),
-
                                         const SizedBox(width: 12),
 
                                         // Chat Info
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              // Name and Time
                                               Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment
-                                                    .spaceBetween,
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
                                                   Text(
                                                     '${chat.firstName} ${chat.lastName}',
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       fontWeight:
-                                                      FontWeight.w600,
+                                                          FontWeight.w600,
                                                       fontFamily: "poppins",
                                                       fontSize: 12,
                                                     ),
                                                   ),
-
                                                   Text(
                                                     controller.formatTimestamp(
                                                       chat.timestamp,
                                                     ),
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       fontSize: 10,
                                                       fontWeight:
-                                                      FontWeight.w400,
+                                                          FontWeight.w400,
                                                       fontFamily: "poppins",
                                                       color: Color(0xFF545454),
                                                     ),
@@ -150,14 +211,16 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                                                 ],
                                               ),
                                               const SizedBox(height: 4),
-
-                                              // Message Preview
                                               Text(
                                                 chat.message,
                                                 style: TextStyle(
                                                   fontFamily: "poppins",
                                                   fontWeight: FontWeight.w300,
                                                   fontSize: 12,
+                                                  color:
+                                                      isUnread
+                                                          ? Colors.green
+                                                          : Colors.black,
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -167,8 +230,6 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                                       ],
                                     ),
                                   ),
-
-                                  // Divider
                                   const Divider(
                                     height: 1,
                                     color: Colors.grey,

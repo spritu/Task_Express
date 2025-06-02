@@ -178,10 +178,12 @@ class ConfirmPaymentRecivedView
                     width: 147,
                     child: ElevatedButton(
                       onPressed: () {
-                        final ProviderHomeController proController = Get.put(
-                          ProviderHomeController(),
-                        );
+                        final ProviderHomeController proController =
+                            Get.find<ProviderHomeController>();
                         proController.enableAvailabilityAfterPayment();
+                        proController.fetchDashboardData();
+                        proController.fetchPastBookings();
+                        print("objectcccc:$proController");
 
                         controller.sendPaymentConfirmation(
                           bookingId: bookingId,

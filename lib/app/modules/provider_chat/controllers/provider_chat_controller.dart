@@ -31,6 +31,7 @@ class ProviderChatController extends GetxController {
   void onInit() {
     super.onInit();
     initializeChat();
+
     // Future.delayed(Duration(milliseconds: 500), () async {
     //   await initializeChat();
     // });
@@ -106,12 +107,18 @@ class ProviderChatController extends GetxController {
               } else if (createdAt is String) {
                 createdAtEpoch =
                     DateTime.tryParse(createdAt)?.millisecondsSinceEpoch ??
-                        DateTime.now().millisecondsSinceEpoch;
+                    DateTime.now().millisecondsSinceEpoch;
               } else {
                 createdAtEpoch = DateTime.now().millisecondsSinceEpoch;
               }
 
               final senderId = msg['sender']?['_id'] ?? '';
+              final messageId = msg['_id'];
+
+              // Just for testing: delete first message
+              // if (history.isEmpty && messageId != null) {
+              //   await deleteMessage(messageId);
+              // }
               history.add(
                 types.TextMessage(
                   id: msg['_id'] ?? const Uuid().v4(),
@@ -132,6 +139,31 @@ class ProviderChatController extends GetxController {
       }
     } catch (e) {
       print("⚠️ Error fetching chat: $e");
+    }
+  }
+
+  // delete msg
+  Future<void> deleteMessage(String messageId) async {
+    var headers = {'Content-Type': 'application/json'};
+    var request = http.Request(
+      'POST',
+      Uri.parse('https://jdapi.youthadda.co/deleteMessage'),
+    );
+
+    request.body = json.encode({"messageId": messageId});
+    request.headers.addAll(headers);
+
+    try {
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        final result = await response.stream.bytesToString();
+        print("✅ Message deleted: $result");
+      } else {
+        print("❌ Failed to delete: ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("⚠️ Error deleting message: $e");
     }
   }
 

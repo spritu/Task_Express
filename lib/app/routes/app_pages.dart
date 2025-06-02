@@ -313,7 +313,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.BOTTOM2,
-      page: () => const Bottom2View(),
+      page: () => Bottom2View(),
       binding: Bottom2Binding(),
     ),
     GetPage(

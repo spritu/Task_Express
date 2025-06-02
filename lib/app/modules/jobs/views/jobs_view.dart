@@ -4,8 +4,10 @@ import '../../../../colors.dart';
 import '../../Bottom2/controllers/bottom2_controller.dart';
 import '../../Bottom2/views/bottom2_view.dart';
 import '../../HelpSupport/views/help_support_view.dart';
+import '../../booking/controllers/booking_controller.dart';
 import '../../job_detail/views/job_detail_view.dart';
 import '../../jobsDetails/views/jobs_details_view.dart';
+import '../../provider_home/controllers/provider_home_controller.dart';
 import '../controllers/jobs_controller.dart';
 
 class JobsView extends GetView<JobsController> {
@@ -21,7 +23,20 @@ class JobsView extends GetView<JobsController> {
         return false;
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFFFF5ED), // light background
+        backgroundColor: const Color(0xFFFFF5ED),
+        appBar: AppBar(
+          title: Text(
+            'Jobs',
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: "poppins",
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          centerTitle: true,
+          backgroundColor: Color(0xFFF89E4A),
+        ),
 
         body: Container(
           decoration: BoxDecoration(gradient: AppColors.appGradient2),
@@ -35,17 +50,7 @@ class JobsView extends GetView<JobsController> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Jobs',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontFamily: "poppins",
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                    children: [],
                   ),
                 ),
                 SizedBox(height: 20),
@@ -301,33 +306,70 @@ class JobsView extends GetView<JobsController> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                _buildPastJob(
-                  name: 'Sourabh m..',
-                  location: 'Saket Nagar, Indore',
-                  amount: '450',
-                  date: '12/12/2024',
-                  status: 'Job Done',
-                  statusColor: Colors.green,
-                  icon: Icons.check_circle,
-                ),
-                _buildPastJob(
-                  name: 'Aneesha Sin..',
-                  location: 'Old Palasia, Indore',
-                  amount: '700',
-                  date: '11/12/2024',
-                  status: 'Job Done',
-                  statusColor: Colors.green,
-                  icon: Icons.check_circle,
-                ),
-                _buildPastJob(
-                  name: 'Smita patd..',
-                  location: 'Rau square, Indore',
-                  amount: '700',
-                  date: '11/12/2024',
-                  status: 'Reject',
-                  statusColor: Colors.grey,
-                  icon: Icons.cancel,
-                ),
+                Obx(() {
+                  final ProviderHomeController proController =
+                      Get.find<ProviderHomeController>();
+                  print(
+                    'pastBookings length: ${proController.pastBookings.length}',
+                  );
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: proController.pastBookings.length,
+                    itemBuilder: (context, index) {
+                      final job = proController.pastBookings[index];
+                      print('jobssss:$job');
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        print('jobssss: $job');
+                      });
+
+                      // Extract service name
+                      final fullName =
+                          "${job['bookedBy']['firstName']} ${job['bookedBy']['lastName']}";
+
+                      // Extract amount
+                      final amount = job['pay']?.toString() ?? '0';
+                      final servicejob =
+                          (job['bookServices'] != null &&
+                                  job['bookServices'] is List &&
+                                  job['bookServices'].isNotEmpty)
+                              ? job['bookServices'][0]['name'] ??
+                                  'Unknown Service'
+                              : 'Unknown Service';
+
+                      // Extract and format date
+                      final jobStartTime =
+                          job['jobStartTime']?.toString() ?? '';
+                      final dateOnly =
+                          jobStartTime.contains('T')
+                              ? jobStartTime.split('T')[0]
+                              : jobStartTime;
+                      final formattedDate = formatDate(
+                        dateOnly,
+                      ); // You should define this function.
+
+                      // Extract user location
+                      final user = job['bookedBy'] as Map<String, dynamic>?;
+                      final location = user?['city']?.toString() ?? 'Unknown';
+
+                      // Static status info
+                      const status = "Completed";
+                      const statusColor = Colors.green;
+                      const icon = Icons.check_circle;
+                      return _buildPastJob(
+                        name: fullName,
+                        location: location,
+                        amount: amount,
+                        service: servicejob,
+                        date: formattedDate,
+                        status: status,
+                        statusColor: statusColor,
+                        icon: icon,
+                      );
+                    },
+                  );
+                }),
               ],
             ),
           ),
@@ -662,6 +704,7 @@ class JobsView extends GetView<JobsController> {
     required String location,
     required String amount,
     required String date,
+    required String service,
     required String status,
     required Color statusColor,
     required IconData icon,
@@ -684,9 +727,9 @@ class JobsView extends GetView<JobsController> {
           ],
         ),
         Text(location, style: const TextStyle(color: Colors.grey)),
-        const SizedBox(height: 4),
-        const Text("Plumbing service", style: TextStyle(fontSize: 12)),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
+        Text(service, style: TextStyle(fontSize: 12)),
+        SizedBox(height: 4),
         Text(
           "Earn: ₹ $amount",
           style: const TextStyle(

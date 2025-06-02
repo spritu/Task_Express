@@ -13,23 +13,32 @@ import '../../provider_setting/views/provider_setting_view.dart';
 import '../controllers/bottom2_controller.dart';
 
 class Bottom2View extends GetView<Bottom2Controller> {
-  const Bottom2View({super.key});
+  final ProviderChatScreenController chatController = Get.put(
+    ProviderChatScreenController(),
+  );
   @override
   Widget build(BuildContext context) {
     Get.put(Bottom2Controller());
+    chatController.fetchLastMessages();
 
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Obx(() => _buildBody(controller.selectedIndex.value)),
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
-          backgroundColor: AppColors.white,
           currentIndex: controller.selectedIndex.value,
-          onTap: (index) => controller.selectedIndex.value = index,
           selectedItemColor: Color(0xFFF67C0A),
           unselectedItemColor: Color(0xFF9F9F9F),
-          type: BottomNavigationBarType.fixed,
           showUnselectedLabels: true,
+          onTap: (index) {
+            controller.selectedIndex.value = index;
+
+            if (index == 3) {
+              // User is viewing chat, clear notification
+
+              chatController.fetchLastMessages();
+            }
+          },
           items: [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Jobs'),
@@ -37,7 +46,32 @@ class Bottom2View extends GetView<Bottom2Controller> {
               icon: Icon(Icons.settings),
               label: 'Setting',
             ),
-            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
+            BottomNavigationBarItem(
+              icon: Stack(
+                children: [
+                  const Icon(Icons.chat),
+                  Obx(() {
+                    if (chatController.hasNewMessage.value) {
+                      return Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      );
+                    } else {
+                      return SizedBox.shrink();
+                    }
+                  }),
+                ],
+              ),
+              label: 'Chat',
+            ),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
           ],
         ),

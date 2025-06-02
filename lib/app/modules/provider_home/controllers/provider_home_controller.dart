@@ -322,6 +322,7 @@ class ProviderHomeController extends GetxController {
     loadUserInfo(); // Load user info and connect socket
     fetchCurrentBooking();
     fetchDashboardData();
+    fetchPastBookings();
   }
 
   void connectSocketAccept() {
@@ -678,6 +679,53 @@ class ProviderHomeController extends GetxController {
     }
   }
 
+  RxList<Map<String, dynamic>> pastBookings = <Map<String, dynamic>>[].obs;
+
+  Future<void> fetchPastBookings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final serviceProId = prefs.getString('userId');
+
+    if (serviceProId == null || serviceProId.isEmpty) {
+      print("serviceProId not found in SharedPreferences");
+      return;
+    }
+
+    var headers = {'Content-Type': 'application/json'};
+
+    var request = http.Request(
+      'POST',
+      Uri.parse('https://jdapi.youthadda.co/getserpropastbooking'),
+    );
+
+    request.body = json.encode({"serviceProId": serviceProId});
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseBody = await response.stream.bytesToString();
+      final decoded = json.decode(responseBody);
+
+      if (decoded['code'] == 200 && decoded['data'] != null) {
+        final List<dynamic> data = decoded['data'];
+
+        // Store raw map data directly
+        pastBookings.value = List<Map<String, dynamic>>.from(data);
+        print("uuuuuuu:${pastBookings.value}");
+
+        print("Fetched ${pastBookings.length} past bookings.");
+        // Print one item for debugging
+        if (pastBookings.isNotEmpty) {
+          print(jsonEncode(pastBookings[0]));
+        }
+      } else {
+        print("No data found or response code mismatch.");
+      }
+    } else {
+      print("Error: ${response.reasonPhrase}");
+    }
+  }
+
   // total earning api
 
   @override
@@ -687,4 +735,24 @@ class ProviderHomeController extends GetxController {
   }
 
   void increment() => count.value++;
+}
+
+class PastBooking {
+  final String serviceName;
+  final int pay;
+  final DateTime jobStartTime;
+
+  PastBooking({
+    required this.serviceName,
+    required this.pay,
+    required this.jobStartTime,
+  });
+
+  factory PastBooking.fromJson(Map<String, dynamic> json) {
+    return PastBooking(
+      serviceName: json['bookServices'][0]['name'] ?? '',
+      pay: json['pay'] ?? 0,
+      jobStartTime: DateTime.parse(json['jobStartTime']),
+    );
+  }
 }

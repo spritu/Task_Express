@@ -77,15 +77,25 @@ class CompletejobView extends GetView<CompletejobController> {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 16),
-                          const CircleAvatar(
+                          SizedBox(height: 16),
+                          CircleAvatar(
                             radius: 47.5,
-                            backgroundImage: AssetImage(
-                              "assets/images/rajesh.png",
-                            ),
                             backgroundColor: Colors.transparent,
+                            backgroundImage:
+                                (booking['data']['bookedFor']['userImg'] !=
+                                            null &&
+                                        booking['data']['bookedFor']['userImg']
+                                            .toString()
+                                            .isNotEmpty)
+                                    ? NetworkImage(
+                                      "https://jdapi.youthadda.co/${booking['data']['bookedFor']['userImg']}",
+                                    )
+                                    : const AssetImage(
+                                      'assets/images/account.png',
+                                    ),
                           ),
-                          const SizedBox(height: 8),
+
+                          SizedBox(height: 8),
                           Text(
                             "${booking['data']['bookedFor']['firstName']} ${booking['data']['bookedFor']['lastName']}",
                             style: TextStyle(

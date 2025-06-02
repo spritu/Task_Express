@@ -140,7 +140,13 @@ class Bottom2Controller extends GetxController {
   void onInit() {
     super.onInit();
     connectSocketjobpay();
-    // Get.put(ProviderHomeController()).fetchDashboardData();
+    // Clear red dot
+
+    final providerHomeController = Get.put(ProviderHomeController());
+
+    providerHomeController.fetchDashboardData();
+    providerHomeController.fetchPastBookings();
+    print("✅ ProviderHomeController initialized");
     Get.put(ConfirmPaymentRecivedController()).fetchPendingPayments();
     //fetchPendingPayments();
   }
