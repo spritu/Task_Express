@@ -149,7 +149,8 @@ class _SplashScreenState extends State<SplashScreen> {
   //     startSplashFlow();
   //   }
   // }
-  void checkLoginStatus() async {
+  void checkLoginStatus() async
+  {
     final box = GetStorage();
     final isLoggedIn = box.read('isLoggedIn') ?? false;
     final isLoggedIn2 = box.read('isLoggedIn2') ?? false;

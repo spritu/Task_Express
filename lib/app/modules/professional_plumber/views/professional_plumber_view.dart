@@ -18,7 +18,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
     final arguments = Get.arguments as Map<String, dynamic>;
     final List users = arguments['users'];
     final String title = arguments['title'] ?? 'Professionals';
-
+    final int avail = arguments['avail'] ?? 0;
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(
@@ -75,6 +75,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
 
                   final imagePath = user['userImg'] ?? '';
                   final imageUrl = imagePath.isNotEmpty ? 'https://jdapi.youthadda.co/$imagePath' : '';
+                  final int avail = user["avail"] ?? 0;
 
                   final charge =
                   user['skills'] != null && user['skills'].isNotEmpty
@@ -91,7 +92,10 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                           'image': user['userImg'],
                           'experience': user['experience'],
                           'phone': user['phone'],
-                          'id': user['_id'],
+                          'id': user['_id'],  'skills': user['skills'] ?? [],
+                          'averageRating': user['averageRating'],'reviews': user['reviews'] ?? [],
+                          'avail': user['avail'], 'latitude': user['latitude'],
+                          'longitude': user['longitude'],'distance': user['distance'], // ✅ Add this
                         },
                       );
                       // Passing only the relevant data to the bottom sheet
@@ -129,7 +133,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                               padding: const EdgeInsets.all(12.0),
                               child: Column(
                                 children: [
-                                  Container(  height: 80,
+                                  SizedBox(  height: 80,
                                     width: 80,
                                     child: Image.network(
                                       imageUrl,
@@ -150,6 +154,14 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         Icons.star,
                                         color: Colors.amber,
                                         size: 16,
+                                      ),Text(
+                                        user['averageRating']?.toString() ?? '0',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w400,
+                                          fontFamily: "poppins",
+                                          color: Colors.grey[800],
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -190,29 +202,38 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                           children: [
-                                            Container(
-                                              width: 15,
-                                              height: 15,
-                                              decoration: const BoxDecoration(
-                                                color: Colors.green,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Center(
-                                                child: Text(
-                                                  "✅",
-                                                  style: TextStyle(fontSize: 6),
+                                            avail == 1
+                                                ? Row(
+                                              children: [
+                                                Icon(Icons.check_circle, color: Colors.green, size: 16),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  "Available",
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontFamily: "poppins",
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Color(0xff11AD0E),
+                                                  ),
                                                 ),
-                                              ),
+                                              ],
+                                            )
+                                                : Row(
+                                              children: [
+                                                Icon(Icons.cancel, color: Colors.red, size: 16),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  "Not Available",
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontFamily: "poppins",
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            const SizedBox(width: 6),
-                                            const Text(
-                                              "Available",
-                                              style: TextStyle(
-                                                color: Colors.green,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 12,
-                                              ),
-                                            ),
+
                                           ],
                                         ),
                                       ],
@@ -228,7 +249,9 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                             'image': user['userImg'],
                                             'experience': user['experience'],
                                             'phone': user['phone'],
-                                            'id': user['_id'],
+                                            'id': user['_id'], 'skills': user['skills'] ?? [],
+                                            'averageRating': user['averageRating'],'reviews': user['reviews'] ?? [],
+                                            'avail': user['avail'],
                                           },
                                         );
                                       },
@@ -282,7 +305,19 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                                 size: 14,
                                                 color: Colors.grey,
                                               ),
-                                            ),Text("2 km",style: TextStyle(fontSize: 12,color: AppColors.grey),)
+                                            ),
+                                            Text(
+                                              user['distance'] != null && user['distance'] != 'N/A'
+                                                  ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
+                                                  : 'N/A',
+                                              style: TextStyle(fontSize: 12),
+                                            )
+
+
+
+
+
+
                                           ],
                                         ),
                                         SizedBox(height: 3),
@@ -543,7 +578,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
 
                     price: "₹ ${skill['charge'].toString()}",
                     onBookNow: () {
-                      print("📌 Book Now tapped for: ${skill['categoryName']}");
+                      print("📌 categoryName ${skill['categoryName']}");
                       showAreUSureSheet(
                         context,
                         name: name,
