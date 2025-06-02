@@ -406,23 +406,23 @@ class HomeView extends GetView<HomeController> {
                                                                 .center, children: [Icon(Icons.add),
                                                           Text('More', style: TextStyle(fontSize: 10,
                                                             ),),],),),),);}
-                                              if (isExpanded &&
-                                                  index == categories.length) {
+                                              if (isExpanded && index == categories.length) {
                                                 return InkWell(
-                                                  onTap:(){
-                                                    bottomController.checkAndShowSignupSheet(context);
-                                                      controller.toggleCategoryView;},
+                                                  onTap: controller.toggleCategoryView,
                                                   child: const Card(
                                                     color: Colors.white,
                                                     child: Center(
                                                       child: Column(
-                                                        mainAxisAlignment: MainAxisAlignment.center, children: [
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
                                                           Icon(Icons.close),
-                                                          Text(
-                                                            'Close',
-                                                            style: TextStyle(
-                                                              fontSize: 10,
-                                                            ),),],),),),);}
+                                                          Text('Close', style: TextStyle(fontSize: 10)),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              }
                                               final cat = categories[index];
                                               return InkWell(
                                                 onTap: () {
@@ -523,7 +523,7 @@ class HomeView extends GetView<HomeController> {
                                                             fontSize: 10,),
                                                           textAlign: TextAlign.center, maxLines: 2,
                                                           overflow: TextOverflow.ellipsis,)],)),),);},),);}),),
-        
+
                                   // 🔽 User List Section
                                   // else if (controller.expandedServiceType.value == 'Visiting Professionals')
                                   //     const Center(child: Text("No users found.")),
@@ -679,7 +679,7 @@ class DiscountBannerView extends StatelessWidget {
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                              
+
                                     Text(
                                       banner["subtitle"] ?? "No Subtitle",
                                       style: const TextStyle(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -90,31 +91,76 @@ class HomeController extends GetxController {
     isLoading.value = true;
 
     try {
-       fetchCategories(); // Ensure categoryNameMap is populated
+      // Ensure category names are ready
+       fetchCategories();
 
+      // Get current user location
+      Position currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      double currentLat = currentPosition.latitude;
+      double currentLon = currentPosition.longitude;
+
+      print("📍 Current location: ($currentLat, $currentLon)");
+
+      // Fetch users by category
       var url = Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId');
-      var request = http.Request('GET', url);
-      var response = await request.send();
+      var response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final jsonString = await response.stream.bytesToString();
-        final jsonData = json.decode(jsonString);
+        final jsonData = json.decode(response.body);
         List<dynamic> users = jsonData['data'];
 
         for (var user in users) {
+          // Add category name
           if (user['skills'] != null) {
             for (var skill in user['skills']) {
               skill['categoryName'] = categoryNameMap[skill['categoryId']] ?? 'Unknown';
             }
           }
+
+          // Extract location
           if (user['location'] != null &&
               user['location']['coordinates'] != null &&
               user['location']['coordinates'].length == 2) {
-            user['longitude'] = user['location']['coordinates'][0];
-            user['latitude'] = user['location']['coordinates'][1];
+
+            double providerLon = user['location']['coordinates'][0]; // longitude
+            double providerLat = user['location']['coordinates'][1]; // latitude
+
+            user['longitude'] = providerLon;
+            user['latitude'] = providerLat;
+
+            print("📍 Provider: ${user['firstName']} at ($providerLat, $providerLon)");
+
+            // Calculate distance
+            var distUrl = Uri.parse(
+              'https://jdapi.youthadda.co/getdistance?lat1=$currentLat&lon1=$currentLon&lat2=$providerLat&lon2=$providerLon',
+            );
+
+            var distResponse = await http.get(distUrl);
+            if (distResponse.statusCode == 200) {
+              var distJson = json.decode(distResponse.body);
+
+              if (distJson['code'] == 200 &&
+                  distJson['data'] != null &&
+                  distJson['data']['distance'] != null) {
+                user['distance'] = distJson['data']['distance'].toString();
+                print("✅ Distance for ${user['firstName']}: ${user['distance']} km");
+              } else {
+                user['distance'] = 'N/A';
+                print("⚠️ Distance missing in response for ${user['firstName']}");
+              }
+            } else {
+              user['distance'] = 'N/A';
+              print("❌ Distance API failed for ${user['firstName']} - ${distResponse.statusCode}");
+            }
+          } else {
+            user['distance'] = 'N/A';
+            print("🚫 No location data for ${user['firstName'] ?? user['_id']}");
           }
         }
 
+        // Assign results and navigate
         results.assignAll(users);
 
         if (results.isNotEmpty) {
@@ -129,14 +175,21 @@ class HomeController extends GetxController {
           });
         }
       } else {
-        print("❌ Error: ${response.reasonPhrase}");
+        print("❌ Failed to fetch users: ${response.statusCode} - ${response.reasonPhrase}");
       }
     } catch (e) {
-      print("❗ Exception: $e");
+      print("❗ Exception during fetchUsersListByCategory: $e");
     } finally {
       isLoading.value = false;
     }
   }
+
+
+
+
+
+
+
   // void fetchUsersListByCategory(String catId, {String? categoryName}) async {
   //   results.clear();
   //   isLoading.value = true;
