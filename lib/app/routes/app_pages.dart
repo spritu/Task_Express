@@ -66,6 +66,8 @@ import '../modules/location/bindings/location_binding.dart';
 import '../modules/location/views/location_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
+import '../modules/name_detail/bindings/name_detail_binding.dart';
+import '../modules/name_detail/views/name_detail_view.dart';
 import '../modules/otp/bindings/otp_binding.dart';
 import '../modules/otp/views/otp_view.dart';
 import '../modules/plastering_helper/bindings/plastering_helper_binding.dart';
@@ -217,7 +219,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PLASTERING_HELPER,
-      page: () => const PlasteringHelperView(),
+      page: () => PlasteringHelperView(),
       binding: PlasteringHelperBinding(),
     ),
     GetPage(
@@ -420,6 +422,11 @@ class AppPages {
       name: _Paths.RECOMPLETE_JOB_PAY,
       page: () => RecompleteJobPayView(paymentData: {}),
       binding: RecompleteJobPayBinding(),
+    ),
+    GetPage(
+      name: _Paths.NAME_DETAIL,
+      page: () => const NameDetailView(),
+      binding: NameDetailBinding(),
     ),
   ];
 }

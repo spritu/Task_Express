@@ -94,8 +94,10 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                           'phone': user['phone'],
                           'id': user['_id'],  'skills': user['skills'] ?? [],
                           'averageRating': user['averageRating'],'reviews': user['reviews'] ?? [],
-                          'avail': user['avail'], 'latitude': user['latitude'],
-                          'longitude': user['longitude'],'distance': user['distance'], // ✅ Add this
+                          'avail': user['avail'],
+                          // 'latitude': user['latitude'],
+                          // 'longitude': user['longitude'],
+                          //'distance': user['distance'], // ✅ Add this
                         },
                       );
                       // Passing only the relevant data to the bottom sheet
@@ -306,10 +308,10 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                                 color: Colors.grey,
                                               ),
                                             ),
-                                            Text(
-                                              user['distance'] != null && user['distance'] != 'N/A'
-                                                  ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
-                                                  : 'N/A',
+                                            Text( "3.5 Km",
+                                              // user['distance'] != null && user['distance'] != 'N/A'
+                                              //     ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
+                                              //     : 'N/A',
                                               style: TextStyle(fontSize: 12),
                                             )
 
