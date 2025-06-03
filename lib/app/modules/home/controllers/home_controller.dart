@@ -31,11 +31,11 @@ class HomeController extends GetxController {
   final addressType = Rx<String>('');
   final contactNo = Rx<String>('');
   final RxList<dynamic> searchResults = <dynamic>[].obs;
-  var isFirstFocused = true.obs;
+  RxBool isFirstFocused = false.obs;
   FocusNode plumberFocusNode = FocusNode();
   FocusNode nameFocusNode = FocusNode();
   bool isFirstActive = true;
-
+  //RxList<Map<String, dynamic>> searchResults = <Map<String, dynamic>>[].obs;
   final TextEditingController searchPlumberController = TextEditingController();
   final TextEditingController searchNameController = TextEditingController();
 
@@ -92,16 +92,16 @@ class HomeController extends GetxController {
 
     try {
       // Ensure category names are ready
-       fetchCategories();
+      fetchCategories();
 
-      // Get current user location
-      Position currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      double currentLat = currentPosition.latitude;
-      double currentLon = currentPosition.longitude;
-
-      print("📍 Current location: ($currentLat, $currentLon)");
+      // Get current user location (you can optionally remove this if not needed)
+      // Position currentPosition = await Geolocator.getCurrentPosition(
+      //   desiredAccuracy: LocationAccuracy.high,
+      // );
+      // double currentLat = currentPosition.latitude;
+      // double currentLon = currentPosition.longitude;
+      //
+      // print("📍 Current location: ($currentLat, $currentLon)");
 
       // Fetch users by category
       var url = Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId');
@@ -111,54 +111,25 @@ class HomeController extends GetxController {
         final jsonData = json.decode(response.body);
         List<dynamic> users = jsonData['data'];
 
-        for (var user in users) {
-          // Add category name
-          if (user['skills'] != null) {
-            for (var skill in user['skills']) {
-              skill['categoryName'] = categoryNameMap[skill['categoryId']] ?? 'Unknown';
-            }
-          }
-
-          // Extract location
-          if (user['location'] != null &&
-              user['location']['coordinates'] != null &&
-              user['location']['coordinates'].length == 2) {
-
-            double providerLon = user['location']['coordinates'][0]; // longitude
-            double providerLat = user['location']['coordinates'][1]; // latitude
-
-            user['longitude'] = providerLon;
-            user['latitude'] = providerLat;
-
-            print("📍 Provider: ${user['firstName']} at ($providerLat, $providerLon)");
-
-            // Calculate distance
-            var distUrl = Uri.parse(
-              'https://jdapi.youthadda.co/getdistance?lat1=$currentLat&lon1=$currentLon&lat2=$providerLat&lon2=$providerLon',
-            );
-
-            var distResponse = await http.get(distUrl);
-            if (distResponse.statusCode == 200) {
-              var distJson = json.decode(distResponse.body);
-
-              if (distJson['code'] == 200 &&
-                  distJson['data'] != null &&
-                  distJson['data']['distance'] != null) {
-                user['distance'] = distJson['data']['distance'].toString();
-                print("✅ Distance for ${user['firstName']}: ${user['distance']} km");
-              } else {
-                user['distance'] = 'N/A';
-                print("⚠️ Distance missing in response for ${user['firstName']}");
-              }
-            } else {
-              user['distance'] = 'N/A';
-              print("❌ Distance API failed for ${user['firstName']} - ${distResponse.statusCode}");
-            }
-          } else {
-            user['distance'] = 'N/A';
-            print("🚫 No location data for ${user['firstName'] ?? user['_id']}");
-          }
-        }
+        // for (var user in users) {
+        //   // Add category name
+        //   if (user['skills'] != null) {
+        //     for (var skill in user['skills']) {
+        //       skill['categoryName'] = categoryNameMap[skill['categoryId']] ?? 'Unknown';
+        //     }
+        //   }
+        //
+        //   // Extract location info only (if needed)
+        //   if (user['location'] != null &&
+        //       user['location']['coordinates'] != null &&
+        //       user['location']['coordinates'].length == 2) {
+        //     double providerLon = user['location']['coordinates'][0]; // longitude
+        //     double providerLat = user['location']['coordinates'][1]; // latitude
+        //
+        //     user['longitude'] = providerLon;
+        //     user['latitude'] = providerLat;
+        //   }
+        // }
 
         // Assign results and navigate
         results.assignAll(users);
@@ -184,39 +155,81 @@ class HomeController extends GetxController {
     }
   }
 
-
-
-
-
-
-
-  // void fetchUsersListByCategory(String catId, {String? categoryName}) async {
+  // Future<void> fetchUsersListByCategory(String catId, {String? categoryName}) async {
   //   results.clear();
   //   isLoading.value = true;
   //
   //   try {
-  //     fetchCategories(); // Step 1: load category name map
+  //     // Ensure category names are ready
+  //      fetchCategories();
   //
+  //     // Get current user location
+  //     Position currentPosition = await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high,
+  //     );
+  //     double currentLat = currentPosition.latitude;
+  //     double currentLon = currentPosition.longitude;
+  //
+  //     print("📍 Current location: ($currentLat, $currentLon)");
+  //
+  //     // Fetch users by category
   //     var url = Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId');
-  //     var request = http.Request('GET', url);
-  //     var response = await request.send();
+  //     var response = await http.get(url);
   //
   //     if (response.statusCode == 200) {
-  //       final jsonString = await response.stream.bytesToString();
-  //       final jsonData = json.decode(jsonString);
-  //       // 🔍 Debug print to show response data
-  //       print("API Response Data: $jsonData");
-  //       // Attach category name to each skill
+  //       final jsonData = json.decode(response.body);
   //       List<dynamic> users = jsonData['data'];
+  //
   //       for (var user in users) {
+  //         // Add category name
   //         if (user['skills'] != null) {
   //           for (var skill in user['skills']) {
-  //             skill['categoryName'] =
-  //                 categoryNameMap[skill['categoryId']] ?? 'Unknown';
+  //             skill['categoryName'] = categoryNameMap[skill['categoryId']] ?? 'Unknown';
   //           }
+  //         }
+  //
+  //         // Extract location
+  //         if (user['location'] != null &&
+  //             user['location']['coordinates'] != null &&
+  //             user['location']['coordinates'].length == 2) {
+  //
+  //           double providerLon = user['location']['coordinates'][0]; // longitude
+  //           double providerLat = user['location']['coordinates'][1]; // latitude
+  //
+  //           user['longitude'] = providerLon;
+  //           user['latitude'] = providerLat;
+  //
+  //           print("📍 Provider: ${user['firstName']} at ($providerLat, $providerLon)");
+  //
+  //           // Calculate distance
+  //           var distUrl = Uri.parse(
+  //             'https://jdapi.youthadda.co/getdistance?lat1=$currentLat&lon1=$currentLon&lat2=$providerLat&lon2=$providerLon',
+  //           );
+  //
+  //           var distResponse = await http.get(distUrl);
+  //           if (distResponse.statusCode == 200) {
+  //             var distJson = json.decode(distResponse.body);
+  //
+  //             if (distJson['code'] == 200 &&
+  //                 distJson['data'] != null &&
+  //                 distJson['data']['distance'] != null) {
+  //               user['distance'] = distJson['data']['distance'].toString();
+  //               print("✅ Distance for ${user['firstName']}: ${user['distance']} km");
+  //             } else {
+  //               user['distance'] = 'N/A';
+  //               print("⚠️ Distance missing in response for ${user['firstName']}");
+  //             }
+  //           } else {
+  //             user['distance'] = 'N/A';
+  //             print("❌ Distance API failed for ${user['firstName']} - ${distResponse.statusCode}");
+  //           }
+  //         } else {
+  //           user['distance'] = 'N/A';
+  //           print("🚫 No location data for ${user['firstName'] ?? user['_id']}");
   //         }
   //       }
   //
+  //       // Assign results and navigate
   //       results.assignAll(users);
   //
   //       if (results.isNotEmpty) {
@@ -225,23 +238,66 @@ class HomeController extends GetxController {
   //           'title': categoryName ?? 'Professionals',
   //         });
   //       } else {
-  //         Get.to(() => ServiceproView(),arguments: {
+  //         Get.to(() => ServiceproView(), arguments: {
   //           'users': results,
   //           'title': categoryName ?? 'Professionals',
   //         });
   //       }
   //     } else {
-  //       print("Error: ${response.reasonPhrase}");
+  //       print("❌ Failed to fetch users: ${response.statusCode} - ${response.reasonPhrase}");
   //     }
   //   } catch (e) {
-  //     print("Exception: $e");
+  //     print("❗ Exception during fetchUsersListByCategory: $e");
   //   } finally {
   //     isLoading.value = false;
   //   }
   // }
 
 
+  void fetchUsersByName() async {
+    String name = nameController.text.trim();
+    if (name.isEmpty) {
+      searchResults.clear();
+      return;
+    }
 
+    try {
+      final url = Uri.parse('https://jdapi.youthadda.co/user/getsp?name=$name');
+      print("📤 Sending request to: $url");
+
+      var request = http.Request('GET', url);
+      var response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+      print("📥 Raw response: $responseBody");
+
+      final jsonData = jsonDecode(responseBody);
+
+      // ✅ Check for `msg` field which contains the list
+      if (jsonData is Map<String, dynamic> && jsonData['msg'] is List) {
+        final List<dynamic> userList = jsonData['msg'];
+
+        searchResults.value = userList.map((item) {
+          final fullName =
+              "${item['firstName']?.trim() ?? ''} ${item['lastName']?.trim() ?? ''}";
+          return {
+            '_id': item['_id'],
+            'name': fullName.trim(),
+            'matchedIn': 'name', 'data': item,
+            'parentId': item['categoryId'] ?? '',
+          };
+        }).toList();
+
+        print("📊 Parsed users count: ${searchResults.length}");
+        print("✅ Fetched ${searchResults.length} results");
+      } else {
+        print("❌ Unexpected JSON structure: $jsonData");
+        searchResults.clear();
+      }
+    } catch (e) {
+      print("❌ Error in fetchUsersByName: $e");
+      searchResults.clear();
+    }
+  }
 
 
 
@@ -536,7 +592,7 @@ class HomeController extends GetxController {
         isFirstFocused.value = true;
       }
     });
-
+    //fetchUsersByName();
     nameFocusNode.addListener(() {
       if (nameFocusNode.hasFocus) {
         isFirstFocused.value = false;
@@ -604,7 +660,6 @@ class HomeController extends GetxController {
   void selectCategory(String label) {
     selectedCategory.value = label;
   }
-
 
   final services = [
     {

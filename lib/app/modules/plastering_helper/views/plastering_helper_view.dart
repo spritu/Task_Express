@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-
 import '../../../../colors.dart';
+import '../../name_detail/views/name_detail_view.dart';
 import '../controllers/plastering_helper_controller.dart';
 
 class PlasteringHelperView extends GetView<PlasteringHelperController> {
-  const PlasteringHelperView({super.key});
+  final Map<String, dynamic> userList = Get.arguments;
+
+  PlasteringHelperView({super.key});
+
   @override
   Widget build(BuildContext context) {
     Get.put(PlasteringHelperController());
+
+    // Wrap single worker in a list
+    final List<Map<String, dynamic>> dataList = [userList];
+
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(
-        backgroundColor: Color(0xFFD9E4FC),
+        backgroundColor: const Color(0xFFD9E4FC),
         elevation: 0,
         leading: const BackButton(color: Colors.black),
         title: Text(
-          "Plastering Helper",
-          style: TextStyle(
+          "${userList['firstName'] ?? ''} ${userList['lastName'] ?? ''}",
+          style: const TextStyle(
             color: AppColors.textColor,
             fontWeight: FontWeight.w400,
             fontFamily: "poppins",
@@ -34,11 +40,10 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: const [
                 Row(
-                  children: const [
+                  children: [
                     Icon(Icons.location_on, color: Colors.black),
                     SizedBox(width: 5),
                     Text(
@@ -49,249 +54,267 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 20),
+                  padding: EdgeInsets.only(left: 20),
                   child: Text("Fh-289, Vijay nagar, Indore"),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 10),
-          // List of workers
+          // List of worker(s)
           Expanded(
-            child: Obx(
-                  () => ListView.builder(
-                itemCount: controller.workers.length,
-                itemBuilder: (context, index) {
-                  final worker = controller.workers[index];
-                  return Container(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 7,
-                    ),
-                    //  padding: const EdgeInsets.all(12),
+            child: ListView.builder(
+              itemCount: dataList.length,
+              itemBuilder: (context, index) {
+                final worker = dataList[index];
+
+                return InkWell(onTap: (){
+                  Get.to(() => NameDetailView(), arguments: worker);
+                },
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 5,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: Row(
                       children: [
-                        Card(color: Colors.white,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
+                        // Left: Image + Rating + Experience
+                        Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                "https://jdapi.youthadda.co/${worker['userImg'] ?? ''}",
+                                height: 80,
+                                width: 80,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    Icon(Icons.person, size: 80, color: Colors.grey),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
                               children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.asset(
-                                    worker['image'],
-                                    height: 80,
-                                    width: 94,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                      size: 16,
-                                    ),
-                                    Text(
-                                      "${worker['rating']} (${worker['reviews']} reviews)",
-                                      style: const TextStyle(color: Colors.grey,fontSize: 11,fontFamily: "poppins",fontWeight: FontWeight.w400),
-                                    ),
-                                  ],
-                                ),
+                                const Icon(Icons.star, color: Colors.amber, size: 14),
+                                const SizedBox(width: 2),
                                 Text(
-                                  "${worker['experience']} year Experience",
-                                  style: const TextStyle(color: Color(0xff7C7C7C),fontSize: 10,fontFamily: "poppins",fontWeight: FontWeight.w400),
+                                  "${worker['rating'] ?? '4.7'} (${worker['reviewCount'] ?? '89'} reviews)",
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey,
+                                    fontFamily: "poppins",
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
+                            Text(
+                              "${worker['expiresAt'] ?? '0'} year Experience",
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey,
+                                fontFamily: "poppins",
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(width: 12),
+                        // Right: Info & Buttons
                         Expanded(
-                          child:
-                          Column(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
+                              // Name + Details Button
                               Row(
                                 children: [
-                                  Text(
-                                    worker['name'],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14,
-                                      fontFamily: "poppins",
-                                      color: AppColors.textColor,
+                                  Expanded(
+                                    child: Text(
+                                      "${worker['firstName'] ?? ''} ${worker['lastName'] ?? ''}",
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: "poppins",
+                                      ),
                                     ),
                                   ),
-                                  const Spacer(),
-                                  TextButton(
-                                    onPressed: () {
-                                      //Get.to(HelperProfileView());
-                                    },
-                                    child: Container(
-                                      height: 19,
-                                      width: 45,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(6),
-                                        color: Color(0xff114BCA),
-                                      ),
-                                      child: Center(
-                                        child: const Text(
-                                          "Details",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 7,
-                                            fontFamily: "poppins",
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
+                                  Container(
+                                    padding:
+                                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xff114BCA),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Text(
+                                      "Details",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: "poppins",
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              if (worker['available'])
-                                Row(
-                                  children: [
-                                    Container(
-                                      width:10,
-                                      height: 10,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.green,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Center(
-                                        child: Text("✅", style: TextStyle(fontSize: 6)),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    const Text(
-                                      "Available",
-                                      style: TextStyle(
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 8,
-                                      ),
-                                    ),
-                                  ],
-                                ),SizedBox(height: 5),
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              const SizedBox(height: 4),
+                              // Availability
+                              Row(
                                 children: [
-                                  // const Icon(
-                                  //   Icons.location_on,
-                                  //   size: 12,
-                                  //   color: Colors.grey,
-                                  // ),
-                                  Column(mainAxisAlignment: MainAxisAlignment.start,crossAxisAlignment: CrossAxisAlignment.start,
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: worker['avail'] == 1 ? Colors.green : Colors.red,
+                                    size: 10,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    worker['avail'] == 1 ? "Available" : "Not Available",
+                                    style: TextStyle(
+                                      color: worker['avail'] == 1 ? Colors.green : Colors.red,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 6),
+                              // Distance & Time
+                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children:  [
+                                  Row(
                                     children: [
-                                      Row(mainAxisAlignment: MainAxisAlignment.start,crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [Padding(
-                                          padding: const EdgeInsets.only(top: 3),
-                                          child: Icon(
-                                            Icons.location_on,
-                                            size: 12,
-                                            color: Colors.grey,
-                                          ),
+                                      Icon(Icons.location_on, size: 14, color: Colors.grey),
+                                      Text(
+                                        "${worker['distance'] ?? '3.5'} km", // Make it dynamic if needed
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.black87,
+                                          fontFamily: "poppins",
                                         ),
-                                          Text(
-                                            "${worker['distance']} "
-                                            ,
-                                            style: const TextStyle(color: Colors.grey,fontSize: 12,fontWeight: FontWeight.w500,fontFamily: "poppins"),
-                                          ),
-                                        ],
-                                      ), Row(
-                                        children: [Icon(Icons.access_time,size: 10,color: AppColors.grey,),
-                                          Text(
-                                            "${worker['time']} away",
-                                            style: const TextStyle(color: Colors.grey,fontSize: 12,fontWeight: FontWeight.w500,fontFamily: "poppins"),
-                                          ),
-                                        ],
                                       ),
                                     ],
-                                  ),Card(color:AppColors.white,
+                                  ),
+                                  Card(
+                                    color: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      side: const BorderSide(color: Colors.black12), // optional border
+                                      borderRadius: BorderRadius.circular(40),
                                     ),
                                     elevation: 2,
                                     child: Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 4.0,
+                                        horizontal: 10.0,
+                                      ),
                                       child: RichText(
-                                        textAlign: TextAlign.center,
                                         text: TextSpan(
-                                          style: const TextStyle(fontSize: 12, color: Colors.blue),
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.orange,
+                                            fontFamily: 'Poppins',
+                                          ),
                                           children: [
-                                            const TextSpan(
-                                              text: "Charge:\n",
-                                              style: TextStyle(fontSize: 10,color: AppColors.blue,
-                                                fontWeight: FontWeight.w600,
+                                            TextSpan(
+                                              text: "Charge: ",
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                color: AppColors.orage,
+                                                fontWeight: FontWeight.w400,
                                               ),
                                             ),
                                             TextSpan(
-                                              text: "₹ 250/day",
+                                              text: "₹ ${worker['charge'] ?? '0'}/day",
                                               style: TextStyle(
-                                                fontSize: 10,color: AppColors.blue,
-                                                fontWeight: FontWeight.w600,
+                                                fontSize: 11,
+                                                color: AppColors.orage,
+                                                fontWeight: FontWeight.w700,
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
                                     ),
-                                  )
-
+                                  ),
                                 ],
                               ),
+                             // const SizedBox(height: 6),
+                              // Charge Pill
 
 
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 10),
+                              // Call & Chat Buttons
                               Row(
                                 children: [
                                   Expanded(
-                                    child: SizedBox(height:24,width:110,
+                                    child: SizedBox(
+                                      height: 32,
                                       child: ElevatedButton(
-                                        onPressed: () {
-                                          // controller.showAfterCallSheet(context);
-                                        },
+                                        onPressed: () {},
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: Color(0xff114BCA),
+                                          backgroundColor: const Color(0xff114BCA),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
                                         ),
-                                        child: const Text("Call",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 12,color: AppColors.white,fontFamily: "poppins"),),
+                                        child: const Text(
+                                          "Call",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            fontFamily: "poppins",
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
                                   Expanded(
-                                    child: SizedBox(height:24,width:100,
-
+                                    child: SizedBox(
+                                      height: 32,
                                       child: ElevatedButton(
                                         onPressed: () {},
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor:Color(0xff114BCA),
+                                          backgroundColor: const Color(0xff114BCA),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
                                         ),
-                                        child: const Text("Chat",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 12,color: AppColors.white,fontFamily: "poppins")),
+                                        child: const Text(
+                                          "Chat",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            fontFamily: "poppins",
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ],
-                              ),SizedBox(height: 10,)
+                              ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
+
           ),
         ],
       ),
-
     );
   }
 }
