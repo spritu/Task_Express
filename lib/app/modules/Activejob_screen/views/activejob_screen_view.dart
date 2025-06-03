@@ -100,7 +100,7 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                               ),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
                                     "Available",
@@ -111,7 +111,7 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                                     ),
                                   ),
                                   Obx(
-                                        () => FlutterSwitch(
+                                    () => FlutterSwitch(
                                       width: 53.0,
                                       height: 26.18,
                                       toggleSize: 23.0,
@@ -163,7 +163,7 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                               ),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
                                     "Service\n Profile",
@@ -175,7 +175,7 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                                   ),
 
                                   Obx(
-                                        () => FlutterSwitch(
+                                    () => FlutterSwitch(
                                       width: 53.0,
                                       height: 26.18,
                                       toggleSize: 23.0,
@@ -267,7 +267,7 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                   SizedBox(height: 5),
                   Card(
                     child: Container(
-                      height: MediaQuery.of(context).size.height*0.5,
+                      height: MediaQuery.of(context).size.height * 0.5,
                       width: double.infinity,
                       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 7),
                       decoration: BoxDecoration(
@@ -276,12 +276,15 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                       ),
                       child: Column(
                         children: [
-                          SizedBox(height:MediaQuery.of(context).size.height*0.2,
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.2,
                             child: GetBuilder<ActivejobScreenController>(
                               builder: (controller) {
                                 if (controller.currentLatLng == null) {
                                   return const Expanded(
-                                    child: Center(child: CircularProgressIndicator()),
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
                                   );
                                 }
 
@@ -289,28 +292,39 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                                   stream: null,
                                   builder: (context, snapshot) {
                                     return SizedBox(
-                                     // height: 250,
+                                      // height: 250,
                                       child: GoogleMap(
                                         initialCameraPosition: CameraPosition(
-                                          target: controller.currentLatLng ?? controller.defaultLatLng,
+                                          target:
+                                              controller.currentLatLng ??
+                                              controller.defaultLatLng,
                                           zoom: 14,
                                         ),
                                         markers: {
                                           Marker(
-                                            markerId: const MarkerId("currentLocation"),
-                                            position: controller.currentLatLng ?? controller.defaultLatLng,
+                                            markerId: const MarkerId(
+                                              "currentLocation",
+                                            ),
+                                            position:
+                                                controller.currentLatLng ??
+                                                controller.defaultLatLng,
                                           ),
                                         },
-                                        onMapCreated: (GoogleMapController mapController) {
-                                          if (!controller.mapControllerCompleter.isCompleted) {
-                                            controller.mapControllerCompleter.complete(mapController);
+                                        onMapCreated: (
+                                          GoogleMapController mapController,
+                                        ) {
+                                          if (!controller
+                                              .mapControllerCompleter
+                                              .isCompleted) {
+                                            controller.mapControllerCompleter
+                                                .complete(mapController);
                                           }
                                         },
                                         myLocationEnabled: true,
                                         myLocationButtonEnabled: true,
                                       ),
                                     );
-                                  }
+                                  },
                                 );
                               },
                             ),
@@ -334,15 +348,15 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                                   // Top Row: Left Side (Details) + Right Side (Earning & Duration)
                                   Row(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       // Left Side Column
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Row(
                                               children: const [
@@ -359,7 +373,7 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                                             const SizedBox(height: 6),
                                             Row(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: const [
                                                 Expanded(
                                                   child: Text(
@@ -367,7 +381,7 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                                                     style: TextStyle(
                                                       fontFamily: "Poppins",
                                                       fontWeight:
-                                                      FontWeight.w600,
+                                                          FontWeight.w600,
                                                       fontSize: 12,
                                                       color: Colors.black,
                                                     ),
@@ -425,24 +439,24 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                                   // Action Buttons
                                   Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       _actionButton(
                                         "Reject",
                                         Colors.white,
                                         Color(0xFFF67C0A),
-                                        textColor: const  Color(0xFFF67C0A),
+                                        textColor: const Color(0xFFF67C0A),
                                       ),
                                       _actionButton(
                                         "Call",
                                         Color(0xFFF67C0A),
                                         Colors.white,
-                                      ),  _actionButton(
+                                      ),
+                                      _actionButton(
                                         "Navigation",
                                         Color(0xFFF67C0A),
                                         Colors.white,
                                       ),
-
                                     ],
                                   ),
                                 ],
@@ -547,7 +561,8 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey.shade300),
                     ),
-                    child: ListView.builder(shrinkWrap: true,
+                    child: ListView.builder(
+                      shrinkWrap: true,
                       itemCount: 5, // or your dynamic length
                       padding: const EdgeInsets.symmetric(horizontal: 3),
                       physics: BouncingScrollPhysics(),
@@ -762,11 +777,11 @@ Widget _infoCard({required String title, required String value}) {
 }
 
 Widget _actionButton(
-    String text,
-    Color bgColor,
-    Color borderColor, {
-      Color? textColor,
-    }) {
+  String text,
+  Color bgColor,
+  Color borderColor, {
+  Color? textColor,
+}) {
   return Container(
     height: 30,
     width: 90,

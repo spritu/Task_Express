@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:get/get.dart';
@@ -8,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:uuid/uuid.dart';
-import 'package:worknest/app/modules/confirm_payment_recived/views/confirm_payment_recived_view.dart';
+import 'package:worknest/app/modules/bottom/controllers/bottom_controller.dart';
 import 'package:worknest/app/modules/provider_home/controllers/provider_home_controller.dart';
 
 import '../../../../colors.dart';
@@ -69,6 +68,51 @@ class Bottom2Controller extends GetxController {
   //     print("❌ Error: ${response.reasonPhrase}");
   //   }
   // }
+
+  // 🌐 Global variable to store notifications
+  List<dynamic> globalNotifications = [];
+
+  Future<void> fetchNotificationsPro() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+
+    if (userId == null || userId.isEmpty) {
+      print("❌ userId not found in SharedPreferences");
+      return;
+    }
+
+    var headers = {'Content-Type': 'application/json'};
+    var url = Uri.parse('https://jdapi.youthadda.co/getnotificationssp');
+
+    var body = json.encode({"userId": userId});
+
+    try {
+      var request = http.Request('POST', url);
+      request.body = body;
+      request.headers.addAll(headers);
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        final jsonData = json.decode(responseBody);
+
+        // ✅ Check and extract the list properly
+        if (jsonData is Map<String, dynamic> && jsonData.containsKey("data")) {
+          globalNotifications = jsonData["data"] ?? [];
+          print("✅ Notifications received:");
+          print(globalNotifications);
+        } else {
+          print("⚠️ Unexpected response format:");
+          print(jsonData);
+        }
+      } else {
+        print("❌ API Error: ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("❌ Exception: $e");
+    }
+  }
 
   void connectSocketjobpay() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -136,11 +180,78 @@ class Bottom2Controller extends GetxController {
     });
   }
 
+  void connectSocketnotifications() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+
+    print("notifications provider  :$userId");
+
+    if (userId == null) {
+      print(" User ID or BookedFor missing notifications");
+      return;
+    }
+
+    print('🔌 Connecting socket for user notifications: $userId');
+
+    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+      'forceNew': true,
+      'auth': {
+        'user': {
+          '_id': userId,
+          'firstName': 'plumber naman', // Optional, can be dynamic
+        },
+      },
+    });
+
+    socket.connect();
+
+    socket.onConnect((_) {
+      print(' Connected to socket notifications provider');
+    });
+
+    socket.onDisconnect((_) {
+      print(' Disconnected from socket notifications');
+    });
+
+    socket.onConnectError((err) {
+      print(' Connect Error: $err');
+    });
+
+    socket.onError((err) {
+      print(' Socket Error: $err');
+    });
+
+    ///Listen to notifications messages
+
+    socket.on('notifications', (data) {
+      print(' Received notifications message: $data');
+      fetchNotificationsPro();
+      final msg = types.TextMessage(
+        id: data['_id'] ?? const Uuid().v4(),
+        text: data['message'] ?? '',
+        author: types.User(id: data['senderId'] ?? 'unknown'),
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      messages.insert(0, msg);
+    });
+  }
+
   @override
   void onInit() {
     super.onInit();
+
+    fetchNotificationsPro();
+
     connectSocketjobpay();
-    // Clear red dot
+
+    /// notification socket
+
+    connectSocketnotifications();
+
+    /// ProviderHomeController api call
 
     final providerHomeController = Get.put(ProviderHomeController());
 

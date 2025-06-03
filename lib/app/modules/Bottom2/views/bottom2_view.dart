@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:worknest/app/modules/bottom/controllers/bottom_controller.dart';
 import 'package:worknest/app/modules/jobs/controllers/jobs_controller.dart';
 import 'package:worknest/app/modules/provider_ChatScreen/views/provider_chat_screen_view.dart';
 import 'package:worknest/app/modules/provider_home/controllers/provider_home_controller.dart';
@@ -13,65 +14,29 @@ import '../../provider_setting/views/provider_setting_view.dart';
 import '../controllers/bottom2_controller.dart';
 
 class Bottom2View extends GetView<Bottom2Controller> {
-  final ProviderChatScreenController chatController = Get.put(
-    ProviderChatScreenController(),
-  );
+  const Bottom2View({super.key});
   @override
   Widget build(BuildContext context) {
-    Get.put(Bottom2Controller());
-    chatController.fetchLastMessages();
-
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Obx(() => _buildBody(controller.selectedIndex.value)),
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
+          backgroundColor: AppColors.white,
           currentIndex: controller.selectedIndex.value,
+          onTap: (index) => controller.selectedIndex.value = index,
           selectedItemColor: Color(0xFFF67C0A),
           unselectedItemColor: Color(0xFF9F9F9F),
+          type: BottomNavigationBarType.fixed,
           showUnselectedLabels: true,
-          onTap: (index) {
-            controller.selectedIndex.value = index;
-
-            if (index == 3) {
-              // User is viewing chat, clear notification
-
-              chatController.fetchLastMessages();
-            }
-          },
           items: [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Jobs'),
             BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Setting',
+              icon: Icon(Icons.notifications),
+              label: 'Notifications',
             ),
-            BottomNavigationBarItem(
-              icon: Stack(
-                children: [
-                  const Icon(Icons.chat),
-                  Obx(() {
-                    if (chatController.hasNewMessage.value) {
-                      return Positioned(
-                        right: 0,
-                        top: 0,
-                        child: Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      );
-                    } else {
-                      return SizedBox.shrink();
-                    }
-                  }),
-                ],
-              ),
-              label: 'Chat',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
           ],
         ),
@@ -81,6 +46,7 @@ class Bottom2View extends GetView<Bottom2Controller> {
 }
 
 final JobsController jobsController = Get.put(JobsController());
+final bottom2Controller = Get.put(Bottom2Controller());
 final ProviderHomeController providerHomeController = Get.put(
   ProviderHomeController(),
 );
@@ -96,6 +62,7 @@ Widget _buildBody(int index) {
       jobsController.fetchCurrentBooking();
       return JobsView();
     case 2:
+      bottom2Controller.fetchNotificationsPro();
       return ProviderSettingView();
     case 3:
       providerChatScreenController.fetchLastMessages();

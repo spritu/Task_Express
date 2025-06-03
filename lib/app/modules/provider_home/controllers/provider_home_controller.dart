@@ -287,10 +287,9 @@ class ProviderHomeController extends GetxController {
   var isServiceProfile = false.obs;
 
   RxBool isAvailable1 = true.obs;
-  RxBool canToggleAvailability = true.obs; // ✅ Add this
+  RxBool canToggleAvailability = true.obs;
 
   void wupdateAvailability(bool value) {
-    // API call ya jo bhi logic ho yahan kare
     print("Availability updated to $value");
   }
 
@@ -319,19 +318,19 @@ class ProviderHomeController extends GetxController {
   void onInit() {
     super.onInit();
     connectSocket();
-    loadUserInfo(); // Load user info and connect socket
+    loadUserInfo();
     fetchCurrentBooking();
     fetchDashboardData();
     fetchPastBookings();
   }
 
   void connectSocketAccept() {
-    print('444444: ${bookedBy}');
+    print('444444: $bookedBy');
 
-    print("❌ wdwcdtf :${userId}");
+    print(" SocketAccept :$userId");
 
     if (userId == null) {
-      print("❌ User ID or BookedFor missing");
+      print("User ID or BookedFor missing");
       return;
     }
 
@@ -342,41 +341,38 @@ class ProviderHomeController extends GetxController {
       'autoConnect': false,
       'forceNew': true,
       'auth': {
-        'user': {
-          '_id': userId.value,
-          'firstName': 'plumber naman', // Optional, can be dynamic
-        },
+        'user': {'_id': userId.value, 'firstName': 'plumber naman'},
       },
     });
 
     socket.connect();
 
     socket.onConnect((_) {
-      print('✅ Connected to socket');
+      print('Connected to socket');
 
       final payload = {'receiver': bookedBy.trim()};
 
-      print('📤 Emitting acceptBooking payload: $payload');
+      print('Emitting acceptBooking payload: $payload');
       socket.emit('acceptBooking', payload);
     });
 
     socket.onDisconnect((_) {
-      print('❌ Disconnected from socket');
+      print('Disconnected from socket');
     });
 
     socket.onConnectError((err) {
-      print('🚫 Connect Error: $err');
+      print('Connect Error: $err');
     });
 
     socket.onError((err) {
-      print('🔥 Socket Error: $err');
+      print('Socket Error: $err');
     });
   }
 
   void connectSocketReject() {
-    print('55555: ${bookedBy}');
+    print('55555: $bookedBy');
 
-    print("❌ wdwcdtf55 :${userId}");
+    print("❌ wdwcdtf55 :$userId");
 
     if (userId == null) {
       print("❌ User ID or BookedFor missing55");
@@ -390,38 +386,36 @@ class ProviderHomeController extends GetxController {
       'autoConnect': false,
       'forceNew': true,
       'auth': {
-        'user': {
-          '_id': userId.value,
-          'firstName': 'plumber naman', // Optional, can be dynamic
-        },
+        'user': {'_id': userId.value, 'firstName': 'plumber naman'},
       },
     });
 
     socket.connect();
 
     socket.onConnect((_) {
-      print('✅ Connected to socket55');
+      print('Connected to socket55');
 
       final payload = {'receiver': bookedBy.trim()};
 
-      print('📤 Emitting rejectBooking payload55: $payload');
+      print('Emitting rejectBooking payload55: $payload');
       socket.emit('rejectBooking', payload);
     });
 
     socket.onDisconnect((_) {
-      print('❌ Disconnected from socket');
+      print('Disconnected from socket');
     });
 
     socket.onConnectError((err) {
-      print('🚫 Connect Error: $err');
+      print('Connect Error: $err');
     });
 
     socket.onError((err) {
-      print('🔥 Socket Error: $err');
+      print('Socket Error: $err');
     });
   }
 
   var bookingData = {}.obs;
+
   void makePhoneCallFromSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? phoneNumber = prefs.getString('currentBookingPhone');
@@ -464,7 +458,7 @@ class ProviderHomeController extends GetxController {
       http.StreamedResponse response = await request.send();
       String responseBody = await response.stream.bytesToString();
 
-      print("📥 API Response Body: $responseBody");
+      print("API Response Body: $responseBody");
 
       if (response.statusCode == 200) {
         var jsonRes = jsonDecode(responseBody);
@@ -483,7 +477,7 @@ class ProviderHomeController extends GetxController {
           String phone = bookingDataList[0]['userMobile'] ?? "";
           await prefs.setString('currentBookingId', bookingId);
           await prefs.setString('currentBookingPhone', phone);
-          print("💾 Booking ID saved to SharedPreferences: $bookingId");
+          print("Booking ID saved to SharedPreferences: $bookingId");
         } else {
           bookingDataList.clear();
         }
@@ -499,7 +493,7 @@ class ProviderHomeController extends GetxController {
         //  Get.snackbar("Error", "Failed to fetch booking");
       }
     } catch (e) {
-      print("❌ Exception in fetchCurrentBooking: $e");
+      print("Exception in fetchCurrentBooking: $e");
       //  Get.snackbar("Error", "Exception: $e");
     } finally {
       isLoading.value = false;
@@ -551,6 +545,7 @@ class ProviderHomeController extends GetxController {
     imagePath.value = prefs.getString('userImg') ?? '';
 
     print("dddd: ${DataList}");
+    print("userIdcccc: ${userId.value}");
 
     if (userId.value.isNotEmpty) {
       connectSocket();
@@ -558,14 +553,12 @@ class ProviderHomeController extends GetxController {
   }
 
   void connectSocket() {
-    print("❌ wdwcdtf :${userId}");
+    print("🔌 Attempting socket connection with userId: ${userId.value}");
 
-    if (userId == null) {
-      print("❌ User ID or BookedFor missing");
+    if (userId.value.isEmpty) {
+      print("❌ userId is empty, aborting socket connection");
       return;
     }
-
-    print('🔌 Connecting socket for user: ${userId}');
 
     socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
       'transports': ['websocket'],
@@ -574,16 +567,13 @@ class ProviderHomeController extends GetxController {
       'auth': {
         'user': {
           '_id': userId.value,
-          'firstName': 'plumber naman', // Optional, can be dynamic
+          'firstName':
+              firstName.value.isNotEmpty ? firstName.value : 'plumber naman',
         },
       },
     });
 
     socket.connect();
-
-    // socket.onConnect((_) {
-    //   print('✅ Connected to socket12121212');
-    // });
 
     socket.onConnect((_) {
       print('✅ Connected to socket');
@@ -601,10 +591,9 @@ class ProviderHomeController extends GetxController {
       print('🔥 Socket Error: $err');
     });
 
-    /// ✅ Listen to newBooking messages
     socket.on('newBooking', (data) {
       print('📩 Received newBooking message: $data');
-      fetchCurrentBooking();
+      fetchCurrentBooking(); // Your method for booking data
 
       final msg = types.TextMessage(
         id: data['_id'] ?? const Uuid().v4(),
@@ -616,6 +605,62 @@ class ProviderHomeController extends GetxController {
       messages.insert(0, msg);
     });
   }
+
+  // void connectSocket() {
+  //   print("pro new booking : ${userId.value}");
+  //
+  //   if (userId == null) {
+  //     print("❌ User ID or BookedFor missing");
+  //     return;
+  //   }
+  //
+  //   print('🔌 Connecting socket for user new booking pro234566 : $userId');
+  //
+  //   socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+  //     'transports': ['websocket'],
+  //     'autoConnect': false,
+  //     'forceNew': true,
+  //     'auth': {
+  //       'user': {
+  //         '_id': userId.value,
+  //         'firstName': 'plumber naman', // Optional, can be dynamic
+  //       },
+  //     },
+  //   });
+  //
+  //   socket.connect();
+  //
+  //   socket.onConnect((_) {
+  //     print('✅ Connected to socket new booking pro345 ');
+  //   });
+  //
+  //   socket.onDisconnect((_) {
+  //     print('❌ Disconnected from socket');
+  //   });
+  //
+  //   socket.onConnectError((err) {
+  //     print('🚫 Connect Error: $err');
+  //   });
+  //
+  //   socket.onError((err) {
+  //     print('🔥 Socket Error: $err');
+  //   });
+  //
+  //   /// ✅ Listen to newBooking messages
+  //   socket.on('newBooking', (data) {
+  //     print('📩 Received newBooking pro message: $data');
+  //     fetchCurrentBooking();
+  //
+  //     final msg = types.TextMessage(
+  //       id: data['_id'] ?? const Uuid().v4(),
+  //       text: data['message'] ?? '',
+  //       author: types.User(id: data['senderId'] ?? 'unknown'),
+  //       createdAt: DateTime.now().millisecondsSinceEpoch,
+  //     );
+  //
+  //     messages.insert(0, msg);
+  //   });
+  // }
 
   Future<void> updateAvailability(bool status) async {
     try {
