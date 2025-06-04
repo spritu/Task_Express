@@ -60,6 +60,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                     ],
                   )),
 
+
                   buildTextField(
                     "First Name",
                     "Enter first name",

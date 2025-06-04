@@ -307,7 +307,7 @@ final String distanceText = distance != null ? '$distance km away' : 'Distance n
                             for (int i = 0; i < skills.length; i++) ...[
                               serviceRow(
                                 getDisplayName(skills[i]), // 👈 name to show
-                                skills[i]['charge'] ?? 0,
+                                int.tryParse(skills[i]['charge'].toString()) ?? 0, // ✅ FIXED
                               ),
                               if (i < skills.length - 1) const Divider(),
                             ],
@@ -603,8 +603,12 @@ final String distanceText = distance != null ? '$distance km away' : 'Distance n
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(name, style: const TextStyle(fontSize: 16)),
-        Text('₹$charge', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(name, style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w500)),
+        Row(
+          children: [  Text('Charge', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+            Text('₹$charge', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+          ],
+        ),
       ],
     );
   }

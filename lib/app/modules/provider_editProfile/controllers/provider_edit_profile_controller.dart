@@ -12,7 +12,7 @@ class ProviderEditProfileController extends GetxController {
   //TODO: Implement ProviderEditProfileController
   RxString imagePath = ''.obs;
   final ImagePicker _picker = ImagePicker();
-
+  RxString selectedImagePath = ''.obs; // ⬅️ Add this in your controller
   final TextEditingController nameController = TextEditingController();
   final TextEditingController genderController = TextEditingController();
   final TextEditingController dobController = TextEditingController();

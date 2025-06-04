@@ -54,7 +54,7 @@ dependencies:
   shared_preferences: ^2.1.1
   google_maps_flutter: ^2.5.0
   phone_state: ^2.1.1
-
+  mime: ^1.0.4
 
   geocoding: ^3.0.0
   geolocator: ^14.0.0

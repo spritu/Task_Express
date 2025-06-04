@@ -8,7 +8,7 @@ import '../../Bottom2/views/bottom2_view.dart';
 import '../../provider_profile/views/provider_profile_view.dart';
 class ProviderOtpController extends GetxController {
   //TODO: Implement ProviderOtpController
-
+  var imagePath = ''.obs;
   String? mobileNumber;
   TextEditingController otpTextController = TextEditingController();
 
@@ -44,92 +44,14 @@ class ProviderOtpController extends GetxController {
     }
   }
 
-  var imagePath = ''.obs;
 
-  Future<void> verifyOtp(String otp) async {
-    if (otp.isEmpty || otp.length != 4) return;
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? mobileNumber = prefs.getString('mobileNumber');
-    if (mobileNumber == null || mobileNumber.isEmpty) return;
-
-    final headers = {'Content-Type': 'application/json'};
-    final body = json.encode({"phone": mobileNumber, "otp": otp});
-    final url = Uri.parse('https://jdapi.youthadda.co/user/verifyotp');
-
-    try {
-      final response = await http.post(url, headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
-
-        // Extract userData
-        final userData = responseData['userData'];
-        final userImg = userData?['userImg']?? ''; // from userData
-        final token = responseData['token'] ?? '';
-        final userId = responseData['id'].toString();
-        final userType = responseData['userType'] ?? 0;
-
-        // Construct final image URL
-        String finalImage = '';
-        if (userImg.isNotEmpty) {
-          finalImage = userImg.startsWith('http')
-              ? userImg
-              : 'https://jdapi.youthadda.co/$userImg';
-        }
-
-        print("🖼️ Final User Image URL: $finalImage");
-
-        // Save to SharedPreferences
-        await prefs.setString('token', token);
-        await prefs.setString('userId', userId);
-        await prefs.setInt('userType', userType);
-        await prefs.setString('image', finalImage);
-
-        // Other user data
-        await prefs.setString('email', userData?['email'] ?? '');
-        await prefs.setString('firstName', userData?['firstName'] ?? '');
-        await prefs.setString('lastName', userData?['lastName'] ?? '');
-        await prefs.setString('dob', userData?['dateOfBirth'] ?? '');
-        await prefs.setString('gender', userData?['gender'] ?? '');
-        await prefs.setString('mobile', userData?['phone'] ?? '');
-        await prefs.setString('userImg', userData?['userImg'] ?? '');
-
-        // Confirm
-        print("✅ Image Saved to SharedPreferences: ${prefs.getString('image')}");
-
-        otpTextController.clear();
-
-        final box = GetStorage();
-        if ((userData?['email'] ?? '').isNotEmpty &&
-            (userData?['firstName'] ?? '').isNotEmpty) {
-          box.write('isLoggedIn2', true);
-          Get.offAllNamed('/bottom2');
-        } else {
-          box.write('isLoggedIn2', false);
-          Get.offAll(() => ProviderProfileView());
-        }
-      } else {
-        print("❌ OTP Verification Failed: ${response.body}");
-      }
-    } catch (e) {
-      print("❌ Exception: $e");
-    }
-  }
   // Future<void> verifyOtp(String otp) async {
-  //   if (otp.isEmpty || otp.length != 4) {
-  //     print("❌ Invalid OTP");
-  //     return;
-  //   }
+  //   if (otp.isEmpty || otp.length != 4) return;
   //
   //   SharedPreferences prefs = await SharedPreferences.getInstance();
   //   String? mobileNumber = prefs.getString('mobileNumber');
-  //
-  //   if (mobileNumber == null || mobileNumber.isEmpty) {
-  //     print("❌ Mobile number not found");
-  //     return;
-  //   }
+  //   if (mobileNumber == null || mobileNumber.isEmpty) return;
   //
   //   final headers = {'Content-Type': 'application/json'};
   //   final body = json.encode({"phone": mobileNumber, "otp": otp});
@@ -140,70 +62,161 @@ class ProviderOtpController extends GetxController {
   //
   //     if (response.statusCode == 200) {
   //       final responseData = json.decode(response.body);
-  //       print("✅ OTP Verified: ${jsonEncode(responseData)}");
+  //       print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
   //
+  //       // Extract userData
+  //       final userData = responseData['userData'];
+  //       final userImg = userData?['userImg']?? ''; // from userData
   //       final token = responseData['token'] ?? '';
+  //       final userId = responseData['id'].toString();
   //       final userType = responseData['userType'] ?? 0;
-  //       final userId = responseData['id']?.toString() ?? '';
   //
-  //       final userData = responseData['userData'] ?? {};
-  //       final firstName = userData['firstName']?.toString() ?? '';
-  //       final lastName = userData['lastName']?.toString() ?? '';
-  //       final email = userData['email']?.toString() ?? '';
-  //       final phone = userData['phone']?.toString() ?? '';
-  //       final profileImage = userData['userImg'] ?? '';
+  //       // Construct final image URL
+  //       String finalImage = '';
+  //       if (userImg.isNotEmpty) {
+  //         finalImage = userImg.startsWith('http')
+  //             ? userImg
+  //             : 'https://jdapi.youthadda.co/$userImg';
+  //       }
+  //
+  //       print("🖼️ Final User Image URL: $finalImage");
+  //
+  //       // Save to SharedPreferences
+  //       await prefs.setString('token', token);
+  //       await prefs.setString('userId', userId);
+  //       await prefs.setInt('userType', userType);
+  //       await prefs.setString('image', finalImage);
+  //
+  //       // Other user data
+  //       await prefs.setString('email', userData?['email'] ?? '');
+  //       await prefs.setString('firstName', userData?['firstName'] ?? '');
+  //       await prefs.setString('lastName', userData?['lastName'] ?? '');
+  //       await prefs.setString('dob', userData?['dateOfBirth'] ?? '');
+  //       await prefs.setString('gender', userData?['gender'] ?? '');
+  //       await prefs.setString('mobile', userData?['phone'] ?? '');
+  //       await prefs.setString('userImg', userData?['userImg'] ?? '');
+  //
+  //       // Confirm
+  //       print("✅ Image Saved to SharedPreferences: ${prefs.getString('image')}");
   //
   //       otpTextController.clear();
   //
-  //       // Save profession details if available
-  //       final skills = userData['skills'];
-  //
-  //       if (skills != null && skills.isNotEmpty) {
-  //         final skill = skills[0];
-  //         final categoryName = skill['categoryId']?['name'] ?? '';
-  //         final subCategoryName = skill['sucategoryId']?['name'] ?? '';
-  //         final charge = skill['charge']?.toString() ?? '';
-  //         final spType = skill['categoryId']?['spType']?.toString() ?? '';
-  //         print("💡 spType: $spType");
-  //         await prefs.setString('spType', spType);
-  //
-  //         await prefs.setString('category', categoryName);
-  //         await prefs.setString('subCategory', subCategoryName);
-  //         await prefs.setString('charge', charge); await prefs.setString('spType', spType);
-  //       }
-  //       final dob = userData?['dateOfBirth'] ?? '';
-  //       final gender = userData?['gender'] ?? '';
-  //       // Save to SharedPreferences
-  //      // 👈 Save spType in SharedPreferences
-  //       await prefs.setString('userId', userId);
-  //       await prefs.setString('token', token);
-  //       await prefs.setInt('userType', userType);
-  //       await prefs.setString('firstName', firstName);
-  //       await prefs.setString('lastName', lastName);
-  //       await prefs.setString('email', email);
-  //       await prefs.setString('mobile', phone);
-  //       await prefs.setString('profileImage', profileImage);
-  //       await prefs.setString('dob', dob);
-  //       await prefs.setString('gender', gender);
   //       final box = GetStorage();
-  //       box.remove('isLoggedIn');
-  //       box.write('isLoggedIn2', true);
-  //
-  //       print("🔐 Saved userType: $userType");
-  //
-  //       // Navigate based on profile completeness
-  //       if (firstName.isNotEmpty && email.isNotEmpty) {
-  //         Get.offAllNamed('/bottom2'); // Home
+  //       if ((userData?['email'] ?? '').isNotEmpty &&
+  //           (userData?['firstName'] ?? '').isNotEmpty) {
+  //         box.write('isLoggedIn2', true);
+  //         Get.offAllNamed('/bottom2');
   //       } else {
-  //         Get.offAll(() => ProviderProfileView()); // Complete profile
+  //         box.write('isLoggedIn2', false);
+  //         Get.offAll(() => ProviderProfileView());
   //       }
   //     } else {
   //       print("❌ OTP Verification Failed: ${response.body}");
   //     }
   //   } catch (e) {
-  //     print("❌ Exception during OTP verification: $e");
+  //     print("❌ Exception: $e");
   //   }
   // }
+  Future<void> verifyOtp(String otp) async {
+    if (otp.isEmpty || otp.length != 4) {
+      print("❌ Invalid OTP");
+      return;
+    }
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? mobileNumber = prefs.getString('mobileNumber');
+
+    if (mobileNumber == null || mobileNumber.isEmpty) {
+      print("❌ Mobile number not found");
+      return;
+    }
+
+    final headers = {'Content-Type': 'application/json'};
+    final body = json.encode({"phone": mobileNumber, "otp": otp});
+    final url = Uri.parse('https://jdapi.youthadda.co/user/verifyotp');
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print("✅ OTP Verified: ${jsonEncode(responseData)}");
+
+        final token = responseData['token'] ?? '';
+        final userType = responseData['userType'] ?? 0;
+        final userId = responseData['id']?.toString() ?? '';
+
+        final userData = responseData['userData'] ?? {};
+        final firstName = userData['firstName']?.toString() ?? '';
+        final lastName = userData['lastName']?.toString() ?? '';
+        final email = userData['email']?.toString() ?? '';
+        final phone = userData['phone']?.toString() ?? '';
+        final userImg = userData?['userImg']?? ''; // from userData
+        String finalImage = '';
+        if (userImg.isNotEmpty) {
+          finalImage = userImg.startsWith('http')
+              ? userImg
+              : 'https://jdapi.youthadda.co/$userImg';
+        }
+
+        print("🖼️ Final User Image URL: $finalImage");
+
+        otpTextController.clear();
+
+        // Save profession details if available
+        final skills = userData['skills'];
+
+        if (skills != null && skills.isNotEmpty) {
+          final skill = skills[0];
+          final categoryName = skill['categoryId']?['name'] ?? '';
+          final subCategoryName = skill['sucategoryId']?['name'] ?? '';
+          final charge = skill['charge']?.toString() ?? '';
+          final spType = skill['categoryId']?['spType']?.toString() ?? '';
+          print("💡 spType: $spType");
+          await prefs.setString('spType', spType);
+          await prefs.setString('image', finalImage);
+
+          await prefs.setString('category', categoryName);
+          await prefs.setString('subCategory', subCategoryName);
+          await prefs.setString('charge', charge); await prefs.setString('spType', spType);
+        }
+        final dob = userData?['dateOfBirth'] ?? '';
+        final gender = userData?['gender'] ?? '';
+        // Save to SharedPreferences
+       // 👈 Save spType in SharedPreferences
+        await prefs.setString('userId', userId);
+        await prefs.setString('token', token);
+        await prefs.setInt('userType', userType);
+        await prefs.setString('firstName', firstName);
+        await prefs.setString('lastName', lastName);
+        await prefs.setString('email', email);
+        await prefs.setString('mobile', phone);
+        await prefs.setString('userImg', userData?['userImg'] ?? '');
+
+        // Confirm
+        print("✅ Image Saved to SharedPreferences: ${prefs.getString('image')}");
+
+        await prefs.setString('dob', dob);
+        await prefs.setString('gender', gender);
+        final box = GetStorage();
+        box.remove('isLoggedIn');
+        box.write('isLoggedIn2', true);
+
+        print("🔐 Saved userType: $userType");
+
+        // Navigate based on profile completeness
+        if (firstName.isNotEmpty && email.isNotEmpty) {
+          Get.offAllNamed('/bottom2'); // Home
+        } else {
+          Get.offAll(() => ProviderProfileView()); // Complete profile
+        }
+      } else {
+        print("❌ OTP Verification Failed: ${response.body}");
+      }
+    } catch (e) {
+      print("❌ Exception during OTP verification: $e");
+    }
+  }
 
 
 

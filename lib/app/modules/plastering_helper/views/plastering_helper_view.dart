@@ -47,7 +47,7 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                     Icon(Icons.location_on, color: Colors.black),
                     SizedBox(width: 5),
                     Text(
-                      "Scheme No 54",
+                      "Address",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Icon(Icons.keyboard_arrow_down),
@@ -67,7 +67,10 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
               itemCount: dataList.length,
               itemBuilder: (context, index) {
                 final worker = dataList[index];
-
+                final charge =
+                worker['skills'] != null && worker['skills'].isNotEmpty
+                    ? worker['skills'][0]['charge'].toString()
+                    : 0;
                 return InkWell(onTap: (){
                   Get.to(() => NameDetailView(), arguments: worker);
                 },
@@ -231,7 +234,8 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                                               ),
                                             ),
                                             TextSpan(
-                                              text: "₹ ${worker['charge'] ?? '0'}/day",
+                                             // text: "₹ ${worker['charge'] ?? '0'}/day",
+                                              text:charge.toString(),
                                               style: TextStyle(
                                                 fontSize: 11,
                                                 color: AppColors.orage,

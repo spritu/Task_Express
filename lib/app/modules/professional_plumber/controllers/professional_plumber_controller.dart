@@ -783,7 +783,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
   //     print("⚠️ Error: $e");
   //   }
   // }
-
+  var selected = 'charge'.obs;
 
   Future<void> saveCurrentLocationToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
