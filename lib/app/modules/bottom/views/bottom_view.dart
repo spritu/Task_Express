@@ -11,14 +11,11 @@ import '../../home/views/home_view.dart';
 import '../../setting/views/setting_view.dart';
 import '../controllers/bottom_controller.dart';
 
-
 class BottomView extends GetView<BottomController> {
   const BottomView({super.key});
 
   @override
   Widget build(BuildContext context) {
-
-
     Get.put(BottomController());
     return Scaffold(
       body: Obx(() {
@@ -29,34 +26,40 @@ class BottomView extends GetView<BottomController> {
         );
       }),
       bottomNavigationBar: Obx(
-            () => BottomNavigationBar( backgroundColor: AppColors.white,
-              selectedItemColor:AppColors.blue, unselectedItemColor: Colors.grey,
-              selectedLabelStyle: const TextStyle(
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w500,
-                fontSize: 9,color: Colors.grey,
-                height: 20 / 9, // line-height equivalent
-                letterSpacing: 0.05, // 5% of 1em = ~0.05
-              ),
-              unselectedLabelStyle: const TextStyle(
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w500,
-                fontSize: 9,
-                height: 20 / 9,
-                letterSpacing: 0.05,
-              ),
-              type: BottomNavigationBarType.fixed, // Needed for more than 3 items
-              currentIndex: controller.selectedIndex.value,showUnselectedLabels: true,
-              onTap: (index) => controller.selectedIndex.value = index,
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-                BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Bookings'),
-                BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifications'),
-                BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-                BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
-              ],
-            )
-
+        () => BottomNavigationBar(
+          backgroundColor: AppColors.white,
+          selectedItemColor: AppColors.blue,
+          unselectedItemColor: Colors.grey,
+          selectedLabelStyle: const TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w500,
+            fontSize: 9,
+            color: Colors.grey,
+            height: 20 / 9, // line-height equivalent
+            letterSpacing: 0.05, // 5% of 1em = ~0.05
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w500,
+            fontSize: 9,
+            height: 20 / 9,
+            letterSpacing: 0.05,
+          ),
+          type: BottomNavigationBarType.fixed, // Needed for more than 3 items
+          currentIndex: controller.selectedIndex.value,
+          showUnselectedLabels: true,
+          onTap: (index) => controller.selectedIndex.value = index,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Bookings'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.notifications),
+              label: 'Notifications',
+            ),
+            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
+          ],
+        ),
 
         //         BottomNavigationBar(
         //   backgroundColor: AppColors.white,
@@ -79,8 +82,11 @@ class BottomView extends GetView<BottomController> {
   }
 }
 
-final ChatScreenController chatScreenController = Get.put(ChatScreenController());
+final ChatScreenController chatScreenController = Get.put(
+  ChatScreenController(),
+);
 final BookingController bookingController = Get.put(BookingController());
+final bottomController = Get.put(BottomController());
 Widget _buildBody(int index, bool showRequestPending, String helperName) {
   switch (index) {
     case 0:
@@ -89,11 +95,12 @@ Widget _buildBody(int index, bool showRequestPending, String helperName) {
       bookingController.fetchCurrentBookings();
       return BookingView();
 
-      case 2:
+    case 2:
+      bottomController.fetchNotifications();
       return const SettingView();
     case 3:
       chatScreenController.fetchLastMessages();
-      return   ChatScreenView();
+      return ChatScreenView();
     case 4:
       return const AccountView();
     default:

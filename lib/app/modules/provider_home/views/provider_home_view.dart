@@ -1109,6 +1109,7 @@ import '../../../../colors.dart';
 import '../../Activejob_screen/views/activejob_screen_view.dart';
 import '../../Bottom2/controllers/bottom2_controller.dart';
 import '../../YourEarning/views/your_earning_view.dart';
+import '../../bottom/controllers/bottom_controller.dart';
 import '../../provider_location/controllers/provider_location_controller.dart';
 import '../controllers/provider_home_controller.dart';
 
@@ -1165,18 +1166,27 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                     ),
                     const Spacer(),
                     Container(
-                      width: 30, // You can adjust size
+                      width: 30,
                       height: 30,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.transparent,
                         border: Border.all(color: Colors.black, width: 1),
                       ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.notifications,
-                          color: Colors.black,
-                          size: 20,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(15),
+                        onTap: () {
+                          final userBottomController = Get.put(
+                            BottomController(),
+                          );
+                          userBottomController.fetchNotifications();
+                        },
+                        child: Center(
+                          child: Icon(
+                            Icons.notifications,
+                            color: Colors.black,
+                            size: 18, // Slightly smaller for better fit
+                          ),
                         ),
                       ),
                     ),

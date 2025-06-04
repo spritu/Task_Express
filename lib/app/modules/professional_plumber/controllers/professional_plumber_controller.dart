@@ -663,7 +663,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
   final HomeController userController = Get.put(HomeController());
   var distances = <int, String>{}.obs;
   var distanceToUser = ''.obs;
-
+  var selected = 'charge'.obs;
   Position? currentPosition;
   Future<Position> _getCurrentPosition() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -783,7 +783,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
   //     print("⚠️ Error: $e");
   //   }
   // }
-  var selected = 'charge'.obs;
+
 
   Future<void> saveCurrentLocationToPrefs() async {
     final prefs = await SharedPreferences.getInstance();

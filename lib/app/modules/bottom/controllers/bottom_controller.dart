@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:uuid/uuid.dart';
@@ -19,33 +22,84 @@ class BottomController extends GetxController {
   final RxList<types.Message> messages = <types.Message>[].obs;
   final Rxn<types.User> user = Rxn<types.User>();
 
+  // Inside your BottomController or NotificationController
+  final RxList<dynamic> notifications = <dynamic>[].obs;
+  // or if it's a map structure:
   final AuthController authController = Get.find<AuthController>();
-
 
   void changeTab(int index) {
     selectedIndex.value = index;
   }
+
   @override
   void onInit() {
     // TODO: implement onInit
     super.onInit();
     connectSocketCancel();
-   // Get.put(RecompleteJobPayController().fetchPendingPaymentsUser());
+    connectSocketnotifications();
+
+    // Get.put(RecompleteJobPayController().fetchPendingPaymentsUser());
   }
 
-  void connectSocketCancel() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId2 = prefs.getString('userId');
-    print('444444: ${userId2}');
+  /// fetchNotifications Api
 
-    print("❌ listenCancel :${userId2}");
+  Future<void> fetchNotifications() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId2 = prefs.getString('userId');
 
     if (userId2 == null) {
-      print("❌ User ID or BookedFor missing");
+      print("❌ User ID not found in SharedPreferences.");
       return;
     }
 
-    print('🔌 Connecting socket for user: ${userId2}');
+    print("📥 Using userId fetchNotifications: $userId2");
+
+    var headers = {'Content-Type': 'application/json'};
+
+    var request = http.Request(
+      'POST',
+      Uri.parse('https://jdapi.youthadda.co/getnotifications'),
+    );
+
+    request.body = json.encode({"userId": userId2});
+    request.headers.addAll(headers);
+
+    try {
+      http.StreamedResponse response = await request.send();
+      String responseBody = await response.stream.bytesToString();
+
+      print("✅ Status Code: ${response.statusCode}");
+      print("📦 Response Body: $responseBody");
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(responseBody);
+
+        notifications.value = responseData['notifications'] ?? [];
+        print("🔔 Notifications fetched: ${notifications.length}");
+
+        for (var notif in notifications) {
+          print("🔔 Notification: $notif");
+        }
+      } else {
+        print("❌ Error: ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("⚠️ Exception occurred: $e");
+    }
+  }
+
+  void connectSocketnotifications() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId2 = prefs.getString('userId');
+
+    print("notifications user :$userId2");
+
+    if (userId2 == null) {
+      print(" User ID or BookedFor missing notifications user");
+      return;
+    }
+
+    print('🔌 Connecting socket for user notifications user: $userId2');
 
     socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
       'transports': ['websocket'],
@@ -62,10 +116,70 @@ class BottomController extends GetxController {
     socket.connect();
 
     socket.onConnect((_) {
-      print('✅ Connected listen Cancel');
+      print(' Connected to socket notifications user');
     });
 
-    print('socket99:${socket}');
+    socket.onDisconnect((_) {
+      print(' Disconnected from socket notifications user');
+    });
+
+    socket.onConnectError((err) {
+      print(' Connect Error user: $err');
+    });
+
+    socket.onError((err) {
+      print(' Socket Error user: $err');
+    });
+
+    ///Listen to notifications messages
+
+    socket.on('notifications', (data) {
+      print(' Received notifications message user: $data');
+      fetchNotifications();
+      final msg = types.TextMessage(
+        id: data['_id'] ?? const Uuid().v4(),
+        text: data['message'] ?? '',
+        author: types.User(id: data['senderId'] ?? 'unknown'),
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      messages.insert(0, msg);
+    });
+  }
+
+  void connectSocketCancel() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId2 = prefs.getString('userId');
+    print('444444: $userId2');
+
+    print(" listenCancel :$userId2");
+
+    if (userId2 == null) {
+      print(" User ID or BookedFor missing");
+      return;
+    }
+
+    print('🔌 Connecting socket for user: $userId2');
+
+    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+      'forceNew': true,
+      'auth': {
+        'user': {
+          '_id': userId2,
+          'firstName': 'plumber naman', // Optional, can be dynamic
+        },
+      },
+    });
+
+    socket.connect();
+
+    socket.onConnect((_) {
+      print('Connected listen Cancel');
+    });
+
+    print('socket99:$socket');
 
     socket.on('paybyuserconfirm', (data) {
       print('📩 Received paybyuserconfirm message23: $data');
