@@ -16,14 +16,15 @@ class ProviderSettingController extends GetxController {
     status.value = !status.value;
   }
 
-
   void toggleTheme() {
     isDarkMode.value = !isDarkMode.value;
     Get.changeThemeMode(isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
     print("Theme Changed: ${isDarkMode.value ? 'Dark' : 'Light'}");
   }
+
   void toggleSmsUpdates() => isSmsUpdates.value = !isSmsUpdates.value;
-  void toggleWhatsappUpdates() => isWhatsappUpdates.value = !isWhatsappUpdates.value;
+  void toggleWhatsappUpdates() =>
+      isWhatsappUpdates.value = !isWhatsappUpdates.value;
   void togglePrivacyData() => isPrivacyData.value = !isPrivacyData.value;
   void toggleDeleteAccount() => isDeleteAccount.value = !isDeleteAccount.value;
 

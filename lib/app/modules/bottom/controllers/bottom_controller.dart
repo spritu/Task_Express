@@ -91,6 +91,8 @@ class BottomController extends GetxController {
   void connectSocketnotifications() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId2 = prefs.getString('userId');
+    String? firstName = prefs.getString('firstName');
+    String? lastName = prefs.getString('lastName');
 
     print("notifications user :$userId2");
 
@@ -106,10 +108,7 @@ class BottomController extends GetxController {
       'autoConnect': false,
       'forceNew': true,
       'auth': {
-        'user': {
-          '_id': userId2,
-          'firstName': 'plumber naman', // Optional, can be dynamic
-        },
+        'user': {'_id': userId2, 'firstName': firstName, 'lastName': lastName},
       },
     });
 
@@ -150,7 +149,9 @@ class BottomController extends GetxController {
   void connectSocketCancel() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId2 = prefs.getString('userId');
-    print('444444: $userId2');
+    String? firstName = prefs.getString('firstName');
+    String? lastName = prefs.getString('lastName');
+    print(' cancelsocketuser : $userId2 $firstName $lastName');
 
     print(" listenCancel :$userId2");
 
@@ -166,10 +167,7 @@ class BottomController extends GetxController {
       'autoConnect': false,
       'forceNew': true,
       'auth': {
-        'user': {
-          '_id': userId2,
-          'firstName': 'plumber naman', // Optional, can be dynamic
-        },
+        'user': {'_id': userId2, 'firstName': firstName, 'lastName': lastName},
       },
     });
 

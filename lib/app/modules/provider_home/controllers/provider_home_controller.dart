@@ -270,6 +270,7 @@ class ProviderHomeController extends GetxController {
   RxBool isAvailable2 = false.obs;
 
   var firstName = ''.obs;
+  var lastName = ''.obs;
   var userId = ''.obs;
   var imagePath = ''.obs;
   var isLoading = false.obs;
@@ -325,7 +326,7 @@ class ProviderHomeController extends GetxController {
   }
 
   void connectSocketAccept() {
-    print('444444: $bookedBy');
+    print('socketAcceptprovider: $bookedBy');
 
     print(" SocketAccept :$userId");
 
@@ -341,7 +342,11 @@ class ProviderHomeController extends GetxController {
       'autoConnect': false,
       'forceNew': true,
       'auth': {
-        'user': {'_id': userId.value, 'firstName': 'plumber naman'},
+        'user': {
+          '_id': userId.value,
+          'firstName': firstName.value,
+          'lastName': lastName.value,
+        },
       },
     });
 
@@ -370,9 +375,9 @@ class ProviderHomeController extends GetxController {
   }
 
   void connectSocketReject() {
-    print('55555: $bookedBy');
+    print('rejectPro: $bookedBy');
 
-    print("❌ wdwcdtf55 :$userId");
+    print("  :$userId");
 
     if (userId == null) {
       print("❌ User ID or BookedFor missing55");
@@ -386,7 +391,11 @@ class ProviderHomeController extends GetxController {
       'autoConnect': false,
       'forceNew': true,
       'auth': {
-        'user': {'_id': userId.value, 'firstName': 'plumber naman'},
+        'user': {
+          '_id': userId.value,
+          'firstName': firstName.value,
+          'lastName': lastName.value,
+        },
       },
     });
 
@@ -527,7 +536,6 @@ class ProviderHomeController extends GetxController {
       if (response.statusCode == 200) {
         var resBody = await response.stream.bytesToString();
         print("✅ Booking status updated: $resBody");
-        connectSocketAccept();
       } else {
         print("❌ Error: ${response.reasonPhrase}");
         //Get.snackbar("Error", "Failed to update status");
@@ -541,6 +549,7 @@ class ProviderHomeController extends GetxController {
   Future<void> loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
     firstName.value = prefs.getString('firstName') ?? '';
+    lastName.value = prefs.getString('lastName') ?? '';
     userId.value = prefs.getString('userId') ?? '';
     imagePath.value = prefs.getString('userImg') ?? '';
 
@@ -569,6 +578,7 @@ class ProviderHomeController extends GetxController {
           '_id': userId.value,
           'firstName':
               firstName.value.isNotEmpty ? firstName.value : 'plumber naman',
+          'lastName': lastName.value,
         },
       },
     });

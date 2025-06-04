@@ -22,7 +22,7 @@ class ChatView extends GetView<ChatController> {
 
     Get.put(ChatController());
     return Scaffold(
-      appBar:AppBar(
+      appBar: AppBar(
         backgroundColor: Color(0xFFAEC6F9),
         automaticallyImplyLeading: false,
         leading: IconButton(
@@ -31,7 +31,8 @@ class ChatView extends GetView<ChatController> {
         ),
         titleSpacing: 0, // 👈 This removes space between back icon and title
         title: Obx(
-              () => Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          () => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 "Chat with ${controller.receiverName.value}",
@@ -43,14 +44,21 @@ class ChatView extends GetView<ChatController> {
               ),
 
               Row(
-                children: [InkWell(onTap: (){
-                  Get.to(UserHelpView());
-                },
-                    child: Icon(Icons.info_outline)),SizedBox(width: 5,),
-                  InkWell(onTap: (){
-                   // navController.changeTab(3);
-                  },
-                      child: Icon(Icons.person)),SizedBox(width: 5,),
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Get.to(UserHelpView());
+                    },
+                    child: Icon(Icons.info_outline),
+                  ),
+                  SizedBox(width: 5),
+                  InkWell(
+                    onTap: () {
+                      // navController.changeTab(3);
+                    },
+                    child: Icon(Icons.person),
+                  ),
+                  SizedBox(width: 5),
                   Row(
                     children: [
                       InkWell(
@@ -76,20 +84,16 @@ class ChatView extends GetView<ChatController> {
                       SizedBox(width: 5),
                     ],
                   ),
-
-
                 ],
               ),
-
             ],
           ),
         ),
       ),
 
-
       body: Container(
         decoration: BoxDecoration(color: Color(0xFFAEC6F9)),
-    child: Column(
+        child: Column(
           children: [
             Expanded(
               child: Obx(() {
@@ -101,23 +105,26 @@ class ChatView extends GetView<ChatController> {
                     final msg = messages[index];
                     final isSender = msg.author.id == controller.user.value?.id;
                     final name =
-                    isSender ? "You" : controller.receiverName.value;
+                        isSender ? "You" : controller.receiverName.value;
                     print('object121 ${controller.receiverImage.value}');
-                    final imageUrl = (isSender
-                        ? controller.user.value?.imageUrl
-                        : controller.receiverImage.value)?.trim();
+                    final imageUrl =
+                        (isSender
+                                ? controller.user.value?.imageUrl
+                                : controller.receiverImage.value)
+                            ?.trim();
 
-                    final ImageProvider displayImage = (imageUrl != null && imageUrl.isNotEmpty)
-                        ? NetworkImage(imageUrl)
-                        : const AssetImage('assets/images/account.png');
+                    final ImageProvider displayImage =
+                        (imageUrl != null && imageUrl.isNotEmpty)
+                            ? NetworkImage(imageUrl)
+                            : const AssetImage('assets/images/account.png');
                     final time =
-                    msg.createdAt != null
-                        ? TimeOfDay.fromDateTime(
-                      DateTime.fromMillisecondsSinceEpoch(
-                        msg.createdAt!,
-                      ),
-                    ).format(context)
-                        : '';
+                        msg.createdAt != null
+                            ? TimeOfDay.fromDateTime(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                msg.createdAt!,
+                              ),
+                            ).format(context)
+                            : '';
 
                     if (msg is types.TextMessage) {
                       return Padding(
@@ -136,18 +143,18 @@ class ChatView extends GetView<ChatController> {
                     } else if (msg is types.ImageMessage) {
                       return msg.uri.isNotEmpty
                           ? Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        child: _buildImageMessageBubble(
-                          isSender: isSender,
-                          name: name,
-                          imageFile: File(msg.uri),
-                          time: time,
-                          imageUrl: displayImage,
-                        ),
-                      )
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            child: _buildImageMessageBubble(
+                              isSender: isSender,
+                              name: name,
+                              imageFile: File(msg.uri),
+                              time: time,
+                              imageUrl: displayImage,
+                            ),
+                          )
                           : const SizedBox.shrink();
                     } else {
                       return const SizedBox.shrink();
@@ -212,6 +219,7 @@ class ChatView extends GetView<ChatController> {
                 ),
               ),
             ),
+
             /// Message Input
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -254,7 +262,6 @@ class ChatView extends GetView<ChatController> {
             ),
 
             /// Book Now Section
-
           ],
         ),
       ),
@@ -270,23 +277,23 @@ class ChatView extends GetView<ChatController> {
     required ImageProvider imageUrl,
   }) {
     final alignment =
-    isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
+        isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
     final bubbleColor = isSender ? Color(0xFF114BCA) : Colors.white;
     final textColor = isSender ? Colors.white : Colors.black87;
     final radius =
-    isSender
-        ? BorderRadius.only(
-      topLeft: Radius.circular(16),
-      topRight: Radius.circular(0),
-      bottomLeft: Radius.circular(16),
-      bottomRight: Radius.circular(16),
-    )
-        : BorderRadius.only(
-      topLeft: Radius.circular(0),
-      topRight: Radius.circular(16),
-      bottomLeft: Radius.circular(16),
-      bottomRight: Radius.circular(16),
-    );
+        isSender
+            ? BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(0),
+              bottomLeft: Radius.circular(16),
+              bottomRight: Radius.circular(16),
+            )
+            : BorderRadius.only(
+              topLeft: Radius.circular(0),
+              topRight: Radius.circular(16),
+              bottomLeft: Radius.circular(16),
+              bottomRight: Radius.circular(16),
+            );
 
     return Row(
       mainAxisAlignment: alignment,
@@ -297,7 +304,7 @@ class ChatView extends GetView<ChatController> {
         Flexible(
           child: Column(
             crossAxisAlignment:
-            isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -313,13 +320,23 @@ class ChatView extends GetView<ChatController> {
                   children: [
                     Text(
                       name,
-                      style: TextStyle(fontSize: 14,
+                      style: TextStyle(
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
+                        fontFamily: 'poppins',
                         color: textColor,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(message, style: TextStyle(color: textColor,fontSize: 12,fontWeight: FontWeight.w300)),
+                    Text(
+                      message,
+                      style: TextStyle(
+                        fontFamily: 'poppins',
+                        color: textColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -357,21 +374,21 @@ class ChatView extends GetView<ChatController> {
     required ImageProvider imageUrl,
   }) {
     final alignment =
-    isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
+        isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
     final radius =
-    isSender
-        ? const BorderRadius.only(
-      topLeft: Radius.circular(16),
-      topRight: Radius.circular(0),
-      bottomLeft: Radius.circular(16),
-      bottomRight: Radius.circular(16),
-    )
-        : const BorderRadius.only(
-      topLeft: Radius.circular(0),
-      topRight: Radius.circular(16),
-      bottomLeft: Radius.circular(16),
-      bottomRight: Radius.circular(16),
-    );
+        isSender
+            ? const BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(0),
+              bottomLeft: Radius.circular(16),
+              bottomRight: Radius.circular(16),
+            )
+            : const BorderRadius.only(
+              topLeft: Radius.circular(0),
+              topRight: Radius.circular(16),
+              bottomLeft: Radius.circular(16),
+              bottomRight: Radius.circular(16),
+            );
 
     return Row(
       mainAxisAlignment: alignment,
@@ -381,7 +398,7 @@ class ChatView extends GetView<ChatController> {
         if (!isSender) const SizedBox(width: 8),
         Column(
           crossAxisAlignment:
-          isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             Container(
               decoration: BoxDecoration(
@@ -421,8 +438,6 @@ class ChatView extends GetView<ChatController> {
     );
   }
 }
-
-
 
 // import 'dart:io';
 //

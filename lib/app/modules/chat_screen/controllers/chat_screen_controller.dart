@@ -109,8 +109,6 @@ class ChatScreenController extends GetxController {
     }
   }
 
-
-
   void playNotificationSound() async {
     await player.setVolume(1.0); // Ensure full volume
     await player.play(AssetSource('assets/sounds/sms.mp3'));
@@ -119,12 +117,16 @@ class ChatScreenController extends GetxController {
   void connectSocket() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
+    final firstName = prefs.getString("firstName");
+    final lastName = prefs.getString('lastName');
+    print("fullname print user : $firstName $lastName");
     if (userId == null) return;
     socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
       'transports': ['websocket'],
-      'autoConnect': false,"forceNew":true,
+      'autoConnect': false,
+      "forceNew": true,
       'auth': {
-        'user': {'_id': userId, 'firstName': 'plumber naman'},
+        'user': {'_id': userId, 'firstName': firstName, 'lastName': lastName},
       },
     });
     print('1234:${userId}');

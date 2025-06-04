@@ -11,7 +11,10 @@ import 'package:uuid/uuid.dart';
 
 import '../../chat_screen/controllers/chat_screen_controller.dart';
 
-late ChatScreenController chatScreenController = Get.put(ChatScreenController());
+late ChatScreenController chatScreenController = Get.put(
+  ChatScreenController(),
+);
+
 class ChatController extends GetxController {
   final RxList<types.Message> messages = <types.Message>[].obs;
   final Rxn<types.User> user = Rxn<types.User>();
@@ -19,6 +22,8 @@ class ChatController extends GetxController {
   //late types.User user; // Sender (current user)
   late String receiverId;
   RxString userId = ''.obs;
+  var firstName = ''.obs;
+  var lastName = ''.obs;
   RxString userImg = ''.obs;
   RxString receiverName = ''.obs;
   var receiverImage = ''.obs;
@@ -32,8 +37,6 @@ class ChatController extends GetxController {
   void changeTab(int index) {
     selectedIndex.value = index;
   }
-
-
 
   late IO.Socket socket;
 
@@ -63,13 +66,15 @@ class ChatController extends GetxController {
     print('object99:${userImg.value}');
     await prefs.reload();
     final userId2 = prefs.getString('userId') ?? '';
-
+    firstName.value = prefs.getString("firstName")!;
+    lastName.value = prefs.getString('lastName')!;
+    print("fullname print user chat22222: $firstName $lastName");
 
     if (userId2.isEmpty) {
       print('❌ User ID not found in SharedPreferences');
       return;
     }
-    user.value = types.User(id: userId2, imageUrl: userImg.value,);
+    user.value = types.User(id: userId2, imageUrl: userImg.value);
     final Map<String, dynamic> data = Get.arguments ?? {};
     print('navigateData: $data');
     if (data != null) {
@@ -80,7 +85,6 @@ class ChatController extends GetxController {
       print('✅ Receiver Name: $receiverName');
       print('✅ Receiver Image: $receiverImage');
       print('✅ isImageNull: ${receiverImage == null || receiverImage.isEmpty}');
-
     } else {
       print('❌ No arguments received');
     }
@@ -117,7 +121,7 @@ class ChatController extends GetxController {
               } else if (createdAt is String) {
                 createdAtEpoch =
                     DateTime.tryParse(createdAt)?.millisecondsSinceEpoch ??
-                        DateTime.now().millisecondsSinceEpoch;
+                    DateTime.now().millisecondsSinceEpoch;
               } else {
                 createdAtEpoch = DateTime.now().millisecondsSinceEpoch;
               }
@@ -145,6 +149,7 @@ class ChatController extends GetxController {
       print("⚠️ Error fetching chat: $e");
     }
   }
+
   void makePhoneCall(String phoneNumber) async {
     final Uri url = Uri(scheme: 'tel', path: phoneNumber);
     if (await canLaunchUrl(url)) {
@@ -154,17 +159,21 @@ class ChatController extends GetxController {
         'Error',
         'Could not launch phone dialer',
         snackPosition: SnackPosition.BOTTOM,
-
       );
     }
   }
+
   void connectSocket() {
     if (user.value == null) return;
     socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'auth': {
-        'user': {'_id': user.value!.id, 'firstName': 'plumber naman'},
+        'user': {
+          '_id': user.value!.id,
+          'firstName': firstName.value,
+          'lastName': lastName.value,
+        },
       },
     });
 
@@ -187,7 +196,9 @@ class ChatController extends GetxController {
     });
 
     socket.on('message', (data) {
-      final ChatScreenController chatScreenController = Get.put(ChatScreenController());
+      final ChatScreenController chatScreenController = Get.put(
+        ChatScreenController(),
+      );
       chatScreenController.fetchLastMessages();
       fetchChatHistory();
       print('📩 Received message: $data');
