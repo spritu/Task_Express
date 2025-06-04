@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../../../colors.dart';
 import '../controllers/name_detail_controller.dart';
 
@@ -9,7 +8,13 @@ class NameDetailView extends GetView<NameDetailController> {
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> worker = Get.arguments;
+   // final Map<String, dynamic> worker = Get.arguments;
+    final worker = Get.arguments as Map<String, dynamic>;
+    final List<Map<String, dynamic>> skills = (worker['skills'] as List?)?.map((e) => Map<String, dynamic>.from(e)).toList() ?? [];
+
+    (worker['skills'] as List).forEach((skill) {
+      print('Category: ${skill['categoryName']}, Subcategory: ${skill['subcategoryName']}, Charge: ${skill['charge']}');
+    });
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5FF),
@@ -59,27 +64,29 @@ class NameDetailView extends GetView<NameDetailController> {
               ),
             ],
           ),
-
           const SizedBox(height: 4),
 
           // Status
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                width: 41,
-                height: 13,
+                width: 60,
+                height: 18,
                 decoration: BoxDecoration(
-                  color: Color(0xffA3EABC),
+                  color: const Color(0xffA3EABC),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Image.asset("assets/images/Verify.png"),
-                      Text(
+                      Image.asset("assets/images/Verify.png", height: 12),
+                      const SizedBox(width: 4),
+                      const Text(
                         "Verified",
                         style: TextStyle(
-                          fontSize: 6,
+                          fontSize: 8,
                           fontFamily: "poppins",
                           fontWeight: FontWeight.w500,
                           color: AppColors.textColor,
@@ -89,7 +96,6 @@ class NameDetailView extends GetView<NameDetailController> {
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
               Row(
                 children: [
                   Icon(Icons.check_circle,
@@ -99,40 +105,53 @@ class NameDetailView extends GetView<NameDetailController> {
                   Text(
                     worker['avail'] == 1 ? "Available" : "Not Available",
                     style: TextStyle(
-                        fontSize: 8,fontFamily: "poppins",fontWeight: FontWeight.w500,
+                        fontSize: 8,
+                        fontFamily: "poppins",
+                        fontWeight: FontWeight.w500,
                         color: worker['avail'] == 1 ? Colors.green : Colors.red),
                   ),
                 ],
               ),
-
             ],
           ),
-
           const SizedBox(height: 10),
 
-          // Experience and Jobs
-          Text("${worker['expiresAt']} year Experience"),
+          // Experience
+          Text("${worker['expiresAt'] ?? 'N/A'} year Experience"),
 
           const SizedBox(height: 20),
-
-          // Visiting charge note
 
           // Professions + Charges
           const Text("Profession:",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
 
-          Card(color: AppColors.white,
-              child: Column(
-            children: [
-              professionTile("Plumber", worker['charge']),
-              professionTile("Electrician", worker['charge']),
-              professionTile("Carpenter", worker['charge']),
-
-            ],
-          )),
-
-
+          Center(
+            child: SizedBox(
+              width: 287,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 1,
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: Column(
+                    children: [
+                      for (int i = 0; i < skills.length; i++) ...[
+                        serviceRow(
+                          getDisplayName(skills[i]), // 👈 name to show
+                          int.tryParse(skills[i]['charge'].toString()) ?? 0, // ✅ FIXED
+                        ),
+                        if (i < skills.length - 1) const Divider(),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: 20),
 
           // Buttons
@@ -141,31 +160,16 @@ class NameDetailView extends GetView<NameDetailController> {
               Expanded(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xff114BCA),
-                    // 🔵 change this to your desired color
+                    backgroundColor: const Color(0xff114BCA),
                     foregroundColor: Colors.white,
-                    // optional: text/icon color
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   onPressed: () {
-
-                    // final phoneNumber = phone ?? '';
-                    // if (phoneNumber.isNotEmpty) {
-                    //   controller.makePhoneCall(phoneNumber);
-                    // } else {
-                    //   Get.snackbar('Error', 'Phone number not available',
-                    //     snackPosition: SnackPosition.BOTTOM,
-                    //     backgroundColor: Colors.red,
-                    //     colorText: Colors.white,
-                    //   );
-                    // }
-
+                    // Call action
                   },
                   child: const Text("Call"),
                 ),
@@ -174,27 +178,22 @@ class NameDetailView extends GetView<NameDetailController> {
               Expanded(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xff114BCA),
-                    // 🔵 change this to your desired color
+                    backgroundColor: const Color(0xff114BCA),
                     foregroundColor: Colors.white,
-                    // optional: text/icon color
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   onPressed: () {
-                 //   Get.to(ChatView());
+                    // Chat action
                   },
                   child: const Text("Chat"),
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 20),
 
           // Ratings & Reviews
@@ -202,16 +201,15 @@ class NameDetailView extends GetView<NameDetailController> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
           Row(
-            children: [
-              const Text("4.7 ⭐", style: TextStyle(fontSize: 16)),
-              const SizedBox(width: 8),
-              const Text("69 Ratings"),
-              const SizedBox(width: 8),
-              const Text("4 Reviews"),
+            children: const [
+              Text("4.7 ⭐", style: TextStyle(fontSize: 16)),
+              SizedBox(width: 8),
+              Text("69 Ratings"),
+              SizedBox(width: 8),
+              Text("4 Reviews"),
             ],
           ),
           const SizedBox(height: 16),
-
           reviewCard("Sravan T.", "09/04/2025",
               "Amit was super professional and arrived right on time..."),
           reviewCard("Shivani Singh", "01/04/2025",
@@ -227,18 +225,11 @@ class NameDetailView extends GetView<NameDetailController> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      // decoration: BoxDecoration(
-      //   color: Colors.white,
-      //   borderRadius: BorderRadius.circular(12),
-      //   boxShadow: const [
-      //     BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 2)),
-      //   ],
-      // ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: const TextStyle(fontSize: 16)),
-          Text("Charge ₹ ${charge ?? '300'}",
+          Text("Charge ₹ $charge",
               style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
@@ -275,5 +266,28 @@ class NameDetailView extends GetView<NameDetailController> {
         ],
       ),
     );
+  }Widget serviceRow(String name, int charge) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(name, style: const TextStyle(fontSize: 14,fontWeight: FontWeight.w500)),
+        Row(
+          children: [  Text('Charge:', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+            Text('₹$charge', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+          ],
+        ),
+      ],
+    );
+  } String getDisplayName(Map<String, dynamic> skill) {
+    final subcategoryName = skill['subcategoryName']?.toString().trim();
+    final categoryName = skill['categoryName']?.toString().trim();
+
+    if (subcategoryName != null && subcategoryName.isNotEmpty && subcategoryName != 'null') {
+      return subcategoryName;
+    } else if (categoryName != null && categoryName.isNotEmpty && categoryName != 'null') {
+      return categoryName;
+    } else {
+      return 'Unknown';
+    }
   }
 }

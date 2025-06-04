@@ -14,6 +14,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
   ProfessionalPlumberView({super.key});
   @override
   Widget build(BuildContext context) {
+
     Get.put(ProfessionalPlumberController());
     final arguments = Get.arguments as Map<String, dynamic>;
     final List users = arguments['users'];
@@ -61,9 +62,27 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   padding: const EdgeInsets.only(left: 20),
                   child: Text("Fh-289, Vijay nagar, Indore"),
                 ),
+
               ],
             ),
+          ),SizedBox(height: 10),Container(
+            width: MediaQuery.of(context).size.width,
+            height: 52,
+            margin: const EdgeInsets.only( left: 16,right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: const Color(0x0D323232), // #3232320D = black with 5% opacity
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child:  Obx(() => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                buildToggleButton("charge", "Search by Charge"),
+                buildToggleButton("distance", "Search by Distance"),
+              ],
+            )),
           ),
+
           const SizedBox(height: 10),
           // List of workers
           Expanded(
@@ -314,12 +333,6 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                               //     : 'N/A',
                                               style: TextStyle(fontSize: 12),
                                             )
-
-
-
-
-
-
                                           ],
                                         ),
                                         SizedBox(height: 3),
@@ -877,6 +890,53 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
           ),
         );
       },
+    );
+  } Widget buildToggleButton(String value, String label) {
+    bool isSelected = controller.selected.value == value;
+
+    return GestureDetector(
+      onTap: () {
+        controller.selected.value = value;
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(3.0),
+        child: Container(
+          height: 31,
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 2,
+                offset: const Offset(1, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(height:16,width:16,decoration: BoxDecoration(  shape: BoxShape.circle,color: AppColors.grey),
+                child: Icon(
+                  Icons.circle,
+                  size: 14,
+                  color: isSelected ? AppColors.blue : Colors.grey.shade400,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 12,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
