@@ -70,54 +70,101 @@ class Bottom2Controller extends GetxController {
   // }
 
   // 🌐 Global variable to store notifications
-  List<dynamic> globalNotifications = [];
+  final RxList<dynamic> globalNotifications = <dynamic>[].obs;
+
+  // Future<void> fetchNotificationsPro() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final userId = prefs.getString('userId');
+  //
+  //   if (userId == null || userId.isEmpty) {
+  //     print("❌ userId not found in SharedPreferences");
+  //     return;
+  //   }
+  //
+  //   var headers = {'Content-Type': 'application/json'};
+  //   var url = Uri.parse('https://jdapi.youthadda.co/getnotificationssp');
+  //
+  //   var body = json.encode({"userId": userId});
+  //
+  //   try {
+  //     var request = http.Request('POST', url);
+  //     request.body = body;
+  //     request.headers.addAll(headers);
+  //
+  //     http.StreamedResponse response = await request.send();
+  //
+  //     if (response.statusCode == 200) {
+  //       final responseBody = await response.stream.bytesToString();
+  //       final jsonData = json.decode(responseBody);
+  //
+  //       // ✅ Check and extract the list properly
+  //       if (jsonData is Map<String, dynamic> && jsonData.containsKey("data")) {
+  //         globalNotifications = jsonData["data"] ?? [];
+  //         print("✅ Notifications received:");
+  //         print(globalNotifications);
+  //       } else {
+  //         print("⚠️ Unexpected response format:");
+  //         print(jsonData);
+  //       }
+  //     } else {
+  //       print("❌ API Error: ${response.reasonPhrase}");
+  //     }
+  //   } catch (e) {
+  //     print("❌ Exception: $e");
+  //   }
+  // }
 
   Future<void> fetchNotificationsPro() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
 
-    if (userId == null || userId.isEmpty) {
-      print("❌ userId not found in SharedPreferences");
+    if (userId == null) {
+      print("User ID not found in SharedPreferences.");
       return;
     }
 
-    var headers = {'Content-Type': 'application/json'};
-    var url = Uri.parse('https://jdapi.youthadda.co/getnotificationssp');
+    print("Using userId fetchNotifications Pro1234: $userId");
 
-    var body = json.encode({"userId": userId});
+    var headers = {'Content-Type': 'application/json'};
+
+    var request = http.Request(
+      'POST',
+      Uri.parse('https://jdapi.youthadda.co/getnotificationssp'),
+    );
+
+    request.body = json.encode({"userId": userId});
+    request.headers.addAll(headers);
 
     try {
-      var request = http.Request('POST', url);
-      request.body = body;
-      request.headers.addAll(headers);
-
       http.StreamedResponse response = await request.send();
+      String responseBody = await response.stream.bytesToString();
+
+      print(" Status Code: ${response.statusCode}");
+      print("Response Body: $responseBody");
 
       if (response.statusCode == 200) {
-        final responseBody = await response.stream.bytesToString();
-        final jsonData = json.decode(responseBody);
+        final responseData = json.decode(responseBody);
 
-        // ✅ Check and extract the list properly
-        if (jsonData is Map<String, dynamic> && jsonData.containsKey("data")) {
-          globalNotifications = jsonData["data"] ?? [];
-          print("✅ Notifications received:");
-          print(globalNotifications);
-        } else {
-          print("⚠️ Unexpected response format:");
-          print(jsonData);
+        globalNotifications.assignAll(responseData['notifications'] ?? []);
+        print("Notifications fetched Provider: ${globalNotifications.length}");
+
+        for (var notif in globalNotifications) {
+          print("Notification Provider 1234: $notif");
         }
       } else {
-        print("❌ API Error: ${response.reasonPhrase}");
+        print("Error: ${response.reasonPhrase}");
       }
     } catch (e) {
-      print("❌ Exception: $e");
+      print("Exception occurred: $e");
     }
   }
 
   void connectSocketjobpay() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
-    print('55555: ${userId}');
+    String? firstName = prefs.getString('firstName');
+    String? lastName = prefs.getString('lastName');
+    print('jobpayprovider : ${userId} ${firstName} ${lastName}');
 
     print("❌ wdwcdtf55 :${userId}");
 
@@ -133,10 +180,7 @@ class Bottom2Controller extends GetxController {
       'autoConnect': false,
       'forceNew': true,
       'auth': {
-        'user': {
-          '_id': userId,
-          'firstName': 'plumber naman', // Optional, can be dynamic
-        },
+        'user': {'_id': userId, 'firstName': firstName, 'lastName': lastName},
       },
     });
 
@@ -183,8 +227,10 @@ class Bottom2Controller extends GetxController {
   void connectSocketnotifications() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
+    String? firstName = prefs.getString('firstName');
+    String? lastName = prefs.getString('lastName');
 
-    print("notifications provider  :$userId");
+    print("notifications provider  :$userId $firstName $lastName");
 
     if (userId == null) {
       print(" User ID or BookedFor missing notifications");
@@ -198,10 +244,7 @@ class Bottom2Controller extends GetxController {
       'autoConnect': false,
       'forceNew': true,
       'auth': {
-        'user': {
-          '_id': userId,
-          'firstName': 'plumber naman', // Optional, can be dynamic
-        },
+        'user': {'_id': userId, 'firstName': firstName, 'lastName': lastName},
       },
     });
 

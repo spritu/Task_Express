@@ -15,6 +15,9 @@ class CompletejobController extends GetxController {
 
   late var bookedby = ''.obs;
   late var bookedFor = ''.obs;
+  late var firstName = ''.obs;
+  late var lastName = ''.obs;
+
   var bookingId = ''.obs;
   final RxList<types.Message> messages = <types.Message>[].obs;
   final Rxn<types.User> user = Rxn<types.User>();
@@ -87,7 +90,8 @@ class CompletejobController extends GetxController {
       'auth': {
         'user': {
           '_id': bookedFor.value,
-          'firstName': 'plumber naman', // Optional, can be dynamic
+          'firstName': firstName.value,
+          'lastName': lastName.value,
         },
       },
     });
@@ -128,6 +132,9 @@ class CompletejobController extends GetxController {
     bookedby.value = booking['data']['bookedBy']['_id'];
 
     bookedFor.value = booking['data']['bookedFor']['_id'];
+
+    firstName.value = booking['data']['bookedFor']['firstName'];
+    lastName.value = booking['data']['bookedFor']['lastName'];
 
     print("📦 Booking ID: $bookingId");
     print("👤 Booked By User ID: ${bookedby.value}");

@@ -50,7 +50,6 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                         itemCount: controller.chats.length,
                         itemBuilder: (context, index) {
                           final chat = controller.chats[index];
-                          final isUnread = !chat.isRead;
 
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -65,9 +64,11 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                                         '${chat.firstName} ${chat.lastName}',
                                     'receiverImage': chat.profilePic,
                                   },
-                                )?.then((_) async {
-                                  await controller.fetchLastMessages();
-                                });
+                                )
+                                //     ?.then((_) async {
+                                //   await controller.fetchLastMessages();
+                                // })
+                                ;
                               },
                               onLongPress: () {
                                 showDialog(
@@ -142,36 +143,36 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                                                         height: 50,
                                                       ),
                                             ),
-                                            if (chat.unreadCount > 0)
-                                              Positioned(
-                                                right: 0,
-                                                top: 0,
-                                                child: Container(
-                                                  padding: const EdgeInsets.all(
-                                                    4,
-                                                  ),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.red,
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  constraints:
-                                                      const BoxConstraints(
-                                                        minWidth: 20,
-                                                        minHeight: 20,
-                                                      ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      '${chat.unreadCount}',
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
+                                            // if (chat.unreadCount > 0)
+                                            //   Positioned(
+                                            //     right: 0,
+                                            //     top: 0,
+                                            //     child: Container(
+                                            //       padding: const EdgeInsets.all(
+                                            //         4,
+                                            //       ),
+                                            //       decoration: BoxDecoration(
+                                            //         color: Colors.red,
+                                            //         shape: BoxShape.circle,
+                                            //       ),
+                                            //       constraints:
+                                            //           const BoxConstraints(
+                                            //             minWidth: 20,
+                                            //             minHeight: 20,
+                                            //           ),
+                                            //       child: Center(
+                                            //         child: Text(
+                                            //           '${chat.unreadCount}',
+                                            //           style: const TextStyle(
+                                            //             color: Colors.white,
+                                            //             fontSize: 10,
+                                            //             fontWeight:
+                                            //                 FontWeight.bold,
+                                            //           ),
+                                            //         ),
+                                            //       ),
+                                            //     ),
+                                            //   ),
                                           ],
                                         ),
                                         const SizedBox(width: 12),
@@ -211,18 +212,61 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                                                 ],
                                               ),
                                               const SizedBox(height: 4),
-                                              Text(
-                                                chat.message,
-                                                style: TextStyle(
-                                                  fontFamily: "poppins",
-                                                  fontWeight: FontWeight.w300,
-                                                  fontSize: 12,
-                                                  color:
-                                                      isUnread
-                                                          ? Colors.green
-                                                          : Colors.black,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    chat.message,
+                                                    style: TextStyle(
+                                                      fontFamily: "poppins",
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                      fontSize: 12,
+                                                      color: Colors.black,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  if (chat.unreadCount > 0)
+                                                    Container(
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                            left: 8,
+                                                          ),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            4,
+                                                          ),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                            color: Colors.green,
+                                                            shape:
+                                                                BoxShape.circle,
+                                                          ),
+                                                      constraints:
+                                                          const BoxConstraints(
+                                                            minWidth: 20,
+                                                            minHeight: 20,
+                                                          ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          '${chat.unreadCount}',
+                                                          style:
+                                                              const TextStyle(
+                                                                color:
+                                                                    Colors
+                                                                        .black,
+                                                                fontSize: 10,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
                                               ),
                                             ],
                                           ),

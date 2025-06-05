@@ -17,8 +17,8 @@ class ChatItem {
   final String firstName;
   final String lastName;
   final String profilePic;
-  late final bool isRead; // ✅
-  late final int unreadCount; // ✅
+  late final bool isRead;
+  late final int unreadCount;
 
   ChatItem({
     required this.message,
@@ -61,6 +61,9 @@ class ProviderChatScreenController extends GetxController {
   void connectSocket() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
+    final firstName = prefs.getString("firstName");
+    final lastName = prefs.getString('lastName');
+    print("fullname print: $firstName $lastName");
     if (userId == null) return;
     print(" Service provider:$userId");
     socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
@@ -68,7 +71,7 @@ class ProviderChatScreenController extends GetxController {
       'autoConnect': false,
       "forceNew": true,
       'auth': {
-        'user': {'_id': userId, 'firstName': 'plumber naman'},
+        'user': {'_id': userId, 'firstName': firstName, 'lastName': lastName},
       },
     });
     print('1234:${userId}');
@@ -91,7 +94,10 @@ class ProviderChatScreenController extends GetxController {
     });
 
     socket.on('message', (data) {
-      fetchLastMessages();
+      ProviderChatScreenController providerChatScreenController = Get.put(
+        ProviderChatScreenController(),
+      );
+      providerChatScreenController.fetchLastMessages();
       //fetchChatHistory();
       print('📩 Received message: $data');
 
@@ -120,6 +126,7 @@ class ProviderChatScreenController extends GetxController {
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         final List<dynamic> jsonData = responseData['data'];
+        print('chsttttttt: $jsonData');
 
         chats.clear();
 
@@ -132,8 +139,8 @@ class ProviderChatScreenController extends GetxController {
             firstName: item['firstName'] ?? 'N/A',
             lastName: item['lastName'] ?? 'N/A',
             profilePic: item['profilePic'] ?? '',
-            isRead: lm?['isRead'] ?? true,
-            unreadCount: item['unreadCount'] ?? 0,
+            isRead: (lm?['viewall']?.toString().toLowerCase() == 'true'),
+            unreadCount: item['unseenCount'] ?? 0,
           );
           chats.add(chatItem);
         }
@@ -144,23 +151,23 @@ class ProviderChatScreenController extends GetxController {
   }
 
   Future<void> markChatAsRead(String receiverId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
-    if (userId == null) return;
-
-    final url = Uri.parse("https://jdapi.youthadda.co/markmessagesread");
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'userId': userId, 'receiverId': receiverId}),
-    );
-
-    if (response.statusCode == 200) {
-      print("✅ Marked as read");
-      await fetchLastMessages();
-    } else {
-      print("❌ Failed to mark as read: ${response.body}");
+    final index = chats.indexWhere((chat) => chat.reciverId == receiverId);
+    if (index != -1) {
+      final chat = chats[index];
+      chats[index] = ChatItem(
+        message: chat.message,
+        timestamp: chat.timestamp,
+        reciverId: chat.reciverId,
+        firstName: chat.firstName,
+        lastName: chat.lastName,
+        profilePic: chat.profilePic,
+        isRead: true,
+        unreadCount: 0,
+      );
+      chats.refresh();
     }
+
+    // Optional: API hit to mark as seen
   }
 
   String formatTimestamp(String isoString) {

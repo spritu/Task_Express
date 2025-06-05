@@ -122,7 +122,12 @@ class ProviderChatView extends GetView<ProviderChatController> {
                             );
 
                             if (confirmDelete == true) {
-                              await controller.deleteMessage(msg.id);
+                              if (msg.author.id == controller.user.value?.id) {
+                                // 🟢 Current user is sender → permanently delete
+                                await controller.deleteMessage(msg.id);
+                              }
+
+                              // 🔴 Always remove locally (for sender & receiver)
                               controller.messages.removeWhere(
                                 (m) => m.id == msg.id,
                               );
@@ -272,10 +277,7 @@ class ProviderChatView extends GetView<ProviderChatController> {
         isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
 
     // Use themed colors for better dark mode support
-    final bubbleColor =
-        isSender
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.surface;
+    final bubbleColor = isSender ? Color(0xFFF28825) : Color(0xFFF7CFAA);
 
     final textColor =
         isSender ? Colors.white : Theme.of(context).colorScheme.onSurface;
@@ -325,12 +327,22 @@ class ProviderChatView extends GetView<ProviderChatController> {
                         Text(
                           name,
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: "poppins",
+                            fontSize: 14,
                             color: textColor,
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(message, style: TextStyle(color: textColor)),
+                        Text(
+                          message,
+                          style: TextStyle(
+                            fontFamily: 'poppins',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            color: textColor,
+                          ),
+                        ),
                       ],
                     ),
                   ),

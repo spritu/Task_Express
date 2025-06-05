@@ -163,8 +163,9 @@ class ConfirmPaymentRecivedController extends GetxController {
 
   void connectSocketCancel() async {
     final userId = selectedPayment['bookedBy']['_id'];
-
-    print(" CancelUser:${userId}");
+    final firstName = selectedPayment['bookedBy']['firstName'];
+    final lastName = selectedPayment['bookedBy']['lastName'];
+    print(" CancelUserprovidersaid :${userId} ${firstName} ${lastName}");
 
     if (userId == null) {
       print("User ID or BookedFor missing cancel");
@@ -178,10 +179,7 @@ class ConfirmPaymentRecivedController extends GetxController {
       'autoConnect': false,
       'forceNew': true,
       'auth': {
-        'user': {
-          '_id': userId,
-          'firstName': 'plumber naman', // Optional, can be dynamic
-        },
+        'user': {'_id': userId, 'firstName': firstName, 'lastName': lastName},
       },
     });
 

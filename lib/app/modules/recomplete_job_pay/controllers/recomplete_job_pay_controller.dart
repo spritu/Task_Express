@@ -162,10 +162,20 @@ class RecompleteJobPayController extends GetxController {
 
         final jsonRes = json.decode(res);
         final idsend = jsonRes['booking']?['bookedFor']?.toString() ?? '';
+        final firstName =
+            jsonRes['booking']?['bookedFor']?['firstName']?.toString() ?? '';
+        final lastName =
+            jsonRes['booking']?['bookedFor']?['lastName']?.toString() ?? '';
+
+        print("gggggggggg $idsend $firstName $lastName");
 
         payController.clear();
 
-        connectSocketjobpay(idsend); // ✅ Callback if needed
+        connectSocketjobpay(
+          idsend,
+          firstName,
+          lastName,
+        ); // ✅ Callback if needed
         Get.back(); // ✅ Close dialog or popup
       } else {
         print('❌ Server error: ${response.statusCode}');
@@ -176,7 +186,11 @@ class RecompleteJobPayController extends GetxController {
     }
   }
 
-  void connectSocketjobpay(String bookedFor) {
+  void connectSocketjobpay(
+    String bookedFor,
+    String firstName,
+    String lastName,
+  ) {
     print('bookedForbook: $bookedFor');
     print("❌ Recomplete : $bookedFor");
 
@@ -194,7 +208,8 @@ class RecompleteJobPayController extends GetxController {
       'auth': {
         'user': {
           '_id': bookedFor,
-          'firstName': 'plumber', // Optional
+          'firstName': firstName,
+          'lastName': lastName,
         },
       },
     });
