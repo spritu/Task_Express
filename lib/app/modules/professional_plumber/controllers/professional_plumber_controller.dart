@@ -648,6 +648,7 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -715,7 +716,84 @@ class ProfessionalPlumberController extends GetxController
     }
   }
 
+  Future<String> getAddressFromLatLng(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        return "${place.locality ?? ''}, ${place.administrativeArea ?? ''}";
+      }
+    } catch (e) {
+      print("Reverse geocoding error: $e");
+    }
+    return "Unknown Location";
+  }
+
+  Future<void> fetchUsersByDistance(String catId) async {
+    try {
+      // ✅ Step 1: Get current location
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      double latitude = position.latitude;
+      double longitude = position.longitude;
+
+      // ✅ Step 2: Call the API with dynamic lat/lng
+      final Uri uri = Uri.parse(
+        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&lat=$latitude&lng=$longitude',
+      );
+
+      var request = http.Request('GET', uri);
+      http.StreamedResponse response = await request.send();
+
+      // ✅ Step 3: Handle the response
+      if (response.statusCode == 200) {
+        String responseBody = await response.stream.bytesToString();
+        final jsonResponse = json.decode(responseBody);
+
+        print("✅ API Response:");
+        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        print(jsonEncode(jsonResponse));
+
+        // Optional: Parse and use the data
+        List<Map<String, dynamic>> users =
+        List<Map<String, dynamic>>.from(jsonResponse['data'] ?? []);
+
+        // You can now use 'users' as needed
+      } else {
+        print("❌ API Error: ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("❌ Exception: $e");
+    }
+  }
+
+
   List<dynamic> users = []; // List of service providers
+  Future<void> fetchUsersSortedByCharge(String catId) async {
+    try {
+      var request = http.Request(
+        'GET',
+        Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&sortBy=lowToHigh'),
+      );
+
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        final resBody = await response.stream.bytesToString();
+        final jsonData = json.decode(resBody);
+
+        users = List<Map<String, dynamic>>.from(jsonData['data'] ?? []);
+        print("ssssssssssssssssssssssssssss");
+      } else {
+       // Get.snackbar('Error', 'Failed to fetch sorted users.');
+      }
+    } catch (e) {
+      print("Sort error: $e");
+     // Get.snackbar('Error', 'Something went wrong');
+    }
+  }
 
   // Future<void> getDistanceFromUserToProvider(Map<String, dynamic> user) async {
   //   try {

@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../auth_controller.dart';
 import 'package:http/http.dart' as http;
 
+import '../../booking/controllers/booking_controller.dart';
+
 class ProviderAccountController extends GetxController with WidgetsBindingObserver {
   //TODO: Implement ProviderAccountController
   var imagePath = ''.obs;
@@ -17,6 +19,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   var skillList = <Map<String, dynamic>>[].obs;
   var selectedProfessionName = ''.obs;
   var spType = ''.obs;
+ // RxList<ServiceModel> userSkills = <ServiceModel>[].obs;
 
 
   var selectedCategoryName = ''.obs;
@@ -411,7 +414,18 @@ var charge1 = "250".obs;
       ),
     );
   }
+  RxList<SkillModel> userSkills = <SkillModel>[].obs;
 
+  Future<void> fetchUserSkills(String userId) async {
+    final response = await http.get(Uri.parse("https://yourapi.com/user/$userId/skills"));
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      final List skills = jsonData['skills'];
+
+      userSkills.value = skills.map((item) => SkillModel.fromJson(item)).toList();
+    }
+  }
 
 
 
@@ -580,6 +594,39 @@ class ServiceModel {
 }
 
 
+class SkillModel {
+  final String id;
+  final String categoryId;
+  final String? subCategoryId;
+  final int charge;
+
+  // Display values (names)
+  final String professionName;
+  final String categoryName;
+  final String subCategoryName;
+
+  SkillModel({
+    required this.id,
+    required this.categoryId,
+    this.subCategoryId,
+    required this.charge,
+    required this.professionName,
+    required this.categoryName,
+    required this.subCategoryName,
+  });
+
+  factory SkillModel.fromJson(Map<String, dynamic> json) {
+    return SkillModel(
+      id: json['_id'] ?? '',
+      categoryId: json['categoryId'] ?? '',
+      subCategoryId: json['sucategoryId'],
+      charge: json['charge'] ?? 0,
+      professionName: json['professionName'] ?? '',
+      categoryName: json['categoryName'] ?? '',
+      subCategoryName: json['subCategoryName'] ?? '',
+    );
+  }
+}
 
 
 class UserSkillModel {

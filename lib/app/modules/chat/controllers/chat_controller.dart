@@ -81,10 +81,10 @@ class ChatController extends GetxController {
       receiverId = data['receiverId'] ?? '';
       receiverName.value = data['receiverName'] ?? 'No Name';
       receiverImage.value = data['userImg'] ?? '';
-      print('✅ Receiver ID: $receiverId');
-      print('✅ Receiver Name: $receiverName');
-      print('✅ Receiver Image: $receiverImage');
-      print('✅ isImageNull: ${receiverImage == null || receiverImage.isEmpty}');
+      // print('✅ Receiver ID: $receiverId');
+      // print('✅ Receiver Name: $receiverName');
+      // print('✅ Receiver Image: $receiverImage');
+      // print('✅ isImageNull: ${receiverImage == null || receiverImage.isEmpty}');
     } else {
       print('❌ No arguments received');
     }
@@ -155,11 +155,11 @@ class ChatController extends GetxController {
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
     } else {
-      Get.snackbar(
-        'Error',
-        'Could not launch phone dialer',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Get.snackbar(
+      //   'Error',
+      //   'Could not launch phone dialer',
+      //   snackPosition: SnackPosition.BOTTOM,
+      // );
     }
   }
 

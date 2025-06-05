@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'package:get/get.dart';
 
@@ -19,7 +20,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
     final arguments = Get.arguments as Map<String, dynamic>;
     final List users = arguments['users'];
     final String title = arguments['title'] ?? 'Professionals';
-    final int avail = arguments['avail'] ?? 0;
+    final int avail = arguments['avail'] ?? 0;  final String catId = arguments['catId'] ?? ''; // 🟢 Use this for sorting
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(
@@ -77,8 +78,8 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
             child:  Obx(() => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                buildToggleButton("charge", "Search by Charge"),
-                buildToggleButton("distance", "Search by Distance"),
+                buildToggleButton("charge", "Search by Charge",catId),
+                buildToggleButton("distance", "Search by Distance",catId),
               ],
             )),
           ),
@@ -95,13 +96,26 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   final imagePath = user['userImg'] ?? '';
                   final imageUrl = imagePath.isNotEmpty ? 'https://jdapi.youthadda.co/$imagePath' : '';
                   final int avail = user["avail"] ?? 0;
-
+                  final distance = user['distance'] ?? 'N/A';
                   final charge =
                   user['skills'] != null && user['skills'].isNotEmpty
                       ? user['skills'][0]['charge']
                       : 0;
                   print("Opening bottom sheet for ${user['firstName']}");
+                  final coords = user['location']?['coordinates'];
 
+
+                  if (coords != null && coords.length >= 2) {
+                    try {
+                      final double lat = (coords[1] as num).toDouble();
+                      final double lng = (coords[0] as num).toDouble();
+
+                      // Replace below with your method to calculate distance from user location
+                   //   distance = controller.getAddressFromLatLng(lat, lng) as double;
+                    } catch (e) {
+                      print("Coordinate parse error: $e");
+                    }
+                  }
                   return InkWell(
                     onTap: () async {
                       Get.to(
@@ -119,23 +133,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                           //'distance': user['distance'], // ✅ Add this
                         },
                       );
-                      // Passing only the relevant data to the bottom sheet
-                      // Get.bottomSheet(
-                      //   showAfterCallSheet(
-                      //     context,
-                      //     name: user['firstName']?.toString() ?? 'No Name',
-                      //     imageUrl: user['userImg']?.toString() ?? '',
-                      //     experience: user['experience']?.toString() ?? '',
-                      //     phone: user['phone']?.toString() ?? '',
-                      //     userId: user['_id'],
-                      //     title: title,
-                      //     skills: List<Map<String, dynamic>>.from(
-                      //       user['skills'] ?? [],
-                      //     ),
-                      //   ),
-                      //   isScrollControlled: true,
-                      // );
-                    },
+                      },
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       margin: const EdgeInsets.symmetric(
@@ -251,14 +249,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                                     fontWeight: FontWeight.w500,
                                                     color: Colors.red,
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                                ),],),],),],),
                                     const Spacer(),
                                     TextButton(
                                       onPressed: () {
@@ -273,9 +264,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                             'id': user['_id'], 'skills': user['skills'] ?? [],
                                             'averageRating': user['averageRating'],'reviews': user['reviews'] ?? [],
                                             'avail': user['avail'],
-                                          },
-                                        );
-                                      },
+                                          },);},
                                       child: Container(
                                         height: 24,
                                         width: 54,
@@ -293,13 +282,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                               fontSize: 7,
                                               fontFamily: "poppins",
                                               fontWeight: FontWeight.w400,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                            ),),),),),],),
                                 SizedBox(height: 4),
                                 Row(
                                   mainAxisAlignment:
@@ -316,18 +299,14 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           MainAxisAlignment.start,
                                           crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                top: 3,
-                                              ),
+                                          children: [Padding(padding: const EdgeInsets.only(top: 3,),
                                               child: Icon(
                                                 Icons.location_on,
                                                 size: 14,
                                                 color: Colors.grey,
                                               ),
                                             ),
-                                            Text( "3.5 Km",
+                                            Text( '$distance', // ✅ Use calculated distance
                                               // user['distance'] != null && user['distance'] != 'N/A'
                                               //     ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
                                               //     : 'N/A',
@@ -336,15 +315,6 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           ],
                                         ),
                                         SizedBox(height: 3),
-                                        // Row(
-                                        //   children: [
-                                        //     Icon(
-                                        //       Icons.access_time,
-                                        //       size: 14,
-                                        //       color: AppColors.grey,
-                                        //     ),
-                                        //   ],
-                                        // ),
                                       ],
                                     ),
                                     Card(
@@ -380,22 +350,9 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                                   fontSize: 11,
                                                   color: AppColors.orage,
                                                   fontWeight: FontWeight.w700,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                                ),),],),),),),],),
                                 const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: SizedBox(
-                                        height: 24,
-                                        width: 110,
+                                Row(children: [Expanded(child: SizedBox(height: 24, width: 110,
                                         child: ElevatedButton(
                                           onPressed: () async {
                                             final phoneNumber =
@@ -403,17 +360,10 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                             if (phoneNumber.isNotEmpty) {
                                               controller.selectedUsers =
                                                   users; // Store full list
-                                              controller
-                                                  .selectedIndexAfterCall =
-                                                  index; // Store selected index
+                                              controller.selectedIndexAfterCall = index; // Store selected index
                                               controller.selectedTitle = title;
-                                              controller
-                                                  .shouldShowSheetAfterCall =
-                                              true; // Trigger sheet on resume
-
-                                              controller.makePhoneCall(
-                                                phoneNumber,
-                                              );
+                                              controller.shouldShowSheetAfterCall = true; // Trigger sheet on resume
+                                              controller.makePhoneCall(phoneNumber);
                                             } else {
                                               Get.snackbar(
                                                 'Error',
@@ -422,25 +372,15 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                                 SnackPosition.BOTTOM,
                                                 backgroundColor: Colors.red,
                                                 colorText: Colors.white,
-                                              );
-                                            }
-                                          },
-
+                                              );}},
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Color(0xff114BCA),
-                                          ),
-                                          child: const Text(
-                                            "Call",
-                                            style: TextStyle(
+                                          ), child: const Text("Call", style: TextStyle(
                                               fontWeight: FontWeight.w500,
                                               fontSize: 12,
                                               color: AppColors.white,
                                               fontFamily: "poppins",
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                            ),),),),),
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: SizedBox(
@@ -461,9 +401,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                                   'receiverName': receiverName.isNotEmpty ? receiverName : 'No Name',
                                                   'receiverImage': receiverImage,
                                                   'phoneNumber': phoneNumber,
-                                                },
-                                              );
-                                            } else {
+                                                },);} else {
                                               Get.snackbar(
                                                 'Error',
                                                 'Receiver ID not available',
@@ -485,22 +423,10 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                               fontFamily: "poppins",
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                    ),
-
-                                  ],
+                                        ),),),],
                                 ),
                                 SizedBox(height: 10),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
+                              ],),),],),),);},),
             ),
           ),
         ],
@@ -891,12 +817,46 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
         );
       },
     );
-  } Widget buildToggleButton(String value, String label) {
+  }Widget buildToggleButton(String value, String label, String catId) {
     bool isSelected = controller.selected.value == value;
 
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         controller.selected.value = value;
+
+        if (value == "charge") {
+          await controller.fetchUsersSortedByCharge(catId);
+        } else if (value == "distance") {
+          print("dissssssssssssssssssssssss");
+          // ✅ Get current location before API call
+          bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+          if (!serviceEnabled) {
+            print('❌ Location services are disabled.');
+            return;
+          }
+
+          LocationPermission permission = await Geolocator.checkPermission();
+          if (permission == LocationPermission.denied) {
+            permission = await Geolocator.requestPermission();
+            if (permission == LocationPermission.denied) {
+              print('❌ Location permission denied');
+              return;
+            }
+          }
+
+          if (permission == LocationPermission.deniedForever) {
+            print('❌ Location permissions are permanently denied');
+            return;
+          }
+
+          Position position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high,
+          );
+
+          await controller.fetchUsersByDistance(
+            catId
+          );
+        }
       },
       child: Padding(
         padding: const EdgeInsets.all(3.0),
@@ -916,11 +876,17 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
           ),
           child: Row(
             children: [
-              Container(height:16,width:16,decoration: BoxDecoration(  shape: BoxShape.circle,color: AppColors.grey),
+              Container(
+                height: 16,
+                width: 16,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey,
+                ),
                 child: Icon(
                   Icons.circle,
                   size: 14,
-                  color: isSelected ? AppColors.blue : Colors.grey.shade400,
+                  color: isSelected ? Colors.blue : Colors.grey.shade400,
                 ),
               ),
               const SizedBox(width: 6),
@@ -939,4 +905,8 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
       ),
     );
   }
+
+
+
+
 }
