@@ -648,7 +648,6 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
-
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -659,7 +658,6 @@ import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 
 import '../../CancelBooking/views/cancel_booking_view.dart';
-
 import '../../bottom/controllers/bottom_controller.dart';
 import '../../bottom/views/bottom_view.dart';
 import '../../home/controllers/home_controller.dart';
@@ -670,7 +668,6 @@ class ProfessionalPlumberController extends GetxController
   var distances = <int, String>{}.obs;
   var distanceToUser = ''.obs;
   var selected = 'charge'.obs;
-
   Position? currentPosition;
   Future<Position> _getCurrentPosition() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -720,84 +717,85 @@ class ProfessionalPlumberController extends GetxController
 
   List<dynamic> users = []; // List of service providers
 
-  Future<void> getDistanceFromUserToProvider(Map<String, dynamic> user) async {
-    try {
-      // Step 1: Get your current location
-      Position currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+  // Future<void> getDistanceFromUserToProvider(Map<String, dynamic> user) async {
+  //   try {
+  //     // Step 1: Get your current location
+  //     Position currentPosition = await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high,
+  //     );
+  //
+  //     double currentLat = currentPosition.latitude;
+  //     double currentLon = currentPosition.longitude;
+  //
+  //     // Step 2: Get provider's location (GeoJSON format: [longitude, latitude])
+  //     if (user['location'] != null &&
+  //         user['location']['coordinates'] != null &&
+  //         user['location']['coordinates'].length == 2) {
+  //
+  //       double providerLon = user['location']['coordinates'][0]; // Longitude
+  //       double providerLat = user['location']['coordinates'][1]; // Latitude
+  //
+  //       print('📍 Provider Location: ($providerLat, $providerLon)');
+  //       print('📍 Your Location: ($currentLat, $currentLon)');
+  //
+  //       // Step 3: Call the distance API
+  //       var url = Uri.parse(
+  //         'https://jdapi.youthadda.co/getdistance?lat1=$currentLat&lon1=$currentLon&lat2=$providerLat&lon2=$providerLon',
+  //       );
+  //
+  //       var response = await http.get(url);
+  //
+  //       if (response.statusCode == 200) {
+  //         var distJson = json.decode(response.body);
+  //
+  //         if (distJson['code'] == 200 &&
+  //             distJson['data'] != null &&
+  //             distJson['data']['distance'] != null) {
+  //           double distance = double.tryParse(distJson['data']['distance'].toString()) ?? 0;
+  //           user['distance'] = distance.toStringAsFixed(2); // Like "12.34"
+  //           print('✅ Distance: ${user['distance']} km');
+  //           print('My Location: $currentLat, $currentLon');
+  //           print('Provider Location: $providerLat, $providerLon');
+  //
+  //         } else {
+  //           user['distance'] = 'N/A';
+  //           print('⚠️ Distance data missing');
+  //         }
+  //       } else {
+  //         user['distance'] = 'N/A';
+  //         print('❌ Failed to get distance: ${response.reasonPhrase}');
+  //       }
+  //     } else {
+  //       user['distance'] = 'N/A';
+  //       print('⚠️ Provider location invalid');
+  //     }
+  //   } catch (e) {
+  //     user['distance'] = 'N/A';
+  //     print('⚠️ Error: $e');
+  //   }
+  // }
 
-      double currentLat = currentPosition.latitude;
-      double currentLon = currentPosition.longitude;
-
-      // Step 2: Get provider's location (GeoJSON format: [longitude, latitude])
-      if (user['location'] != null &&
-          user['location']['coordinates'] != null &&
-          user['location']['coordinates'].length == 2) {
-        double providerLon = user['location']['coordinates'][0]; // Longitude
-        double providerLat = user['location']['coordinates'][1]; // Latitude
-
-        print('📍 Provider Location: ($providerLat, $providerLon)');
-        print('📍 Your Location: ($currentLat, $currentLon)');
-
-        // Step 3: Call the distance API
-        var url = Uri.parse(
-          'https://jdapi.youthadda.co/getdistance?lat1=$currentLat&lon1=$currentLon&lat2=$providerLat&lon2=$providerLon',
-        );
-
-        var response = await http.get(url);
-
-        if (response.statusCode == 200) {
-          var distJson = json.decode(response.body);
-
-          if (distJson['code'] == 200 &&
-              distJson['data'] != null &&
-              distJson['data']['distance'] != null) {
-            double distance =
-                double.tryParse(distJson['data']['distance'].toString()) ?? 0;
-            user['distance'] = distance.toStringAsFixed(2); // Like "12.34"
-            print('✅ Distance: ${user['distance']} km');
-            print('My Location: $currentLat, $currentLon');
-            print('Provider Location: $providerLat, $providerLon');
-          } else {
-            user['distance'] = 'N/A';
-            print('⚠️ Distance data missing');
-          }
-        } else {
-          user['distance'] = 'N/A';
-          print('❌ Failed to get distance: ${response.reasonPhrase}');
-        }
-      } else {
-        user['distance'] = 'N/A';
-        print('⚠️ Provider location invalid');
-      }
-    } catch (e) {
-      user['distance'] = 'N/A';
-      print('⚠️ Error: $e');
-    }
-  }
-
-  Future<void> fetchAndProcessUsers() async {
-    try {
-      var response = await http.get(Uri.parse('https://api.example.com/users'));
-
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        users = data['data']; // Replace with actual path
-
-        // Call distance function for each user
-        for (var user in users) {
-          await getDistanceFromUserToProvider(user);
-        }
-
-        update(); // GetX use kar rahe ho to UI update hoga
-      } else {
-        print("❌ Failed to fetch users");
-      }
-    } catch (e) {
-      print("⚠️ Error: $e");
-    }
-  }
+  // Future<void> fetchAndProcessUsers() async {
+  //   try {
+  //     var response = await http.get(Uri.parse('https://api.example.com/users'));
+  //
+  //     if (response.statusCode == 200) {
+  //       var data = json.decode(response.body);
+  //       users = data['data']; // Replace with actual path
+  //
+  //       // Call distance function for each user
+  //       for (var user in users) {
+  //         await getDistanceFromUserToProvider(user);
+  //       }
+  //
+  //       update(); // GetX use kar rahe ho to UI update hoga
+  //     } else {
+  //       print("❌ Failed to fetch users");
+  //     }
+  //   } catch (e) {
+  //     print("⚠️ Error: $e");
+  //   }
+  // }
 
   Future<void> saveCurrentLocationToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
@@ -846,29 +844,26 @@ class ProfessionalPlumberController extends GetxController
   var bookingData = {}.obs;
   var selectedIndex = 0.obs;
   final selectedUser = Rxn<Map<String, dynamic>>();
-
   //Position? currentPosition;
 
   double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
     return Geolocator.distanceBetween(lat1, lng1, lat2, lng2); // in kilometers
   }
-
-  Future<void> getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-
-    currentPosition = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-  }
+  // Future<void> getCurrentLocation() async {
+  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if (!serviceEnabled) {
+  //     await Geolocator.openLocationSettings();
+  //     return;
+  //   }
+  //
+  //   LocationPermission permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //   }
+  //
+  //   currentPosition = await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high);
+  // }
 
   @override
   void onInit() {
@@ -877,62 +872,60 @@ class ProfessionalPlumberController extends GetxController
     //   getDistanceFromSharedPrefs(lat2,);
     WidgetsBinding.instance.addObserver(this);
   }
+  // Future<void> fetchDistanceForUser(int index, double lat2, double lng2) async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   double? lat1 = prefs.getDouble('lat1');
+  //   double? lng1 = prefs.getDouble('lng1');
+  //
+  //   if (lat1 != null && lng1 != null) {
+  //     final url = Uri.parse(
+  //         'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lng1&lat2=$lat2&lon2=$lng2');
+  //
+  //     try {
+  //       var request = http.MultipartRequest('GET', url);
+  //       http.StreamedResponse response = await request.send();
+  //
+  //       if (response.statusCode == 200) {
+  //         String result = await response.stream.bytesToString();
+  //         var data = json.decode(result);
+  //         print("✅ API response: $data");
+  //
+  //         // ✅ Extract from `data['data']['distance']`
+  //         if (data['data'] != null && data['data']['distance'] != null) {
+  //           double rawDistance = data['data']['distance'];
+  //          // String formattedDistance = (rawDistance / 1000).toStringAsFixed(2); // convert to KM
+  //           //distances[index] = '$formattedDistance KM';
+  //           print("📏 Distance for user[$index]: ${distances[index]}");
+  //         } else {
+  //           distances[index] = 'N/A';
+  //         }
+  //       } else {
+  //         distances[index] = 'Error';
+  //         print("❌ Failed with status: ${response.statusCode}");
+  //       }
+  //     } catch (e) {
+  //       distances[index] = 'Error';
+  //       print("❌ Exception: $e");
+  //     }
+  //   } else {
+  //     distances[index] = 'No Location';
+  //   }
+  //
+  //   update(); // update UI in GetX
+  // }
 
-  Future<void> fetchDistanceForUser(int index, double lat2, double lng2) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    double? lat1 = prefs.getDouble('lat1');
-    double? lng1 = prefs.getDouble('lng1');
-
-    if (lat1 != null && lng1 != null) {
-      final url = Uri.parse(
-        'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lng1&lat2=$lat2&lon2=$lng2',
-      );
-
-      try {
-        var request = http.MultipartRequest('GET', url);
-        http.StreamedResponse response = await request.send();
-
-        if (response.statusCode == 200) {
-          String result = await response.stream.bytesToString();
-          var data = json.decode(result);
-          print("✅ API response: $data");
-
-          // ✅ Extract from `data['data']['distance']`
-          if (data['data'] != null && data['data']['distance'] != null) {
-            double rawDistance = data['data']['distance'];
-            // String formattedDistance = (rawDistance / 1000).toStringAsFixed(2); // convert to KM
-            //distances[index] = '$formattedDistance KM';
-            print("📏 Distance for user[$index]: ${distances[index]}");
-          } else {
-            distances[index] = 'N/A';
-          }
-        } else {
-          distances[index] = 'Error';
-          print("❌ Failed with status: ${response.statusCode}");
-        }
-      } catch (e) {
-        distances[index] = 'Error';
-        print("❌ Exception: $e");
-      }
-    } else {
-      distances[index] = 'No Location';
-    }
-
-    update(); // update UI in GetX
-  }
-
-  void updateUserDistances(List<dynamic> users) {
-    for (int i = 0; i < users.length; i++) {
-      final lat = double.tryParse(users[i]['lat'] ?? '0') ?? 0.0;
-      final lng = double.tryParse(users[i]['lng'] ?? '0') ?? 0.0;
-
-      if (lat != 0.0 && lng != 0.0) {
-        fetchDistanceForUser(i, lat, lng);
-      } else {
-        distances[i] = 'Invalid';
-      }
-    }
-  }
+  // void updateUserDistances(List<dynamic> users) {
+  //   for (int i = 0; i < users.length; i++) {
+  //     final lat = double.tryParse(users[i]['lat'] ?? '0') ?? 0.0;
+  //     final lng = double.tryParse(users[i]['lng'] ?? '0') ?? 0.0;
+  //
+  //     if (lat != 0.0 && lng != 0.0) {
+  //       fetchDistanceForUser(i, lat, lng);
+  //     } else {
+  //       distances[i] = 'Invalid';
+  //     }
+  //   }
+  // }
 
   @override
   void onClose() {
@@ -1053,6 +1046,7 @@ class ProfessionalPlumberController extends GetxController
     }
   }
 
+  // Booking API call
   final RxString bookedBy = ''.obs;
   final RxString bookedFor = ''.obs;
   final RxList<types.Message> messages = <types.Message>[].obs;
