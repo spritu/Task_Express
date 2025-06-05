@@ -70,13 +70,13 @@ class ChatView extends GetView<ChatController> {
                           if (phoneNumber.isNotEmpty) {
                             controller.makePhoneCall(phoneNumber);
                           } else {
-                            Get.snackbar(
-                              'Error',
-                              'Phone number not available',
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white,
-                            );
+                            // Get.snackbar(
+                            //   'Error',
+                            //   'Phone number not available',
+                            //   snackPosition: SnackPosition.BOTTOM,
+                            //   backgroundColor: Colors.red,
+                            //   colorText: Colors.white,
+                            // );
                           }
                         },
                         child: Icon(Icons.call),

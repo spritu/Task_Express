@@ -262,18 +262,17 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                           print(await response.stream.bytesToString());
                           } else {
                           print("Delete failed: ${response.reasonPhrase}");
-                          Get.snackbar("Error", "Skill delete failed: ${response.reasonPhrase}");
+                      //    Get.snackbar("Error", "Skill delete failed: ${response.reasonPhrase}");
                           }
                           } catch (e) {
                           print("Delete error: $e");
-                          Get.snackbar("Error", "Something went wrong while deleting skill.");
+                         // Get.snackbar("Error", "Something went wrong while deleting skill.");
                           }
                           } else {
-                          Get.snackbar("Error", "Invalid category or subcategory data.");
+                        //  Get.snackbar("Error", "Invalid category or subcategory data.");
                           }
                           },
-
-                            child: Container(
+                                        child: Container(
                                           height: 21,
                                           width: 57,
                                           decoration: BoxDecoration(
