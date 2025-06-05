@@ -647,19 +647,23 @@
 //   }
 // }
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 
 import '../../CancelBooking/views/cancel_booking_view.dart';
 import '../../bottom/controllers/bottom_controller.dart';
 import '../../bottom/views/bottom_view.dart';
 import '../../home/controllers/home_controller.dart';
 
-class ProfessionalPlumberController extends GetxController with WidgetsBindingObserver {
+class ProfessionalPlumberController extends GetxController
+    with WidgetsBindingObserver {
   final HomeController userController = Get.put(HomeController());
   var distances = <int, String>{}.obs;
   var distanceToUser = ''.obs;
@@ -685,11 +689,19 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
     }
 
     return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      desiredAccuracy: LocationAccuracy.high,
+    );
   }
 
-  Future<String?> fetchDistance(double lat1, double lon1, double lat2, double lon2) async {
-    var url = Uri.parse('https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lon1&lat2=$lat2&lon2=$lon2');
+  Future<String?> fetchDistance(
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) async {
+    var url = Uri.parse(
+      'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lon1&lat2=$lat2&lon2=$lon2',
+    );
 
     var request = http.MultipartRequest('GET', url);
     http.StreamedResponse response = await request.send();
@@ -702,6 +714,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
       return null;
     }
   }
+
   List<dynamic> users = []; // List of service providers
 
   // Future<void> getDistanceFromUserToProvider(Map<String, dynamic> user) async {
@@ -784,13 +797,14 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
   //   }
   // }
 
-
   Future<void> saveCurrentLocationToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     if (currentPosition != null) {
       await prefs.setDouble('lat1', currentPosition!.latitude);
       await prefs.setDouble('lng1', currentPosition!.longitude);
-      print("✅ Saved location: ${currentPosition!.latitude}, ${currentPosition!.longitude}");
+      print(
+        "✅ Saved location: ${currentPosition!.latitude}, ${currentPosition!.longitude}",
+      );
     } else {
       print("⚠️ currentPosition is null. Location not saved.");
     }
@@ -800,12 +814,17 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
   List<dynamic>? selectedUsers;
   String? selectedTitle;
 
-  void setCallContext({required int index, required List users, required String title}) {
+  void setCallContext({
+    required int index,
+    required List users,
+    required String title,
+  }) {
     selectedIndexAfterCall = index;
     selectedUsers = users;
     selectedTitle = title;
     shouldShowSheetAfterCall = true;
   }
+
   // To show bottom sheet after phone call ends
   bool shouldShowSheetAfterCall = false;
   var distance = ''.obs;
@@ -828,7 +847,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
   //Position? currentPosition;
 
   double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
-    return Geolocator.distanceBetween(lat1, lng1, lat2, lng2) ; // in kilometers
+    return Geolocator.distanceBetween(lat1, lng1, lat2, lng2); // in kilometers
   }
   // Future<void> getCurrentLocation() async {
   //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -852,7 +871,6 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
     //  getDistanceFromApi( lat2,  lng2)
     //   getDistanceFromSharedPrefs(lat2,);
     WidgetsBinding.instance.addObserver(this);
-
   }
   // Future<void> fetchDistanceForUser(int index, double lat2, double lng2) async {
   //   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -896,9 +914,6 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
   //   update(); // update UI in GetX
   // }
 
-
-
-
   // void updateUserDistances(List<dynamic> users) {
   //   for (int i = 0; i < users.length; i++) {
   //     final lat = double.tryParse(users[i]['lat'] ?? '0') ?? 0.0;
@@ -917,6 +932,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
     super.onClose();
     WidgetsBinding.instance.removeObserver(this);
   }
+
   Future<String> getDistanceFromApi(double lat2, double lng2) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     double? lat1 = prefs.getDouble('lat1');
@@ -1019,9 +1035,6 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
     }
   }
 
-
-
-
   // Make phone call and mark to show sheet after call ends
   void makePhoneCall(String phoneNumber) async {
     final Uri callUri = Uri(scheme: 'tel', path: phoneNumber);
@@ -1032,6 +1045,13 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
       Get.snackbar('Error', 'Could not launch phone call');
     }
   }
+
+  // Booking API call
+  final RxString bookedBy = ''.obs;
+  final RxString bookedFor = ''.obs;
+  final RxList<types.Message> messages = <types.Message>[].obs;
+  final Rxn<types.User> user = Rxn<types.User>();
+  late IO.Socket socket;
 
   // Booking API call
   Future<void> bookServiceProvider({
@@ -1050,11 +1070,17 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
 
       var headers = {'Content-Type': 'application/json'};
 
+      // ✅ Store in RxString
+      this.bookedBy.value = userId2;
+      this.bookedFor.value = bookedFor;
+
       var body = json.encode({
         "bookedBy": userId2,
         "bookedFor": bookedFor,
         "bookServices": serviceIds,
       });
+
+      print("Sprint: $bookedFor");
 
       var request = http.Request(
         'POST',
@@ -1081,6 +1107,7 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
         controller.helperName.value = selectedHelperName;
         controller.showRequestPending.value = acceptStatus == null;
         controller.selectedIndex.value = 1;
+        connectSocket();
 
         Get.to(() => BottomView());
       } else {
@@ -1092,18 +1119,84 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
     }
   }
 
+  /// socket new booking
+
+  void connectSocket() {
+    if (bookedBy.value == null || bookedFor.value.isEmpty) {
+      print(" User ID or BookedFor missing New booking");
+      return;
+    }
+
+    print(
+      '🔌 Connecting socket for user New booking: ${bookedBy.value}, bookedFor: ${bookedFor.value}',
+    );
+
+    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+      'forceNew': true,
+      'auth': {
+        'user': {
+          '_id': bookedBy.value,
+          'firstName': 'plumber naman', // Optional, can be dynamic
+        },
+      },
+    });
+
+    socket.connect();
+
+    // socket.onConnect((_) {
+    //   print('Connected to socket12121212');
+    // });
+
+    socket.onConnect((_) {
+      print(' Connected to socket New booking');
+
+      /// Emit userId and bookedFor after socket is connected
+      final payload = {'receiver': bookedFor.value};
+
+      print('Emitting newBooking payload New booking: $payload');
+      socket.emit('newBooking', payload);
+    });
+
+    socket.onDisconnect((_) {
+      print('New booking Disconnected from socket');
+    });
+
+    socket.onConnectError((err) {
+      print('New booking Connect Error: $err');
+    });
+
+    socket.onError((err) {
+      print('New booking Socket Error: $err');
+    });
+
+    /// Listen to newBooking messages
+    socket.on('newBooking', (data) {
+      print('📩 Received newBooking message: $data');
+
+      final msg = types.TextMessage(
+        id: data['_id'] ?? const Uuid().v4(),
+        text: data['message'] ?? '',
+        author: types.User(id: data['senderId'] ?? 'unknown'),
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      messages.insert(0, msg);
+    });
+  }
 
   // Widget to show bottom sheet after call ends
   Widget showAfterCallSheet(
-      BuildContext context, {
-        required String name,
-        required String imageUrl,
-        required String experience,
-        required String phone,
-        required String userId,
-        required String title,
-        required List<Map<String, dynamic>> skills, // Pass dynamic skills
-      }) {
+    BuildContext context, {
+    required String name,
+    required String imageUrl,
+    required String experience,
+    required String phone,
+    required String userId,
+    required String title,
+    required List<Map<String, dynamic>> skills, // Pass dynamic skills
+  }) {
     return SingleChildScrollView(
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -1129,9 +1222,11 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundImage: imageUrl.isNotEmpty
-                      ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
-                      : const AssetImage('assets/images/account.png') as ImageProvider,
+                  backgroundImage:
+                      imageUrl.isNotEmpty
+                          ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
+                          : const AssetImage('assets/images/account.png')
+                              as ImageProvider,
                 ),
                 const SizedBox(width: 10),
                 Text(
@@ -1162,13 +1257,14 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: professionRow(
-                  title: (skill['subcategoryName'] != null && skill['subcategoryName'].toString().isNotEmpty)
-                      ? skill['subcategoryName']
-                      : (skill['categoryName'] != null && skill['categoryName'].toString().isNotEmpty)
-                      ? skill['categoryName']
-                      : 'Service',
-
-
+                  title:
+                      (skill['subcategoryName'] != null &&
+                              skill['subcategoryName'].toString().isNotEmpty)
+                          ? skill['subcategoryName']
+                          : (skill['categoryName'] != null &&
+                              skill['categoryName'].toString().isNotEmpty)
+                          ? skill['categoryName']
+                          : 'Service',
 
                   price: "₹ ${skill['charge'].toString()}",
                   onBookNow: () {
@@ -1186,15 +1282,14 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
                         await bookServiceProvider(
                           // <-- Ensure this is defined
                           bookedFor: userId,
-                          serviceIds: serviceIds, selectedHelperName: '',
+                          serviceIds: serviceIds,
+                          selectedHelperName: '',
                         );
                       },
                     );
                   },
-
                 ),
               ),
-
 
             const SizedBox(height: 20),
             const Text(
@@ -1282,7 +1377,10 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
                   onPressed: onBookNow,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF114BCA),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -1307,20 +1405,17 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
     );
   }
 
-
-
-
   void showAreUSureSheet(
-      BuildContext context, {
-        required String name,
-        required String imageUrl,
-        required String experience,
-        required String phone,
-        required String userId,
-        required String title,
-        required Map<String, dynamic> skill,
-        required Future<void> Function(List<String> serviceIds) bookServiceProvider,
-      }) {
+    BuildContext context, {
+    required String name,
+    required String imageUrl,
+    required String experience,
+    required String phone,
+    required String userId,
+    required String title,
+    required Map<String, dynamic> skill,
+    required Future<void> Function(List<String> serviceIds) bookServiceProvider,
+  }) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1349,9 +1444,13 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
                   ),
                   CircleAvatar(
                     radius: 40,
-                    backgroundImage: imageUrl.isNotEmpty
-                        ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
-                        : const AssetImage('assets/images/account.png') as ImageProvider,
+                    backgroundImage:
+                        imageUrl.isNotEmpty
+                            ? NetworkImage(
+                              'https://jdapi.youthadda.co/$imageUrl',
+                            )
+                            : const AssetImage('assets/images/account.png')
+                                as ImageProvider,
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -1364,7 +1463,10 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
                   ),
                   const SizedBox(height: 20),
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 20,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -1386,7 +1488,8 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
                           width: 176,
                           child: ElevatedButton(
                             onPressed: () async {
-                              String serviceId = skill['subcategoryId']?.toString() ??
+                              String serviceId =
+                                  skill['subcategoryId']?.toString() ??
                                   skill['categoryId'].toString();
                               Navigator.pop(context);
                               await bookServiceProvider([serviceId]);
@@ -1400,7 +1503,11 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.check, color: Colors.white, size: 18),
+                                Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
                                 SizedBox(width: 10),
                                 Text(
                                   "Yes",
@@ -1430,7 +1537,11 @@ class ProfessionalPlumberController extends GetxController with WidgetsBindingOb
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.close, color: Color(0xFF114BCA), size: 18),
+                                Icon(
+                                  Icons.close,
+                                  color: Color(0xFF114BCA),
+                                  size: 18,
+                                ),
                                 SizedBox(width: 10),
                                 Text(
                                   "No",
