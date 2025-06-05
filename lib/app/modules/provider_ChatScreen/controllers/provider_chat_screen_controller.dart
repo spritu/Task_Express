@@ -40,6 +40,7 @@ class ProviderChatScreenController extends GetxController {
   final Rxn<types.User> user = Rxn<types.User>();
   late IO.Socket socket;
   RxString userId = ''.obs;
+  var receiverId = ''.obs;
   @override
   void onInit() {
     super.onInit();
@@ -94,11 +95,11 @@ class ProviderChatScreenController extends GetxController {
     });
 
     socket.on('message', (data) {
-      ProviderChatScreenController providerChatScreenController = Get.put(
-        ProviderChatScreenController(),
-      );
-      providerChatScreenController.fetchLastMessages();
-      //fetchChatHistory();
+      // ProviderChatScreenController providerChatScreenController = Get.put(
+      //   ProviderChatScreenController(),
+      // );
+      // providerChatScreenController.fetchLastMessages();
+      fetchLastMessages();
       print('📩 Received message: $data');
 
       final msg = types.TextMessage(
@@ -132,6 +133,10 @@ class ProviderChatScreenController extends GetxController {
 
         for (var item in jsonData) {
           final lm = item['lastMessage'];
+          receiverId.value = item['receiverId'];
+          print(
+            "viewallmessage: $receiverId   unseenCount: ${item['unseenCount']}",
+          );
           final chatItem = ChatItem(
             message: lm?['message'] ?? 'No message',
             timestamp: lm?['timestamp'] ?? 'No timestamp',

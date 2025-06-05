@@ -56,6 +56,7 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                             child: InkWell(
                               onTap: () async {
                                 await controller.markChatAsRead(chat.reciverId);
+                                // await controller.fetchAllMessages();
                                 Get.to(
                                   ProviderChatView(),
                                   arguments: {
@@ -253,16 +254,12 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                                                       child: Center(
                                                         child: Text(
                                                           '${chat.unreadCount}',
-                                                          style:
-                                                              const TextStyle(
-                                                                color:
-                                                                    Colors
-                                                                        .black,
-                                                                fontSize: 10,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),

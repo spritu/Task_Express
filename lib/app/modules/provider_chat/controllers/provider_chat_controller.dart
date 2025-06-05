@@ -76,8 +76,40 @@ class ProviderChatController extends GetxController {
     }
 
     connectSocket();
+
+    /// 👉 Call after receiverId is set
+    await fetchAllMessages();
+
     fetchChatHistory();
     isInitialized.value = true;
+  }
+
+  Future<void> fetchAllMessages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final reciverID = prefs.getString('userId');
+    print("vgvgvgvgvgv:$reciverID");
+    if (reciverID!.isEmpty) {
+      print('❌ receiverId is empty, aborting fetchAllMessages');
+      return;
+    }
+
+    var headers = {'Content-Type': 'application/json'};
+    print('📨 receiverId all messages: $reciverID');
+
+    var url = Uri.parse('https://jdapi.youthadda.co/viewAll');
+    var body = json.encode({"receiver": reciverID});
+
+    try {
+      var response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        print('✅ Success viewall : ${response.body}');
+      } else {
+        print('❌ Error ${response.statusCode}: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('⚠️ Exception occurred: $e');
+    }
   }
 
   Future<void> fetchChatHistory() async {
@@ -113,7 +145,7 @@ class ProviderChatController extends GetxController {
               }
 
               final senderId = msg['sender']?['_id'] ?? '';
-              final messageId = msg['_id'];
+              final isRead = msg['viewall'] == "true";
 
               // Just for testing: delete first message
               // if (history.isEmpty && messageId != null) {
@@ -125,12 +157,14 @@ class ProviderChatController extends GetxController {
                   text: msg['message'] ?? '',
                   author: types.User(id: senderId),
                   createdAt: createdAtEpoch,
+                  metadata: {'isRead': isRead},
                 ),
               );
             }
           }
 
           messages.assignAll(history); // 👈 old to new
+          print("messages54544555${messages}");
         } else {
           print("❌ Unexpected response format");
         }

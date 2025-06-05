@@ -60,6 +60,7 @@ class ProviderChatView extends GetView<ProviderChatController> {
                   itemBuilder: (context, index) {
                     final msg = messages[index];
                     final isSender = msg.author.id == controller.user.value?.id;
+                    final isRead = msg.metadata?['isRead'] == true;
                     final name =
                         isSender ? "You" : controller.receiverName.value;
                     print('object121 ${controller.receiverImage.value}');
@@ -96,7 +97,7 @@ class ProviderChatView extends GetView<ProviderChatController> {
                           message: msg.text,
                           time: time,
                           imageUrl: displayImage,
-                          isRead: true,
+                          isRead: isRead,
                           onLongPress: () async {
                             final confirmDelete = await showDialog<bool>(
                               context: context,
