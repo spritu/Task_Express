@@ -272,8 +272,7 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                           Get.snackbar("Error", "Invalid category or subcategory data.");
                           }
                           },
-
-                            child: Container(
+                                        child: Container(
                                           height: 21,
                                           width: 57,
                                           decoration: BoxDecoration(
