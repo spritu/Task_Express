@@ -123,9 +123,14 @@ class ProviderChatView extends GetView<ProviderChatController> {
                             );
 
                             if (confirmDelete == true) {
-                              if (msg.author.id == controller.user.value?.id) {
-                                // 🟢 Current user is sender → permanently delete
-                                await controller.deleteMessage(msg.id);
+                              final userId = controller.user.value?.id;
+
+                              if (msg.author.id == userId) {
+                                // 🟢 Current user is sender → permanently delete from server
+                                await controller.deleteMessage(
+                                  msg.id,
+                                  userId!,
+                                ); // 👈 userId passed here
                               }
 
                               // 🔴 Always remove locally (for sender & receiver)

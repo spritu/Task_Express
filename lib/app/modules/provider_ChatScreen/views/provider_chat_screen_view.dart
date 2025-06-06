@@ -55,7 +55,13 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: InkWell(
                               onTap: () async {
+                                final bottom2controller = Get.put(
+                                  Bottom2Controller(),
+                                );
+                                await bottom2controller
+                                    .markChatNotificationAsSeen();
                                 await controller.markChatAsRead(chat.reciverId);
+
                                 // await controller.fetchAllMessages();
                                 Get.to(
                                   ProviderChatView(),
@@ -65,11 +71,9 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                                         '${chat.firstName} ${chat.lastName}',
                                     'receiverImage': chat.profilePic,
                                   },
-                                )
-                                //     ?.then((_) async {
-                                //   await controller.fetchLastMessages();
-                                // })
-                                ;
+                                )?.then((_) async {
+                                  await controller.fetchLastMessages();
+                                });
                               },
                               onLongPress: () {
                                 showDialog(
@@ -202,7 +206,7 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                                                     controller.formatTimestamp(
                                                       chat.timestamp,
                                                     ),
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 10,
                                                       fontWeight:
                                                           FontWeight.w400,

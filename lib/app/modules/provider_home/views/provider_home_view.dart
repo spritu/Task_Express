@@ -1165,31 +1165,31 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                       ],
                     ),
                     const Spacer(),
-                    Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.transparent,
-                        border: Border.all(color: Colors.black, width: 1),
-                      ),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(15),
-                        onTap: () {
-                          final userBottomController = Get.put(
-                            BottomController(),
-                          );
-                          userBottomController.fetchNotifications();
-                        },
-                        child: Center(
-                          child: Icon(
-                            Icons.notifications,
-                            color: Colors.black,
-                            size: 18, // Slightly smaller for better fit
-                          ),
-                        ),
-                      ),
-                    ),
+                    // Container(
+                    //   width: 30,
+                    //   height: 30,
+                    //   decoration: BoxDecoration(
+                    //     shape: BoxShape.circle,
+                    //     color: Colors.transparent,
+                    //     border: Border.all(color: Colors.black, width: 1),
+                    //   ),
+                    //   child: InkWell(
+                    //     borderRadius: BorderRadius.circular(15),
+                    //     onTap: () {
+                    //       final userBottomController = Get.put(
+                    //         BottomController(),
+                    //       );
+                    //       userBottomController.fetchNotifications();
+                    //     },
+                    //     child: Center(
+                    //       child: Icon(
+                    //         Icons.notifications,
+                    //         color: Colors.black,
+                    //         size: 18, // Slightly smaller for better fit
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
                 SizedBox(height: 10),
