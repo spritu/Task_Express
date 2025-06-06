@@ -86,24 +86,23 @@ class HomeController extends GetxController {
     }
   }
   Map<String, String> categoryNameMap = {};
+
+
   Future<void> fetchUsersListByCategory(String catId, {String? categoryName}) async {
+    print("📦 catId received: $catId"); // This must NOT be null
     results.clear();
     isLoading.value = true;
 
     try {
-      // Ensure category names are ready
+      // ✅ Save catId to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('selectedCatId', catId);
+      print("💾 Saved catId to SharedPreferences: $catId");
+
+      // Optional: fetchCategories (if needed)
       fetchCategories();
 
-      // Get current user location (you can optionally remove this if not needed)
-      // Position currentPosition = await Geolocator.getCurrentPosition(
-      //   desiredAccuracy: LocationAccuracy.high,
-      // );
-      // double currentLat = currentPosition.latitude;
-      // double currentLon = currentPosition.longitude;
-      //
-      // print("📍 Current location: ($currentLat, $currentLon)");
-
-      // Fetch users by category
+      // 🔗 API call
       var url = Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId');
       var response = await http.get(url);
 
@@ -111,40 +110,25 @@ class HomeController extends GetxController {
         final jsonData = json.decode(response.body);
         List<dynamic> users = jsonData['data'];
 
-        // for (var user in users) {
-        //   // Add category name
-        //   if (user['skills'] != null) {
-        //     for (var skill in user['skills']) {
-        //       skill['categoryName'] = categoryNameMap[skill['categoryId']] ?? 'Unknown';
-        //     }
-        //   }
-        //
-        //   // Extract location info only (if needed)
-        //   if (user['location'] != null &&
-        //       user['location']['coordinates'] != null &&
-        //       user['location']['coordinates'].length == 2) {
-        //     double providerLon = user['location']['coordinates'][0]; // longitude
-        //     double providerLat = user['location']['coordinates'][1]; // latitude
-        //
-        //     user['longitude'] = providerLon;
-        //     user['latitude'] = providerLat;
-        //   }
-        // }
-
-        // Assign results and navigate
         results.assignAll(users);
 
         if (results.isNotEmpty) {
+          print("✅ Going to ProfessionalPlumberView with catId: $catId");
+
           Get.to(() => ProfessionalPlumberView(), arguments: {
             'users': results,
+            'catId': catId,
             'title': categoryName ?? 'Professionals',
           });
         } else {
+          print("➡ Navigating to ServiceproView with catId: $catId");
           Get.to(() => ServiceproView(), arguments: {
             'users': results,
+            'catId': catId,
             'title': categoryName ?? 'Professionals',
           });
         }
+
       } else {
         print("❌ Failed to fetch users: ${response.statusCode} - ${response.reasonPhrase}");
       }
@@ -154,6 +138,7 @@ class HomeController extends GetxController {
       isLoading.value = false;
     }
   }
+
 
   // Future<void> fetchUsersListByCategory(String catId, {String? categoryName}) async {
   //   results.clear();

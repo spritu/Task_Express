@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../colors.dart';
+import '../../chat/views/chat_view.dart';
 import '../../name_detail/views/name_detail_view.dart';
 import '../controllers/plastering_helper_controller.dart';
 
@@ -68,14 +69,18 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
               itemBuilder: (context, index) {
                 final worker = dataList[index];
                 final charge =
-                worker['skills'] != null && worker['skills'].isNotEmpty
-                    ? worker['skills'][0]['charge'].toString()
-                    : 0;
-                return InkWell(onTap: (){
-                  Get.to(() => NameDetailView(), arguments: worker);
-                },
+                    worker['skills'] != null && worker['skills'].isNotEmpty
+                        ? worker['skills'][0]['charge'].toString()
+                        : 0;
+                return InkWell(
+                  onTap: () {
+                    Get.to(() => NameDetailView(), arguments: worker);
+                  },
                   child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -100,14 +105,22 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                                 height: 80,
                                 width: 80,
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
-                                    Icon(Icons.person, size: 80, color: Colors.grey),
+                                errorBuilder:
+                                    (_, __, ___) => Icon(
+                                      Icons.person,
+                                      size: 80,
+                                      color: Colors.grey,
+                                    ),
                               ),
                             ),
                             const SizedBox(height: 6),
                             Row(
                               children: [
-                                const Icon(Icons.star, color: Colors.amber, size: 14),
+                                const Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                  size: 14,
+                                ),
                                 const SizedBox(width: 2),
                                 Text(
                                   "${worker['rating'] ?? '4.7'} (${worker['reviewCount'] ?? '89'} reviews)",
@@ -150,8 +163,10 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                                     ),
                                   ),
                                   Container(
-                                    padding:
-                                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: const Color(0xff114BCA),
                                       borderRadius: BorderRadius.circular(8),
@@ -174,14 +189,22 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                                 children: [
                                   Icon(
                                     Icons.check_circle,
-                                    color: worker['avail'] == 1 ? Colors.green : Colors.red,
+                                    color:
+                                        worker['avail'] == 1
+                                            ? Colors.green
+                                            : Colors.red,
                                     size: 10,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    worker['avail'] == 1 ? "Available" : "Not Available",
+                                    worker['avail'] == 1
+                                        ? "Available"
+                                        : "Not Available",
                                     style: TextStyle(
-                                      color: worker['avail'] == 1 ? Colors.green : Colors.red,
+                                      color:
+                                          worker['avail'] == 1
+                                              ? Colors.green
+                                              : Colors.red,
                                       fontSize: 10,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -191,13 +214,20 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
 
                               const SizedBox(height: 6),
                               // Distance & Time
-                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children:  [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
                                   Row(
                                     children: [
-                                      Icon(Icons.location_on, size: 14, color: Colors.grey),
+                                      Icon(
+                                        Icons.location_on,
+                                        size: 14,
+                                        color: Colors.grey,
+                                      ),
                                       Text(
-                                        "${worker['distance'] ?? '3.5'} km", // Make it dynamic if needed
+                                        "${worker['distance'] ?? '3.5'} km",
+                                        // Make it dynamic if needed
                                         style: TextStyle(
                                           fontSize: 11,
                                           color: Colors.black87,
@@ -234,8 +264,8 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                                               ),
                                             ),
                                             TextSpan(
-                                             // text: "₹ ${worker['charge'] ?? '0'}/day",
-                                              text:charge.toString(),
+                                              // text: "₹ ${worker['charge'] ?? '0'}/day",
+                                              text: charge.toString(),
                                               style: TextStyle(
                                                 fontSize: 11,
                                                 color: AppColors.orage,
@@ -249,10 +279,9 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                                   ),
                                 ],
                               ),
-                             // const SizedBox(height: 6),
+
+                              // const SizedBox(height: 6),
                               // Charge Pill
-
-
                               const SizedBox(height: 10),
                               // Call & Chat Buttons
                               Row(
@@ -261,11 +290,34 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                                     child: SizedBox(
                                       height: 32,
                                       child: ElevatedButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          final phoneNumber =
+                                              worker['phone'] ?? '';
+                                          if (phoneNumber.isNotEmpty) {
+                                            // Store full list
+
+                                            controller.makePhoneCall(
+                                              phoneNumber,
+                                            );
+                                          } else {
+                                            Get.snackbar(
+                                              'Error',
+                                              'Phone number not available',
+                                              snackPosition:
+                                                  SnackPosition.BOTTOM,
+                                              backgroundColor: Colors.red,
+                                              colorText: Colors.white,
+                                            );
+                                          }
+                                        },
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xff114BCA),
+                                          backgroundColor: const Color(
+                                            0xff114BCA,
+                                          ),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                         ),
                                         child: const Text(
@@ -285,11 +337,48 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                                     child: SizedBox(
                                       height: 32,
                                       child: ElevatedButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          final receiverId =
+                                              worker['_id'].toString();
+                                          final receiverName =
+                                              '${worker['firstName'] ?? ''} ${worker['lastName'] ?? ''}'
+                                                  .trim();
+                                          final receiverImage =
+                                              worker['userImg'] ?? '';
+                                          final phoneNumber =
+                                              worker['phone'] ?? '';
+                                          if (receiverId.isNotEmpty) {
+                                            Get.to(
+                                              ChatView(),
+                                              arguments: {
+                                                'receiverId': receiverId,
+                                                'receiverName':
+                                                    receiverName.isNotEmpty
+                                                        ? receiverName
+                                                        : 'No Name',
+                                                'receiverImage': receiverImage,
+                                                'phoneNumber': phoneNumber,
+                                              },
+                                            );
+                                          } else {
+                                            Get.snackbar(
+                                              'Error',
+                                              'Receiver ID not available',
+                                              snackPosition:
+                                                  SnackPosition.BOTTOM,
+                                              backgroundColor: Colors.red,
+                                              colorText: Colors.white,
+                                            );
+                                          }
+                                        },
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xff114BCA),
+                                          backgroundColor: const Color(
+                                            0xff114BCA,
+                                          ),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
                                         ),
                                         child: const Text(
@@ -315,7 +404,6 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                 );
               },
             ),
-
           ),
         ],
       ),

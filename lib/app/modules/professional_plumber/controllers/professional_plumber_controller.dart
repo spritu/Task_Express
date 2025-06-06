@@ -667,9 +667,45 @@ class ProfessionalPlumberController extends GetxController
     with WidgetsBindingObserver {
   final HomeController userController = Get.put(HomeController());
   var distances = <int, String>{}.obs;
-  var distanceToUser = ''.obs;
+  var distanceToUser = ''.obs; late RxString catId = ''.obs;
+  // Observable catId
+  var users = <Map<String, dynamic>>[].obs;
   var selected = 'charge'.obs;
   Position? currentPosition;
+
+  Future<void> loadCatIdFromArguments() async {
+    final args = Get.arguments;
+    print("👀 Incoming arguments: $args"); // Debug print
+
+    if (args != null && args['catId'] != null) {
+      catId.value = args['catId'];
+      print("✅ catId loaded from arguments: ${catId.value}");
+    } else {
+      print("❌ catId not found in arguments");
+    }
+  }
+  Future<void> loadCatIdFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? savedCatId = prefs.getString('selectedCatId');
+
+    if (savedCatId != null && savedCatId.isNotEmpty) {
+      catId.value = savedCatId;
+      print("✅ Loaded catId from SharedPreferences: $savedCatId");
+    } else {
+      print("❌ No catId found in SharedPreferences");
+    }
+  }
+
+  Future<void> waitAndLoadArguments() async {
+    await Future.delayed(Duration(milliseconds: 100));
+    final args = Get.arguments;
+    if (args != null && args['catId'] != null) {
+      catId.value = args['catId'];
+      print("✅ Fallback catId loaded: ${catId.value}");
+    }
+  }
+
+
   Future<Position> _getCurrentPosition() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -729,50 +765,57 @@ class ProfessionalPlumberController extends GetxController
     return "Unknown Location";
   }
 
-  Future<void> fetchUsersByDistance(String catId) async {
+  Future<void> fetchUsersWithDistance() async {
     try {
-      // ✅ Step 1: Get current location
+    //  String currentCatId = catId.value;
+      final prefs = await SharedPreferences.getInstance();
+      String? catId = prefs.getString('selectedCatId');
+      // ✅ Get current user location
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      double latitude = position.latitude;
-      double longitude = position.longitude;
+      double lat = position.latitude;
+      double lng = position.longitude;
 
-      // ✅ Step 2: Call the API with dynamic lat/lng
-      final Uri uri = Uri.parse(
-        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&lat=$latitude&lng=$longitude',
+      print("📍 LAT: $lat, LNG: $lng, CATID: $catId");
+
+      // ✅ Construct URL
+      final url = Uri.parse(
+        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&lat=$lat&lng=$lng',
       );
 
-      var request = http.Request('GET', uri);
+      // ✅ Make GET request
+      var request = http.Request('GET', url);
       http.StreamedResponse response = await request.send();
 
-      // ✅ Step 3: Handle the response
       if (response.statusCode == 200) {
-        String responseBody = await response.stream.bytesToString();
-        final jsonResponse = json.decode(responseBody);
+        final resBody = await response.stream.bytesToString();
+        final jsonData = json.decode(resBody);
 
-        print("✅ API Response:");
-        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        print(jsonEncode(jsonResponse));
+        print("✅ RESPONSE: $jsonData");
 
-        // Optional: Parse and use the data
-        List<Map<String, dynamic>> users =
-        List<Map<String, dynamic>>.from(jsonResponse['data'] ?? []);
+        users.value = List<Map<String, dynamic>>.from(jsonData['data'] ?? []);
 
-        // You can now use 'users' as needed
+        for (var user in users) {
+          print("👤 ${user['name']} - Distance: ${user['distance']} km");
+        }
       } else {
-        print("❌ API Error: ${response.reasonPhrase}");
+        print('❌ API Error: ${response.statusCode} - ${response.reasonPhrase}');
+        print('❌ Full URL: $url');
       }
     } catch (e) {
-      print("❌ Exception: $e");
+      print('❌ Exception: $e');
     }
   }
 
 
-  List<dynamic> users = []; // List of service providers
-  Future<void> fetchUsersSortedByCharge(String catId) async {
+
+
+  Future<void> fetchUsersSortedByCharge() async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      String? catId = prefs.getString('selectedCatId');
       var request = http.Request(
         'GET',
         Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&sortBy=lowToHigh'),
@@ -784,7 +827,7 @@ class ProfessionalPlumberController extends GetxController
         final resBody = await response.stream.bytesToString();
         final jsonData = json.decode(resBody);
 
-        users = List<Map<String, dynamic>>.from(jsonData['data'] ?? []);
+        users.value = List<Map<String, dynamic>>.from(jsonData['data'] ?? []);
         print("ssssssssssssssssssssssssssss");
       } else {
        // Get.snackbar('Error', 'Failed to fetch sorted users.');
@@ -945,11 +988,33 @@ class ProfessionalPlumberController extends GetxController
 
   @override
   void onInit() {
-    super.onInit();
-    //  getDistanceFromApi( lat2,  lng2)
-    //   getDistanceFromSharedPrefs(lat2,);
-    WidgetsBinding.instance.addObserver(this);
+    super.onInit(); Future.microtask(() async {
+      await loadCatIdFromArguments();
+    });
+    waitAndLoadArguments();
+    final arguments = Get.arguments as Map<String, dynamic>;
+
+    if (arguments != null) {
+      users.value = List<Map<String, dynamic>>.from(arguments['users'] ?? []);
+      final String title = arguments['title'] ?? 'Professionals';
+    final String catId = arguments['catId'] ?? '';
+
+
+      print("🎯 Controller CatID: ${catId}");
+    }
+
+
+    // if (args != null && args['catId'] != null) {
+    //   catId = args['catId'].toString();
+    //   fetchUsersWithDistance();
+    //   print("catiiiiiii:$catId");
+    // } else {
+    //   print("❌ catId missing in arguments");
+    // }
   }
+
+
+
   // Future<void> fetchDistanceForUser(int index, double lat2, double lng2) async {
   //   SharedPreferences prefs = await SharedPreferences.getInstance();
   //   double? lat1 = prefs.getDouble('lat1');

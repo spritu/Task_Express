@@ -20,7 +20,13 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
     final arguments = Get.arguments as Map<String, dynamic>;
     final List users = arguments['users'];
     final String title = arguments['title'] ?? 'Professionals';
-    final int avail = arguments['avail'] ?? 0;  final String catId = arguments['catId'] ?? ''; // 🟢 Use this for sorting
+    final int avail = arguments['avail'] ?? 0;
+    final String catId = arguments['catId'] ?? '';
+
+
+    print("🎯 CatIDddddddddddddd: ${catId}");
+    //final String catId = arguments['_id'] ?? ''; // 🟢 Use this for sorting
+  //  print("catidddd:$catId");
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(
@@ -78,8 +84,8 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
             child:  Obx(() => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                buildToggleButton("charge", "Search by Charge",catId),
-                buildToggleButton("distance", "Search by Distance",catId),
+                buildToggleButton("charge", "Search by Charge","catId"),
+                buildToggleButton("distance", "Search by Distance","catId"),
               ],
             )),
           ),
@@ -96,7 +102,12 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   final imagePath = user['userImg'] ?? '';
                   final imageUrl = imagePath.isNotEmpty ? 'https://jdapi.youthadda.co/$imagePath' : '';
                   final int avail = user["avail"] ?? 0;
-                  final distance = user['distance'] ?? 'N/A';
+                  final distance = user['distance']?.toString() ?? 'N/A';
+                  for (var user in users) {
+                    final distance = user['distance']?.toString() ?? 'N/A';
+                    print("👤 ${user['name']} - Distance: $distance");
+                  }
+
                   final charge =
                   user['skills'] != null && user['skills'].isNotEmpty
                       ? user['skills'][0]['charge']
@@ -306,11 +317,15 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                                 color: Colors.grey,
                                               ),
                                             ),
-                                            Text( '$distance', // ✅ Use calculated distance
-                                              // user['distance'] != null && user['distance'] != 'N/A'
-                                              //     ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
-                                              //     : 'N/A',
-                                              style: TextStyle(fontSize: 12),
+                                            Row(
+                                              children: [
+                                                Text( user['distance']?.toString() ?? '0',// ✅ Use calculated distance
+                                                  // user['distance'] != null && user['distance'] != 'N/A'
+                                                  //     ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
+                                                  //     : 'N/A',
+                                                  style: TextStyle(fontSize: 12),
+                                                ),SizedBox(width: 4,),Text("Km")
+                                              ],
                                             )
                                           ],
                                         ),
@@ -825,7 +840,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
         controller.selected.value = value;
 
         if (value == "charge") {
-          await controller.fetchUsersSortedByCharge(catId);
+          await controller.fetchUsersSortedByCharge();
         } else if (value == "distance") {
           print("dissssssssssssssssssssssss");
           // ✅ Get current location before API call
@@ -853,8 +868,8 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
             desiredAccuracy: LocationAccuracy.high,
           );
 
-          await controller.fetchUsersByDistance(
-            catId
+          await controller.fetchUsersWithDistance(
+
           );
         }
       },

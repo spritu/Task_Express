@@ -83,7 +83,7 @@ void main() async {
   Get.put(TileFixingHelperController(), permanent: true);
   Get.put(JobsDetailsController(), permanent: true);
   Get.put(RoadConstructionHelperController(), permanent: true);
-  Get.put(ProfessionalPlumberController(), permanent: true);
+//  Get.put(ProfessionalPlumberController(), permanent: true);
   Get.put(SettingController(), permanent: true);
   // Get.put(EditProfileController(),permanent: true);
   Get.put(JobsController(), permanent: true);

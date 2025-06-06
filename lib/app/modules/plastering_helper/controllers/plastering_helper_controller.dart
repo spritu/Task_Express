@@ -1,5 +1,6 @@
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PlasteringHelperController extends GetxController {
   //TODO: Implement PlasteringHelperController
@@ -17,7 +18,15 @@ class PlasteringHelperController extends GetxController {
   //     return "Error: $e";
   //   }
   // }
+  void makePhoneCall(String phoneNumber) async {
+    final Uri callUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(callUri)) {
 
+      await launchUrl(callUri);
+    } else {
+      Get.snackbar('Error', 'Could not launch phone call');
+    }
+  }
   void fetchWorkers() {
     workers.value = [
       {
