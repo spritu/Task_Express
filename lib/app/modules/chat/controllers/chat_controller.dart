@@ -60,11 +60,14 @@ class ChatController extends GetxController {
 
   Future<void> initializeChat() async {
     // Retrieve userId from SharedPreferences
+
     final prefs = await SharedPreferences.getInstance();
     final baseUrl = 'https://jdapi.youthadda.co/';
     userImg.value = '$baseUrl${prefs.getString('userImg')}';
     print('object99:${userImg.value}');
+
     await prefs.reload();
+
     final userId2 = prefs.getString('userId') ?? '';
     firstName.value = prefs.getString("firstName")!;
     lastName.value = prefs.getString('lastName')!;
@@ -89,9 +92,40 @@ class ChatController extends GetxController {
       print('❌ No arguments received');
     }
 
+    /// 👉 Call after receiverId is set
+    await fetchAllMessages();
+
     connectSocket();
     fetchChatHistory();
     isInitialized.value = true;
+  }
+
+  Future<void> fetchAllMessages() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final reciverID = prefs.getString('userId');
+    print("vgvgvgvgvgv:$reciverID");
+    if (reciverID!.isEmpty) {
+      print('❌ receiverId is empty, aborting fetchAllMessages');
+      return;
+    }
+
+    var headers = {'Content-Type': 'application/json'};
+    print('📨 receiverId all messages: $reciverID');
+
+    var url = Uri.parse('https://jdapi.youthadda.co/viewAll');
+    var body = json.encode({"receiver": reciverID});
+
+    try {
+      var response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        print('✅ Success viewall : ${response.body}');
+      } else {
+        print('❌ Error ${response.statusCode}: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('⚠️ Exception occurred: $e');
+    }
   }
 
   Future<void> fetchChatHistory() async {
@@ -127,12 +161,14 @@ class ChatController extends GetxController {
               }
 
               final senderId = msg['sender']?['_id'] ?? '';
+              final isRead = msg['viewall'] == "true";
               history.add(
                 types.TextMessage(
                   id: msg['_id'] ?? const Uuid().v4(),
                   text: msg['message'] ?? '',
                   author: types.User(id: senderId),
                   createdAt: createdAtEpoch,
+                  metadata: {'isRead': isRead},
                 ),
               );
             }
@@ -147,6 +183,33 @@ class ChatController extends GetxController {
       }
     } catch (e) {
       print("⚠️ Error fetching chat: $e");
+    }
+  }
+
+  Future<void> deleteMessage(String messageId, String userId) async {
+    var headers = {'Content-Type': 'application/json'};
+    var request = http.Request(
+      'POST',
+      Uri.parse('https://jdapi.youthadda.co/deleteMessage'),
+    );
+
+    request.body = json.encode({"messageId": messageId, "userId": userId});
+    request.headers.addAll(headers);
+
+    try {
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        final result = await response.stream.bytesToString();
+        print("✅ Message deleted: $result");
+      } else {
+        print("❌ Failed to delete: ${response.reasonPhrase}");
+      }
+      print("🔁 Status Code: ${response.statusCode}");
+      print("📨 Headers: ${response.headers}");
+      print("📦 Body: $response");
+    } catch (e) {
+      print("⚠️ Error deleting message: $e");
     }
   }
 

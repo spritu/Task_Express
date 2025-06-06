@@ -20,6 +20,8 @@ class Bottom2Controller extends GetxController {
 
   var selected = 0.obs;
 
+  var hasUnreadNotifications = false.obs;
+
   final RxList<types.Message> messages = <types.Message>[].obs;
   final Rxn<types.User> user = Rxn<types.User>();
   late IO.Socket socket;
@@ -144,18 +146,57 @@ class Bottom2Controller extends GetxController {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(responseBody);
-
         globalNotifications.assignAll(responseData['notifications'] ?? []);
-        print("Notifications fetched Provider: ${globalNotifications.length}");
 
-        for (var notif in globalNotifications) {
-          print("Notification Provider 1234: $notif");
-        }
+        // Check if any notification is unread
+        bool unreadFound = globalNotifications.any(
+          (notif) => notif['isRead'] == false,
+        );
+        hasUnreadNotifications.value = unreadFound;
+
+        print("Notifications fetched Provider: ${globalNotifications.length}");
       } else {
         print("Error: ${response.reasonPhrase}");
       }
     } catch (e) {
       print("Exception occurred: $e");
+    }
+  }
+
+  /// seen chat notification Api
+
+  Future<void> markChatNotificationAsSeen() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? senderId = prefs.getString('userId');
+    print("123456789:$senderId");
+
+    if (senderId == null) {
+      print("⚠️ senderId not found in SharedPreferences");
+      return;
+    }
+
+    var headers = {'Content-Type': 'application/json'};
+
+    var request = http.Request(
+      'POST',
+      Uri.parse('https://jdapi.youthadda.co/seenchatnotification'),
+    );
+
+    request.body = json.encode({"senderId": senderId});
+
+    request.headers.addAll(headers);
+
+    try {
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        final result = await response.stream.bytesToString();
+        print("✅ Notification marked as seen: $result");
+      } else {
+        print("❌ Failed: ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("⚠️ Error sending seen notification: $e");
     }
   }
 
