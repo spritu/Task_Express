@@ -20,13 +20,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
     final arguments = Get.arguments as Map<String, dynamic>;
     final List users = arguments['users'];
     final String title = arguments['title'] ?? 'Professionals';
-    final int avail = arguments['avail'] ?? 0;
-    final String catId = arguments['catId'] ?? '';
-
-
-    print("🎯 CatIDddddddddddddd: ${catId}");
-    //final String catId = arguments['_id'] ?? ''; // 🟢 Use this for sorting
-  //  print("catidddd:$catId");
+    final int avail = arguments['avail'] ?? 0;  final String catId = arguments['catId'] ?? ''; // 🟢 Use this for sorting
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(
@@ -84,8 +78,8 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
             child:  Obx(() => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                buildToggleButton("charge", "Search by Charge","catId"),
-                buildToggleButton("distance", "Search by Distance","catId"),
+                buildToggleButton("charge", "Search by Charge",catId),
+                buildToggleButton("distance", "Search by Distance",catId),
               ],
             )),
           ),
@@ -102,12 +96,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   final imagePath = user['userImg'] ?? '';
                   final imageUrl = imagePath.isNotEmpty ? 'https://jdapi.youthadda.co/$imagePath' : '';
                   final int avail = user["avail"] ?? 0;
-                  final distance = user['distance']?.toString() ?? 'N/A';
-                  for (var user in users) {
-                    final distance = user['distance']?.toString() ?? 'N/A';
-                    print("👤 ${user['name']} - Distance: $distance");
-                  }
-
+                  final distance = user['distance'] ?? 'N/A';
                   final charge =
                   user['skills'] != null && user['skills'].isNotEmpty
                       ? user['skills'][0]['charge']
@@ -122,7 +111,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                       final double lng = (coords[0] as num).toDouble();
 
                       // Replace below with your method to calculate distance from user location
-                   //   distance = controller.getAddressFromLatLng(lat, lng) as double;
+                      //   distance = controller.getAddressFromLatLng(lat, lng) as double;
                     } catch (e) {
                       print("Coordinate parse error: $e");
                     }
@@ -144,7 +133,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                           //'distance': user['distance'], // ✅ Add this
                         },
                       );
-                      },
+                    },
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       margin: const EdgeInsets.symmetric(
@@ -311,21 +300,17 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                           crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                           children: [Padding(padding: const EdgeInsets.only(top: 3,),
-                                              child: Icon(
-                                                Icons.location_on,
-                                                size: 14,
-                                                color: Colors.grey,
-                                              ),
+                                            child: Icon(
+                                              Icons.location_on,
+                                              size: 14,
+                                              color: Colors.grey,
                                             ),
-                                            Row(
-                                              children: [
-                                                Text( user['distance']?.toString() ?? '0',// ✅ Use calculated distance
-                                                  // user['distance'] != null && user['distance'] != 'N/A'
-                                                  //     ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
-                                                  //     : 'N/A',
-                                                  style: TextStyle(fontSize: 12),
-                                                ),SizedBox(width: 4,),Text("Km")
-                                              ],
+                                          ),
+                                            Text( '$distance', // ✅ Use calculated distance
+                                              // user['distance'] != null && user['distance'] != 'N/A'
+                                              //     ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
+                                              //     : 'N/A',
+                                              style: TextStyle(fontSize: 12),
                                             )
                                           ],
                                         ),
@@ -368,77 +353,77 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                                 ),),],),),),),],),
                                 const SizedBox(height: 8),
                                 Row(children: [Expanded(child: SizedBox(height: 24, width: 110,
-                                        child: ElevatedButton(
-                                          onPressed: () async {
-                                            final phoneNumber =
-                                                user['phone'] ?? '';
-                                            if (phoneNumber.isNotEmpty) {
-                                              controller.selectedUsers =
-                                                  users; // Store full list
-                                              controller.selectedIndexAfterCall = index; // Store selected index
-                                              controller.selectedTitle = title;
-                                              controller.shouldShowSheetAfterCall = true; // Trigger sheet on resume
-                                              controller.makePhoneCall(phoneNumber);
-                                            } else {
-                                              Get.snackbar(
-                                                'Error',
-                                                'Phone number not available',
-                                                snackPosition:
-                                                SnackPosition.BOTTOM,
-                                                backgroundColor: Colors.red,
-                                                colorText: Colors.white,
-                                              );}},
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Color(0xff114BCA),
-                                          ), child: const Text("Call", style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 12,
-                                              color: AppColors.white,
-                                              fontFamily: "poppins",
-                                            ),),),),),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: SizedBox(
-                                        height: 24,
-                                        width: 100,
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            final receiverId = user['_id'].toString();
-                                            final receiverName = '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'.trim();
-                                            final receiverImage = user['userImg'] ?? '';
-                                            final phoneNumber = user['phone'] ?? '';
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      final phoneNumber =
+                                          user['phone'] ?? '';
+                                      if (phoneNumber.isNotEmpty) {
+                                        controller.selectedUsers =
+                                            users; // Store full list
+                                        controller.selectedIndexAfterCall = index; // Store selected index
+                                        controller.selectedTitle = title;
+                                        controller.shouldShowSheetAfterCall = true; // Trigger sheet on resume
+                                        controller.makePhoneCall(phoneNumber);
+                                      } else {
+                                        Get.snackbar(
+                                          'Error',
+                                          'Phone number not available',
+                                          snackPosition:
+                                          SnackPosition.BOTTOM,
+                                          backgroundColor: Colors.red,
+                                          colorText: Colors.white,
+                                        );}},
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xff114BCA),
+                                    ), child: const Text("Call", style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                    color: AppColors.white,
+                                    fontFamily: "poppins",
+                                  ),),),),),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: 24,
+                                      width: 100,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          final receiverId = user['_id'].toString();
+                                          final receiverName = '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'.trim();
+                                          final receiverImage = user['userImg'] ?? '';
+                                          final phoneNumber = user['phone'] ?? '';
 
-                                            if (receiverId.isNotEmpty) {
-                                              Get.to(
-                                                ChatView(),
-                                                arguments: {
-                                                  'receiverId': receiverId,
-                                                  'receiverName': receiverName.isNotEmpty ? receiverName : 'No Name',
-                                                  'receiverImage': receiverImage,
-                                                  'phoneNumber': phoneNumber,
-                                                },);} else {
-                                              Get.snackbar(
-                                                'Error',
-                                                'Receiver ID not available',
-                                                snackPosition: SnackPosition.BOTTOM,
-                                                backgroundColor: Colors.red,
-                                                colorText: Colors.white,
-                                              );
-                                            }
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xff114BCA),
+                                          if (receiverId.isNotEmpty) {
+                                            Get.to(
+                                              ChatView(),
+                                              arguments: {
+                                                'receiverId': receiverId,
+                                                'receiverName': receiverName.isNotEmpty ? receiverName : 'No Name',
+                                                'receiverImage': receiverImage,
+                                                'phoneNumber': phoneNumber,
+                                              },);} else {
+                                            Get.snackbar(
+                                              'Error',
+                                              'Receiver ID not available',
+                                              snackPosition: SnackPosition.BOTTOM,
+                                              backgroundColor: Colors.red,
+                                              colorText: Colors.white,
+                                            );
+                                          }
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xff114BCA),
+                                        ),
+                                        child: const Text(
+                                          "Chat",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 12,
+                                            color: AppColors.white,
+                                            fontFamily: "poppins",
                                           ),
-                                          child: const Text(
-                                            "Chat",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 12,
-                                              color: AppColors.white,
-                                              fontFamily: "poppins",
-                                            ),
-                                          ),
-                                        ),),),],
+                                        ),
+                                      ),),),],
                                 ),
                                 SizedBox(height: 10),
                               ],),),],),),);},),
@@ -840,7 +825,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
         controller.selected.value = value;
 
         if (value == "charge") {
-          await controller.fetchUsersSortedByCharge();
+          await controller.fetchUsersSortedByCharge(catId);
         } else if (value == "distance") {
           print("dissssssssssssssssssssssss");
           // ✅ Get current location before API call
@@ -868,8 +853,8 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
             desiredAccuracy: LocationAccuracy.high,
           );
 
-          await controller.fetchUsersWithDistance(
-
+          await controller.fetchUsersByDistance(
+              catId
           );
         }
       },
