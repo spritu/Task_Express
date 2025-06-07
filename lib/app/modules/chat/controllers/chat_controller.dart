@@ -46,7 +46,7 @@ class ChatController extends GetxController {
     super.onInit();
     initializeChat();
     markAllAsSeen();
-    connectSocketAllMessage();
+    // connectSocketAllMessage();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       messages.refresh();
@@ -152,7 +152,7 @@ class ChatController extends GetxController {
     /// ✅ Handle "seen" event and update UI
     socket.on('allMessagesViewed', (data) {
       print('👁️ allMessagesViewed: $data');
-      fetchChatHistory();
+      // fetchChatHistory();
 
       final seenMessageId = data['messageId'];
 
