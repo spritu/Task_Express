@@ -8,6 +8,7 @@ import '../../../../colors.dart';
 import '../../Bottom2/controllers/bottom2_controller.dart';
 import '../../Bottom2/views/bottom2_view.dart';
 import '../../YourEarning/views/your_earning_view.dart';
+import '../../provider_editProfile/controllers/provider_edit_profile_controller.dart';
 import '../../provider_editProfile/views/provider_edit_profile_view.dart';
 import '../controllers/provider_account_controller.dart';
 
@@ -16,7 +17,7 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(ProviderAccountController());
+    Get.put(ProviderAccountController()); Get.put(ProviderEditProfileController());
     return WillPopScope(
       onWillPop: () async {
         Get.find<Bottom2Controller>().selectedIndex.value = 0;
