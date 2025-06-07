@@ -62,21 +62,31 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                             child: Row(
                               children: [
                                 Obx(() {
-                                  final imageUrl = controller.imagePath.value;
+                                  final controller = Get.find<ProviderEditProfileController>();
+
+                                  final localImagePath = controller.selectedImagePath.value;
+                                  final serverImageUrl = controller.imagePath.value;
+
+                                  ImageProvider imageProvider;
+
+                                  if (localImagePath.isNotEmpty && File(localImagePath).existsSync()) {
+                                    // ✅ Show selected local image
+                                    imageProvider = FileImage(File(localImagePath));
+                                  } else if (serverImageUrl.isNotEmpty) {
+                                    // ✅ Show server image
+                                    imageProvider = NetworkImage(serverImageUrl);
+                                  } else {
+                                    // ✅ Fallback asset image
+                                    imageProvider = const AssetImage('assets/images/account.png');
+                                  }
+
                                   return CircleAvatar(
                                     radius: 40,
-                                    backgroundImage:
-                                    imageUrl.isNotEmpty
-                                        ? NetworkImage(imageUrl)
-                                        : const AssetImage(
-                                      'assets/images/account.png',
-                                    )
-                                    as ImageProvider,
-                                    onBackgroundImageError: (_, __) {
-                                      print("❌ Image failed to load.");
-                                    },
+                                    backgroundImage: imageProvider,
+                                    onBackgroundImageError: (_, __) => print("❌ Failed to load image."),
                                   );
                                 }),
+
                                 SizedBox(width: 8),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

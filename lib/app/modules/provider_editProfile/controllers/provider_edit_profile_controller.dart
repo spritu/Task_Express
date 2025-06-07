@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +11,7 @@ import '../../provider_account/controllers/provider_account_controller.dart';
 
 class ProviderEditProfileController extends GetxController {
   //TODO: Implement ProviderEditProfileController
-  RxString imagePath = ''.obs;
+//  RxString imagePath = ''.obs;
   final ImagePicker _picker = ImagePicker();
   RxString selectedImagePath = ''.obs; // ⬅️ Add this in your controller
   final TextEditingController nameController = TextEditingController();
@@ -18,7 +19,7 @@ class ProviderEditProfileController extends GetxController {
   final TextEditingController dobController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   var userData = {}.obs;
-
+  var imagePath = ''.obs; // This should be set from API response
   @override
   void onInit() {
     super.onInit();
@@ -74,7 +75,7 @@ class ProviderEditProfileController extends GetxController {
     }
   }
 
-  Future<void> updateUser() async {
+  Future<void> updateUser({required String imageFilePath}) async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
 
@@ -102,8 +103,15 @@ class ProviderEditProfileController extends GetxController {
       "dob": dobController.text,
     });
 
-    if (imagePath.value.isNotEmpty && !imagePath.value.startsWith("http")) {
-      request.files.add(await http.MultipartFile.fromPath('userImg', imagePath.value));
+    // ✅ Image attach karo agar diya gaya ho
+    if (imageFilePath.isNotEmpty && File(imageFilePath).existsSync()) {
+      request.files.add(
+        await http.MultipartFile.fromPath('profileImg', imageFilePath),
+      );
+
+      // ✅ Immediately update UI with selected image
+      selectedImagePath.value = imageFilePath;
+      await prefs.setString('userImg', imageFilePath); // save locally if needed
     }
 
     try {
@@ -112,24 +120,11 @@ class ProviderEditProfileController extends GetxController {
       final responseJson = jsonDecode(responseBody);
 
       if (response.statusCode == 200 && responseJson['code'] == 200) {
-        // Save updated data into SharedPreferences immediately
         await prefs.setString('firstName', firstName);
         await prefs.setString('lastName', lastName);
         await prefs.setString('email', emailController.text);
         await prefs.setString('gender', genderController.text);
         await prefs.setString('dob', dobController.text);
-
-        if (imagePath.value.isNotEmpty) {
-          if (imagePath.value.startsWith("http")) {
-            await prefs.setString('userImg', imagePath.value);
-          } else {
-            // For local path, you might want to upload first or handle differently.
-            // Here just save the local path temporarily.
-            await prefs.setString('userImg', imagePath.value);
-          }
-        }
-
-        // Update userData observable for immediate UI refresh
         userData.value = {
           "firstName": firstName,
           "lastName": lastName,
@@ -151,12 +146,13 @@ class ProviderEditProfileController extends GetxController {
         final accountController = Get.find<ProviderAccountController>();
         await accountController.loadUserInfo();
         await accountController.loadMobileNumber();
-
         Get.snackbar("Success", responseJson['msg'] ?? "Profile updated successfully");
+
       } else {
         Get.snackbar("Error", responseJson['msg'] ?? "Failed to update profile");
       }
     } catch (e) {
+      print("❌ Exception during update: $e");
       Get.snackbar("Error", "Something went wrong. Please try again.");
     }
   }

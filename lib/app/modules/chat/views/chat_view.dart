@@ -8,6 +8,7 @@ import '../../../../colors.dart';
 import '../../HelpSupport/views/help_support_view.dart';
 import '../../account/views/account_view.dart';
 import '../../bottom/controllers/bottom_controller.dart';
+import '../../professional_plumber/controllers/professional_plumber_controller.dart';
 import '../../user_help/views/user_help_view.dart';
 import '../controllers/chat_controller.dart';
 
@@ -237,6 +238,13 @@ class ChatView extends GetView<ChatController> {
                     ),
                     ElevatedButton(
                       onPressed: () {
+                        // final callSheetController = Get.find<ProfessionalPlumberController>();
+                        //
+                        // // Set selectedUsers, selectedIndexAfterCall, selectedTitle here if needed
+                        // // Or make sure these values are already set previously
+                        //
+                        // callSheetController.shouldShowSheetAfterCall.value = true;
+
                         // Book Now logic here
                       },
                       style: ElevatedButton.styleFrom(
