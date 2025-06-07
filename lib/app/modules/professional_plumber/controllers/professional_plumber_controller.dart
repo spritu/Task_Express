@@ -695,11 +695,11 @@ class ProfessionalPlumberController extends GetxController
   }
 
   Future<String?> fetchDistance(
-      double lat1,
-      double lon1,
-      double lat2,
-      double lon2,
-      ) async {
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) async {
     var url = Uri.parse(
       'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lon1&lat2=$lat2&lon2=$lon2',
     );
@@ -757,8 +757,9 @@ class ProfessionalPlumberController extends GetxController
         print(jsonEncode(jsonResponse));
 
         // Optional: Parse and use the data
-        List<Map<String, dynamic>> users =
-        List<Map<String, dynamic>>.from(jsonResponse['data'] ?? []);
+        List<Map<String, dynamic>> users = List<Map<String, dynamic>>.from(
+          jsonResponse['data'] ?? [],
+        );
 
         // You can now use 'users' as needed
       } else {
@@ -769,13 +770,14 @@ class ProfessionalPlumberController extends GetxController
     }
   }
 
-
   List<dynamic> users = []; // List of service providers
   Future<void> fetchUsersSortedByCharge(String catId) async {
     try {
       var request = http.Request(
         'GET',
-        Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&sortBy=lowToHigh'),
+        Uri.parse(
+          'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&sortBy=lowToHigh',
+        ),
       );
 
       http.StreamedResponse response = await request.send();
@@ -1199,7 +1201,10 @@ class ProfessionalPlumberController extends GetxController
 
   /// socket new booking
 
-  void connectSocket() {
+  void connectSocket() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? firstName = prefs.getString('firstName');
+    String? lastName = prefs.getString('lastName');
     if (bookedBy.value == null || bookedFor.value.isEmpty) {
       print(" User ID or BookedFor missing New booking");
       return;
@@ -1216,7 +1221,8 @@ class ProfessionalPlumberController extends GetxController
       'auth': {
         'user': {
           '_id': bookedBy.value,
-          'firstName': 'plumber naman', // Optional, can be dynamic
+          'firstName': firstName,
+          'lastName': lastName,
         },
       },
     });
@@ -1266,15 +1272,15 @@ class ProfessionalPlumberController extends GetxController
 
   // Widget to show bottom sheet after call ends
   Widget showAfterCallSheet(
-      BuildContext context, {
-        required String name,
-        required String imageUrl,
-        required String experience,
-        required String phone,
-        required String userId,
-        required String title,
-        required List<Map<String, dynamic>> skills, // Pass dynamic skills
-      }) {
+    BuildContext context, {
+    required String name,
+    required String imageUrl,
+    required String experience,
+    required String phone,
+    required String userId,
+    required String title,
+    required List<Map<String, dynamic>> skills, // Pass dynamic skills
+  }) {
     return SingleChildScrollView(
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -1301,10 +1307,10 @@ class ProfessionalPlumberController extends GetxController
                 CircleAvatar(
                   radius: 40,
                   backgroundImage:
-                  imageUrl.isNotEmpty
-                      ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
-                      : const AssetImage('assets/images/account.png')
-                  as ImageProvider,
+                      imageUrl.isNotEmpty
+                          ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
+                          : const AssetImage('assets/images/account.png')
+                              as ImageProvider,
                 ),
                 const SizedBox(width: 10),
                 Text(
@@ -1336,13 +1342,13 @@ class ProfessionalPlumberController extends GetxController
                 padding: const EdgeInsets.only(bottom: 12),
                 child: professionRow(
                   title:
-                  (skill['subcategoryName'] != null &&
-                      skill['subcategoryName'].toString().isNotEmpty)
-                      ? skill['subcategoryName']
-                      : (skill['categoryName'] != null &&
-                      skill['categoryName'].toString().isNotEmpty)
-                      ? skill['categoryName']
-                      : 'Service',
+                      (skill['subcategoryName'] != null &&
+                              skill['subcategoryName'].toString().isNotEmpty)
+                          ? skill['subcategoryName']
+                          : (skill['categoryName'] != null &&
+                              skill['categoryName'].toString().isNotEmpty)
+                          ? skill['categoryName']
+                          : 'Service',
 
                   price: "₹ ${skill['charge'].toString()}",
                   onBookNow: () {
@@ -1484,16 +1490,16 @@ class ProfessionalPlumberController extends GetxController
   }
 
   void showAreUSureSheet(
-      BuildContext context, {
-        required String name,
-        required String imageUrl,
-        required String experience,
-        required String phone,
-        required String userId,
-        required String title,
-        required Map<String, dynamic> skill,
-        required Future<void> Function(List<String> serviceIds) bookServiceProvider,
-      }) {
+    BuildContext context, {
+    required String name,
+    required String imageUrl,
+    required String experience,
+    required String phone,
+    required String userId,
+    required String title,
+    required Map<String, dynamic> skill,
+    required Future<void> Function(List<String> serviceIds) bookServiceProvider,
+  }) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1523,12 +1529,12 @@ class ProfessionalPlumberController extends GetxController
                   CircleAvatar(
                     radius: 40,
                     backgroundImage:
-                    imageUrl.isNotEmpty
-                        ? NetworkImage(
-                      'https://jdapi.youthadda.co/$imageUrl',
-                    )
-                        : const AssetImage('assets/images/account.png')
-                    as ImageProvider,
+                        imageUrl.isNotEmpty
+                            ? NetworkImage(
+                              'https://jdapi.youthadda.co/$imageUrl',
+                            )
+                            : const AssetImage('assets/images/account.png')
+                                as ImageProvider,
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -1568,7 +1574,7 @@ class ProfessionalPlumberController extends GetxController
                             onPressed: () async {
                               String serviceId =
                                   skill['subcategoryId']?.toString() ??
-                                      skill['categoryId'].toString();
+                                  skill['categoryId'].toString();
                               Navigator.pop(context);
                               await bookServiceProvider([serviceId]);
                             },

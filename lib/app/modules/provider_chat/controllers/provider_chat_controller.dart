@@ -132,7 +132,7 @@ class ProviderChatController extends GetxController {
 
     socket.on('allMessagesViewed', (data) {
       print(' Received allMessagesViewed message: $data');
-      fetchChatHistory();
+      // fetchChatHistory();
       final msg = types.TextMessage(
         id: data['_id'] ?? const Uuid().v4(),
         text: data['message'] ?? '',
