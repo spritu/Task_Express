@@ -18,7 +18,7 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
     Get.put(ProviderChatScreenController());
     return WillPopScope(
       onWillPop: () async {
-        Get.find<BottomController>().selectedIndex.value = 0; // 👈 Home tab
+        Get.find<BottomController>().selectedIndex.value = 0;
         Get.offAll(() => BottomView());
         return false;
       },

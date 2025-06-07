@@ -287,13 +287,21 @@ class ProviderChatController extends GetxController {
   //   }
   // }
 
-  void connectSocket() {
+  void connectSocket() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? firstName = prefs.getString('firstName');
+    String? lastName = prefs.getString('lastName');
+
     if (user.value == null) return;
     socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'auth': {
-        'user': {'_id': user.value!.id, 'firstName': 'plumber naman'},
+        'user': {
+          '_id': user.value!.id,
+          'firstName': firstName,
+          'lastName': lastName,
+        },
       },
     });
 

@@ -17,6 +17,7 @@ class BottomView extends GetView<BottomController> {
   @override
   Widget build(BuildContext context) {
     Get.put(BottomController());
+    final chatScreenController = Get.put(ChatScreenController());
     return Scaffold(
       body: Obx(() {
         return _buildBody(
@@ -48,16 +49,81 @@ class BottomView extends GetView<BottomController> {
           type: BottomNavigationBarType.fixed, // Needed for more than 3 items
           currentIndex: controller.selectedIndex.value,
           showUnselectedLabels: true,
-          onTap: (index) => controller.selectedIndex.value = index,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Bookings'),
+          onTap: (index) async {
+            controller.selectedIndex.value = index;
+            if (index == 2) {
+              await bottomController.fetchNotifications(); // Optional refresh
+              bottomController.hasUnreadNotifications.value =
+                  false; // Hide red dot
+              // Optionally call an API to mark all notifications as read
+            }
+            // Clear the red dot if user opens Chat tab
+            if (index == 3) {
+              await bottomController.markChatNotificationAsSeen();
+              chatScreenController.hasUnreadnotify.value = false;
+            }
+          },
+          items: [
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.list),
+              label: 'Bookings',
+            ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.notifications),
+              icon: Obx(
+                () => Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(Icons.notifications),
+                    if (bottomController.hasUnreadNotifications.value)
+                      Positioned(
+                        top: -1,
+                        right: -1,
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
               label: 'Notifications',
             ),
-            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
+            BottomNavigationBarItem(
+              icon: Obx(
+                () => Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(Icons.chat),
+                    if (chatScreenController.hasUnreadnotify.value)
+                      Positioned(
+                        top: -1,
+                        right: -1,
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              label: 'Chat',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Account',
+            ),
           ],
         ),
 

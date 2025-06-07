@@ -12,10 +12,10 @@ class ChatScreenView extends GetView<ChatScreenController> {
 
   @override
   Widget build(BuildContext context) {
-  Get.put(ChatScreenController());
+    Get.put(ChatScreenController());
     return WillPopScope(
       onWillPop: () async {
-        Get.find<BottomController>().selectedIndex.value = 0; // 👈 Home tab
+        Get.find<BottomController>().selectedIndex.value = 0;
         Get.offAll(() => BottomView());
         return false;
       },
@@ -53,19 +53,59 @@ class ChatScreenView extends GetView<ChatScreenController> {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: InkWell(
-                              onTap: () {
+                              onTap: () async {
+                                final bottomController = Get.put(
+                                  BottomController(),
+                                );
+                                bottomController.markChatNotificationAsSeen();
+
+                                await controller.markChatAsRead(chat.reciverId);
+
                                 Get.to(
                                   ChatView(),
                                   arguments: {
                                     'receiverId': chat.reciverId,
                                     'receiverName':
-                                    '${chat.firstName} ${chat.lastName}',
+                                        '${chat.firstName} ${chat.lastName}',
                                     'receiverImage': chat.profilePic,
                                   },
                                 )?.then((_) async {
                                   await controller.fetchLastMessages();
                                 });
                               },
+                              onLongPress: () {
+                                showDialog(
+                                  context: context,
+                                  builder:
+                                      (context) => AlertDialog(
+                                        title: const Text('Delete Chat'),
+                                        content: const Text(
+                                          'Are you sure you want to delete this chat?',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed:
+                                                () => Navigator.pop(context),
+                                            child: const Text('Cancel'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              Navigator.pop(context);
+                                              // await controller.deleteChat(chat.reciverId);
+                                              // await controller.fetchLastMessages();
+                                            },
+                                            child: const Text(
+                                              'Delete',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                );
+                              },
+
                               child: Column(
                                 children: [
                                   Padding(
@@ -75,7 +115,7 @@ class ChatScreenView extends GetView<ChatScreenController> {
                                     ),
                                     child: Row(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         // Profile Image
                                         ClipRRect(
@@ -83,28 +123,28 @@ class ChatScreenView extends GetView<ChatScreenController> {
                                             25,
                                           ),
                                           child:
-                                          chat.profilePic.isNotEmpty
-                                              ? Image.network(
-                                            chat.profilePic,
-                                            width: 50,
-                                            height: 50,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (
-                                                context,
-                                                error,
-                                                stack,
-                                                ) => Image.asset(
-                                              "assets/images/account.png",
-                                              width: 50,
-                                              height: 50,
-                                            ),
-                                          )
-                                              : Image.asset(
-                                            "assets/images/account.png",
-                                            width: 50,
-                                            height: 50,
-                                          ),
+                                              chat.profilePic.isNotEmpty
+                                                  ? Image.network(
+                                                    chat.profilePic,
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder:
+                                                        (
+                                                          context,
+                                                          error,
+                                                          stack,
+                                                        ) => Image.asset(
+                                                          "assets/images/account.png",
+                                                          width: 50,
+                                                          height: 50,
+                                                        ),
+                                                  )
+                                                  : Image.asset(
+                                                    "assets/images/account.png",
+                                                    width: 50,
+                                                    height: 50,
+                                                  ),
                                         ),
 
                                         const SizedBox(width: 12),
@@ -113,19 +153,19 @@ class ChatScreenView extends GetView<ChatScreenController> {
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                             children: [
                                               // Name and Time
                                               Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment
-                                                    .spaceBetween,
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
                                                   Text(
                                                     '${chat.firstName} ${chat.lastName}',
                                                     style: TextStyle(
                                                       fontWeight:
-                                                      FontWeight.w600,
+                                                          FontWeight.w600,
                                                       fontFamily: "poppins",
                                                       fontSize: 12,
                                                     ),
@@ -138,7 +178,7 @@ class ChatScreenView extends GetView<ChatScreenController> {
                                                     style: TextStyle(
                                                       fontSize: 10,
                                                       fontWeight:
-                                                      FontWeight.w400,
+                                                          FontWeight.w400,
                                                       fontFamily: "poppins",
                                                       color: Color(0xFF545454),
                                                     ),
@@ -148,14 +188,56 @@ class ChatScreenView extends GetView<ChatScreenController> {
                                               const SizedBox(height: 4),
 
                                               // Message Preview
-                                              Text(
-                                                chat.message,
-                                                style: TextStyle(
-                                                  fontFamily: "poppins",
-                                                  fontWeight: FontWeight.w300,
-                                                  fontSize: 12,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    chat.message,
+                                                    style: TextStyle(
+                                                      fontFamily: "poppins",
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                      fontSize: 12,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  if (chat.unreadCount > 0)
+                                                    Container(
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                            left: 8,
+                                                          ),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            4,
+                                                          ),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                            color: Colors.green,
+                                                            shape:
+                                                                BoxShape.circle,
+                                                          ),
+                                                      constraints:
+                                                          const BoxConstraints(
+                                                            minWidth: 20,
+                                                            minHeight: 20,
+                                                          ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          '${chat.unreadCount}',
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
                                               ),
                                             ],
                                           ),
@@ -210,7 +292,7 @@ class CustomSearchBar extends StatelessWidget {
       ),
       child: Row(
         children: const [
-          Icon(Icons.search, color: Color(0xFF5F5D5D),size: 24,),
+          Icon(Icons.search, color: Color(0xFF5F5D5D), size: 24),
           SizedBox(width: 8),
           Expanded(
             child: TextField(

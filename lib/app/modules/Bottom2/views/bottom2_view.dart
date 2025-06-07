@@ -55,7 +55,7 @@ class Bottom2View extends GetView<Bottom2Controller> {
                 children: [
                   Icon(Icons.notifications),
                   Obx(() {
-                    if (bottom2Controller.hasUnreadNotifications.value)
+                    if (bottom2Controller.hasUnreadNotifications.value) {
                       return Positioned(
                         top: -1,
                         right: -1,
@@ -68,8 +68,9 @@ class Bottom2View extends GetView<Bottom2Controller> {
                           ),
                         ),
                       );
-                    else
+                    } else {
                       return SizedBox.shrink();
+                    }
                   }),
                 ],
               ),

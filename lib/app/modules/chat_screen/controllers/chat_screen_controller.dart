@@ -15,6 +15,8 @@ class ChatItem {
   final String lastName;
   final String profilePic;
   final String reciverId;
+  late final bool isRead;
+  late final int unreadCount;
 
   ChatItem({
     required this.message,
@@ -23,24 +25,32 @@ class ChatItem {
     required this.lastName,
     required this.profilePic,
     required this.reciverId,
+    this.isRead = true,
+    this.unreadCount = 0,
+    required unredviewNotify,
   });
 }
 
 class ChatScreenController extends GetxController {
   // List of chat items
   RxList<ChatItem> chats = <ChatItem>[].obs;
+  RxBool hasNewMessage = false.obs;
 
   final RxList<types.Message> messages = <types.Message>[].obs;
   final Rxn<types.User> user = Rxn<types.User>();
   late IO.Socket socket;
   RxString userId = ''.obs;
   final player = AudioPlayer();
+  var receiverId = ''.obs;
+  var hasUnreadMessages = false.obs;
+  var hasUnreadnotify = false.obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchLastMessages();
     connectSocket();
+    hasNewMessage.value = false;
   }
 
   @override
@@ -79,9 +89,21 @@ class ChatScreenController extends GetxController {
         print("📊 Total chats found: ${jsonData.length}");
 
         chats.clear();
+        bool unreadFound = false;
+        bool unreadNotify = false;
 
         for (var item in jsonData) {
           final lm = item['lastMessage'];
+          receiverId.value = item['receiverId'];
+          final unreadCount = item['unseenCount'] ?? 0;
+          final unredviewNotify = item['unseenChatNotificationCount'] ?? 0;
+          if (unreadCount > 0) unreadFound = true;
+          if (unredviewNotify > 0) unreadNotify = true;
+
+          print(
+            "viewallmessagexxxxx: $receiverId   unseenCount: ${item['unseenCount']}",
+          );
+
           final chatItem = ChatItem(
             message: lm?['message'] ?? 'No message',
             timestamp: lm?['timestamp'] ?? 'No timestamp',
@@ -89,9 +111,14 @@ class ChatScreenController extends GetxController {
             firstName: item['firstName'] ?? 'N/A',
             lastName: item['lastName'] ?? 'N/A',
             profilePic: item['profilePic'] ?? '',
+            isRead: (lm?['viewall']?.toString().toLowerCase() == 'true'),
+            unreadCount: unreadCount,
+            unredviewNotify: unredviewNotify,
           );
           chats.add(chatItem);
         }
+        hasUnreadMessages.value = unreadFound;
+        hasUnreadnotify.value = unreadNotify;
 
         for (var chat in chats) {
           print('--- Chat ---');
@@ -107,6 +134,27 @@ class ChatScreenController extends GetxController {
     } catch (e) {
       print("⚠️ Exception: $e");
     }
+  }
+
+  Future<void> markChatAsRead(String receiverId) async {
+    final index = chats.indexWhere((chat) => chat.reciverId == receiverId);
+    if (index != -1) {
+      final chat = chats[index];
+      chats[index] = ChatItem(
+        message: chat.message,
+        timestamp: chat.timestamp,
+        reciverId: chat.reciverId,
+        firstName: chat.firstName,
+        lastName: chat.lastName,
+        profilePic: chat.profilePic,
+        isRead: true,
+        unreadCount: 0,
+        unredviewNotify: 0,
+      );
+      chats.refresh();
+    }
+
+    // Optional: API hit to mark as seen
   }
 
   void playNotificationSound() async {

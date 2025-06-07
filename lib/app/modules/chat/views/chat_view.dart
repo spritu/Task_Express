@@ -51,14 +51,14 @@ class ChatView extends GetView<ChatController> {
                     },
                     child: Icon(Icons.info_outline),
                   ),
-                  SizedBox(width: 5),
+                  SizedBox(width: 10),
                   InkWell(
                     onTap: () {
                       // navController.changeTab(3);
                     },
                     child: Icon(Icons.person),
                   ),
-                  SizedBox(width: 5),
+                  SizedBox(width: 10),
                   Row(
                     children: [
                       InkWell(
@@ -104,6 +104,7 @@ class ChatView extends GetView<ChatController> {
                   itemBuilder: (context, index) {
                     final msg = messages[index];
                     final isSender = msg.author.id == controller.user.value?.id;
+                    final isRead = msg.metadata?['isRead'] == true;
                     final name =
                         isSender ? "You" : controller.receiverName.value;
                     print('object121 ${controller.receiverImage.value}');
@@ -133,11 +134,54 @@ class ChatView extends GetView<ChatController> {
                           vertical: 4,
                         ),
                         child: _buildMessageBubble(
+                          context: context,
                           isSender: isSender,
                           name: name,
                           message: msg.text,
                           time: time,
                           imageUrl: displayImage,
+                          isRead: isRead,
+                          onLongPress: () async {
+                            final confirmDelete = await showDialog<bool>(
+                              context: context,
+                              builder:
+                                  (context) => AlertDialog(
+                                    title: const Text("Delete Message"),
+                                    content: Text(
+                                      "Are you sure you want to delete this message?",
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed:
+                                            () => Navigator.pop(context, false),
+                                        child: Text("Cancel"),
+                                      ),
+                                      TextButton(
+                                        onPressed:
+                                            () => Navigator.pop(context, true),
+                                        child: const Text("Delete"),
+                                      ),
+                                    ],
+                                  ),
+                            );
+
+                            if (confirmDelete == true) {
+                              final userId = controller.user.value?.id;
+
+                              if (msg.author.id == userId) {
+                                // 🟢 Current user is sender → permanently delete from server
+                                await controller.deleteMessage(
+                                  msg.id,
+                                  userId!,
+                                ); // 👈 userId passed here
+                              }
+
+                              // 🔴 Always remove locally (for sender & receiver)
+                              controller.messages.removeWhere(
+                                (m) => m.id == msg.id,
+                              );
+                            }
+                          },
                         ),
                       );
                     } else if (msg is types.ImageMessage) {
@@ -268,102 +312,217 @@ class ChatView extends GetView<ChatController> {
     );
   }
 
-  /// Bubble for text messages
   Widget _buildMessageBubble({
+    required BuildContext context,
     required bool isSender,
     required String name,
     required String message,
     required String time,
     required ImageProvider imageUrl,
+    required bool isRead,
+    required VoidCallback onLongPress,
   }) {
     final alignment =
         isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
+
+    // Use themed colors for better dark mode support
     final bubbleColor = isSender ? Color(0xFF114BCA) : Colors.white;
-    final textColor = isSender ? Colors.white : Colors.black87;
+
+    final textColor =
+        isSender ? Colors.white : Theme.of(context).colorScheme.onSurface;
+
     final radius =
         isSender
-            ? BorderRadius.only(
+            ? const BorderRadius.only(
               topLeft: Radius.circular(16),
               topRight: Radius.circular(0),
               bottomLeft: Radius.circular(16),
               bottomRight: Radius.circular(16),
             )
-            : BorderRadius.only(
+            : const BorderRadius.only(
               topLeft: Radius.circular(0),
               topRight: Radius.circular(16),
               bottomLeft: Radius.circular(16),
               bottomRight: Radius.circular(16),
             );
 
-    return Row(
-      mainAxisAlignment: alignment,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (!isSender) CircleAvatar(backgroundImage: imageUrl, radius: 20),
-        if (!isSender) const SizedBox(width: 8),
-        Flexible(
-          child: Column(
-            crossAxisAlignment:
-                isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Row(
+        mainAxisAlignment: alignment,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!isSender) CircleAvatar(backgroundImage: imageUrl, radius: 20),
+          if (!isSender) const SizedBox(width: 8),
+          Flexible(
+            child: Column(
+              crossAxisAlignment:
+                  isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                  onLongPress: onLongPress,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: bubbleColor,
+                      borderRadius: radius,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontFamily: "poppins",
+                            fontSize: 14,
+                            color: textColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          message,
+                          style: TextStyle(
+                            fontFamily: 'poppins',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            color: textColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  color: bubbleColor,
-                  borderRadius: radius,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(
+                  height: 4,
+                ), // for spacing between bubble and time
+                Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
+                    const SizedBox(width: 4),
                     Text(
-                      name,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'poppins',
-                        color: textColor,
-                      ),
+                      time,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      message,
-                      style: TextStyle(
-                        fontFamily: 'poppins',
-                        color: textColor,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
+                    if (isSender) ...[
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.done_all,
+                        size: 16,
+                        color: isRead ? Colors.blue : Colors.grey,
                       ),
-                    ),
+                    ],
                   ],
                 ),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(width: 4),
-                  Text(
-                    time,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    Icons.done_all,
-                    size: 16,
-                    color: isSender ? Colors.white : Colors.green,
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        if (isSender) const SizedBox(width: 8),
-        if (isSender) CircleAvatar(backgroundImage: imageUrl, radius: 20),
-      ],
+          if (isSender) const SizedBox(width: 8),
+          if (isSender) CircleAvatar(backgroundImage: imageUrl, radius: 20),
+        ],
+      ),
     );
   }
+
+  /// Bubble for text messages
+  // Widget _buildMessageBubble({
+  //   required bool isSender,
+  //   required String name,
+  //   required String message,
+  //   required String time,
+  //   required ImageProvider imageUrl,
+  // }) {
+  //   final alignment =
+  //       isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
+  //   final bubbleColor = isSender ? Color(0xFF114BCA) : Colors.white;
+  //   final textColor = isSender ? Colors.white : Colors.black87;
+  //   final radius =
+  //       isSender
+  //           ? BorderRadius.only(
+  //             topLeft: Radius.circular(16),
+  //             topRight: Radius.circular(0),
+  //             bottomLeft: Radius.circular(16),
+  //             bottomRight: Radius.circular(16),
+  //           )
+  //           : BorderRadius.only(
+  //             topLeft: Radius.circular(0),
+  //             topRight: Radius.circular(16),
+  //             bottomLeft: Radius.circular(16),
+  //             bottomRight: Radius.circular(16),
+  //           );
+  //
+  //   return Row(
+  //     mainAxisAlignment: alignment,
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       if (!isSender) CircleAvatar(backgroundImage: imageUrl, radius: 20),
+  //       if (!isSender) const SizedBox(width: 8),
+  //       Flexible(
+  //         child: Column(
+  //           crossAxisAlignment:
+  //               isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+  //           children: [
+  //             Container(
+  //               padding: const EdgeInsets.symmetric(
+  //                 horizontal: 12,
+  //                 vertical: 10,
+  //               ),
+  //               decoration: BoxDecoration(
+  //                 color: bubbleColor,
+  //                 borderRadius: radius,
+  //               ),
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Text(
+  //                     name,
+  //                     style: TextStyle(
+  //                       fontSize: 14,
+  //                       fontWeight: FontWeight.w600,
+  //                       fontFamily: 'poppins',
+  //                       color: textColor,
+  //                     ),
+  //                   ),
+  //                   const SizedBox(height: 4),
+  //                   Text(
+  //                     message,
+  //                     style: TextStyle(
+  //                       fontFamily: 'poppins',
+  //                       color: textColor,
+  //                       fontSize: 13,
+  //                       fontWeight: FontWeight.w400,
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //             Row(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 const SizedBox(width: 4),
+  //                 Text(
+  //                   time,
+  //                   style: const TextStyle(fontSize: 12, color: Colors.grey),
+  //                 ),
+  //                 const SizedBox(width: 4),
+  //                 Icon(
+  //                   Icons.done_all,
+  //                   size: 16,
+  //                   color: isSender ? Colors.white : Colors.green,
+  //                 ),
+  //               ],
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //       if (isSender) const SizedBox(width: 8),
+  //       if (isSender) CircleAvatar(backgroundImage: imageUrl, radius: 20),
+  //     ],
+  //   );
+  // }
 
   /// Bubble for image messages
   Widget _buildImageMessageBubble({

@@ -27,6 +27,8 @@ class BottomController extends GetxController {
   // or if it's a map structure:
   final AuthController authController = Get.find<AuthController>();
 
+  var hasUnreadNotifications = false.obs;
+
   void changeTab(int index) {
     selectedIndex.value = index;
   }
@@ -73,18 +75,58 @@ class BottomController extends GetxController {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(responseBody);
+        notifications.assignAll(responseData['notifications'] ?? '');
 
-        notifications.value = responseData['notifications'] ?? [];
+        bool unreadFound = notifications.any(
+          (notif) => notif['isRead'] == false,
+        );
+        hasUnreadNotifications.value = unreadFound;
         print("🔔 Notifications fetched: ${notifications.length}");
 
-        for (var notif in notifications) {
-          print("🔔 Notification: $notif");
-        }
+        // notifications.value = responseData['notifications'] ?? [];
+        // for (var notif in notifications) {
+        //   print("🔔 Notification: $notif");
+        // }
       } else {
         print("❌ Error: ${response.reasonPhrase}");
       }
     } catch (e) {
       print("⚠️ Exception occurred: $e");
+    }
+  }
+
+  Future<void> markChatNotificationAsSeen() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? senderId = prefs.getString('userId');
+    print("123456789:$senderId");
+
+    if (senderId == null) {
+      print("⚠️ senderId not found in SharedPreferences");
+      return;
+    }
+
+    var headers = {'Content-Type': 'application/json'};
+
+    var request = http.Request(
+      'POST',
+      Uri.parse('https://jdapi.youthadda.co/seenchatnotification'),
+    );
+
+    request.body = json.encode({"senderId": senderId});
+
+    request.headers.addAll(headers);
+
+    try {
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        final result = await response.stream.bytesToString();
+        print("✅ Notification marked as seen user2222: $result");
+      } else {
+        print("❌ Failed: ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      print("⚠️ Error sending seen notification: $e");
     }
   }
 

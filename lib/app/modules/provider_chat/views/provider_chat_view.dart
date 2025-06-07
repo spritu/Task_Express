@@ -7,6 +7,7 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:get/get.dart';
 
 import '../../../../colors.dart';
+import '../../booking/controllers/booking_controller.dart';
 import '../controllers/provider_chat_controller.dart';
 
 class ProviderChatView extends GetView<ProviderChatController> {
@@ -17,35 +18,76 @@ class ProviderChatView extends GetView<ProviderChatController> {
     final TextEditingController messageController = TextEditingController();
     return Scaffold(
       appBar: AppBar(
-        title: Obx(
-          () => Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CircleAvatar(
-                backgroundImage:
-                    controller.imagePath.value.isNotEmpty
-                        ? FileImage(File(controller.imagePath.value))
-                        : const AssetImage('assets/images/account.png'),
-              ),
-              const SizedBox(width: 10),
-              Obx(
-                () => Text(
-                  controller.receiverName.value,
-                  style: TextStyle(fontSize: 15),
-                ),
-              ),
-              Spacer(),
-              IconButton(onPressed: () {}, icon: Icon(Icons.info_outline)),
-              IconButton(onPressed: () {}, icon: Icon(Icons.person)),
-              IconButton(onPressed: () {}, icon: Icon(Icons.call)),
-            ],
-          ),
-        ),
-        backgroundColor: Color(0xFFFDE1C8),
+        automaticallyImplyLeading: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
         ),
+        titleSpacing: 0,
+        title: Obx(
+          () => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Chat with ${controller.receiverName.value}",
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: "poppins",
+                ),
+              ),
+
+              Row(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      // Get.to(UserHelpView());
+                    },
+                    child: Icon(Icons.info_outline),
+                  ),
+                  SizedBox(width: 5),
+                  InkWell(
+                    onTap: () {
+                      // navController.changeTab(3);
+                    },
+                    child: Icon(Icons.person),
+                  ),
+                  SizedBox(width: 5),
+                  Row(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          // Get arguments passed from previous screen
+                          final Map<String, dynamic> data = Get.arguments ?? {};
+                          final phoneNumber = data['phoneNumber'] ?? '';
+
+                          if (phoneNumber.isNotEmpty) {
+                            //  controller.makePhoneCall(phoneNumber);
+                          } else {
+                            // Get.snackbar(
+                            //   'Error',
+                            //   'Phone number not available',
+                            //   snackPosition: SnackPosition.BOTTOM,
+                            //   backgroundColor: Colors.red,
+                            //   colorText: Colors.white,
+                            // );
+                          }
+                        },
+                        child: Icon(Icons.call),
+                      ),
+                      SizedBox(width: 5),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        backgroundColor: Color(0xFFFDE1C8),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => Get.back(),
+        // ),
       ),
       body: Container(
         decoration: BoxDecoration(color: Color(0xFFFDE1C8)),

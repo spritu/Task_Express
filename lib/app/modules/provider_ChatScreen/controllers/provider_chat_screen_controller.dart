@@ -44,6 +44,7 @@ class ProviderChatScreenController extends GetxController {
   var receiverId = ''.obs;
   var hasUnreadMessages = false.obs;
   var hasUnreadnotify = false.obs;
+
   @override
   void onInit() {
     super.onInit();

@@ -100,6 +100,64 @@ class ChatController extends GetxController {
     isInitialized.value = true;
   }
 
+  void connectSocketAllMessage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+    String? firstName = prefs.getString('firstName');
+    String? lastName = prefs.getString('lastName');
+
+    print("AllMessage provider  :$userId $firstName $lastName");
+
+    if (userId == null) {
+      print(" User ID or BookedFor missing AllMessage");
+      return;
+    }
+
+    print('🔌 Connecting socket for user AllMessage: $userId');
+
+    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': false,
+      'forceNew': true,
+      'auth': {
+        'user': {'_id': userId, 'firstName': firstName, 'lastName': lastName},
+      },
+    });
+
+    socket.connect();
+
+    socket.onConnect((_) {
+      print(' Connected to socket AllMessage provider');
+    });
+
+    socket.onDisconnect((_) {
+      print(' Disconnected from socket AllMessage');
+    });
+
+    socket.onConnectError((err) {
+      print(' Connect Error: $err');
+    });
+
+    socket.onError((err) {
+      print(' Socket Error: $err');
+    });
+
+    ///Listen to notifications messages
+
+    socket.on('allMessagesViewed', (data) {
+      print(' Received allMessagesViewed message: $data');
+
+      final msg = types.TextMessage(
+        id: data['_id'] ?? const Uuid().v4(),
+        text: data['message'] ?? '',
+        author: types.User(id: data['senderId'] ?? 'unknown'),
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+      );
+
+      messages.insert(0, msg);
+    });
+  }
+
   Future<void> fetchAllMessages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final reciverID = prefs.getString('userId');
