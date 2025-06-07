@@ -88,346 +88,444 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
           // List of workers
           Expanded(
             child: Obx(
-                  () => ListView.builder(
-                itemCount: users.length,
-                itemBuilder: (context, index) {
-                  final user = users[index];
-
-                  final imagePath = user['userImg'] ?? '';
-                  final imageUrl = imagePath.isNotEmpty ? 'https://jdapi.youthadda.co/$imagePath' : '';
-                  final int avail = user["avail"] ?? 0;
-                  final distance = user['distance'] ?? 'N/A';
-                  final charge =
-                  user['skills'] != null && user['skills'].isNotEmpty
-                      ? user['skills'][0]['charge']
-                      : 0;
-                  print("Opening bottom sheet for ${user['firstName']}");
-                  final coords = user['location']?['coordinates'];
-
-
-                  if (coords != null && coords.length >= 2) {
-                    try {
-                      final double lat = (coords[1] as num).toDouble();
-                      final double lng = (coords[0] as num).toDouble();
-
-                      // Replace below with your method to calculate distance from user location
-                      //   distance = controller.getAddressFromLatLng(lat, lng) as double;
-                    } catch (e) {
-                      print("Coordinate parse error: $e");
-                    }
+                  () { if (controller.isLoading.value) {
+                    return Center(child: CircularProgressIndicator());
                   }
-                  return InkWell(
-                    onTap: () async {
-                      Get.to(
-                            () => ProfessionalProfileView(),
-                        arguments: {
-                          'name': user['firstName'],
-                          'image': user['userImg'],
-                          'experience': user['experience'],
-                          'phone': user['phone'],
-                          'id': user['_id'],  'skills': user['skills'] ?? [],
-                          'averageRating': user['averageRating'],'reviews': user['reviews'] ?? [],
-                          'avail': user['avail'],
-                          // 'latitude': user['latitude'],
-                          // 'longitude': user['longitude'],
-                          //'distance': user['distance'], // ✅ Add this
-                        },
-                      );
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 7,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          Card(
-                            color: Colors.white,
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Column(
-                                children: [
-                                  SizedBox(  height: 80,
-                                    width: 80,
-                                    child: Image.network(
-                                      imageUrl,
-                                      height: 80,
-                                      width: 80,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Image.asset(
-                                          'assets/images/person.jpeg',
-                                          fit: BoxFit.cover,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
-                                        size: 16,
-                                      ),Text(
-                                        user['averageRating']?.toString() ?? '0',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w400,
-                                          fontFamily: "poppins",
-                                          color: Colors.grey[800],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    "${user['experience'] ?? 0} year Experience",
-                                    style: const TextStyle(
-                                      color: Color(0xff7C7C7C),
-                                      fontSize: 10,
-                                      fontFamily: "poppins",
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row( crossAxisAlignment: CrossAxisAlignment.start,
 
-                                  children: [
-                                    Column(crossAxisAlignment: CrossAxisAlignment.start,
+
+                  return
+                    ListView.builder(
+                      itemCount: controller.users.length,
+                      itemBuilder: (context, index) {
+                        final user = controller.users[index];
+
+
+                        final imagePath = user['userImg'] ?? '';
+                        final imageUrl = imagePath.isNotEmpty
+                            ? 'https://jdapi.youthadda.co/$imagePath'
+                            : '';
+                        String rawDistance = user['distance'] ?? "0.00 km";
+                        String distanceOnly = rawDistance.replaceAll(" km", "");
+
+                        double? distanceDouble = double.tryParse(distanceOnly);
+                        String finalDistance = distanceDouble != null
+                            ? "${distanceDouble.toStringAsFixed(2)} km"
+                            : "N/A";
+
+                        final int avail = user["avail"] ?? 0;
+                        final distance = user['distance'] ?? 'N/A';
+                        final charge =
+                        user['skills'] != null && user['skills'].isNotEmpty
+                            ? user['skills'][0]['charge']
+                            : 0;
+                        print("Opening bottom sheet for ${user['firstName']}");
+                        final coords = user['location']?['coordinates'];
+                        final matchedCharge = (user['matchedCharge'] != null && user['matchedCharge'] > 0)
+                            ? user['matchedCharge']
+                            : (user['skills'] != null && user['skills'].isNotEmpty
+                            ? user['skills'][0]['charge']
+                            : 0);
+
+
+
+
+                        if (coords != null && coords.length >= 2) {
+                          try {
+                            final double lat = (coords[1] as num).toDouble();
+                            final double lng = (coords[0] as num).toDouble();
+
+                            // Replace below with your method to calculate distance from user location
+                            //   distance = controller.getAddressFromLatLng(lat, lng) as double;
+                          } catch (e) {
+                            print("Coordinate parse error: $e");
+                          }
+                        }
+                        return InkWell(
+                          onTap: () async {
+                            Get.to(
+                                  () => ProfessionalProfileView(),
+                              arguments: {
+                                'name': user['firstName'],
+                                'image': user['userImg'],
+                                'experience': user['experience'],
+                                'phone': user['phone'],
+                                'id': user['_id'],
+                                'skills': user['skills'] ?? [],
+                                'averageRating': user['averageRating'],
+                                'reviews': user['reviews'] ?? [],
+                                'avail': user['avail'],
+                                // 'latitude': user['latitude'],
+                                // 'longitude': user['longitude'],
+                                //'distance': user['distance'], // ✅ Add this
+                              },
+                            );
+                          },
+                          child: Container(
+                            width: MediaQuery
+                                .of(context)
+                                .size
+                                .width,
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                Card(
+                                  color: Colors.white,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Column(
                                       children: [
-                                        Text(
-                                          "${user['firstName'] ?? 'No'} ${user['lastName'] ?? 'Name'}",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14,
-                                            fontFamily: "poppins",
-                                            color: AppColors.textColor,
+                                        SizedBox(height: 80,
+                                          width: 80,
+                                          child: Image.network(
+                                            imageUrl,
+                                            height: 80,
+                                            width: 80,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error,
+                                                stackTrace) {
+                                              return Image.asset(
+                                                'assets/images/person.jpeg',
+                                                fit: BoxFit.cover,
+                                              );
+                                            },
                                           ),
                                         ),
-                                        SizedBox(height: 3),
-                                        Row(mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            avail == 1
-                                                ? Row(
-                                              children: [
-                                                Icon(Icons.check_circle, color: Colors.green, size: 16),
-                                                SizedBox(width: 4),
-                                                Text(
-                                                  "Available",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontFamily: "poppins",
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Color(0xff11AD0E),
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                                : Row(
-                                              children: [
-                                                Icon(Icons.cancel, color: Colors.red, size: 16),
-                                                SizedBox(width: 4),
-                                                Text(
-                                                  "Not Available",
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontFamily: "poppins",
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.red,
-                                                  ),
-                                                ),],),],),],),
-                                    const Spacer(),
-                                    TextButton(
-                                      onPressed: () {
-                                        // Passing only relevant data to navigate to the profile view
-                                        Get.to(
-                                              () => ProfessionalProfileView(),
-                                          arguments: {
-                                            'name': user['firstName'],
-                                            'image': user['userImg'],
-                                            'experience': user['experience'],
-                                            'phone': user['phone'],
-                                            'id': user['_id'], 'skills': user['skills'] ?? [],
-                                            'averageRating': user['averageRating'],'reviews': user['reviews'] ?? [],
-                                            'avail': user['avail'],
-                                          },);},
-                                      child: Container(
-                                        height: 24,
-                                        width: 54,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                          color: Color(0xff114BCA),
-                                        ),
-                                        child: Center(
-                                          child: const Text(
-                                            "Details",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 7,
-                                              fontFamily: "poppins",
-                                              fontWeight: FontWeight.w400,
-                                            ),),),),),],),
-                                SizedBox(height: 4),
-                                Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
                                         Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [Padding(padding: const EdgeInsets.only(top: 3,),
-                                            child: Icon(
-                                              Icons.location_on,
-                                              size: 14,
-                                              color: Colors.grey,
+                                          children: [
+                                            const Icon(
+                                              Icons.star,
+                                              color: Colors.amber,
+                                              size: 16,
+                                            ), Text(
+                                              user['averageRating']
+                                                  ?.toString() ?? '0',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w400,
+                                                fontFamily: "poppins",
+                                                color: Colors.grey[800],
+                                              ),
                                             ),
-                                          ),
-                                            Text( '$distance', // ✅ Use calculated distance
-                                              // user['distance'] != null && user['distance'] != 'N/A'
-                                              //     ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
-                                              //     : 'N/A',
-                                              style: TextStyle(fontSize: 12),
-                                            )
                                           ],
                                         ),
-                                        SizedBox(height: 3),
-                                      ],
-                                    ),
-                                    Card(
-                                      color: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(40),
-                                      ),
-                                      elevation: 2,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 4.0,
-                                          horizontal: 10.0,
-                                        ),
-                                        child: RichText(
-                                          text: TextSpan(
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.orange,
-                                              fontFamily: 'Poppins',
-                                            ),
-                                            children: [
-                                              TextSpan(
-                                                text: "Charge: ",
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: AppColors.orage,
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: "₹ $charge/day",
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                  color: AppColors.orage,
-                                                  fontWeight: FontWeight.w700,
-                                                ),),],),),),),],),
-                                const SizedBox(height: 8),
-                                Row(children: [Expanded(child: SizedBox(height: 24, width: 110,
-                                  child: ElevatedButton(
-                                    onPressed: () async {
-                                      final phoneNumber =
-                                          user['phone'] ?? '';
-                                      if (phoneNumber.isNotEmpty) {
-                                        controller.selectedUsers =
-                                            users; // Store full list
-                                        controller.selectedIndexAfterCall = index; // Store selected index
-                                        controller.selectedTitle = title;
-                                        controller.shouldShowSheetAfterCall = true; // Trigger sheet on resume
-                                        controller.makePhoneCall(phoneNumber);
-                                      } else {
-                                        Get.snackbar(
-                                          'Error',
-                                          'Phone number not available',
-                                          snackPosition:
-                                          SnackPosition.BOTTOM,
-                                          backgroundColor: Colors.red,
-                                          colorText: Colors.white,
-                                        );}},
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color(0xff114BCA),
-                                    ), child: const Text("Call", style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12,
-                                    color: AppColors.white,
-                                    fontFamily: "poppins",
-                                  ),),),),),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 24,
-                                      width: 100,
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          final receiverId = user['_id'].toString();
-                                          final receiverName = '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'.trim();
-                                          final receiverImage = user['userImg'] ?? '';
-                                          final phoneNumber = user['phone'] ?? '';
-
-                                          if (receiverId.isNotEmpty) {
-                                            Get.to(
-                                              ChatView(),
-                                              arguments: {
-                                                'receiverId': receiverId,
-                                                'receiverName': receiverName.isNotEmpty ? receiverName : 'No Name',
-                                                'receiverImage': receiverImage,
-                                                'phoneNumber': phoneNumber,
-                                              },);} else {
-                                            Get.snackbar(
-                                              'Error',
-                                              'Receiver ID not available',
-                                              snackPosition: SnackPosition.BOTTOM,
-                                              backgroundColor: Colors.red,
-                                              colorText: Colors.white,
-                                            );
-                                          }
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xff114BCA),
-                                        ),
-                                        child: const Text(
-                                          "Chat",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 12,
-                                            color: AppColors.white,
+                                        Text(
+                                          "${user['experience'] ??
+                                              0} year Experience",
+                                          style: const TextStyle(
+                                            color: Color(0xff7C7C7C),
+                                            fontSize: 10,
                                             fontFamily: "poppins",
+                                            fontWeight: FontWeight.w400,
                                           ),
                                         ),
-                                      ),),),],
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                                SizedBox(height: 10),
-                              ],),),],),),);},),
-            ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .start,
+                                    children: [
+                                      Row(crossAxisAlignment: CrossAxisAlignment
+                                          .start,
+
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .start,
+                                            children: [
+                                              Text(
+                                                "${user['firstName'] ??
+                                                    'No'} ${user['lastName'] ??
+                                                    'Name'}",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 14,
+                                                  fontFamily: "poppins",
+                                                  color: AppColors.textColor,
+                                                ),
+                                              ),
+                                              SizedBox(height: 3),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment
+                                                    .start,
+                                                crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                                children: [
+                                                  avail == 1
+                                                      ? Row(
+                                                    children: [
+                                                      Icon(Icons.check_circle,
+                                                          color: Colors.green,
+                                                          size: 16),
+                                                      SizedBox(width: 4),
+                                                      Text(
+                                                        "Available",
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontFamily: "poppins",
+                                                          fontWeight: FontWeight
+                                                              .w500,
+                                                          color: Color(
+                                                              0xff11AD0E),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                      : Row(
+                                                    children: [
+                                                      Icon(Icons.cancel,
+                                                          color: Colors.red,
+                                                          size: 16),
+                                                      SizedBox(width: 4),
+                                                      Text(
+                                                        "Not Available",
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontFamily: "poppins",
+                                                          fontWeight: FontWeight
+                                                              .w500,
+                                                          color: Colors.red,
+                                                        ),
+                                                      ),
+                                                    ],),
+                                                ],),
+                                            ],),
+                                          const Spacer(),
+                                          TextButton(
+                                            onPressed: () {
+                                              // Passing only relevant data to navigate to the profile view
+                                              Get.to(
+                                                    () =>
+                                                    ProfessionalProfileView(),
+                                                arguments: {
+                                                  'name': user['firstName'],
+                                                  'image': user['userImg'],
+                                                  'experience': user['experience'],
+                                                  'phone': user['phone'],
+                                                  'id': user['_id'],
+                                                  'skills': user['skills'] ??
+                                                      [],
+                                                  'averageRating': user['averageRating'],
+                                                  'reviews': user['reviews'] ??
+                                                      [],
+                                                  'avail': user['avail'],
+                                                },);
+                                            },
+                                            child: Container(
+                                              height: 24,
+                                              width: 54,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius
+                                                    .circular(
+                                                  10,
+                                                ),
+                                                color: Color(0xff114BCA),
+                                              ),
+                                              child: Center(
+                                                child: const Text(
+                                                  "Details",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 7,
+                                                    fontFamily: "poppins",
+                                                    fontWeight: FontWeight.w400,
+                                                  ),),),),),
+                                        ],),
+                                      SizedBox(height: 4),
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .only(top: 3,),
+                                                    child: Icon(
+                                                      Icons.location_on,
+                                                      size: 14,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                  Text(finalDistance,
+                                                    // ✅ Use calculated distance
+                                                    // user['distance'] != null && user['distance'] != 'N/A'
+                                                    //     ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
+                                                    //     : 'N/A',
+                                                    style: TextStyle(
+                                                        fontSize: 12),
+                                                  )
+                                                ],
+                                              ),
+                                              SizedBox(height: 3),
+                                            ],
+                                          ),
+                                          Card(
+                                            color: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius
+                                                  .circular(40),
+                                            ),
+                                            elevation: 2,
+                                            child: Padding(
+                                              padding: const EdgeInsets
+                                                  .symmetric(
+                                                vertical: 4.0,
+                                                horizontal: 4.0,
+                                              ),
+                                              child: RichText(
+                                                text: TextSpan(
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.orange,
+                                                    fontFamily: 'Poppins',
+                                                  ),
+                                                  children: [
+                                                    TextSpan(
+                                                      text: "Charge: ",
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        color: AppColors.orage,
+                                                        fontWeight: FontWeight
+                                                            .w400,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: "₹ $matchedCharge/day",
+                                                      style: TextStyle(
+                                                        fontSize: 11,
+                                                        color: AppColors.orage,
+                                                        fontWeight: FontWeight
+                                                            .w700,
+                                                      ),),
+                                                  ],),),),),
+                                        ],),
+                                      const SizedBox(height: 8),
+                                      Row(children: [
+                                        Expanded(child: SizedBox(
+                                          height: 24, width: 110,
+                                          child: ElevatedButton(
+                                            onPressed: () async {
+                                              final phoneNumber =
+                                                  user['phone'] ?? '';
+                                              if (phoneNumber.isNotEmpty) {
+                                                controller.selectedUsers =
+                                                    users; // Store full list
+                                                controller
+                                                    .selectedIndexAfterCall =
+                                                    index; // Store selected index
+                                                controller.selectedTitle =
+                                                    title;
+                                                controller
+                                                    .shouldShowSheetAfterCall =
+                                                true; // Trigger sheet on resume
+                                                controller.makePhoneCall(
+                                                    phoneNumber);
+                                              } else {
+                                                Get.snackbar(
+                                                  'Error',
+                                                  'Phone number not available',
+                                                  snackPosition:
+                                                  SnackPosition.BOTTOM,
+                                                  backgroundColor: Colors.red,
+                                                  colorText: Colors.white,
+                                                );
+                                              }
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Color(
+                                                  0xff114BCA),
+                                            ),
+                                            child: const Text(
+                                              "Call", style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              color: AppColors.white,
+                                              fontFamily: "poppins",
+                                            ),),),),),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: SizedBox(
+                                            height: 24,
+                                            width: 100,
+                                            child: ElevatedButton(
+                                              onPressed: () {
+                                                final receiverId = user['_id']
+                                                    .toString();
+                                                final receiverName = '${user['firstName'] ??
+                                                    ''} ${user['lastName'] ??
+                                                    ''}'.trim();
+                                                final receiverImage = user['userImg'] ??
+                                                    '';
+                                                final phoneNumber = user['phone'] ??
+                                                    '';
+
+                                                if (receiverId.isNotEmpty) {
+                                                  Get.to(
+                                                    ChatView(),
+                                                    arguments: {
+                                                      'receiverId': receiverId,
+                                                      'receiverName': receiverName
+                                                          .isNotEmpty
+                                                          ? receiverName
+                                                          : 'No Name',
+                                                      'receiverImage': receiverImage,
+                                                      'phoneNumber': phoneNumber,
+                                                    },);
+                                                } else {
+                                                  Get.snackbar(
+                                                    'Error',
+                                                    'Receiver ID not available',
+                                                    snackPosition: SnackPosition
+                                                        .BOTTOM,
+                                                    backgroundColor: Colors.red,
+                                                    colorText: Colors.white,
+                                                  );
+                                                }
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: const Color(
+                                                    0xff114BCA),
+                                              ),
+                                              child: const Text(
+                                                "Chat",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 12,
+                                                  color: AppColors.white,
+                                                  fontFamily: "poppins",
+                                                ),
+                                              ),
+                                            ),),),
+                                      ],
+                                      ),
+                                      SizedBox(height: 10),
+                                    ],),),
+                              ],),),);
+                      },);
+
+                  } ),
           ),
         ],
       ),
@@ -825,7 +923,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
         controller.selected.value = value;
 
         if (value == "charge") {
-          await controller.fetchUsersSortedByCharge(catId);
+          await controller.fetchUsersSortedByCharge();
         } else if (value == "distance") {
           print("dissssssssssssssssssssssss");
           // ✅ Get current location before API call
@@ -853,8 +951,8 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
             desiredAccuracy: LocationAccuracy.high,
           );
 
-          await controller.fetchUsersByDistance(
-              catId
+          await controller.fetchUsersWithDistance(
+
           );
         }
       },

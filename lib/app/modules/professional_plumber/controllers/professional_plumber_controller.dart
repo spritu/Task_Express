@@ -665,56 +665,54 @@ import '../../home/controllers/home_controller.dart';
 
 class ProfessionalPlumberController extends GetxController
     with WidgetsBindingObserver {
+
+  ProfessionalPlumberController(); // 👈 constructor
   final HomeController userController = Get.put(HomeController());
   var distances = <int, String>{}.obs;
-  var distanceToUser = ''.obs;
+  var distanceToUser = ''.obs;var isLoading = false.obs;
+
+  var users = <Map<String, dynamic>>[].obs;
+  late String catId;
+  // Observable catId
+  //var users = <Map<String, dynamic>>[].obs;
   var selected = 'charge'.obs;
   Position? currentPosition;
-  Future<Position> _getCurrentPosition() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      return Future.error('Location services are disabled.');
-    }
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
-      }
-    }
+  Future<void> loadCatIdFromArguments() async {
+    final args = Get.arguments;
+    print("👀 Incoming arguments: $args"); // Debug print
 
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error('Location permissions are permanently denied.');
-    }
-
-    return await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-  }
-
-  Future<String?> fetchDistance(
-      double lat1,
-      double lon1,
-      double lat2,
-      double lon2,
-      ) async {
-    var url = Uri.parse(
-      'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lon1&lat2=$lat2&lon2=$lon2',
-    );
-
-    var request = http.MultipartRequest('GET', url);
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      final distanceString = await response.stream.bytesToString();
-      return distanceString;
+    if (args != null && args['catId'] != null) {
+      // catId.value = args['catId'];
+      // print("✅ catId loaded from arguments: ${catId.value}");
     } else {
-      print('Error: ${response.reasonPhrase}');
-      return null;
+      print("❌ catId not found in arguments");
     }
   }
+  Future<void> loadCatIdFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? savedCatId = prefs.getString('selectedCatId');
+
+    if (savedCatId != null && savedCatId.isNotEmpty) {
+    //  catId.value = savedCatId;
+      print("✅ Loaded catId from SharedPreferences: $savedCatId");
+    } else {
+      print("❌ No catId found in SharedPreferences");
+    }
+  }
+
+  Future<void> waitAndLoadArguments() async {
+    await Future.delayed(Duration(milliseconds: 100));
+    final args = Get.arguments;
+    if (args != null && args['catId'] != null) {
+   //   catId.value = args['catId'];
+     // print("✅ Fallback catId loaded: ${catId.value}");
+    }
+  }
+
+
+
+
 
   Future<String> getAddressFromLatLng(double lat, double lng) async {
     try {
@@ -729,151 +727,83 @@ class ProfessionalPlumberController extends GetxController
     return "Unknown Location";
   }
 
-  Future<void> fetchUsersByDistance(String catId) async {
+  Future<void> fetchUsersSortedByCharge() async {
     try {
-      // ✅ Step 1: Get current location
+      final prefs = await SharedPreferences.getInstance();
+      final catId = prefs.getString('selectedCatId');
+      isLoading.value = true;  // loader start
+      print("🔎 Sorting users by charge for catId: $catId");
+
+      var url = Uri.parse(
+        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&sortBy=lowToHigh',
+      );
+
+      var request = http.Request('GET', url);
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        final resBody = await response.stream.bytesToString();
+        final jsonData = json.decode(resBody);
+        final matchedCharge = jsonData['matchedCharge'] ?? 0;
+
+        users.value = List<Map<String, dynamic>>.from(jsonData['data'] ?? []);
+
+        print("✅ Sorted users fetched: ${users.length}");
+      } else {  users.clear(); // 👈 add this line
+        print("❌ Failed to fetch sorted users");
+      }
+    } catch (e) {
+      print("❗ Sort error: $e");
+    } finally {
+      isLoading.value = false;  // loader stop
+    }
+  }
+  Future<void> fetchUsersWithDistance() async {
+    isLoading.value = true; // Start loader
+    try {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      double latitude = position.latitude;
-      double longitude = position.longitude;
+      double lat = position.latitude;
+      double lng = position.longitude;
 
-      // ✅ Step 2: Call the API with dynamic lat/lng
-      final Uri uri = Uri.parse(
-        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&lat=$latitude&lng=$longitude',
+      print("📍 LAT: $lat, LNG: $lng, CATID: $catId");
+
+      final url = Uri.parse(
+        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&lat=$lng&lng=$lat&nearMe=true',
       );
 
-      var request = http.Request('GET', uri);
-      http.StreamedResponse response = await request.send();
-
-      // ✅ Step 3: Handle the response
-      if (response.statusCode == 200) {
-        String responseBody = await response.stream.bytesToString();
-        final jsonResponse = json.decode(responseBody);
-
-        print("✅ API Response:");
-        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        print(jsonEncode(jsonResponse));
-
-        // Optional: Parse and use the data
-        List<Map<String, dynamic>> users =
-        List<Map<String, dynamic>>.from(jsonResponse['data'] ?? []);
-
-        // You can now use 'users' as needed
-      } else {
-        print("❌ API Error: ${response.reasonPhrase}");
-      }
-    } catch (e) {
-      print("❌ Exception: $e");
-    }
-  }
-
-
-  List<dynamic> users = []; // List of service providers
-  Future<void> fetchUsersSortedByCharge(String catId) async {
-    try {
-      var request = http.Request(
-        'GET',
-        Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&sortBy=lowToHigh'),
-      );
-
+      var request = http.Request('GET', url);
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
         final resBody = await response.stream.bytesToString();
         final jsonData = json.decode(resBody);
 
-        users = List<Map<String, dynamic>>.from(jsonData['data'] ?? []);
-        print("ssssssssssssssssssssssssssss");
+        print("✅ RESPONSE: $jsonData");
+
+        users.value = List<Map<String, dynamic>>.from(jsonData['data'] ?? []);
+
+        for (var user in users) {
+          print("👤 ${user['firstName']} - Distance: ${user['distance']} km");
+        }
       } else {
-        // Get.snackbar('Error', 'Failed to fetch sorted users.');
+        print('❌ API Error: ${response.statusCode} - ${response.reasonPhrase}');
+        print('❌ Full URL: $url');
       }
     } catch (e) {
-      print("Sort error: $e");
-      // Get.snackbar('Error', 'Something went wrong');
+      print('❌ Exception: $e');
+    } finally {
+      isLoading.value = false; // Stop loader
     }
   }
 
-  // Future<void> getDistanceFromUserToProvider(Map<String, dynamic> user) async {
-  //   try {
-  //     // Step 1: Get your current location
-  //     Position currentPosition = await Geolocator.getCurrentPosition(
-  //       desiredAccuracy: LocationAccuracy.high,
-  //     );
-  //
-  //     double currentLat = currentPosition.latitude;
-  //     double currentLon = currentPosition.longitude;
-  //
-  //     // Step 2: Get provider's location (GeoJSON format: [longitude, latitude])
-  //     if (user['location'] != null &&
-  //         user['location']['coordinates'] != null &&
-  //         user['location']['coordinates'].length == 2) {
-  //
-  //       double providerLon = user['location']['coordinates'][0]; // Longitude
-  //       double providerLat = user['location']['coordinates'][1]; // Latitude
-  //
-  //       print('📍 Provider Location: ($providerLat, $providerLon)');
-  //       print('📍 Your Location: ($currentLat, $currentLon)');
-  //
-  //       // Step 3: Call the distance API
-  //       var url = Uri.parse(
-  //         'https://jdapi.youthadda.co/getdistance?lat1=$currentLat&lon1=$currentLon&lat2=$providerLat&lon2=$providerLon',
-  //       );
-  //
-  //       var response = await http.get(url);
-  //
-  //       if (response.statusCode == 200) {
-  //         var distJson = json.decode(response.body);
-  //
-  //         if (distJson['code'] == 200 &&
-  //             distJson['data'] != null &&
-  //             distJson['data']['distance'] != null) {
-  //           double distance = double.tryParse(distJson['data']['distance'].toString()) ?? 0;
-  //           user['distance'] = distance.toStringAsFixed(2); // Like "12.34"
-  //           print('✅ Distance: ${user['distance']} km');
-  //           print('My Location: $currentLat, $currentLon');
-  //           print('Provider Location: $providerLat, $providerLon');
-  //
-  //         } else {
-  //           user['distance'] = 'N/A';
-  //           print('⚠️ Distance data missing');
-  //         }
-  //       } else {
-  //         user['distance'] = 'N/A';
-  //         print('❌ Failed to get distance: ${response.reasonPhrase}');
-  //       }
-  //     } else {
-  //       user['distance'] = 'N/A';
-  //       print('⚠️ Provider location invalid');
-  //     }
-  //   } catch (e) {
-  //     user['distance'] = 'N/A';
-  //     print('⚠️ Error: $e');
-  //   }
-  // }
 
-  // Future<void> fetchAndProcessUsers() async {
-  //   try {
-  //     var response = await http.get(Uri.parse('https://api.example.com/users'));
-  //
-  //     if (response.statusCode == 200) {
-  //       var data = json.decode(response.body);
-  //       users = data['data']; // Replace with actual path
-  //
-  //       // Call distance function for each user
-  //       for (var user in users) {
-  //         await getDistanceFromUserToProvider(user);
-  //       }
-  //
-  //       update(); // GetX use kar rahe ho to UI update hoga
-  //     } else {
-  //       print("❌ Failed to fetch users");
-  //     }
-  //   } catch (e) {
-  //     print("⚠️ Error: $e");
-  //   }
-  // }
+
+
+
+
 
   Future<void> saveCurrentLocationToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
@@ -927,83 +857,29 @@ class ProfessionalPlumberController extends GetxController
   double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
     return Geolocator.distanceBetween(lat1, lng1, lat2, lng2); // in kilometers
   }
-  // Future<void> getCurrentLocation() async {
-  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   if (!serviceEnabled) {
-  //     await Geolocator.openLocationSettings();
-  //     return;
-  //   }
-  //
-  //   LocationPermission permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
-  //   }
-  //
-  //   currentPosition = await Geolocator.getCurrentPosition(
-  //       desiredAccuracy: LocationAccuracy.high);
-  // }
+
 
   @override
   void onInit() {
-    super.onInit();
-    //  getDistanceFromApi( lat2,  lng2)
-    //   getDistanceFromSharedPrefs(lat2,);
-    WidgetsBinding.instance.addObserver(this);
+   fetchUsersSortedByCharge();
+  final args = Get.arguments;
+  if (args != null && args['catId'] != null) {
+    catId = args['catId'];
+    print("📦 catId loaded in controller: $catId");
+  } else {
+    catId = '';
+    print("⚠️ catId is missing in arguments");
   }
-  // Future<void> fetchDistanceForUser(int index, double lat2, double lng2) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   double? lat1 = prefs.getDouble('lat1');
-  //   double? lng1 = prefs.getDouble('lng1');
-  //
-  //   if (lat1 != null && lng1 != null) {
-  //     final url = Uri.parse(
-  //         'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lng1&lat2=$lat2&lon2=$lng2');
-  //
-  //     try {
-  //       var request = http.MultipartRequest('GET', url);
-  //       http.StreamedResponse response = await request.send();
-  //
-  //       if (response.statusCode == 200) {
-  //         String result = await response.stream.bytesToString();
-  //         var data = json.decode(result);
-  //         print("✅ API response: $data");
-  //
-  //         // ✅ Extract from `data['data']['distance']`
-  //         if (data['data'] != null && data['data']['distance'] != null) {
-  //           double rawDistance = data['data']['distance'];
-  //          // String formattedDistance = (rawDistance / 1000).toStringAsFixed(2); // convert to KM
-  //           //distances[index] = '$formattedDistance KM';
-  //           print("📏 Distance for user[$index]: ${distances[index]}");
-  //         } else {
-  //           distances[index] = 'N/A';
-  //         }
-  //       } else {
-  //         distances[index] = 'Error';
-  //         print("❌ Failed with status: ${response.statusCode}");
-  //       }
-  //     } catch (e) {
-  //       distances[index] = 'Error';
-  //       print("❌ Exception: $e");
-  //     }
-  //   } else {
-  //     distances[index] = 'No Location';
-  //   }
-  //
-  //   update(); // update UI in GetX
-  // }
+    super.onInit(); Future.microtask(() async {
+      await loadCatIdFromArguments();
+    });
+    waitAndLoadArguments();
 
-  // void updateUserDistances(List<dynamic> users) {
-  //   for (int i = 0; i < users.length; i++) {
-  //     final lat = double.tryParse(users[i]['lat'] ?? '0') ?? 0.0;
-  //     final lng = double.tryParse(users[i]['lng'] ?? '0') ?? 0.0;
-  //
-  //     if (lat != 0.0 && lng != 0.0) {
-  //       fetchDistanceForUser(i, lat, lng);
-  //     } else {
-  //       distances[i] = 'Invalid';
-  //     }
-  //   }
-  // }
+
+
+
+  }
+
 
   @override
   void onClose() {
@@ -1037,45 +913,6 @@ class ProfessionalPlumberController extends GetxController
     }
   }
 
-  // Future<void> getDistanceFromSharedPrefs() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //
-  //   double? lat1 = prefs.getDouble('lat1');
-  //   double? lng1 = prefs.getDouble('lng1');
-  //   double? lat2 = prefs.getDouble('lat2');
-  //   double? lng2 = prefs.getDouble('lng2');
-  //
-  //   if (lat1 != null && lng1 != null && lat2 != null && lng2 != null) {
-  //     print("📍 User1: ($lat1, $lng1)");
-  //     print("📍 User2: ($lat2, $lng2)");
-  //
-  //     final url = Uri.parse(
-  //       'https://jdapi.youthadda.co/getdistance?lat1=$lat1&lon1=$lng1&lat2=$lat2&lon2=$lng2',
-  //     );
-  //
-  //     var request = http.MultipartRequest('GET', url);
-  //     http.StreamedResponse response = await request.send();
-  //
-  //     if (response.statusCode == 200) {
-  //       String result = await response.stream.bytesToString();
-  //       print("✅ Distance API Response: $result");
-  //
-  //       // Parse JSON response
-  //       var data = json.decode(result);
-  //       if (data['distance'] != null) {
-  //         distance.value = data['distance'].toString(); // Update Rx value
-  //       } else {
-  //         distance.value = 'null';
-  //       }
-  //     } else {
-  //       print("❌ Failed to fetch distance: ${response.statusCode} - ${response.reasonPhrase}");
-  //       distance.value = 'Error';
-  //     }
-  //   } else {
-  //     print("⚠️ One or more coordinates are missing in SharedPreferences.");
-  //     distance.value = 'Coordinates missing';
-  //   }
-  // }
 
   // Listen for app lifecycle changes, mainly to detect when phone call ends
   @override
@@ -1130,6 +967,8 @@ class ProfessionalPlumberController extends GetxController
   final RxList<types.Message> messages = <types.Message>[].obs;
   final Rxn<types.User> user = Rxn<types.User>();
   late IO.Socket socket;
+
+ // ProfessionalPlumberController(String catId);
 
   // Booking API call
   Future<void> bookServiceProvider({
