@@ -12,6 +12,7 @@ import '../../Scaffolding_helper/views/scaffolding_helper_view.dart';
 import '../../booking/controllers/booking_controller.dart';
 import '../../login/views/login_view.dart';
 import '../../plastering_helper/views/plastering_helper_view.dart';
+import '../../professional_plumber/controllers/professional_plumber_controller.dart';
 import '../../professional_plumber/views/professional_plumber_view.dart';
 import '../../professional_profile/views/professional_profile_view.dart';
 import '../../road_construction_helper/views/road_construction_helper_view.dart';
@@ -86,6 +87,40 @@ class HomeController extends GetxController {
     }
   }
   Map<String, String> categoryNameMap = {};
+  // Future<void> fetchUsersListByCategory(String catId, {String? categoryName}) async {
+  //   print("📦 catId received: $catId");
+  //   results.clear();
+  //   isLoading.value = true;
+  //
+  //   try {
+  //     fetchCategories();
+  //
+  //     // ✅ Call distance-fetching API directly
+  //     await ProfessionalPlumberController(catId);
+  //
+  //     if (users.isNotEmpty) {
+  //       print("✅ Going to ProfessionalPlumberView with catId: $catId");
+  //
+  //       Get.to(() => ProfessionalPlumberView(), arguments: {
+  //         'users': users,
+  //         'catId': catId,
+  //         'title': categoryName ?? 'Professionals',
+  //       });
+  //     } else {
+  //       print("➡ Navigating to ServiceproView with catId: $catId");
+  //
+  //       Get.to(() => ServiceproView(), arguments: {
+  //         'users': users,
+  //         'catId': catId,
+  //         'title': categoryName ?? 'Professionals',
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print("❗ Exception during fetchUsersListByCategory: $e");
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
 
 
   Future<void> fetchUsersListByCategory(String catId, {String? categoryName}) async {
@@ -117,16 +152,18 @@ class HomeController extends GetxController {
 
           Get.to(() => ProfessionalPlumberView(), arguments: {
             'users': results,
-            'catId': catId,
+            'catId': catId, // ✅ MUST be here
             'title': categoryName ?? 'Professionals',
           });
+
         } else {
           print("➡ Navigating to ServiceproView with catId: $catId");
           Get.to(() => ServiceproView(), arguments: {
             'users': results,
-            'catId': catId,
+            'catId': catId, // ✅ Include here too
             'title': categoryName ?? 'Professionals',
           });
+
         }
 
       } else {
