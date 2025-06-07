@@ -382,10 +382,12 @@ class BookingController extends GetxController {
     super.onInit();
     fetchCurrentBookings();
     connectSocketAccept();
-    connectSocketReject();fetchUserPastBooking();
+    connectSocketReject();
+    fetchUserPastBooking();
 
     //  fetchUserCurrentBooking();
   }
+
   Future<void> fetchUserPastBooking() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -398,9 +400,7 @@ class BookingController extends GetxController {
 
       isLoading.value = true;
 
-      var headers = {
-        'Content-Type': 'application/json',
-      };
+      var headers = {'Content-Type': 'application/json'};
       var request = http.Request(
         'POST',
         Uri.parse('https://jdapi.youthadda.co/getuserpastbooking'),
@@ -433,8 +433,6 @@ class BookingController extends GetxController {
       isLoading.value = false;
     }
   }
-
-
 
   // Inside your controller
   //var bookingList = <dynamic>[].obs;
@@ -941,8 +939,11 @@ class Booking {
 }
 
 String formatDate(String isoDate) {
-  final DateTime dateTime = DateTime.parse(isoDate).toLocal(); // convert to local time
-  final DateFormat formatter = DateFormat('dd MMM yyyy, hh:mm a'); // e.g., 22 May 2025, 12:09 PM
+  final DateTime dateTime =
+      DateTime.parse(isoDate).toLocal(); // convert to local time
+  final DateFormat formatter = DateFormat(
+    'dd MMM yyyy, hh:mm a',
+  ); // e.g., 22 May 2025, 12:09 PM
   return formatter.format(dateTime);
 }
 
@@ -980,7 +981,8 @@ class UserModel {
     String spTypeValue = '1'; // default if not found
 
     // Extract spType from first bookService if available
-    if (json['bookServices'] != null && (json['bookServices'] as List).isNotEmpty) {
+    if (json['bookServices'] != null &&
+        (json['bookServices'] as List).isNotEmpty) {
       final firstService = (json['bookServices'] as List).first;
       spTypeValue = firstService['spType']?.toString() ?? '1';
     }
@@ -1037,12 +1039,7 @@ class UserModel {
   //     spType: spTypeValue,
   //   );
   // }
-
 }
-
-
-
-
 
 class SkillModel {
   final String categoryId;

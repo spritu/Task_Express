@@ -83,11 +83,11 @@ void main() async {
   Get.put(TileFixingHelperController(), permanent: true);
   Get.put(JobsDetailsController(), permanent: true);
   Get.put(RoadConstructionHelperController(), permanent: true);
-//  Get.put(ProfessionalPlumberController(), permanent: true);
+  //  Get.put(ProfessionalPlumberController(), permanent: true);
   Get.put(SettingController(), permanent: true);
   // Get.put(EditProfileController(),permanent: true);
   Get.put(JobsController(), permanent: true);
-  Get.lazyPut(() => ChatController(), fenix: true);
+  // Get.lazyPut(() => ChatController(), fenix: true);
   Get.put(ProviderSettingController(), permanent: true);
   Get.lazyPut(() => ProviderChatController(), fenix: true);
   Get.put(OtpController(), permanent: true);
@@ -125,7 +125,6 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     checkLoginStatus();
-
   }
 
   // void checkLoginStatus() async {
@@ -150,8 +149,7 @@ class _SplashScreenState extends State<SplashScreen> {
   //     startSplashFlow();
   //   }
   // }
-  void checkLoginStatus() async
-  {
+  void checkLoginStatus() async {
     final box = GetStorage();
     final isLoggedIn = box.read('isLoggedIn') ?? false;
     final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
