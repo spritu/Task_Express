@@ -1698,9 +1698,8 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                     ),
                                                     onConfirm: () {
                                                       Get.back();
-                                                      controller.bookingDataList
-                                                          .clear();
-                                                      // Set the selected index in Bottom2Controller before navigation
+                                                      bookingList.clear();
+
                                                       final bottomController =
                                                           Get.put(
                                                             Bottom2Controller(),

@@ -75,6 +75,7 @@ class CompletejobController extends GetxController {
     print('55555: ${bookedFor}');
 
     print("❌ wdwcdtf55 :${bookedFor}");
+    print("yyyyyy:$firstName");
 
     if (bookedFor == null) {
       print("❌ User ID or BookedFor missing55");
@@ -133,8 +134,8 @@ class CompletejobController extends GetxController {
 
     bookedFor.value = booking['data']['bookedFor']['_id'];
 
-    firstName.value = booking['data']['bookedFor']['firstName'];
-    lastName.value = booking['data']['bookedFor']['lastName'];
+    firstName.value = booking['data']['bookedBy']['firstName'];
+    lastName.value = booking['data']['bookedBy']['lastName'];
 
     print("📦 Booking ID: $bookingId");
     print("👤 Booked By User ID: ${bookedby.value}");

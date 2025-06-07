@@ -104,7 +104,7 @@ class ChatView extends GetView<ChatController> {
                   itemBuilder: (context, index) {
                     final msg = messages[index];
                     final isSender = msg.author.id == controller.user.value?.id;
-                    final isRead = msg.metadata?['isRead'] == true;
+                    final isRead = msg.metadata?['viewall'] == true;
                     final name =
                         isSender ? "You" : controller.receiverName.value;
                     print('object121 ${controller.receiverImage.value}');
@@ -169,14 +169,14 @@ class ChatView extends GetView<ChatController> {
                               final userId = controller.user.value?.id;
 
                               if (msg.author.id == userId) {
-                                // 🟢 Current user is sender → permanently delete from server
+                                //  Current user is sender → permanently delete from server
                                 await controller.deleteMessage(
                                   msg.id,
                                   userId!,
-                                ); // 👈 userId passed here
+                                ); //  userId passed here
                               }
 
-                              // 🔴 Always remove locally (for sender & receiver)
+                              //  Always remove locally (for sender & receiver)
                               controller.messages.removeWhere(
                                 (m) => m.id == msg.id,
                               );

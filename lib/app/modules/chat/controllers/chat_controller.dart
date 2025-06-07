@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -44,6 +45,13 @@ class ChatController extends GetxController {
   void onInit() {
     super.onInit();
     initializeChat();
+    markAllAsSeen();
+    connectSocketAllMessage();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      messages.refresh();
+    });
+
     final args = Get.arguments ?? {};
     receiverImage.value = args['receiverImage'] ?? '';
     print("🟢 RECEIVER IMAGE: ${receiverImage.value}");
@@ -96,6 +104,7 @@ class ChatController extends GetxController {
     await fetchAllMessages();
 
     connectSocket();
+    // connectSocketAllMessage();
     fetchChatHistory();
     isInitialized.value = true;
   }
@@ -106,14 +115,12 @@ class ChatController extends GetxController {
     String? firstName = prefs.getString('firstName');
     String? lastName = prefs.getString('lastName');
 
-    print("AllMessage provider  :$userId $firstName $lastName");
-
     if (userId == null) {
-      print(" User ID or BookedFor missing AllMessage");
+      print("User ID missing");
       return;
     }
 
-    print('🔌 Connecting socket for user AllMessage: $userId');
+    print('🔌 Connecting socket for userId: $userId');
 
     socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
       'transports': ['websocket'],
@@ -127,36 +134,112 @@ class ChatController extends GetxController {
     socket.connect();
 
     socket.onConnect((_) {
-      print(' Connected to socket AllMessage provider');
+      print('✅ Socket connected');
     });
 
     socket.onDisconnect((_) {
-      print(' Disconnected from socket AllMessage');
+      print('❌ Socket disconnected');
     });
 
     socket.onConnectError((err) {
-      print(' Connect Error: $err');
+      print('⚠️ Connect error: $err');
     });
 
     socket.onError((err) {
-      print(' Socket Error: $err');
+      print('❗ Socket error: $err');
     });
 
-    ///Listen to notifications messages
-
+    /// ✅ Handle "seen" event and update UI
     socket.on('allMessagesViewed', (data) {
-      print(' Received allMessagesViewed message: $data');
+      print('👁️ allMessagesViewed: $data');
+      fetchChatHistory();
 
-      final msg = types.TextMessage(
-        id: data['_id'] ?? const Uuid().v4(),
-        text: data['message'] ?? '',
-        author: types.User(id: data['senderId'] ?? 'unknown'),
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-      );
+      final seenMessageId = data['messageId'];
 
-      messages.insert(0, msg);
+      for (int i = 0; i < messages.length; i++) {
+        final msg = messages[i];
+        if (msg.id == seenMessageId && msg is types.TextMessage) {
+          // Update metadata
+          messages[i] = msg.copyWith(metadata: {'viewall': true});
+          messages.refresh();
+          print('🔵 Message marked as seen: $seenMessageId');
+        }
+      }
+
+      messages.refresh(); // Force UI update
     });
   }
+
+  void markAllAsSeen() {
+    for (var msg in messages) {
+      if (msg is types.TextMessage &&
+          msg.author.id != user.value?.id &&
+          (msg.metadata == null || msg.metadata?['viewall'] != true)) {
+        socket.emit('allMessagesViewed', {
+          'messageId': msg.id,
+          'userId': user.value?.id,
+        });
+      }
+    }
+  }
+
+  // void connectSocketAllMessage() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? userId = prefs.getString('userId');
+  //   String? firstName = prefs.getString('firstName');
+  //   String? lastName = prefs.getString('lastName');
+  //
+  //   print("AllMessage userSaid  :$userId $firstName $lastName");
+  //
+  //   if (userId == null) {
+  //     print(" User ID or BookedFor missing AllMessage");
+  //     return;
+  //   }
+  //
+  //   print('🔌 Connecting socket for user AllMessage userSaid: $userId');
+  //
+  //   socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+  //     'transports': ['websocket'],
+  //     'autoConnect': false,
+  //     'forceNew': true,
+  //     'auth': {
+  //       'user': {'_id': userId, 'firstName': firstName, 'lastName': lastName},
+  //     },
+  //   });
+  //
+  //   socket.connect();
+  //
+  //   socket.onConnect((_) {
+  //     print(' Connected to socket AllMessage user said ');
+  //   });
+  //
+  //   socket.onDisconnect((_) {
+  //     print(' Disconnected from socket AllMessage');
+  //   });
+  //
+  //   socket.onConnectError((err) {
+  //     print(' Connect Error: $err');
+  //   });
+  //
+  //   socket.onError((err) {
+  //     print(' Socket Error: $err');
+  //   });
+  //
+  //   ///Listen to notifications messages
+  //
+  //   socket.on('allMessagesViewed', (data) {
+  //     print(' Received allMessagesViewed user Said message: $data');
+  //     //fetchChatHistory();
+  //     final msg = types.TextMessage(
+  //       id: data['_id'] ?? const Uuid().v4(),
+  //       text: data['message'] ?? '',
+  //       author: types.User(id: data['senderId'] ?? 'unknown'),
+  //       createdAt: DateTime.now().millisecondsSinceEpoch,
+  //     );
+  //
+  //     messages.insert(0, msg);
+  //   });
+  // }
 
   Future<void> fetchAllMessages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -226,7 +309,7 @@ class ChatController extends GetxController {
                   text: msg['message'] ?? '',
                   author: types.User(id: senderId),
                   createdAt: createdAtEpoch,
-                  metadata: {'isRead': isRead},
+                  metadata: {'viewall': isRead},
                 ),
               );
             }

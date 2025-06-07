@@ -162,7 +162,7 @@ Widget _buildBody(int index, bool showRequestPending, String helperName) {
       return BookingView();
 
     case 2:
-      bottomController.fetchNotifications();
+      // bottomController.fetchNotifications();
       return const SettingView();
     case 3:
       chatScreenController.fetchLastMessages();

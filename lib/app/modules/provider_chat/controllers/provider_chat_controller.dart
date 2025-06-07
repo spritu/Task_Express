@@ -77,6 +77,7 @@ class ProviderChatController extends GetxController {
     }
 
     connectSocket();
+    // connectSocketAllMessage();
 
     /// 👉 Call after receiverId is set
     await fetchAllMessages();
@@ -131,7 +132,7 @@ class ProviderChatController extends GetxController {
 
     socket.on('allMessagesViewed', (data) {
       print(' Received allMessagesViewed message: $data');
-
+      fetchChatHistory();
       final msg = types.TextMessage(
         id: data['_id'] ?? const Uuid().v4(),
         text: data['message'] ?? '',
