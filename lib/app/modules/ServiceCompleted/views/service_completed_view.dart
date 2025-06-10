@@ -293,7 +293,7 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                             width: 105,
                             child: ElevatedButton(
                               onPressed: () {
-                                controller.submitReview();
+                                controller.submitReview(controller.bookingId.value);
                                 Get.to(ServiceCompletedSuccessfullyView());
                               },
                               style: ElevatedButton.styleFrom(

@@ -8,15 +8,15 @@ import '../../ServiceCompletedSuccessfully/views/service_completed_successfully_
 class ServiceCompletedController extends GetxController {
   final rating = 0.0.obs;
   final review = ''.obs;
-
+  var bookingId = ''.obs;
   void setRating(double value) {
     rating.value = value;
   }
-
-  Future<void> submitReview() async {
+  final Map<String, dynamic> booking = Get.arguments;
+  Future<void> submitReview(String bookingId) async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId'); // Get stored ID from registration
-
+    String? userId2 = prefs.getString('userId');
     if (userId == null) {
     //  Get.snackbar("Error", "User ID not found. Please log in again.");
       return;
@@ -29,9 +29,10 @@ class ServiceCompletedController extends GetxController {
     final headers = {'Content-Type': 'application/json'};
     final body = json.encode({
       "reviewer": userId, // Replace with dynamic value if needed
-      "reviewedUser": "6800d9e2764d14e5400cc38e", // Replace with dynamic value if needed
-      "rating": rating.value,
-      "review": review.value
+      "reviewedUser": userId2, // Replace with dynamic value if needed
+      "bookingId": bookingId,
+      "rating": rating.value.toString(),
+      "review": review.value.toString()
     });
 
     try {
@@ -57,4 +58,13 @@ class ServiceCompletedController extends GetxController {
      // Get.snackbar("Error", "Something went wrong: $e");
     }
   }
+  @override
+  void onInit() {
+    super.onInit();
+    final Map<String, dynamic> booking = Get.arguments;
+    print('65656565:${booking}');
+
+    bookingId.value = booking['data']['_id'];
+  }
+
 }

@@ -928,24 +928,34 @@ class ProviderProfileController extends GetxController {
         box.write('isLoggedIn2', true);
         final message = jsonRes['msg'] ?? 'Service provider registered';
         Get.snackbar('Success', message);
-        final userData = jsonRes['data'] ?? jsonRes['user'] ?? jsonRes;
-        final rawImg = userData?['userImg'] ?? '';
-        String finalImage = '';
+                final userData = jsonRes['data'] ?? jsonRes['user'] ?? jsonRes;
+                print("👀 userData: $userData");
 
-        if (rawImg.isNotEmpty) {
-          finalImage = rawImg.startsWith('http')
-              ? rawImg
-              : 'https://jdapi.youthadda.co/$rawImg';
-        }
+                String rawImg = userData?['userImg'] ?? '';
+                String finalImage = '';
 
-// Save using a consistent key like 'image'
+                if (rawImg.isNotEmpty) {
+                  if (rawImg.startsWith('http') || rawImg.startsWith('/data')) {
+                    finalImage = rawImg;
+                  } else {
+                    finalImage = 'https://jdapi.youthadda.co/$rawImg';
+                  }
+                } else {
+                  // Fallback to uploaded image path
+                  finalImage = imagePath.value;
+                }
+
+// ✅ Save to reactive var + prefs
+        imagePath.value = finalImage;
         await prefs.setString('image', finalImage);
 
-        print("🖼️ Final User Image URL: $finalImage");
-        // 🔸 Save required data to SharedPreferences
+        print("✅ Final image used and saved: $finalImage");
+
+
+                // 🔸 Save required data to SharedPreferences
         await prefs.setString('categoryId', selectedCategoryId.value);
         await prefs.setString('category', selectedCategoryName.value);
-        await prefs.setString('subcategory', selectedCategoryName.value);
+        await prefs.setString('subCategory', selectedSubCategoryName.value); // ✅ fixed
         await prefs.setString('firstName', firstName.value);
         await prefs.setString('lastName', lastName.value);
         await prefs.setString('profession', selectedProfession.value);

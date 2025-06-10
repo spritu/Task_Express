@@ -369,7 +369,7 @@ class BookingController extends GetxController {
   //TODO: Implement BookingController
   var isLoading = false.obs;
   var userList = <UserModel>[].obs;
-
+  var bookingId = ''.obs;
   // var bookings = <BookingModel>[].obs;
   var bookingList = [].obs;
   var bookinged = <String, dynamic>{}.obs;
@@ -736,37 +736,13 @@ var count = 0.obs;
 @override
 void onInit() {
   fetchUserCurrentBooking();
+  final Map<String, dynamic> booking = Get.arguments;
+  print('65656565:${booking}');
+
+//  bookingId.value = booking['data']['_id'];
 }
 
-Future<void> fetchBookings() async {
-  var headers = {'Content-Type': 'application/json'};
-  var request = http.Request(
-    'POST',
-    Uri.parse('https://jdapi.youthadda.co/getusercurrentbooking'),
-  );
 
-  request.body = json.encode({"userId": "682b28bda976fa14107b0b6e"});
-  request.headers.addAll(headers);
-
-  http.StreamedResponse response = await request.send();
-
-  if (response.statusCode == 200) {
-    final jsonString = await response.stream.bytesToString();
-    print("✅ Response: $jsonString"); // 👈 yeh line add karein
-    final result = json.decode(jsonString);
-
-    if (result['data'] is List) {
-      bookings.value =
-          (result['data'] as List)
-              .map((e) => BookingModel.fromJson(e))
-              .toList();
-    } else if (result['data'] is Map) {
-      bookings.value = [BookingModel.fromJson(result['data'])];
-    }
-  } else {
-    print("❌ Error: ${response.reasonPhrase}");
-  }
-}
 
 void Function(Function(BuildContext))? onNeedContext;
 final AuthController authController = Get.find<AuthController>();
@@ -775,7 +751,7 @@ void onReady() {
   //super.onReady();
   Future.delayed(Duration.zero, () {
     if (!authController.isLoggedIn.value) {
-      // context use nahi kar sakte directly yahan, toh callback ke through bhejna padega
+
       if (onNeedContext != null) {
         onNeedContext!(showSignupSheet);
       }

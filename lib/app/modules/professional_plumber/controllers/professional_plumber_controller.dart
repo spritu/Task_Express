@@ -665,11 +665,11 @@ import '../../home/controllers/home_controller.dart';
 
 class ProfessionalPlumberController extends GetxController
     with WidgetsBindingObserver {
+
   ProfessionalPlumberController(); // 👈 constructor
   final HomeController userController = Get.put(HomeController());
   var distances = <int, String>{}.obs;
-  var distanceToUser = ''.obs;
-  var isLoading = false.obs;
+  var distanceToUser = ''.obs;var isLoading = false.obs;
 
   var users = <Map<String, dynamic>>[].obs;
   late String catId;
@@ -689,7 +689,6 @@ class ProfessionalPlumberController extends GetxController
       print("❌ catId not found in arguments");
     }
   }
-
   Future<void> loadCatIdFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     String? savedCatId = prefs.getString('selectedCatId');
@@ -711,6 +710,10 @@ class ProfessionalPlumberController extends GetxController
     }
   }
 
+
+
+
+
   Future<String> getAddressFromLatLng(double lat, double lng) async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
@@ -728,11 +731,17 @@ class ProfessionalPlumberController extends GetxController
     try {
       final prefs = await SharedPreferences.getInstance();
       final catId = prefs.getString('selectedCatId');
-      isLoading.value = true; // loader start
-      print("🔎 Sorting users by charge for catId: $catId");
+      final subCatId = prefs.getString('selectedSubCatId');
 
-      var url = Uri.parse(
-        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&sortBy=lowToHigh',
+      isLoading.value = true; // Loader start
+
+      print("🔎 Sorting users by charge for catId: $catId and subCatId: $subCatId");
+
+      // ✅ Build URL with optional subCatId
+      final url = Uri.parse(
+        'https://jdapi.youthadda.co/user/getusersbycatsubcat'
+            '?id=$catId&sortBy=lowToHigh'
+            '${subCatId != null && subCatId.isNotEmpty ? '&subcat_id=$subCatId' : ''}',
       );
 
       var request = http.Request('GET', url);
@@ -747,17 +756,17 @@ class ProfessionalPlumberController extends GetxController
 
         print("✅ Sorted users fetched: ${users.length}");
       } else {
-        users.clear(); // 👈 add this line
+        users.clear(); // ⛔️ Clear users on failure
         print("❌ Failed to fetch sorted users");
       }
     } catch (e) {
       print("❗ Sort error: $e");
     } finally {
-      isLoading.value = false; // loader stop
+      isLoading.value = false; // Loader stop
     }
   }
 
-  Future<void> fetchUsersWithDistance() async {
+  Future<void> fetchUsersWithDistance(String catId, {String? subCatId}) async {
     isLoading.value = true; // Start loader
     try {
       Position position = await Geolocator.getCurrentPosition(
@@ -767,10 +776,12 @@ class ProfessionalPlumberController extends GetxController
       double lat = position.latitude;
       double lng = position.longitude;
 
-      print("📍 LAT: $lat, LNG: $lng, CATID: $catId");
+      print("📍 LAT: $lat, LNG: $lng, CATID: $catId, SUBCATID: $subCatId");
 
       final url = Uri.parse(
-        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&lat=$lng&lng=$lat&nearMe=true',
+        'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId'
+            '&lat=$lng&lng=$lat&nearMe=true'
+            '${subCatId != null ? '&subcat_id=$subCatId' : ''}',
       );
 
       var request = http.Request('GET', url);
@@ -797,6 +808,13 @@ class ProfessionalPlumberController extends GetxController
       isLoading.value = false; // Stop loader
     }
   }
+
+
+
+
+
+
+
 
   Future<void> saveCurrentLocationToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
@@ -851,6 +869,7 @@ class ProfessionalPlumberController extends GetxController
     return Geolocator.distanceBetween(lat1, lng1, lat2, lng2); // in kilometers
   }
 
+
   @override
   void onInit() {
     fetchUsersSortedByCharge();
@@ -862,12 +881,16 @@ class ProfessionalPlumberController extends GetxController
       catId = '';
       print("⚠️ catId is missing in arguments");
     }
-    super.onInit();
-    Future.microtask(() async {
+    super.onInit(); Future.microtask(() async {
       await loadCatIdFromArguments();
     });
     waitAndLoadArguments();
+
+    WidgetsBinding.instance.addObserver(this);
+
+
   }
+
 
   @override
   void onClose() {
@@ -900,6 +923,7 @@ class ProfessionalPlumberController extends GetxController
       return 'Coordinates missing';
     }
   }
+
 
   // Listen for app lifecycle changes, mainly to detect when phone call ends
   @override
@@ -1092,15 +1116,15 @@ class ProfessionalPlumberController extends GetxController
 
   // Widget to show bottom sheet after call ends
   Widget showAfterCallSheet(
-    BuildContext context, {
-    required String name,
-    required String imageUrl,
-    required String experience,
-    required String phone,
-    required String userId,
-    required String title,
-    required List<Map<String, dynamic>> skills, // Pass dynamic skills
-  }) {
+      BuildContext context, {
+        required String name,
+        required String imageUrl,
+        required String experience,
+        required String phone,
+        required String userId,
+        required String title,
+        required List<Map<String, dynamic>> skills, // Pass dynamic skills
+      }) {
     return SingleChildScrollView(
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -1127,10 +1151,10 @@ class ProfessionalPlumberController extends GetxController
                 CircleAvatar(
                   radius: 40,
                   backgroundImage:
-                      imageUrl.isNotEmpty
-                          ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
-                          : const AssetImage('assets/images/account.png')
-                              as ImageProvider,
+                  imageUrl.isNotEmpty
+                      ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
+                      : const AssetImage('assets/images/account.png')
+                  as ImageProvider,
                 ),
                 const SizedBox(width: 10),
                 Text(
@@ -1162,13 +1186,13 @@ class ProfessionalPlumberController extends GetxController
                 padding: const EdgeInsets.only(bottom: 12),
                 child: professionRow(
                   title:
-                      (skill['subcategoryName'] != null &&
-                              skill['subcategoryName'].toString().isNotEmpty)
-                          ? skill['subcategoryName']
-                          : (skill['categoryName'] != null &&
-                              skill['categoryName'].toString().isNotEmpty)
-                          ? skill['categoryName']
-                          : 'Service',
+                  (skill['subcategoryName'] != null &&
+                      skill['subcategoryName'].toString().isNotEmpty)
+                      ? skill['subcategoryName']
+                      : (skill['categoryName'] != null &&
+                      skill['categoryName'].toString().isNotEmpty)
+                      ? skill['categoryName']
+                      : 'Service',
 
                   price: "₹ ${skill['charge'].toString()}",
                   onBookNow: () {
@@ -1310,16 +1334,16 @@ class ProfessionalPlumberController extends GetxController
   }
 
   void showAreUSureSheet(
-    BuildContext context, {
-    required String name,
-    required String imageUrl,
-    required String experience,
-    required String phone,
-    required String userId,
-    required String title,
-    required Map<String, dynamic> skill,
-    required Future<void> Function(List<String> serviceIds) bookServiceProvider,
-  }) {
+      BuildContext context, {
+        required String name,
+        required String imageUrl,
+        required String experience,
+        required String phone,
+        required String userId,
+        required String title,
+        required Map<String, dynamic> skill,
+        required Future<void> Function(List<String> serviceIds) bookServiceProvider,
+      }) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1349,12 +1373,12 @@ class ProfessionalPlumberController extends GetxController
                   CircleAvatar(
                     radius: 40,
                     backgroundImage:
-                        imageUrl.isNotEmpty
-                            ? NetworkImage(
-                              'https://jdapi.youthadda.co/$imageUrl',
-                            )
-                            : const AssetImage('assets/images/account.png')
-                                as ImageProvider,
+                    imageUrl.isNotEmpty
+                        ? NetworkImage(
+                      'https://jdapi.youthadda.co/$imageUrl',
+                    )
+                        : const AssetImage('assets/images/account.png')
+                    as ImageProvider,
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -1394,7 +1418,7 @@ class ProfessionalPlumberController extends GetxController
                             onPressed: () async {
                               String serviceId =
                                   skill['subcategoryId']?.toString() ??
-                                  skill['categoryId'].toString();
+                                      skill['categoryId'].toString();
                               Navigator.pop(context);
                               await bookServiceProvider([serviceId]);
                             },
