@@ -123,23 +123,37 @@ class HomeController extends GetxController {
   // }
 
 
-  Future<void> fetchUsersListByCategory(String catId, {String? categoryName}) async {
-    print("📦 catId received: $catId"); // This must NOT be null
+  Future<void> fetchUsersListByCategory(
+      String catId, {
+        String? subCatId, // ⬅️ Add this
+        String? categoryName,
+      }) async {
+    print("📦 catId received: $catId");
+    if (subCatId != null) {
+      print("📦 subCatId received: $subCatId");
+    }
+
     results.clear();
     isLoading.value = true;
 
     try {
-      // ✅ Save catId to SharedPreferences
+      // ✅ Save catId and subCatId to SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('selectedCatId', catId);
       print("💾 Saved catId to SharedPreferences: $catId");
 
-      // Optional: fetchCategories (if needed)
+      if (subCatId != null && subCatId.isNotEmpty) {
+        await prefs.setString('selectedSubCatId', subCatId);
+        print("💾 Saved subCatId to SharedPreferences: $subCatId");
+      }
+
+      // Optional category fetch
       fetchCategories();
 
-      // 🔗 API call
-      var url = Uri.parse('https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId');
-      var response = await http.get(url);
+      // 🔗 API call with both catId & subCatId
+      final url = Uri.parse(
+          'https://jdapi.youthadda.co/user/getusersbycatsubcat?id=$catId&subcat_id=${subCatId ?? ''}');
+      final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -152,20 +166,20 @@ class HomeController extends GetxController {
 
           Get.to(() => ProfessionalPlumberView(), arguments: {
             'users': results,
-            'catId': catId, // ✅ MUST be here
+            'catId': catId,
+            'subCatId': subCatId,
             'title': categoryName ?? 'Professionals',
           });
-
         } else {
           print("➡ Navigating to ServiceproView with catId: $catId");
+
           Get.to(() => ServiceproView(), arguments: {
             'users': results,
-            'catId': catId, // ✅ Include here too
+            'catId': catId,
+            'subCatId': subCatId,
             'title': categoryName ?? 'Professionals',
           });
-
         }
-
       } else {
         print("❌ Failed to fetch users: ${response.statusCode} - ${response.reasonPhrase}");
       }
@@ -175,6 +189,7 @@ class HomeController extends GetxController {
       isLoading.value = false;
     }
   }
+
 
 
 

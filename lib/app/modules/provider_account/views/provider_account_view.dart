@@ -63,29 +63,34 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                               children: [
                                 Obx(() {
                                   final controller = Get.find<ProviderEditProfileController>();
-
                                   final localImagePath = controller.selectedImagePath.value;
                                   final serverImageUrl = controller.imagePath.value;
+
+                                  print("🧪 localImagePath: $localImagePath");
+                                  print("🧪 serverImageUrl: $serverImageUrl");
 
                                   ImageProvider imageProvider;
 
                                   if (localImagePath.isNotEmpty && File(localImagePath).existsSync()) {
-                                    // ✅ Show selected local image
                                     imageProvider = FileImage(File(localImagePath));
                                   } else if (serverImageUrl.isNotEmpty) {
-                                    // ✅ Show server image
                                     imageProvider = NetworkImage(serverImageUrl);
                                   } else {
-                                    // ✅ Fallback asset image
                                     imageProvider = const AssetImage('assets/images/account.png');
                                   }
 
                                   return CircleAvatar(
                                     radius: 40,
                                     backgroundImage: imageProvider,
-                                    onBackgroundImageError: (_, __) => print("❌ Failed to load image."),
+                                    onBackgroundImageError: (_, __) =>
+                                        print("❌ Failed to load image: $serverImageUrl"),
                                   );
                                 }),
+
+
+
+
+
 
                                 SizedBox(width: 8),
                                 Column(
@@ -132,89 +137,90 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                     ),
                     SizedBox(height: 10),
                     Card(color: Color(0xffFCD8B7),
-                        child: Column(
-                          children: [Padding(
-                            padding: const EdgeInsets.only(top: 5,right: 5),
-                            child: Row(mainAxisAlignment: MainAxisAlignment.end,
-                              children: [Container(height: 21,width: 57,decoration: BoxDecoration(color: Color(0xffF67C0A),
-                              borderRadius: BorderRadius.circular(6)),
+                      child: Column(
+                        children: [Padding(
+                          padding: const EdgeInsets.only(top: 5,right: 5),
+                          child: Row(mainAxisAlignment: MainAxisAlignment.end,
+                            children: [Container(height: 21,width: 57,decoration: BoxDecoration(color: Color(0xffF67C0A),
+                                borderRadius: BorderRadius.circular(6)),
                               child: InkWell( onTap: () {
                                 controller.deleteUserSkill(
-                               // make sure userId is available in your controller
-                                 "categoryId",
-                                "subCategoryId",
-                                  1
+                                  // make sure userId is available in your controller
+                                    "categoryId",
+                                    "subCategoryId",
+                                    1
                                 );
                               },
                                 child: Row(mainAxisAlignment: MainAxisAlignment.center,
                                   children: [Image.asset("assets/images/delete.png",height: 12,color: Colors.white,),SizedBox(width: 3,),
-                                Text("Delete",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 10,color: AppColors.white),)],),
+                                    Text("Delete",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 10,color: AppColors.white),)],),
                               ),)],),
-                          ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Card(
-                                elevation: 2,
-                                shape: RoundedRectangleBorder(
+                        ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Card(
+                              elevation: 2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
+                                  color: Colors.white,
                                 ),
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: EdgeInsets.symmetric(vertical: 12),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: Colors.white,
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Obx(() => _buildRow(
-                                        "Profession",
-                                        controller.isLoading.value
-                                            ? "Loading..."
-                                            : controller.selectedProfessionName.value.isNotEmpty
-                                            ? controller.selectedProfessionName.value
-                                            : controller.spTypeLabel,
+                                child: Column(
+                                  children: [
+                                    Obx(() => _buildRow(
+                                      "Profession",
+                                      controller.isLoading.value
+                                          ? "Loading..."
+                                          : controller.selectedProfessionName.value.isNotEmpty
+                                          ? controller.selectedProfessionName.value
+                                          : controller.spTypeLabel,
+                                      isDropdown: false,
+                                    )),
+
+
+                                    Divider(thickness: 1),
+
+                                    Obx(
+                                          () => _buildRow(
+                                        "Category",
+                                        controller.selectedCategoryName.value,
                                         isDropdown: false,
-                                      )),
-
-
-                                      Divider(thickness: 1),
-
-                                      Obx(
-                                        () => _buildRow(
-                                          "Category",
-                                          controller.selectedCategoryName.value,
-                                          isDropdown: false,
-                                        ),
                                       ),
-                                      Divider(thickness: 1),
-                                      Obx(
-                                        () => _buildRow(
-                                          "Sub Category",
-                                          controller.selectedSubCategoryName.value,
-                                          isDropdown: false,
-                                        ),
+                                    ),
+                                    Divider(thickness: 1),
+                                    Obx(
+                                          () => _buildRow(
+                                        "Sub Category",
+                                        controller.selectedSubCategoryName.value,
+                                        isDropdown: false,
                                       ),
-                                      Divider(thickness: 1),
-                                      Obx(
-                                            () => _buildRow(
-                                          "Charge",
-                                          controller.charge.value,
-                                          isEditable: true,
-                                          onEditTap: () {
-                                            _showEditPopup(context, "Charge", controller.charge.value, (newVal) {
-                                              controller.charge.value = newVal;
-                                            });
-                                          },
-                                        ),
-                                      ),],
-                                  ),
+                                    ),
+
+                                    Divider(thickness: 1),
+                                    Obx(
+                                          () => _buildRow(
+                                        "Charge",
+                                        controller.charge.value,
+                                        isEditable: true,
+                                        onEditTap: () {
+                                          _showEditPopup(context, "Charge", controller.charge.value, (newVal) {
+                                            controller.charge.value = newVal;
+                                          });
+                                        },
+                                      ),
+                                    ),],
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
+                    ),
                     SizedBox(height: 20),
                     /// Toggleable Service Card
                     Obx(() {
@@ -244,45 +250,45 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       InkWell(
-                                      onTap: () async {
-                          final selectedCat = categories.firstWhereOrNull((cat) => cat.label == model.category);
-                          final selectedSub = selectedCat?.subcategories.firstWhereOrNull((sub) => sub.name == model.subcategory);
-                          final userId = controller.userId.value;
+                                        onTap: () async {
+                                          final selectedCat = categories.firstWhereOrNull((cat) => cat.label == model.category);
+                                          final selectedSub = selectedCat?.subcategories.firstWhereOrNull((sub) => sub.name == model.subcategory);
+                                          final userId = controller.userId.value;
 
-                          if (selectedCat != null && selectedSub != null && userId.isNotEmpty) {
-                          try {
-                          var headers = {'Content-Type': 'application/json'};
-                          var request = http.Request(
-                          'POST',
-                          Uri.parse('https://jdapi.youthadda.co/user/deleteuserskill'),
-                          );
+                                          if (selectedCat != null && selectedSub != null && userId.isNotEmpty) {
+                                            try {
+                                              var headers = {'Content-Type': 'application/json'};
+                                              var request = http.Request(
+                                                'POST',
+                                                Uri.parse('https://jdapi.youthadda.co/user/deleteuserskill'),
+                                              );
 
-                          request.body = json.encode({
-                          "userId": userId,
-                          "categoryId": selectedCat.id,
-                          "sucategoryId": selectedSub.id,
-                          });
+                                              request.body = json.encode({
+                                                "userId": userId,
+                                                "categoryId": selectedCat.id,
+                                                "sucategoryId": selectedSub.id,
+                                              });
 
-                          request.headers.addAll(headers);
-                          http.StreamedResponse response = await request.send();
+                                              request.headers.addAll(headers);
+                                              http.StreamedResponse response = await request.send();
 
-                          if (response.statusCode == 200) {
-                          // Remove from UI after successful delete
-                          controller.serviceCards.removeAt(index);
-                          controller.serviceCards.refresh();
-                          print(await response.stream.bytesToString());
-                          } else {
-                          print("Delete failed: ${response.reasonPhrase}");
-                      //    Get.snackbar("Error", "Skill delete failed: ${response.reasonPhrase}");
-                          }
-                          } catch (e) {
-                          print("Delete error: $e");
-                         // Get.snackbar("Error", "Something went wrong while deleting skill.");
-                          }
-                          } else {
-                        //  Get.snackbar("Error", "Invalid category or subcategory data.");
-                          }
-                          },
+                                              if (response.statusCode == 200) {
+                                                // Remove from UI after successful delete
+                                                controller.serviceCards.removeAt(index);
+                                                controller.serviceCards.refresh();
+                                                print(await response.stream.bytesToString());
+                                              } else {
+                                                print("Delete failed: ${response.reasonPhrase}");
+                                                //    Get.snackbar("Error", "Skill delete failed: ${response.reasonPhrase}");
+                                              }
+                                            } catch (e) {
+                                              print("Delete error: $e");
+                                              // Get.snackbar("Error", "Something went wrong while deleting skill.");
+                                            }
+                                          } else {
+                                            //  Get.snackbar("Error", "Invalid category or subcategory data.");
+                                          }
+                                        },
                                         child: Container(
                                           height: 21,
                                           width: 57,
@@ -773,16 +779,16 @@ Widget _buildRow2(BuildContext context, String title) {
       children: [
         Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
         Obx(
-          () => Row(
+              () => Row(
             children: [
               Text(
                 controller.selectedProfession.value,
                 style: TextStyle(
                   color:
-                      controller.selectedProfession.value !=
-                              "Fixed Charge Helper"
-                          ? Colors.orange
-                          : Colors.black54,
+                  controller.selectedProfession.value !=
+                      "Fixed Charge Helper"
+                      ? Colors.orange
+                      : Colors.black54,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -853,12 +859,12 @@ Widget _buildRow2(BuildContext context, String title) {
 }
 
 Widget buildList(
-  BuildContext context,
-  IconData leadingIcon,
-  String name,
-  IconData trailingIcon, {
-  TextSpan? richText,
-}) {
+    BuildContext context,
+    IconData leadingIcon,
+    String name,
+    IconData trailingIcon, {
+      TextSpan? richText,
+    }) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10),
     child: Row(
@@ -867,25 +873,25 @@ Widget buildList(
         const SizedBox(width: 12),
         Expanded(
           child:
-              richText != null
-                  ? RichText(
-                    text: TextSpan(
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontFamily: "Poppins",
-                        color: Colors.black,
-                      ),
-                      children: [TextSpan(text: name), richText],
-                    ),
-                  )
-                  : Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontFamily: "Poppins",
-                      color: Colors.black,
-                    ),
-                  ),
+          richText != null
+              ? RichText(
+            text: TextSpan(
+              style: const TextStyle(
+                fontSize: 14,
+                fontFamily: "Poppins",
+                color: Colors.black,
+              ),
+              children: [TextSpan(text: name), richText],
+            ),
+          )
+              : Text(
+            name,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: "Poppins",
+              color: Colors.black,
+            ),
+          ),
         ),
         Icon(trailingIcon, size: 16, color: Colors.black54),
       ],

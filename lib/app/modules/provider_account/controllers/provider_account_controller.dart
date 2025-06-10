@@ -8,6 +8,7 @@ import '../../../../auth_controller.dart';
 import 'package:http/http.dart' as http;
 
 import '../../booking/controllers/booking_controller.dart';
+import '../../provider_editProfile/controllers/provider_edit_profile_controller.dart';
 
 class ProviderAccountController extends GetxController with WidgetsBindingObserver {
   //TODO: Implement ProviderAccountController
@@ -19,7 +20,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   var skillList = <Map<String, dynamic>>[].obs;
   var selectedProfessionName = ''.obs;
   var spType = ''.obs;
- // RxList<ServiceModel> userSkills = <ServiceModel>[].obs;
+  // RxList<ServiceModel> userSkills = <ServiceModel>[].obs;
 
 
   var selectedCategoryName = ''.obs;
@@ -52,7 +53,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   RxList<CategoryModel> fixedChargeHelpers = <CategoryModel>[].obs;
   bool isEditable = false;
   RxString selectCategory = "".obs;
- // var addedServices = <ServiceModel>[].obs; // List to hold added services
+  // var addedServices = <ServiceModel>[].obs; // List to hold added services
   var addedServices = <Service>[].obs;
 
   // Add a service
@@ -83,7 +84,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     }
 
     imagePath.value = image ?? '';
-    await prefs.setString('image', imagePath.value);
+    await prefs.setString('userImg', imagePath.value);
 
     String? base64Image = prefs.getString('userImgBase64');
     if (base64Image != null && base64Image.isNotEmpty) {
@@ -97,34 +98,24 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
 
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? storedImage = prefs.getString('image') ?? '';
-    String? image = prefs.getString('image');
 
-// If it's just the file name and needs to be combined with base URL
-    if (image != null && !image.startsWith('http')) {
-      image = 'https://jdapi.youthadda.co/$image';
+    String rawImg = prefs.getString('image') ?? '';
+    String finalImage = '';
+
+    if (rawImg.isNotEmpty) {
+      if (rawImg.startsWith('http') || rawImg.startsWith('/data')) {
+        finalImage = rawImg;
+      } else {
+        finalImage = 'https://jdapi.youthadda.co/$rawImg';
+      }
     }
 
-    imagePath.value = image ?? '';
-    await prefs.setString('image', imagePath.value); // ✅ Safe fallback
-    String? userId = prefs.getString('userId');
-    String? token = prefs.getString('token');
-    String? email = prefs.getString('email');
-    firstName.value = prefs.getString('firstName') ?? '';
-    lastName.value = prefs.getString('lastName') ?? '';
-    String? mobile = prefs.getString('mobile');
-    imagePath.value = prefs.getString('image') ?? '';
-    print("🖼️ Loaded image path: ${imagePath.value}");
-
-    print("👤 Loaded: $firstName $lastName, 📸 Image: ${imagePath.value}");
-    print("📦 Stored Data:");
-    print("🔑 userId: $userId");
-    print("🔑 token: $token");
-    print("📧 email: $email");
-    print("👤 firstName: $firstName");
-    print("👤 lastName: $lastName");
-    print("📱 mobile: $mobile");
+    imagePath.value = finalImage;
+    print("🖼️ Loaded image path: $finalImage");
   }
+
+
+
   TextEditingController chargeController = TextEditingController();
   RxString selectSubCategory = "".obs;
 
@@ -214,6 +205,21 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     charge.value = prefs.getString('charge') ?? '';
     isLoading.value = false;
 
+
+    String rawImg = prefs.getString('userImg') ?? '';
+    String finalImage = '';
+
+    if (rawImg.isNotEmpty) {
+      if (rawImg.startsWith('http') || rawImg.startsWith('/data')) {
+        finalImage = rawImg;
+      } else {
+        finalImage = 'https://jdapi.youthadda.co/$rawImg';
+      }
+    }
+
+    imagePath.value = finalImage;
+    print("🖼️ Loaded image path: $finalImage");
+    imagePath.refresh(); // ⬅️ Important!
     print("🔄 Loaded User Info:");
     print("🧑‍💼 Profession: ${selectedProfessionName.value}");
     print("📂 Category: ${selectedCategoryName.value}");
@@ -234,7 +240,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   void toggleServiceCard() {
     showServiceCard.value = !showServiceCard.value;
   }
-var charge1 = "250".obs;
+  var charge1 = "250".obs;
   void setCharge(String charge) {
     selectCharge.value = charge;
   }
@@ -394,18 +400,18 @@ var charge1 = "250".obs;
                 if (response.statusCode == 200) {
                   // If the API call is successful, remove the item from the list
                   serviceCards.removeAt(index); // Remove the card at the given index
-              serviceCards.refresh(); // Refresh the list to update UI
+                  serviceCards.refresh(); // Refresh the list to update UI
 
                   // Show success message
-                 // Get.snackbar("Deleted", "Service deleted successfully");
+                  // Get.snackbar("Deleted", "Service deleted successfully");
                 } else {
                   // Do not remove the card if the API fails
-               //   Get.snackbar("Error", "Failed to delete: ${response.reasonPhrase}");
+                  //   Get.snackbar("Error", "Failed to delete: ${response.reasonPhrase}");
                 }
               } catch (e) {
                 // Handle any exceptions and print to debug
                 print("Error: $e");
-             //   Get.snackbar("Error", "Something went wrong");
+                //   Get.snackbar("Error", "Something went wrong");
               }
             },
             child: const Text("Yes"),
@@ -440,12 +446,16 @@ var charge1 = "250".obs;
   @override
   void onInit()  {
     super.onInit();loadUserData();
-    fetchCategories(); _loadUserData();
+    fetchCategories();
+    //_loadUserData();
     chargeController.text = charge.value;
-    loadUserInfo1();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Get.find<ProviderEditProfileController>();
+ loadUserInfo1();
+    });
     WidgetsBinding.instance.addObserver(this);
     loadMobileNumber();
-     loadUserInfo();
+    loadUserInfo();
   }
   void updateFilteredCategories(String profession) {
     if (profession == "Visiting Professional") {
@@ -557,7 +567,7 @@ class SubcategoryModel {
   String get id => subId;
 }
 
-  // Optional: If you want to access `subId` as `id`
+// Optional: If you want to access `subId` as `id`
 
 
 

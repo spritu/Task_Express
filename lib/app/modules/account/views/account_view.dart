@@ -9,6 +9,7 @@ import '../../bottom/controllers/bottom_controller.dart';
 import '../../bottom/views/bottom_view.dart';
 import '../../edit_profile/controllers/edit_profile_controller.dart';
 import '../../edit_profile/views/edit_profile_view.dart';
+import '../../provider_editProfile/controllers/provider_edit_profile_controller.dart';
 import '../../provider_profile/views/provider_profile_view.dart';
 import '../controllers/account_controller.dart';
 
@@ -17,7 +18,7 @@ class AccountView extends GetView<AccountController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(AccountController());  Get.put(EditProfileController());
+    Get.put(AccountController());  Get.put(EditProfileController());Get.put(ProviderEditProfileController());
     return WillPopScope(
       onWillPop: () async {
         Get.find<BottomController>().selectedIndex.value = 0;
@@ -74,32 +75,29 @@ class AccountView extends GetView<AccountController> {
                                 // }),
 
                                 Obx(() {
-                                  final controller = Get.find<EditProfileController>();
-                                  final localImagePath = controller.selectedImagePath.value;
-                                  final serverImageUrl = controller.imagePath.value;
+                          final controller = Get.find<ProviderEditProfileController>();
+                          final localImagePath = controller.selectedImagePath.value;
+                          final serverImageUrl = controller.imagePath.value;
 
-                                  ImageProvider imageProvider;
+                          ImageProvider imageProvider;
 
-                                  if (localImagePath.isNotEmpty && File(localImagePath).existsSync()) {
-                                    // ✅ Show local image (when edited)
-                                    imageProvider = FileImage(File(localImagePath));
-                                  } else if (serverImageUrl.isNotEmpty) {
-                                    // ✅ Show server image (initial load)
-                                    imageProvider = NetworkImage(serverImageUrl);
-                                  } else {
-                                    // ✅ Fallback image
-                                    imageProvider = const AssetImage('assets/images/account.png');
-                                  }
+                          if (localImagePath.isNotEmpty && File(localImagePath).existsSync()) {
+                          imageProvider = FileImage(File(localImagePath));
+                          } else if (serverImageUrl.isNotEmpty) {
+                          imageProvider = NetworkImage(serverImageUrl);
+                          } else {
+                          imageProvider = const AssetImage('assets/images/account.png');
+                          }
 
-                                  return CircleAvatar(
-                                    radius: 40,
-                                    backgroundImage: imageProvider,
-                                    onBackgroundImageError: (_, __) => print("❌ Failed to load image."),
-                                  );
-                                }),
+                          return CircleAvatar(
+                          radius: 40,
+                          backgroundImage: imageProvider,
+                          );
+                          }),
 
 
-                                Padding(
+
+                          Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8.0,
                                     vertical: 10,
