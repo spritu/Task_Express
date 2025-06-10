@@ -1377,7 +1377,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                           ),
                           children: [
                             const TextSpan(text: "You’re "),
-                            const TextSpan(
+                            TextSpan(
                               text: "Online",
                               style: TextStyle(
                                 color: Colors.green,
@@ -1580,7 +1580,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                           width: 4,
                                                         ),
                                                         Text(
-                                                          serviceName,
+                                                          "Assigned for : $serviceName",
                                                           style:
                                                               const TextStyle(
                                                                 fontFamily:
@@ -1916,7 +1916,15 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                         // Round orange border button (no icon inside per image)
                         InkWell(
                           onTap: () {
-                            Get.to(ActivejobScreenView());
+                            Get.to(
+                              ActivejobScreenView(),
+                              arguments: {
+                                "bookingData": controller.bookingDataList,
+                                "dashboardData": controller.dashboardData,
+                                "pastbookings": controller.pastBookings,
+                                "firstName": controller.firstName,
+                              },
+                            );
                           },
                           child: Align(
                             alignment: Alignment.centerRight,

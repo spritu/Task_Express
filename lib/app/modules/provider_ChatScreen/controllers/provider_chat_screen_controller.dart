@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:uuid/uuid.dart';
 
+import '../../Bottom2/controllers/bottom2_controller.dart';
+
 class ChatItem {
   final String message;
   final String timestamp;
@@ -44,6 +46,19 @@ class ProviderChatScreenController extends GetxController {
   var receiverId = ''.obs;
   var hasUnreadMessages = false.obs;
   var hasUnreadnotify = false.obs;
+
+  /// Called when new message is received via socket
+  void onNewMessageReceived() {
+    final bottomController = Get.find<Bottom2Controller>();
+    if (bottomController.selectedIndex.value != 3) {
+      hasUnreadnotify.value = true;
+    }
+  }
+
+  /// Clear red dot
+  void clearUnreadNotify() {
+    hasUnreadnotify.value = false;
+  }
 
   @override
   void onInit() {
@@ -104,6 +119,7 @@ class ProviderChatScreenController extends GetxController {
       // );
       // providerChatScreenController.fetchLastMessages();
       fetchLastMessages();
+      onNewMessageReceived();
       print('📩 Received message: $data');
 
       final msg = types.TextMessage(
@@ -189,7 +205,27 @@ class ProviderChatScreenController extends GetxController {
       chats.refresh();
     }
 
-    // Optional: API hit to mark as seen
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    if (userId == null || userId.isEmpty) {
+      print('❌ userId is empty');
+      return;
+    }
+
+    var headers = {'Content-Type': 'application/json'};
+    var url = Uri.parse('https://jdapi.youthadda.co/viewAll');
+    var body = json.encode({"receiver": userId}); // ✅ As required
+
+    try {
+      var response = await http.post(url, headers: headers, body: body);
+      if (response.statusCode == 200) {
+        print('✅ Success: marked all as read');
+      } else {
+        print('❌ API Error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('⚠️ Exception: $e');
+    }
   }
 
   String formatTimestamp(String isoString) {

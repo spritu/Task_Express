@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import '../../../../colors.dart';
+import '../../YourEarning/views/your_earning_view.dart';
 import '../controllers/activejob_screen_controller.dart';
 
 class ActivejobScreenView extends GetView<ActivejobScreenController> {
@@ -10,6 +12,17 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
   @override
   Widget build(BuildContext context) {
     Get.put(ActivejobScreenController());
+    final Map<String, dynamic> args = Get.arguments ?? {};
+
+    final bookingData = args['bookingData'] ?? {};
+    final dashBoardData = args['dashboardData'] ?? {};
+    final pastBooking = args['pastbookings'] ?? {};
+    final firstName = args['firstName'] ?? {};
+    print("wwwwwwwwwwwwwwwww:$bookingData");
+    print("xxxxxxxxxxxxxxxxxxxxxxxxx:$dashBoardData");
+    print('zzzzzzzzzzzzzzzzzzzzzzzz$pastBooking');
+    print("uuuuuuuuuuuuu$firstName");
+
     return Scaffold(
       body: Container(
         height: MediaQuery.of(context).size.height,
@@ -222,12 +235,14 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "Hello Suraj,",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            fontFamily: "Poppins",
+                        Obx(
+                          () => Text(
+                            "Hello $firstName",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              fontFamily: "Poppins",
+                            ),
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -330,138 +345,194 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                             ),
                           ),
                           SizedBox(height: 3),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: 4,
-                            child: Container(
-                              height: 169,
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: Colors.white,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Top Row: Left Side (Details) + Right Side (Earning & Duration)
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      // Left Side Column
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: const [
-                                                Text(
-                                                  "Shivani singh,",
-                                                  style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 6),
-                                            Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: const [
-                                                Expanded(
-                                                  child: Text(
-                                                    "E7, 775, saket nagar Indore",
-                                                    style: TextStyle(
-                                                      fontFamily: "Poppins",
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 12,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              "Landmark: Beside pizza hut",
-                                              style: TextStyle(
-                                                fontFamily: "Poppins",
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 12,
-                                                color: Color(0xFF616161),
-                                              ),
-                                            ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.2,
+                            child: Obx(() {
+                              return ListView.builder(
+                                itemCount: bookingData.length,
+                                physics: NeverScrollableScrollPhysics(),
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  final booking = bookingData[index];
 
-                                            const SizedBox(height: 8),
-                                            const Row(
-                                              children: [
-                                                Text(
-                                                  "Assigned for: Basic Plumbing work",
-                                                  style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 12,
-                                                    color: Color(0xFF7A7A7A),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
+                                  final bookedBy = booking['bookedBy'] ?? {};
+                                  final firstName =
+                                      bookedBy['firstName']?.toString() ??
+                                      'Unknown';
+                                  final lastName =
+                                      bookedBy['lastName']?.toString() ?? '';
+                                  final city =
+                                      bookedBy['city']?.toString() ?? 'No city';
+
+                                  final bookServices =
+                                      booking['bookServices'] ?? [];
+                                  final serviceName =
+                                      bookServices.isNotEmpty
+                                          ? bookServices[0]['name']
+                                                  ?.toString() ??
+                                              'Service'
+                                          : 'Service';
+
+                                  final earning =
+                                      booking['earning']?.toString() ?? '0';
+                                  final duration =
+                                      booking['duration']?.toString() ?? '--';
+                                  print('Booking index23455: $index');
+                                  print('First name2345: $firstName');
+                                  print('Last name23456: $lastName');
+                                  return Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 4,
+                                    child: Container(
+                                      height: 169,
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: Colors.white,
                                       ),
-
-                                      // Right Side Column (Earning + Duration)
-                                      Column(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          _infoCard(
-                                            title: "Distance",
-                                            value: "3.5 km",
+                                          // Top Row: Left Side (Details) + Right Side (Earning & Duration)
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              // Left Side Column
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          "$firstName $lastName",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                "Poppins",
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 12,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 6),
+                                                    Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Expanded(
+                                                          child: Text(
+                                                            city,
+                                                            style: TextStyle(
+                                                              fontFamily:
+                                                                  "Poppins",
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontSize: 12,
+                                                              color:
+                                                                  Colors.black,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      "Landmark: Beside pizza hut",
+                                                      style: TextStyle(
+                                                        fontFamily: "Poppins",
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 12,
+                                                        color: Color(
+                                                          0xFF616161,
+                                                        ),
+                                                      ),
+                                                    ),
+
+                                                    const SizedBox(height: 8),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          "Assigned for : $serviceName",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                "Poppins",
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 12,
+                                                            color: Color(
+                                                              0xFF7A7A7A,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+
+                                              // Right Side Column (Earning + Duration)
+                                              Column(
+                                                children: [
+                                                  _infoCard(
+                                                    title: "Distance",
+                                                    value: "$earning",
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  _infoCard(
+                                                    title: "Duration",
+                                                    value: "$duration",
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
                                           ),
-                                          const SizedBox(height: 8),
-                                          _infoCard(
-                                            title: "Duration",
-                                            value: "28 mins",
+                                          const SizedBox(height: 20),
+
+                                          // Action Buttons
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              _actionButton(
+                                                "Reject",
+                                                Colors.white,
+                                                Color(0xFFF67C0A),
+                                                textColor: const Color(
+                                                  0xFFF67C0A,
+                                                ),
+                                              ),
+                                              _actionButton(
+                                                "Call",
+                                                Color(0xFFF67C0A),
+                                                Colors.white,
+                                              ),
+                                              _actionButton(
+                                                "Navigation",
+                                                Color(0xFFF67C0A),
+                                                Colors.white,
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 20),
-
-                                  // Action Buttons
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      _actionButton(
-                                        "Reject",
-                                        Colors.white,
-                                        Color(0xFFF67C0A),
-                                        textColor: const Color(0xFFF67C0A),
-                                      ),
-                                      _actionButton(
-                                        "Call",
-                                        Color(0xFFF67C0A),
-                                        Colors.white,
-                                      ),
-                                      _actionButton(
-                                        "Navigation",
-                                        Color(0xFFF67C0A),
-                                        Colors.white,
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
+                                    ),
+                                  );
+                                },
+                              );
+                            }),
                           ),
                         ],
                       ),
@@ -479,48 +550,54 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: _dashboardCard(
-                              title: "Today's\n Jobs",
-                              value: "2",
+                  Obx(() {
+                    return Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: _dashboardCard(
+                                title: "Today's\n Jobs",
+                                value: dashBoardData['todayJobs'].toString(),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _dashboardCard(
-                              title: "Earnings\n Today",
-                              value: "₹750",
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _dashboardCard(
+                                title: "Earnings\n Today",
+                                value:
+                                    dashBoardData['todayEarnings'].toString(),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: _dashboardCard(
-                              title: " Hour’s\nWorked",
-                              value: "5",
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: _dashboardCard(
+                                title: " Hour’s\nWorked",
+                                value:
+                                    dashBoardData['todayHoursWorked']
+                                        .toString(),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _dashboardCard(
-                              title: "Average\n Rating",
-                              value: "4.7",
-                              icon: Icons.star,
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _dashboardCard(
+                                title: "Average\n Rating",
+                                value:
+                                    dashBoardData['averageRating'].toString(),
+                                icon: Icons.star,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                          ],
+                        ),
+                      ],
+                    );
+                  }),
                   SizedBox(height: 10),
                   Text(
                     "Your Earnings",
@@ -532,17 +609,34 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                     ),
                   ),
                   SizedBox(height: 5),
-                  Card(
-                    color: Colors.white,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _earningsCard(title: "This Week", amount: "₹2450"),
-                        _earningsCard(title: "This Month", amount: "₹8450"),
-                        _earningsCard(title: "Total", amount: "₹34,450"),
-                      ],
-                    ),
-                  ),
+                  Obx(() {
+                    return Card(
+                      color: Colors.white,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _earningsCard(
+                            title: "This Week",
+                            amount:
+                                "₹ ${dashBoardData['weekEarnings'].toString()}",
+                            filter: 'week',
+                          ),
+                          _earningsCard(
+                            title: "This Month",
+                            amount:
+                                "₹${dashBoardData['monthEarnings'].toString()}",
+                            filter: 'month',
+                          ),
+                          _earningsCard(
+                            title: "Total",
+                            amount:
+                                "₹${dashBoardData['totalEarnings'].toString()}",
+                            filter: 'all',
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                   Text(
                     "Recent Jobs",
                     style: TextStyle(
@@ -561,21 +655,49 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey.shade300),
                     ),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: 5, // or your dynamic length
-                      padding: const EdgeInsets.symmetric(horizontal: 3),
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return Column(
-                          children: [
-                            _jobItem(),
-                            if (index != 4)
-                              Divider(color: Colors.grey.shade300, height: 1),
-                          ],
-                        );
-                      },
-                    ),
+                    child: Obx(() {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: pastBooking.length, // or your dynamic length
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
+                        physics: BouncingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final booking = pastBooking[index];
+
+                          final serviceName =
+                              booking['bookServices'] != null &&
+                                      booking['bookServices'] is List &&
+                                      booking['bookServices'].isNotEmpty
+                                  ? booking['bookServices'][0]['name'] ?? 'N/A'
+                                  : 'N/A';
+
+                          final jobStartTimeStr = booking['jobStartTime'];
+                          final jobStartTime =
+                              jobStartTimeStr != null
+                                  ? DateTime.tryParse(jobStartTimeStr)
+                                  : null;
+                          final pay = booking['pay'];
+
+                          return Column(
+                            children: [
+                              _jobItem(
+                                serviceName: serviceName,
+                                pay:
+                                    pay, // Replace with actual field if available
+                                date:
+                                    jobStartTime != null
+                                        ? DateFormat(
+                                          'dd MMM yyyy',
+                                        ).format(jobStartTime)
+                                        : 'N/A',
+                              ),
+                              if (index != pastBooking.length - 1)
+                                Divider(color: Colors.grey.shade300, height: 1),
+                            ],
+                          );
+                        },
+                      );
+                    }),
                   ),
 
                   const SizedBox(height: 8),
@@ -615,13 +737,16 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
     );
   }
 
-  Widget _earningsCard({required String title, required String amount}) {
+  Widget _earningsCard({
+    required String title,
+    required String amount,
+    required String filter, // 👈 add this
+  }) {
     return Expanded(
       child: Container(
         height: 119,
         margin: EdgeInsets.symmetric(horizontal: 6),
         padding: EdgeInsets.symmetric(vertical: 12),
-
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -635,9 +760,9 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
             ),
             SizedBox(height: 4),
             Container(
-              height: 2,
+              height: 0.8,
               width: 53,
-              color: Colors.grey.shade300,
+              color: Color(0xFF7B7B7B),
               margin: EdgeInsets.symmetric(vertical: 4),
             ),
             Text(
@@ -646,26 +771,31 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
                 fontFamily: "Poppins",
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
-                color: Color(0xFFE66800),
+                color: Color(0xFFF67C0A),
               ),
             ),
             SizedBox(height: 15),
             // Details button
-            Container(
-              height: 24,
-              width: 54,
-              decoration: BoxDecoration(
-                border: Border.all(color: Color(0xFFF67C0A)),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Center(
-                child: Text(
-                  "Details",
-                  style: TextStyle(
-                    fontFamily: "Poppins",
-                    fontSize: 10,
-                    color: Color(0xFFE66800),
-                    fontWeight: FontWeight.w400,
+            InkWell(
+              onTap: () {
+                // ✅ Pass filter as argument
+                Get.to(() => YourEarningView(), arguments: {'filter': filter});
+              },
+              child: Container(
+                height: 24,
+                width: 54,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Color(0xFFF67C0A)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    "Details",
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                 ),
               ),
@@ -676,7 +806,11 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
     );
   }
 
-  Widget _jobItem() {
+  Widget _jobItem({
+    required String serviceName,
+    required int pay,
+    required String date,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       child: Row(
@@ -685,19 +819,19 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  "Plumbing job",
+                  serviceName,
                   style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                     fontFamily: "Poppins",
                     color: Colors.black,
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  "Pipe Repair",
+                  "Past Booking",
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -710,26 +844,26 @@ class ActivejobScreenView extends GetView<ActivejobScreenController> {
           ),
 
           // Amount
-          const Text(
-            "₹8450",
-            style: TextStyle(
-              fontSize: 13,
+          Text(
+            "₹$pay",
+            style: const TextStyle(
+              fontSize: 14,
               fontWeight: FontWeight.w600,
               fontFamily: "Poppins",
               color: Color(0xFFF67C0A),
             ),
           ),
 
-          const SizedBox(width: 20),
+          const SizedBox(width: 12),
 
           // Date
-          const Text(
-            "10 Apr 2025",
-            style: TextStyle(
-              fontSize: 11,
+          Text(
+            date,
+            style: const TextStyle(
+              fontSize: 10,
               fontWeight: FontWeight.w500,
               fontFamily: "Poppins",
-              color: Colors.black54,
+              color: Color(0xFF1F1F1F),
             ),
           ),
         ],

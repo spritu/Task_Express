@@ -32,14 +32,15 @@ class Bottom2View extends GetView<Bottom2Controller> {
             if (index == 2) {
               await bottom2Controller
                   .fetchNotificationsPro(); // Optional refresh
-              bottom2Controller.hasUnreadNotifications.value =
-                  false; // Hide red dot
+              bottom2Controller.hasUnreadNotifications.value = false;
+              // Hide red dot
               // Optionally call an API to mark all notifications as read
             }
             // Clear the red dot if user opens Chat tab
             if (index == 3) {
               await bottom2Controller.markChatNotificationAsSeen();
               proChatScreenController.hasUnreadnotify.value = false;
+              proChatScreenController.clearUnreadNotify();
             }
           },
           selectedItemColor: Color(0xFFF67C0A),

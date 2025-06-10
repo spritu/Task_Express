@@ -867,6 +867,7 @@ class ProfessionalPlumberController extends GetxController
       await loadCatIdFromArguments();
     });
     waitAndLoadArguments();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
