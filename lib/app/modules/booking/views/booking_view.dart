@@ -432,7 +432,7 @@ class BookingView extends GetView<BookingController> {
                                                               child: ElevatedButton(
                                                                 onPressed: () {
                                                                   Get.to(
-                                                                    ServiceCompletedView(),);
+                                                                    ServiceCompletedView(), arguments: item,);
                                                                 },
                                                                 style: ElevatedButton.styleFrom(
                                                                   backgroundColor:

@@ -369,7 +369,7 @@ class BookingController extends GetxController {
   //TODO: Implement BookingController
   var isLoading = false.obs;
   var userList = <UserModel>[].obs;
-  var bookingId = ''.obs;
+
   // var bookings = <BookingModel>[].obs;
   var bookingList = [].obs;
   var bookinged = <String, dynamic>{}.obs;
@@ -732,14 +732,16 @@ void makePhoneCall(String phoneNumber) async {
 }
 
 var bookings = <BookingModel>[].obs;
+var bookingId = ''.obs;
 var count = 0.obs;
 @override
 void onInit() {
   fetchUserCurrentBooking();
+
   final Map<String, dynamic> booking = Get.arguments;
   print('65656565:${booking}');
 
-//  bookingId.value = booking['data']['_id'];
+  bookingId.value = booking['data']['_id'];
 }
 
 
