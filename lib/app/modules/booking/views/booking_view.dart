@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:worknest/app/modules/chat/views/chat_view.dart';
 import 'package:worknest/app/modules/completejob/views/completejob_view.dart';
 import '../../../../colors.dart';
+import '../../../../rating_screen.dart';
 import '../../BookingConfirm/views/booking_confirm_view.dart';
 import '../../ServiceCompleted/views/service_completed_view.dart';
 import '../../bottom/controllers/bottom_controller.dart';
@@ -192,299 +193,173 @@ class BookingView extends GetView<BookingController> {
                                         //
                                         // return SizedBox(height: 300,
                                         // child:
-                                        ListView.builder(
-                                          itemCount: controller.userList.length,
-                                          shrinkWrap: true,
-                                          itemBuilder: (context, index) {
-                                            final item =
-                                                controller.userList[index];
-                                            print(
-                                              "Image URL: https://jdapi.youthadda.co/${item.userImg}",
-                                            );
-                                            return Card(
-                                              color: AppColors.white,
-                                              child: Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                      vertical: 8,
-                                                      horizontal: 4,
-                                                    ),
-                                                // padding: const EdgeInsets.all(12),
-                                                child: Column(
+                                    ListView.builder(
+                                      itemCount: controller.userList.length,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        final UserModel item = controller.userList[index]; // ✅ No casting to Map
+
+                                        final userImg = item.userImg ?? '';
+                                        final firstName = item.bookedFor['firstName'] ?? '';
+                                        final lastName = item.bookedFor['lastName'] ?? '';
+                                        final spType = item.spType;
+                                        final jobStartTime = item.jobStartTime;
+
+                                        print("Image URL: https://jdapi.youthadda.co/$userImg");
+
+                                        return Card(
+                                          color: AppColors.white,
+                                          child: Container(
+                                            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      // crossAxisAlignment: CrossAxisAlignment.start,
+                                                    /// Left Section
+                                                    Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
-                                                        /// Left Section - Text
-                                                        Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
+                                                        /// Name Row
+                                                        Row(
                                                           children: [
-                                                            /// Name
-                                                            Row(
+                                                            CircleAvatar(
+                                                              radius: 25,
+                                                              backgroundImage: userImg.isNotEmpty
+                                                                  ? NetworkImage("https://jdapi.youthadda.co/$userImg")
+                                                                  : const AssetImage("assets/images/account.png") as ImageProvider,
+                                                              onBackgroundImageError: (_, __) {
+                                                                debugPrint("Error loading image for user: $userImg");
+                                                              },
+                                                            ),
+                                                            const SizedBox(width: 4),
+                                                            Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
-                                                                CircleAvatar(
-                                                                  radius: 25,
-                                                                  backgroundImage:
-                                                                      item.userImg !=
-                                                                                  null &&
-                                                                              item.userImg!.isNotEmpty
-                                                                          ? NetworkImage(
-                                                                            "https://jdapi.youthadda.co/${item.userImg}",
-                                                                          )
-                                                                          : AssetImage(
-                                                                                "assets/images/account.png",
-                                                                              )
-                                                                              as ImageProvider,
-                                                                  onBackgroundImageError: (
-                                                                    _,
-                                                                    __,
-                                                                  ) {
-                                                                    debugPrint(
-                                                                      "Error loading image for user: ${item.userImg}",
-                                                                    );
-                                                                  },
+                                                                Text(
+                                                                  "$firstName $lastName",
+                                                                  style: const TextStyle(
+                                                                    fontFamily: "poppins",
+                                                                    fontSize: 14,
+                                                                    fontWeight: FontWeight.w500,
+                                                                  ),
                                                                 ),
-                                                                SizedBox(
-                                                                  width: 4,
-                                                                ),
-
-                                                                Column(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Text(
-                                                                      "${item.bookedFor['firstName']} ${item.bookedFor['lastName']}",
-                                                                      style: TextStyle(
-                                                                        fontFamily:
-                                                                            "poppins",
-                                                                        fontSize:
-                                                                            14,
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                      ),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      height: 3,
-                                                                    ),
-
-                                                                    /// Subtitle
-                                                                    RichText(
-                                                                      text: TextSpan(
-                                                                        style: TextStyle(
-                                                                          fontFamily:
-                                                                              "poppins",
-                                                                          fontSize:
-                                                                              12,
-                                                                          fontWeight:
-                                                                              FontWeight.w400,
-                                                                          color:
-                                                                              Colors.grey.shade600,
-                                                                        ),
-                                                                        children: [
-                                                                          TextSpan(
-                                                                            text:
-                                                                                item.spType ==
-                                                                                        '2'
-                                                                                    ? "Fixed Charge Helper"
-                                                                                    : "Visiting Professional",
-                                                                          ),
-
-                                                                          // const TextSpan(
-                                                                          //   text:
-                                                                          //   "Electrician",
-                                                                          //   style: TextStyle(
-                                                                          //     fontWeight:
-                                                                          //     FontWeight.w400,
-                                                                          //     fontSize:
-                                                                          //     12,
-                                                                          //     color: Color(
-                                                                          //       0xFF114BCA,
-                                                                          //     ), // Blue color
-                                                                          //   ),
-                                                                          // ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ],
+                                                                const SizedBox(height: 3),
+                                                                Text(
+                                                                  spType == '2' ? "Fixed Charge Helper" : "Visiting Professional",
+                                                                  style: TextStyle(
+                                                                    fontFamily: "poppins",
+                                                                    fontSize: 12,
+                                                                    fontWeight: FontWeight.w400,
+                                                                    color: Colors.grey.shade600,
+                                                                  ),
                                                                 ),
                                                               ],
                                                             ),
-
-                                                            const SizedBox(
-                                                              height: 8,
-                                                            ),
-
-                                                            /// Booked (optional additional line)
-                                                            RichText(
-                                                              text: TextSpan(
-                                                                children: [
-                                                                  TextSpan(
-                                                                    text:
-                                                                        'Booked: ',
-                                                                    style: TextStyle(
-                                                                      fontFamily:
-                                                                          'Poppins',
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w400, // 400 = regular
-                                                                      fontSize:
-                                                                          11,
-
-                                                                      letterSpacing:
-                                                                          0,
-                                                                      color:
-                                                                          Colors
-                                                                              .black,
-                                                                    ),
-                                                                  ),
-                                                                  TextSpan(
-                                                                    text: formatDate(
-                                                                      item.jobStartTime,
-                                                                    ),
-                                                                    // text:
-                                                                    // '${item.jobStartTime}',
-                                                                    style: TextStyle(
-                                                                      fontFamily:
-                                                                          'Poppins',
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500, // 500 = medium
-                                                                      fontSize:
-                                                                          14,
-
-                                                                      letterSpacing:
-                                                                          0,
-                                                                      color:
-                                                                          Colors
-                                                                              .black,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
                                                           ],
                                                         ),
+                                                        const SizedBox(height: 8),
 
-                                                        /// Right Section - Buttons
-                                                        Column(
-                                                          children: [
-                                                            /// Re-book
-                                                            SizedBox(
-                                                              height: 32,
-                                                              width: 85,
-                                                              child: ElevatedButton(
-                                                                onPressed:
-                                                                    () {},
-                                                                style: ElevatedButton.styleFrom(
-                                                                  backgroundColor:
-                                                                      Colors
-                                                                          .white,
-                                                                  elevation: 0,
-                                                                  side: const BorderSide(
-                                                                    color:
-                                                                        Colors
-                                                                            .black,
-                                                                  ),
-                                                                  shape: RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                          8,
-                                                                        ),
-                                                                  ),
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .zero,
-                                                                ),
-                                                                child: const Text(
-                                                                  "Re-Book",
-                                                                  style: TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontFamily:
-                                                                        "poppins",
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    color:
-                                                                        Colors
-                                                                            .black,
-                                                                  ),
+                                                        /// Booked Time
+                                                        RichText(
+                                                          text: TextSpan(
+                                                            children: [
+                                                              const TextSpan(
+                                                                text: 'Booked: ',
+                                                                style: TextStyle(
+                                                                  fontFamily: 'Poppins',
+                                                                  fontWeight: FontWeight.w400,
+                                                                  fontSize: 11,
+                                                                  color: Colors.black,
                                                                 ),
                                                               ),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 10,
-                                                            ),
-
-                                                            /// Rate Service
-                                                            SizedBox(
-                                                              height: 32,
-                                                              width: 85,
-                                                              child: ElevatedButton(
-                                                                onPressed: () {
-                                                                  Get.to(
-                                                                    ServiceCompletedView(), arguments: item,);
-                                                                },
-                                                                style: ElevatedButton.styleFrom(
-                                                                  backgroundColor:
-                                                                      Colors
-                                                                          .white,
-                                                                  elevation: 0,
-                                                                  side: const BorderSide(
-                                                                    color: Color(
-                                                                      0xFF114BCA,
-                                                                    ),
-                                                                  ),
-                                                                  shape: RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                          8,
-                                                                        ),
-                                                                  ),
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .zero,
-                                                                ),
-                                                                child: const Text(
-                                                                  "Rate Service ",
-                                                                  style: TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontFamily:
-                                                                        "poppins",
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    color: Color(
-                                                                      0xFF114BCA,
-                                                                    ),
-                                                                  ),
+                                                              TextSpan(
+                                                                text: formatDate(jobStartTime),
+                                                                style: const TextStyle(
+                                                                  fontFamily: 'Poppins',
+                                                                  fontWeight: FontWeight.w500,
+                                                                  fontSize: 14,
+                                                                  color: Colors.black,
                                                                 ),
                                                               ),
-                                                            ),
-                                                          ],
+                                                            ],
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
-                                                    SizedBox(height: 5),
+
+                                                    /// Right Section - Buttons
+                                                    Column(
+                                                      children: [
+                                                        SizedBox(
+                                                          height: 32,
+                                                          width: 85,
+                                                          child: ElevatedButton(
+                                                            onPressed: () {
+                                                              // Re-Book action
+                                                            },
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor: Colors.white,
+                                                              elevation: 0,
+                                                              side: const BorderSide(color: Colors.black),
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.circular(8),
+                                                              ),
+                                                              padding: EdgeInsets.zero,
+                                                            ),
+                                                            child: const Text(
+                                                              "Re-Book",
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                                fontFamily: "poppins",
+                                                                fontWeight: FontWeight.w500,
+                                                                color: Colors.black,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        SizedBox(
+                                                          height: 32,
+                                                          width: 85,
+                                                          child: ElevatedButton(
+                                                            onPressed: () {
+                                                              Get.to(Rating(), arguments: item); // ✅ Send UserModel
+                                                            },
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor: Colors.white,
+                                                              elevation: 0,
+                                                              side: const BorderSide(color: Color(0xFF114BCA)),
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.circular(8),
+                                                              ),
+                                                              padding: EdgeInsets.zero,
+                                                            ),
+                                                            child: const Text(
+                                                              "Rate Service ",
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                                fontFamily: "poppins",
+                                                                fontWeight: FontWeight.w500,
+                                                                color: Color(0xFF114BCA),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ],
                                                 ),
-                                                //));
-                                                // },
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ],
+                                                const SizedBox(height: 5),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+
+
+                                    ],
                                     ),
                                   ),
                                 ),

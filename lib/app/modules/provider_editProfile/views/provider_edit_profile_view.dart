@@ -95,7 +95,7 @@ class ProviderEditProfileView extends GetView<ProviderEditProfileController> {
                     ),
                   ),
                   onPressed: () async {
-                    await controller.updateUser(imageFilePath: controller.imagePath.value);
+                    await controller.updateUser();
                   },
                   child: const Text(
                     "Save",

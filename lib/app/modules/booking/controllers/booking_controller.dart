@@ -448,7 +448,7 @@ class BookingController extends GetxController {
     // Hide the booking card
     showBookingCard.value = false;
   }
-
+  var bookingId = ''.obs;
   Future<void> fetchCurrentBookings() async {
     isLoading.value = true;
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -742,6 +742,7 @@ void onInit() {
   print('65656565:${booking}');
 
   bookingId.value = booking['data']['_id'];
+
 }
 
 
@@ -987,36 +988,6 @@ class UserModel {
       spType: spTypeValue,
     );
   }
-
-  // factory UserModel.fromJson(Map<String, dynamic> json) {
-  //   String spTypeValue = '1'; // default if not found
-  //
-  //   // Check if bookServices list exists and is not empty
-  //   if (json['bookServices'] != null && (json['bookServices'] as List).isNotEmpty) {
-  //     final firstService = (json['bookServices'] as List).first;
-  //     spTypeValue = firstService['spType']?.toString() ?? '1';
-  //   }
-  //
-  //
-  //   print("spType from API extracted: $spTypeValue");  // Debug print
-  //
-  //   return UserModel(
-  //     id: json['_id'] ?? '',
-  //     userImg: json['bookedFor']?['userImg'],
-  //
-  //     bookedBy: json['bookedBy'] ?? {},
-  //     bookedFor: json['bookedFor'] ?? {},
-  //     bookServices: json['bookServices'] ?? [],
-  //     completeJob: json['completeJob'] ?? 0,
-  //     accept: json['accept'] ?? '',
-  //     paymentDoneBySp: json['paymentdonebysp'] ?? false,
-  //     paymentDoneByUser: json['paymentdonebyuser'] ?? false,
-  //     jobStartTime: json['jobStartTime'] ?? '',
-  //     jobEndTime: json['jobEndTime'] ?? '',
-  //     pay: json['pay'] ?? 0,
-  //     spType: spTypeValue,
-  //   );
-  // }
 }
 
 class SkillModel {

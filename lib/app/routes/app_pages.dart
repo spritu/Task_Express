@@ -274,7 +274,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.SERVICE_COMPLETED,
-      page: () => const ServiceCompletedView(),
+      page: () =>  ServiceCompletedView(),
       binding: ServiceCompletedBinding(),
     ),
     GetPage(

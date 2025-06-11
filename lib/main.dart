@@ -8,6 +8,7 @@ import 'app/modules/Bottom2/controllers/bottom2_controller.dart';
 import 'app/modules/BricklayingHelper/controllers/bricklaying_helper_controller.dart';
 import 'app/modules/CancelBooking/controllers/cancel_booking_controller.dart';
 import 'app/modules/Scaffolding_helper/controllers/scaffolding_helper_controller.dart';
+import 'app/modules/ServiceCompleted/controllers/service_completed_controller.dart';
 import 'app/modules/account/controllers/account_controller.dart';
 import 'app/modules/add_address/controllers/add_address_controller.dart';
 import 'app/modules/booking/controllers/booking_controller.dart';

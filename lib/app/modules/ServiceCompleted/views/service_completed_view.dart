@@ -13,13 +13,10 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> booking = Get.arguments;
-
-    DateTime createdAt =
-        DateTime.tryParse(booking['createdAt'] ?? '') ?? DateTime.now();
-    DateTime updatedAt =
-        DateTime.tryParse(booking['updatedAt'] ?? '') ?? DateTime.now();
-
+    final Map<String, dynamic> booking = (Get.arguments ?? {}) as Map<String, dynamic>;
+    print("booking: $booking");
+    DateTime createdAt = DateTime.tryParse(booking['createdAt'] ?? '') ?? DateTime.now();
+    DateTime updatedAt = DateTime.tryParse(booking['updatedAt'] ?? '') ?? DateTime.now();
     final formattedDate = DateFormat('d MMM, yyyy').format(createdAt);
     final startTime = DateFormat('hh:mm a').format(createdAt);
     final endTime = DateFormat('hh:mm a').format(updatedAt);
@@ -27,91 +24,62 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
     final durationHours = duration.inHours;
     final durationMinutes = duration.inMinutes % 60;
     final String durationString =
-        durationHours > 0
-            ? '$durationHours Hours${durationMinutes > 0 ? " $durationMinutes Minutes" : ""}'
-            : '$durationMinutes Minutes';
-
+        durationHours > 0 ? '$durationHours Hours${durationMinutes > 0 ? " $durationMinutes Minutes" : ""}' : '$durationMinutes Minutes';
     Get.put(ServiceCompletedController());
-
     return WillPopScope(
       onWillPop: () async {
         Get.find<BottomController>().selectedIndex.value = 0; // 👈 Home tab
         Get.offAll(() => BottomView());
         return false;
       },
-      child: Scaffold(
-        body: Container(
+      child: Scaffold(body: Container(
           height: MediaQuery.of(context).size.height,
           decoration: const BoxDecoration(gradient: AppColors.appGradient),
-          child: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
+        child: SafeArea(child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0), child: Column(
+                children: [Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [IconButton(
                         icon: const Icon(Icons.arrow_back),
-                        onPressed: () => Get.back(),
-                      ),
-
-                      const Text(
-                        "Service Completed",
+                        onPressed: () => Get.back(),),
+                      const Text("Service Completed",
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
-                          fontFamily: "poppins",
-                        ),
-                      ),
+                          fontFamily: "poppins",),),
                       Text(""),
-                    ],
-                  ),
+                    ],),
                   const SizedBox(height: 10),
                   Image.asset("assets/images/service.png"),
                   const SizedBox(height: 5),
-
                   // Top Info
                   Card(
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
+                    child: Container(padding: const EdgeInsets.all(8),decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           width: 1,
-                          color: const Color(0xFFD9E4FC),
-                        ),
+                          color: const Color(0xFFD9E4FC),),
                         color: Colors.white,
                       ),
                       child: Text.rich(
                         TextSpan(
                           children: [
                             TextSpan(
-                              text:
-                                  "${booking['data']['bookedFor']['firstName']} ${booking['data']['bookedFor']['lastName']}",
-
+                              text: "${booking['data']['bookedFor']['firstName']} ${booking['data']['bookedFor']['lastName']}",
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 12,
                                 fontFamily: "poppins",
                                 color: Colors.black,
-                              ),
-                            ),
+                              ),),
                             TextSpan(
-                              text:
-                                  " has completed the work at your location. Please review the details below and proceed to payment.",
+                              text: " has completed the work at your location. Please review the details below and proceed to payment.",
                               style: TextStyle(
                                 fontWeight: FontWeight.w400,
                                 fontSize: 12,
                                 fontFamily: "poppins",
                                 color: Colors.black,
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                            ),],),),),),
 
                   const SizedBox(height: 5),
 
@@ -191,8 +159,8 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                         ),
                         const SizedBox(height: 5),
                         Container(
-                          height: 53,
-                          width: 273,
+                          height: 55,
+                         // width: 273,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 5,
                             vertical: 3,
@@ -212,8 +180,8 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                "How was your experience with Suraj Sen?",
+                               Text(
+                                "How was your experience with ${booking['data']['bookedFor']['firstName']} ${booking['data']['bookedFor']['lastName']}?",
                                 style: TextStyle(
                                   fontFamily: "poppins",
                                   fontWeight: FontWeight.w400,

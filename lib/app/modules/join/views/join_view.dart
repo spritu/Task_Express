@@ -265,7 +265,8 @@ class JoinView extends GetView<JoinController> {
     required String subtitle,
     required Color color,
   }) {
-    return Card(color: AppColors.white,
+    return Card(
+      color: AppColors.white,
       child: InkWell(onTap: (){
         Get.to(LoginView());
       },
@@ -273,7 +274,14 @@ class JoinView extends GetView<JoinController> {
           width: 128,height: 180,
           padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
           decoration: BoxDecoration(
-
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  Color.fromRGBO(255, 255, 255, 0.29), // rgba(255,255,255,0.29)
+                  Color.fromRGBO(17, 75, 202, 0.29),   // rgba(17,75,202,0.29)
+                ],
+              ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -325,7 +333,14 @@ class JoinView extends GetView<JoinController> {
         child: Container(
           width: 128,height: 180,
           padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-          decoration: BoxDecoration(
+          decoration: BoxDecoration(   gradient: LinearGradient(
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+            colors: [
+              Color.fromRGBO(255, 255, 255, 0.29), // rgba(255,255,255,0.29)
+              Color.fromRGBO(246, 124, 10, 0.29),  // rgba(246,124,10,0.29)
+            ],
+          ),
           //  border: Border.all(color: Colors.black12),
             borderRadius: BorderRadius.circular(12),
           ),

@@ -92,6 +92,7 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
 
 
 
+
                                 SizedBox(width: 8),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -95,9 +95,8 @@ class EditProfileView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: () async {
-                    await controller.updateUser(imageFilePath: controller.imagePath.value);
-
+                  onPressed: () {
+                    controller.updateUser();
                   },
                   child: const Text(
                     "Save",
