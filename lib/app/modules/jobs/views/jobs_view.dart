@@ -16,6 +16,8 @@ class JobsView extends GetView<JobsController> {
   @override
   Widget build(BuildContext context) {
     Get.put(JobsController());
+    final ProviderHomeController proController =
+        Get.find<ProviderHomeController>();
     return WillPopScope(
       onWillPop: () async {
         Get.find<Bottom2Controller>().selectedIndex.value = 0;
@@ -45,7 +47,6 @@ class JobsView extends GetView<JobsController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
@@ -53,7 +54,7 @@ class JobsView extends GetView<JobsController> {
                     children: [],
                   ),
                 ),
-                SizedBox(height: 20),
+
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: Obx(() {
@@ -227,60 +228,53 @@ class JobsView extends GetView<JobsController> {
                                       const SizedBox(height: 12),
                                       Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                            MainAxisAlignment.center,
                                         children: [
-                                          Expanded(
+                                          _outlinedButton("Call", false),
+                                          const SizedBox(width: 8),
+                                          // Expanded(
+                                          //   child: InkWell(
+                                          //     onTap: () {
+                                          //       showModalBottomSheet(
+                                          //         context: Get.context!,
+                                          //         isScrollControlled: true,
+                                          //         backgroundColor:
+                                          //             Colors.transparent,
+                                          //         builder:
+                                          //             (_) => Container(
+                                          //               decoration: const BoxDecoration(
+                                          //                 color: Colors.white,
+                                          //                 borderRadius:
+                                          //                     BorderRadius.only(
+                                          //                       topLeft:
+                                          //                           Radius.circular(
+                                          //                             16,
+                                          //                           ),
+                                          //                       topRight:
+                                          //                           Radius.circular(
+                                          //                             16,
+                                          //                           ),
+                                          //                     ),
+                                          //               ),
+                                          //               child:
+                                          //                   const JobDetailView(),
+                                          //             ),
+                                          //       );
+                                          //     },
+                                          //     child: _outlinedButton(
+                                          //       "Details",
+                                          //       false,
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          const SizedBox(width: 8),
+                                          InkWell(
+                                            onTap: () {
+                                              Get.to(() => HelpSupportView());
+                                            },
                                             child: _outlinedButton(
-                                              "Call",
-                                              false,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: InkWell(
-                                              onTap: () {
-                                                showModalBottomSheet(
-                                                  context: Get.context!,
-                                                  isScrollControlled: true,
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  builder:
-                                                      (_) => Container(
-                                                        decoration: const BoxDecoration(
-                                                          color: Colors.white,
-                                                          borderRadius:
-                                                              BorderRadius.only(
-                                                                topLeft:
-                                                                    Radius.circular(
-                                                                      16,
-                                                                    ),
-                                                                topRight:
-                                                                    Radius.circular(
-                                                                      16,
-                                                                    ),
-                                                              ),
-                                                        ),
-                                                        child:
-                                                            const JobDetailView(),
-                                                      ),
-                                                );
-                                              },
-                                              child: _outlinedButton(
-                                                "Details",
-                                                false,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: InkWell(
-                                              onTap: () {
-                                                Get.to(() => HelpSupportView());
-                                              },
-                                              child: _outlinedButton(
-                                                "Help",
-                                                true,
-                                              ),
+                                              "Help",
+                                              true,
                                             ),
                                           ),
                                         ],
@@ -307,8 +301,6 @@ class JobsView extends GetView<JobsController> {
                 ),
                 const SizedBox(height: 12),
                 Obx(() {
-                  final ProviderHomeController proController =
-                      Get.find<ProviderHomeController>();
                   print(
                     'pastBookings length: ${proController.pastBookings.length}',
                   );
@@ -358,6 +350,7 @@ class JobsView extends GetView<JobsController> {
                       const statusColor = Colors.green;
                       const icon = Icons.check_circle;
                       return _buildPastJob(
+                        job: job,
                         name: fullName,
                         location: location,
                         amount: amount,
@@ -637,20 +630,44 @@ class JobsView extends GetView<JobsController> {
     );
   }
 
-  Widget _actionButton(String title, Color bg, Color borderColor) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor),
-      ),
-      child: Text(
-        title,
-        style: TextStyle(
-          color: borderColor,
-          fontFamily: "poppins",
-          fontWeight: FontWeight.w500,
+  Widget _actionButton(
+    String title,
+    Color bg,
+    Color borderColor,
+    Map<String, dynamic> job,
+  ) {
+    return InkWell(
+      onTap: () {
+        // final ProviderHomeController proController =
+        //     Get.find<ProviderHomeController>();
+
+        Get.to(
+          JobsDetailsView(),
+          arguments: {
+            "jobsDetails": [job],
+          },
+        );
+      },
+      child: Container(
+        height: 25,
+        width: 69,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor),
+        ),
+        child: Center(
+          child: Text(
+            title,
+            style: TextStyle(
+              color: borderColor,
+              fontFamily: "poppins",
+              fontWeight: FontWeight.w500,
+              fontSize: 12,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );
@@ -676,9 +693,10 @@ class JobsView extends GetView<JobsController> {
 
   Widget _outlinedButton(String title, bool isSelected) {
     return SizedBox(
-      height: 40,
+      height: 30,
+      width: 82,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           color: isSelected ? Colors.orange : Colors.white,
           border: Border.all(color: Colors.orange),
@@ -700,6 +718,7 @@ class JobsView extends GetView<JobsController> {
   }
 
   Widget _buildPastJob({
+    required Map<String, dynamic> job,
     required String name,
     required String location,
     required String amount,
@@ -746,10 +765,8 @@ class JobsView extends GetView<JobsController> {
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
             InkWell(
-              onTap: () {
-                // Get.to(JobsDetailsView());
-              },
-              child: _actionButton("Details", Colors.white, Colors.orange),
+              onTap: () {},
+              child: _actionButton("Details", Colors.white, Colors.orange, job),
             ),
           ],
         ),

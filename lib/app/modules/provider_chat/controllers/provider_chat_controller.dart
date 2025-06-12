@@ -61,7 +61,7 @@ class ProviderChatController extends GetxController {
     userId.value = prefs.getString('userId') ?? '';
     firstName.value = prefs.getString('firstName') ?? '';
     lastName.value = prefs.getString('lastName') ?? '';
-    print("hbhhbhbhbhb:${userId.value}");
+    print("hbhhbhbhbhb:${userImg.value}");
 
     if (userId.isEmpty) {
       print('❌ User ID not found in SharedPreferences');
@@ -78,7 +78,9 @@ class ProviderChatController extends GetxController {
     if (data != null) {
       receiverId = data['receiverId'] ?? '';
       receiverName.value = data['receiverName'] ?? 'No Name';
-      receiverImage.value = data['receiverImage'] ?? '';
+      final receiverImgPath = data['receiverImage'] ?? '';
+      receiverImage.value = '$baseUrl$receiverImgPath';
+
       print('✅ Receiver ID: $receiverId');
       print('✅ Receiver Name: $receiverName');
       print('✅ Receiver Image: $receiverImage');

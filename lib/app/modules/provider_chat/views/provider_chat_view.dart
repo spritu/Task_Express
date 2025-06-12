@@ -107,15 +107,28 @@ class ProviderChatView extends GetView<ProviderChatController> {
                         isSender ? "You" : controller.receiverName.value;
                     print('object121 ${controller.receiverImage.value}');
                     final imageUrl =
-                        (isSender
-                                ? controller.user.value?.imageUrl
-                                : controller.receiverImage.value)
-                            ?.trim();
+                        isSender
+                            ? controller.user.value?.imageUrl ?? ''
+                            : controller.receiverImage.value;
 
                     final ImageProvider displayImage =
-                        (imageUrl != null && imageUrl.isNotEmpty)
+                        (imageUrl.isNotEmpty &&
+                                Uri.tryParse(imageUrl)?.hasAbsolutePath == true)
                             ? NetworkImage(imageUrl)
-                            : AssetImage('assets/images/account.png');
+                            : const AssetImage('assets/images/account.png')
+                                as ImageProvider;
+
+                    CircleAvatar(radius: 20, backgroundImage: displayImage);
+                    // final imageUrl =
+                    //     isSender
+                    //         ? controller.user.value?.imageUrl ?? ''
+                    //         : controller.receiverImage.value;
+                    //
+                    // final ImageProvider displayImage =
+                    //     imageUrl.isNotEmpty
+                    //         ? NetworkImage(imageUrl)
+                    //         : const AssetImage('assets/images/account.png')
+                    //             as ImageProvider;
 
                     final time =
                         msg.createdAt != null
