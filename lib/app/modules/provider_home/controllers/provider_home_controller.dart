@@ -735,6 +735,7 @@ class ProviderHomeController extends GetxController {
   }
 
   RxList<Map<String, dynamic>> pastBookings = <Map<String, dynamic>>[].obs;
+  final RxBool showAllPastBookings = false.obs;
 
   Future<void> fetchPastBookings() async {
     final prefs = await SharedPreferences.getInstance();

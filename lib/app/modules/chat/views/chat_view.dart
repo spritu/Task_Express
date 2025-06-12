@@ -415,14 +415,14 @@ class ChatView extends GetView<ChatController> {
                       time,
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
-                    if (isSender) ...[
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.done_all,
-                        size: 16,
-                        color: isRead ? Colors.blue : Colors.grey,
-                      ),
-                    ],
+                    // if (isSender) ...[
+                    //   const SizedBox(width: 4),
+                    //   Icon(
+                    //     Icons.done_all,
+                    //     size: 16,
+                    //     color: isRead ? Colors.blue : Colors.grey,
+                    //   ),
+                    // ],
                   ],
                 ),
               ],

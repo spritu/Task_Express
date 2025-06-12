@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
@@ -109,66 +110,66 @@ class ChatController extends GetxController {
     isInitialized.value = true;
   }
 
-  void connectSocketAllMessage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userId');
-    String? firstName = prefs.getString('firstName');
-    String? lastName = prefs.getString('lastName');
-
-    if (userId == null) {
-      print("User ID missing");
-      return;
-    }
-
-    print('🔌 Connecting socket for userId: $userId');
-
-    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
-      'transports': ['websocket'],
-      'autoConnect': false,
-      'forceNew': true,
-      'auth': {
-        'user': {'_id': userId, 'firstName': firstName, 'lastName': lastName},
-      },
-    });
-
-    socket.connect();
-
-    socket.onConnect((_) {
-      print('✅ Socket connected');
-    });
-
-    socket.onDisconnect((_) {
-      print('❌ Socket disconnected');
-    });
-
-    socket.onConnectError((err) {
-      print('⚠️ Connect error: $err');
-    });
-
-    socket.onError((err) {
-      print('❗ Socket error: $err');
-    });
-
-    /// ✅ Handle "seen" event and update UI
-    socket.on('allMessagesViewed', (data) {
-      print('👁️ allMessagesViewed: $data');
-      // fetchChatHistory();
-
-      final seenMessageId = data['messageId'];
-
-      for (int i = 0; i < messages.length; i++) {
-        final msg = messages[i];
-        if (msg.id == seenMessageId && msg is types.TextMessage) {
-          // Update metadata
-          messages[i] = msg.copyWith(metadata: {'viewall': true});
-          messages.refresh();
-          print('🔵 Message marked as seen: $seenMessageId');
-        }
-      }
-
-      messages.refresh(); // Force UI update
-    });
-  }
+  // void connectSocketAllMessage() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? userId = prefs.getString('userId');
+  //   String? firstName = prefs.getString('firstName');
+  //   String? lastName = prefs.getString('lastName');
+  //
+  //   if (userId == null) {
+  //     print("User ID missing");
+  //     return;
+  //   }
+  //
+  //   print('🔌 Connecting socket for userId: $userId');
+  //
+  //   socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+  //     'transports': ['websocket'],
+  //     'autoConnect': false,
+  //     'forceNew': true,
+  //     'auth': {
+  //       'user': {'_id': userId, 'firstName': firstName, 'lastName': lastName},
+  //     },
+  //   });
+  //
+  //   socket.connect();
+  //
+  //   socket.onConnect((_) {
+  //     print('✅ Socket connected');
+  //   });
+  //
+  //   socket.onDisconnect((_) {
+  //     print('❌ Socket disconnected');
+  //   });
+  //
+  //   socket.onConnectError((err) {
+  //     print('⚠️ Connect error: $err');
+  //   });
+  //
+  //   socket.onError((err) {
+  //     print('❗ Socket error: $err');
+  //   });
+  //
+  //   /// ✅ Handle "seen" event and update UI
+  //   socket.on('allMessagesViewed', (data) {
+  //     print('👁️ allMessagesViewed: $data');
+  //     // fetchChatHistory();
+  //
+  //     final seenMessageId = data['messageId'];
+  //
+  //     for (int i = 0; i < messages.length; i++) {
+  //       final msg = messages[i];
+  //       if (msg.id == seenMessageId && msg is types.TextMessage) {
+  //         // Update metadata
+  //         messages[i] = msg.copyWith(metadata: {'viewall': true});
+  //         messages.refresh();
+  //         print('🔵 Message marked as seen: $seenMessageId');
+  //       }
+  //     }
+  //
+  //     messages.refresh(); // Force UI update
+  //   });
+  // }
 
   void markAllAsSeen() {
     for (var msg in messages) {
@@ -384,7 +385,11 @@ class ChatController extends GetxController {
     socket.connect();
 
     socket.onConnect((_) {
-      print('✅ Connected to socket');
+      print('✅ Connected to socket userSaid');
+      // final payload = {'receiver': receiverId.trim()};
+      //
+      // print('Emitting chatScreenActive payload userSaid: $payload');
+      // socket.emit('chatScreenActive', payload);
     });
 
     socket.onDisconnect((_) {
@@ -412,10 +417,45 @@ class ChatController extends GetxController {
         text: data['message'] ?? '',
         author: types.User(id: data['senderId']),
         createdAt: DateTime.now().millisecondsSinceEpoch,
+        metadata: {
+          'viewall': false, // 👈 Add this!
+        },
       );
 
       messages.insert(0, msg);
     });
+
+    // socket.on('allMessagesViewed', (data) {
+    //   print('👀 Received allMessagesViewed: $data');
+    //   fetchAllMessages();
+    //
+    //   for (int i = 0; i < messages.length; i++) {
+    //     if (messages[i] is types.TextMessage &&
+    //         messages[i].author.id == user.value!.id) {
+    //       final oldMsg = messages[i] as types.TextMessage;
+    //
+    //       messages[i] = oldMsg.copyWith(
+    //         metadata: {...?oldMsg.metadata, 'viewall': true},
+    //       );
+    //     }
+    //   }
+    //
+    //   messages.refresh(); // 🔄 Important to rebuild UI
+    // });
+
+    // socket.on('chatScreenActive', (data) {
+    //   print('📩 Received chatScreenActive message: $data');
+    //   // Your method for booking data
+    //
+    //   final msg = types.TextMessage(
+    //     id: data['_id'] ?? const Uuid().v4(),
+    //     text: data['message'] ?? '',
+    //     author: types.User(id: data['senderId'] ?? 'unknown'),
+    //     createdAt: DateTime.now().millisecondsSinceEpoch,
+    //   );
+    //
+    //   messages.insert(0, msg);
+    // });
   }
 
   final RxString imagePath = ''.obs;
@@ -467,7 +507,6 @@ class ChatController extends GetxController {
   @override
   void onClose() {
     socket.dispose();
-    //  chatScreenController.fetchLastMessages();
     print("🔌 Socket closed");
     super.onClose();
   }

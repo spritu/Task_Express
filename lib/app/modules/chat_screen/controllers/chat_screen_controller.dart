@@ -154,7 +154,27 @@ class ChatScreenController extends GetxController {
       chats.refresh();
     }
 
-    // Optional: API hit to mark as seen
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    if (userId == null || userId.isEmpty) {
+      print('❌ userId is empty');
+      return;
+    }
+
+    var headers = {'Content-Type': 'application/json'};
+    var url = Uri.parse('https://jdapi.youthadda.co/viewAll');
+    var body = json.encode({"receiver": userId}); // ✅ As required
+
+    try {
+      var response = await http.post(url, headers: headers, body: body);
+      if (response.statusCode == 200) {
+        print('✅ Success: marked all as read');
+      } else {
+        print('❌ API Error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('⚠️ Exception: $e');
+    }
   }
 
   void playNotificationSound() async {

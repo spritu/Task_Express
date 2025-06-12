@@ -107,15 +107,28 @@ class ProviderChatView extends GetView<ProviderChatController> {
                         isSender ? "You" : controller.receiverName.value;
                     print('object121 ${controller.receiverImage.value}');
                     final imageUrl =
-                        (isSender
-                                ? controller.user.value?.imageUrl
-                                : controller.receiverImage.value)
-                            ?.trim();
+                        isSender
+                            ? controller.user.value?.imageUrl ?? ''
+                            : controller.receiverImage.value;
 
                     final ImageProvider displayImage =
-                        (imageUrl != null && imageUrl.isNotEmpty)
+                        (imageUrl.isNotEmpty &&
+                                Uri.tryParse(imageUrl)?.hasAbsolutePath == true)
                             ? NetworkImage(imageUrl)
-                            : AssetImage('assets/images/account.png');
+                            : const AssetImage('assets/images/account.png')
+                                as ImageProvider;
+
+                    CircleAvatar(radius: 20, backgroundImage: displayImage);
+                    // final imageUrl =
+                    //     isSender
+                    //         ? controller.user.value?.imageUrl ?? ''
+                    //         : controller.receiverImage.value;
+                    //
+                    // final ImageProvider displayImage =
+                    //     imageUrl.isNotEmpty
+                    //         ? NetworkImage(imageUrl)
+                    //         : const AssetImage('assets/images/account.png')
+                    //             as ImageProvider;
 
                     final time =
                         msg.createdAt != null
@@ -406,14 +419,14 @@ class ProviderChatView extends GetView<ProviderChatController> {
                       time,
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
-                    if (isSender) ...[
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.done_all,
-                        size: 16,
-                        color: isRead ? Colors.blue : Colors.grey,
-                      ),
-                    ],
+                    // if (isSender) ...[
+                    //   const SizedBox(width: 4),
+                    //   Icon(
+                    //     Icons.done_all,
+                    //     size: 16,
+                    //     color: isRead ? Colors.blue : Colors.grey,
+                    //   ),
+                    // ],
                   ],
                 ),
               ],

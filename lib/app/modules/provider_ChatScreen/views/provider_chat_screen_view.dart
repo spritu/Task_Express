@@ -72,7 +72,13 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                                     'receiverImage': chat.profilePic,
                                   },
                                 )?.then((_) async {
+                                  await controller.markChatAsRead(
+                                    chat.reciverId,
+                                  );
+                                  await bottom2controller
+                                      .fetchNotificationsPro();
                                   await controller.fetchLastMessages();
+                                  controller.chats.refresh();
                                 });
                               },
                               onLongPress: () {
@@ -148,6 +154,7 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                                                         height: 50,
                                                       ),
                                             ),
+
                                             // if (chat.unreadCount > 0)
                                             //   Positioned(
                                             //     right: 0,

@@ -70,6 +70,9 @@ class ChatScreenView extends GetView<ChatScreenController> {
                                     'receiverImage': chat.profilePic,
                                   },
                                 )?.then((_) async {
+                                  await controller.markChatAsRead(
+                                    chat.reciverId,
+                                  );
                                   await controller.fetchLastMessages();
                                 });
                               },

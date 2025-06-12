@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -20,6 +22,8 @@ class ProviderChatController extends GetxController {
   RxString userImg = ''.obs;
   RxString receiverName = ''.obs;
   RxString receiverImage = ''.obs;
+  var firstName = ''.obs;
+  var lastName = ''.obs;
 
   // late String receiverName;
   // late String receiverImage;
@@ -31,6 +35,11 @@ class ProviderChatController extends GetxController {
   void onInit() {
     super.onInit();
     initializeChat();
+
+    // ✅ Mark messages as read after UI has rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchAllMessages();
+    });
 
     // Future.delayed(Duration(milliseconds: 500), () async {
     //   await initializeChat();
@@ -50,7 +59,9 @@ class ProviderChatController extends GetxController {
     print('object99:${userImg.value}');
     await prefs.reload();
     userId.value = prefs.getString('userId') ?? '';
-    print("hbhhbhbhbhb:${userId.value}");
+    firstName.value = prefs.getString('firstName') ?? '';
+    lastName.value = prefs.getString('lastName') ?? '';
+    print("hbhhbhbhbhb:${userImg.value}");
 
     if (userId.isEmpty) {
       print('❌ User ID not found in SharedPreferences');
@@ -67,7 +78,9 @@ class ProviderChatController extends GetxController {
     if (data != null) {
       receiverId = data['receiverId'] ?? '';
       receiverName.value = data['receiverName'] ?? 'No Name';
-      receiverImage.value = data['receiverImage'] ?? '';
+      final receiverImgPath = data['receiverImage'] ?? '';
+      receiverImage.value = '$baseUrl$receiverImgPath';
+
       print('✅ Receiver ID: $receiverId');
       print('✅ Receiver Name: $receiverName');
       print('✅ Receiver Image: $receiverImage');
@@ -86,64 +99,65 @@ class ProviderChatController extends GetxController {
     isInitialized.value = true;
   }
 
-  void connectSocketAllMessage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userId');
-    String? firstName = prefs.getString('firstName');
-    String? lastName = prefs.getString('lastName');
+  // void connectSocketAllMessage() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? userId = prefs.getString('userId');
+  //   String? firstName = prefs.getString('firstName');
+  //   String? lastName = prefs.getString('lastName');
+  //
+  //   print("AllMessage provider  :$userId $firstName $lastName");
+  //
+  //   if (userId == null) {
+  //     print(" User ID or BookedFor missing AllMessage");
+  //     return;
+  //   }
+  //
+  //   print('🔌 Connecting socket for user AllMessage: $userId');
+  //
+  //   socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
+  //     'transports': ['websocket'],
+  //     'autoConnect': false,
+  //     'forceNew': true,
+  //     'auth': {
+  //       'user': {'_id': userId, 'firstName': firstName, 'lastName': lastName},
+  //     },
+  //   });
+  //
+  //   socket.connect();
+  //
+  //   socket.onConnect((_) {
+  //     print(' Connected to socket AllMessage provider');
+  //   });
+  //
+  //   socket.onDisconnect((_) {
+  //     print(' Disconnected from socket AllMessage');
+  //   });
+  //
+  //   socket.onConnectError((err) {
+  //     print(' Connect Error: $err');
+  //   });
+  //
+  //   socket.onError((err) {
+  //     print(' Socket Error: $err');
+  //   });
+  //
+  //   ///Listen to notifications messages
+  //
+  //   socket.on('chatScreenActive', (data) {
+  //     print(' Received chatScreenActive message: $data');
+  //     // fetchChatHistory();
+  //     final msg = types.TextMessage(
+  //       id: data['_id'] ?? const Uuid().v4(),
+  //       text: data['message'] ?? '',
+  //       author: types.User(id: data['senderId'] ?? 'unknown'),
+  //       createdAt: DateTime.now().millisecondsSinceEpoch,
+  //     );
+  //
+  //     messages.insert(0, msg);
+  //   });
+  // }
 
-    print("AllMessage provider  :$userId $firstName $lastName");
-
-    if (userId == null) {
-      print(" User ID or BookedFor missing AllMessage");
-      return;
-    }
-
-    print('🔌 Connecting socket for user AllMessage: $userId');
-
-    socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
-      'transports': ['websocket'],
-      'autoConnect': false,
-      'forceNew': true,
-      'auth': {
-        'user': {'_id': userId, 'firstName': firstName, 'lastName': lastName},
-      },
-    });
-
-    socket.connect();
-
-    socket.onConnect((_) {
-      print(' Connected to socket AllMessage provider');
-    });
-
-    socket.onDisconnect((_) {
-      print(' Disconnected from socket AllMessage');
-    });
-
-    socket.onConnectError((err) {
-      print(' Connect Error: $err');
-    });
-
-    socket.onError((err) {
-      print(' Socket Error: $err');
-    });
-
-    ///Listen to notifications messages
-
-    socket.on('allMessagesViewed', (data) {
-      print(' Received allMessagesViewed message: $data');
-      // fetchChatHistory();
-      final msg = types.TextMessage(
-        id: data['_id'] ?? const Uuid().v4(),
-        text: data['message'] ?? '',
-        author: types.User(id: data['senderId'] ?? 'unknown'),
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-      );
-
-      messages.insert(0, msg);
-    });
-  }
-
+  /// view all messages
   Future<void> fetchAllMessages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final reciverID = prefs.getString('userId');
@@ -172,6 +186,7 @@ class ProviderChatController extends GetxController {
     }
   }
 
+  /// chat list api
   Future<void> fetchChatHistory() async {
     if (user.value == null || receiverId.isEmpty) return;
 
@@ -236,7 +251,7 @@ class ProviderChatController extends GetxController {
     }
   }
 
-  // delete msg
+  /// delete msg
   Future<void> deleteMessage(String messageId, String userId) async {
     var headers = {'Content-Type': 'application/json'};
     var request = http.Request(
@@ -290,8 +305,8 @@ class ProviderChatController extends GetxController {
 
   void connectSocket() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? firstName = prefs.getString('firstName');
-    String? lastName = prefs.getString('lastName');
+    // String? firstName = prefs.getString('firstName');
+    // String? lastName = prefs.getString('lastName');
 
     if (user.value == null) return;
     socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
@@ -300,8 +315,8 @@ class ProviderChatController extends GetxController {
       'auth': {
         'user': {
           '_id': user.value!.id,
-          'firstName': firstName,
-          'lastName': lastName,
+          'firstName': firstName.value,
+          'lastName': lastName.value,
         },
       },
     });
@@ -310,6 +325,12 @@ class ProviderChatController extends GetxController {
 
     socket.onConnect((_) {
       print('✅ Connected to socket');
+
+      // final payload = {'receiver': receiverId.trim()};
+      // print('gggggggg:$receiverId');
+      //
+      // print('Emitting chatScreenActive payload provider: $payload');
+      // socket.emit('chatScreenActive', payload);
     });
 
     socket.onDisconnect((_) {
@@ -336,10 +357,43 @@ class ProviderChatController extends GetxController {
         text: data['message'] ?? '',
         author: types.User(id: data['senderId']),
         createdAt: DateTime.now().millisecondsSinceEpoch,
+        metadata: {
+          'viewall': false, // 👈 Add this!
+        },
       );
 
       messages.insert(0, msg);
     });
+    // socket.on('allMessagesViewed', (data) {
+    //   print('👀 Received allMessagesViewed: $data');
+    //   fetchAllMessages();
+    //
+    //   for (int i = 0; i < messages.length; i++) {
+    //     if (messages[i] is types.TextMessage &&
+    //         messages[i].author.id == user.value!.id) {
+    //       final oldMsg = messages[i] as types.TextMessage;
+    //
+    //       messages[i] = oldMsg.copyWith(
+    //         metadata: {...?oldMsg.metadata, 'viewall': true},
+    //       );
+    //     }
+    //   }
+    //   messages.refresh();
+    // });
+
+    // socket.on('chatScreenActive', (data) {
+    //   print('📩 Received chatScreenActive messagexyz: $data');
+    //   // Your method for booking data
+    //
+    //   final msg = types.TextMessage(
+    //     id: data['_id'] ?? const Uuid().v4(),
+    //     text: data['message'] ?? '',
+    //     author: types.User(id: data['senderId'] ?? 'unknown'),
+    //     createdAt: DateTime.now().millisecondsSinceEpoch,
+    //   );
+    //
+    //   messages.insert(0, msg);
+    // });
   }
 
   final RxString imagePath = ''.obs;

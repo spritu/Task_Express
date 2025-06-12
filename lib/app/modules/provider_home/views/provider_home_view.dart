@@ -1351,44 +1351,91 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                     borderRadius: BorderRadius.circular(12),
                     color: const Color(0xFFFCD8B7),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Obx(
-                        () => Text(
-                          "Hello ${controller.firstName.value}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            fontFamily: "Poppins",
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 2),
-                      RichText(
-                        text: TextSpan(
-                          style: const TextStyle(
-                            fontFamily: "Poppins",
-                            fontSize: 12,
-                            color: Colors.black54,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          children: [
-                            const TextSpan(text: "You’re "),
-                            const TextSpan(
-                              text: "Online",
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Obx(
+                            () => Text(
+                              "Hello ${controller.firstName.value}",
                               style: TextStyle(
-                                color: Colors.green,
                                 fontWeight: FontWeight.w500,
-                                fontFamily: "poppins",
-                                fontSize: 12,
+                                fontSize: 16,
+                                fontFamily: "Poppins",
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+
+                          const SizedBox(height: 2),
+                          RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontFamily: "Poppins",
+                                fontSize: 12,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              children: [
+                                TextSpan(text: "You’re "),
+                                TextSpan(
+                                  text: "Online",
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: "poppins",
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
+                      Obx(() {
+                        if (controller.bookingDataList.isEmpty) {
+                          return SizedBox(); // Return empty widget if no booking
+                        }
+                        return InkWell(
+                          onTap: () {
+                            Get.to(
+                              ActivejobScreenView(),
+                              arguments: {
+                                "bookingData": controller.bookingDataList,
+                                "dashboardData": controller.dashboardData,
+                                "pastbookings": controller.pastBookings,
+                                "firstName": controller.firstName,
+                              },
+                            );
+                          },
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Container(
+                              height: 28,
+                              width: 80,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Color(0xFFF67C0A),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "View Map", // or any text you want
+                                  style: TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ),
@@ -1580,7 +1627,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                                           width: 4,
                                                         ),
                                                         Text(
-                                                          serviceName,
+                                                          "Assigned for : $serviceName",
                                                           style:
                                                               const TextStyle(
                                                                 fontFamily:
@@ -1863,9 +1910,16 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                             border: Border.all(color: Colors.grey.shade300),
                           ),
                           child: Obx(() {
+                            int itemCount =
+                                controller.showAllPastBookings.value
+                                    ? controller.pastBookings.length
+                                    : controller.pastBookings.length > 3
+                                    ? 3
+                                    : controller.pastBookings.length;
+
                             return ListView.builder(
                               shrinkWrap: true,
-                              itemCount: controller.pastBookings.length,
+                              itemCount: itemCount,
                               physics: const BouncingScrollPhysics(),
                               itemBuilder: (context, index) {
                                 final booking = controller.pastBookings[index];
@@ -1914,35 +1968,41 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                         const SizedBox(height: 8),
 
                         // Round orange border button (no icon inside per image)
-                        InkWell(
-                          onTap: () {
-                            Get.to(ActivejobScreenView());
-                          },
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Container(
-                              height: 28,
-                              width: 80,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Color(0xFFF67C0A),
-                                  width: 1,
+                        Obx(() {
+                          if (controller.pastBookings.length <= 3) {
+                            return SizedBox();
+                          }
+                          return InkWell(
+                            onTap: () {
+                              controller.showAllPastBookings.value =
+                                  !controller.showAllPastBookings.value;
+                            },
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Container(
+                                height: 28,
+                                width: 80,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Color(0xFFF67C0A),
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "View More", // or any text you want
-                                  style: TextStyle(
-                                    fontFamily: "Poppins",
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
+                                child: Center(
+                                  child: Text(
+                                    "View More", // or any text you want
+                                    style: TextStyle(
+                                      fontFamily: "Poppins",
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
+                          );
+                        }),
                       ],
                     ),
                   ),
