@@ -126,9 +126,7 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 10),
-
                   // Rate & Review
                   Container(
                     height: 242,
@@ -159,8 +157,8 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                         ),
                         const SizedBox(height: 5),
                         Container(
-                          height: 55,
-                         // width: 273,
+                          height: 53,
+                          width: 273,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 5,
                             vertical: 3,
@@ -180,8 +178,8 @@ class ServiceCompletedView extends GetView<ServiceCompletedController> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                               Text(
-                                "How was your experience with ${booking['data']['bookedFor']['firstName']} ${booking['data']['bookedFor']['lastName']}?",
+                              const Text(
+                                "How was your experience with Suraj Sen?",
                                 style: TextStyle(
                                   fontFamily: "poppins",
                                   fontWeight: FontWeight.w400,
