@@ -100,32 +100,22 @@ class SignUpController extends GetxController {
   Future<void> registerUser() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // ✅ Get userId2 from OTP verification step
     String? userId2 = prefs.getString('userId');
+    if (userId2 == null || userId2.isEmpty) return;
 
-    if (userId2 == null || userId2.isEmpty) {
-     // Get.snackbar('Error', 'User ID not found. Please verify OTP again.');
-      return;
-    }
-
-    // ✅ Validate required fields (optional check)
-    if (firstName.value.isEmpty || lastName.value.isEmpty || gender.value.isEmpty || dateOfBirth.value.isEmpty || email.value.isEmpty) {
-    //  Get.snackbar('Error', 'Please fill all the fields');
-      return;
-    }
+    if (firstName.value.isEmpty || lastName.value.isEmpty || gender.value.isEmpty || dateOfBirth.value.isEmpty || email.value.isEmpty) return;
 
     var request = http.MultipartRequest(
       'POST',
       Uri.parse('https://jdapi.youthadda.co/user/register'),
     );
 
-    // ✅ Add form fields
     request.fields.addAll({
       '_id': userId2,
       'firstName': firstName.value,
       'lastName': lastName.value,
       'gender': gender.value,
-      'dateOfBirth': dateOfBirth.value, // Use format yyyy-mm-dd
+      'dateOfBirth': dateOfBirth.value,
       'email': email.value,
       'city': city.value,
       'pinCode': pinCode.value,
@@ -133,7 +123,6 @@ class SignUpController extends GetxController {
       'referralCode': referralCode.value,
     });
 
-    // ✅ Optional: Add image if exists
     if (imagePath.value.isNotEmpty && await File(imagePath.value).exists()) {
       request.files.add(await http.MultipartFile.fromPath('userImg', imagePath.value));
     } else {
@@ -141,9 +130,7 @@ class SignUpController extends GetxController {
     }
 
     try {
-      request.headers.addAll({
-        'Accept': 'application/json',
-      });
+      request.headers.addAll({'Accept': 'application/json'});
 
       print('📤 Sending request with fields: ${request.fields}');
       http.StreamedResponse response = await request.send();
@@ -153,63 +140,43 @@ class SignUpController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final decodedResponse = json.decode(resBody);
-        print('🔍 Decoded Response: $decodedResponse');
         final box = GetStorage();
         box.write('isLoggedIn', true);
-        final userData = decodedResponse['data'] ?? decodedResponse['user'] ?? decodedResponse;
-        final rawImg = userData?['userImg'] ?? '';
-        String finalImage = '';
 
-        if (rawImg.isNotEmpty) {
-          finalImage = rawImg.startsWith('http')
+        final userData = decodedResponse['data'] ?? {};
+        final rawImg = userData['userImg'] ?? '';
+        final token = decodedResponse['token'] ?? ''; // ✅ FIXED LINE
+
+        String finalImage = '';
+        if (rawImg != null && rawImg.toString().isNotEmpty) {
+          finalImage = rawImg.toString().startsWith('http')
               ? rawImg
               : 'https://jdapi.youthadda.co/$rawImg';
         }
 
-// Save using a consistent key like 'image'
         await prefs.setString('image', finalImage);
+        await prefs.setString('token', token); // ✅ SAVE TOKEN HERE
+        await prefs.setString('userId', userData['_id'] ?? '');
+        await prefs.setString('firstName', userData['firstName'] ?? '');
+        await prefs.setString('lastName', userData['lastName'] ?? '');
+        await prefs.setString('dob', userData['dateOfBirth'] ?? '');
+        await prefs.setString('email', userData['email'] ?? '');
+        await prefs.setString('gender', userData['gender'] ?? '');
+        await prefs.setString('userImg', rawImg.toString());
 
-        print("🖼️ Final User Image URL: $finalImage");
-        if (userData != null) {
-          await prefs.setString('userId', userData['_id'] ?? '');
-          await prefs.setString('firstName', userData['firstName'] ?? '');
-          await prefs.setString('lastName', userData['lastName'] ?? '');
-          await prefs.setString('dob', userData['dateOfBirth'] ?? '');
-          await prefs.setString('email', userData['email'] ?? '');
-          await prefs.setString('gender', userData['gender'] ?? '');
-          await prefs.setString('userImg', userData?['userImg'] ?? '');
+        print("✅ Token saved: $token");
+        print("✅ Image saved: $finalImage");
 
-          // Confirm
-          print("✅ Image saved to SharedPreferences: ${prefs.getString('image')}");
-
-          // if (userData['userImg'] != null) {
-          //   await prefs.setString('userImg', userData['userImg']);
-          // }
-
-          // Optional: Reset controllers
-          // Get.delete<AccountController>();
-          // Get.put(AccountController());
-          // Get.delete<EditProfileController>();
-          // Get.put(EditProfileController());
-
-        //  Get.snackbar('Success', 'Registration Successful');
-          clearFields();
-          final box = GetStorage();
-          box.write('isLoggedIn', true);
-          Get.to(() => LocationView());
-        } else {
-          print("❗ Missing 'data' in response");
-        //  Get.snackbar('Error', 'Invalid response from server.');
-        }
+        clearFields();
+        Get.to(() => LocationView());
       } else {
         print('❌ Server Error (${response.statusCode}): $resBody');
-       // Get.snackbar('Error', 'Server Error: ${response.statusCode}');
       }
     } catch (e) {
       print('❌ Exception: $e');
-     // Get.snackbar('Error', 'Something went wrong. Try again later.');
     }
   }
+
 
 
   //682189e078ab2a5c1939a503

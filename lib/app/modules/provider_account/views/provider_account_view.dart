@@ -17,6 +17,7 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
 
   @override
   Widget build(BuildContext context) {
+
     Get.put(ProviderAccountController()); Get.put(ProviderEditProfileController());
     return WillPopScope(
       onWillPop: () async {

@@ -87,46 +87,62 @@ class OtpController extends GetxController {
         final responseData = json.decode(response.body);
         print("✅ OTP Verified. Full Response:\n${jsonEncode(responseData)}");
 
-        // Extract userData
         final userData = responseData['userData'];
-        final userImg = userData?['userImg']?? ''; // from userData
         final token = responseData['token'] ?? '';
         final userId = responseData['id'].toString();
         final userType = responseData['userType'] ?? 0;
+        final userImg = userData?['userImg'] ?? '';
 
-        // Construct final image URL
+        // Set full image path
         String finalImage = '';
         if (userImg.isNotEmpty) {
-          finalImage = userImg.startsWith('http')
-              ? userImg
-              : 'https://jdapi.youthadda.co/$userImg';
+          finalImage = userImg.startsWith('http') ? userImg : 'https://jdapi.youthadda.co/$userImg';
         }
 
-        print("🖼️ Final User Image URL: $finalImage");
-
-        // Save to SharedPreferences
+        // Save basic info
         await prefs.setString('token', token);
         await prefs.setString('userId', userId);
         await prefs.setInt('userType', userType);
         await prefs.setString('image', finalImage);
+        await prefs.setString('userImg', userImg);
 
-        // Other user data
+        // Save profile info
         await prefs.setString('email', userData?['email'] ?? '');
         await prefs.setString('firstName', userData?['firstName'] ?? '');
         await prefs.setString('lastName', userData?['lastName'] ?? '');
         await prefs.setString('dob', userData?['dateOfBirth'] ?? '');
         await prefs.setString('gender', userData?['gender'] ?? '');
         await prefs.setString('mobile', userData?['phone'] ?? '');
-        await prefs.setString('userImg', userData?['userImg'] ?? '');
 
-        // Confirm
-        print("✅ Image Saved to SharedPreferences: ${prefs.getString('image')}");
+        // Save skills ONLY if userType == 2 (Service Provider)
+        if (userType == 2) {
+          final skills = userData['skills'];
+          if (skills != null && skills.isNotEmpty) {
+            final skill = skills[0];
+            final categoryName = skill['categoryId']?['name'] ?? '';
+            final subCategoryName = skill['sucategoryId']?['name'] ?? '';
+            final charge = skill['charge']?.toString() ?? '';
+            final spType = skill['categoryId']?['spType']?.toString() ?? '';
 
+            await prefs.setString('category', categoryName);
+            await prefs.setString('subCategory', subCategoryName);
+            await prefs.setString('charge', charge);
+            await prefs.setString('spType', spType);
+
+            print("✅ Skills saved: $categoryName → $subCategoryName | ₹$charge");
+          } else {
+            print("ℹ️ No skills found for this service provider.");
+          }
+        }
+
+        // Navigate
         otpController.clear();
-
         final box = GetStorage();
-        if ((userData?['email'] ?? '').isNotEmpty &&
-            (userData?['firstName'] ?? '').isNotEmpty) {
+
+        final isProfileComplete = (userData?['email'] ?? '').isNotEmpty &&
+            (userData?['firstName'] ?? '').isNotEmpty;
+
+        if (isProfileComplete) {
           box.write('isLoggedIn', true);
           Get.offAllNamed('/bottom');
         } else {
@@ -134,12 +150,14 @@ class OtpController extends GetxController {
           Get.offAll(() => SignUpView());
         }
       } else {
-        print("❌ OTP Verification Failed: ${response.body}");
+        print("❌ OTP verification failed: ${response.body}");
       }
     } catch (e) {
-      print("❌ Exception: $e");
+      print("❌ Exception during OTP verification: $e");
     }
   }
+
+
 
   // Future<void> verifyOtp(String otp) async {
   //   if (otp.isEmpty || otp.length != 4) return;

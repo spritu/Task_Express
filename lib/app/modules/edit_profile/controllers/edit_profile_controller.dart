@@ -114,14 +114,16 @@ class EditProfileController extends GetxController {
         await prefs.setString('email', emailController.text);
         await prefs.setString('gender', genderController.text);
         await prefs.setString('dob', dobController.text);
+        await prefs.setString('userImg', imagePath.value);
 
         if (imagePath.value.isNotEmpty) {
           if (imagePath.value.startsWith("http")) {
             await prefs.setString('userImg', imagePath.value);
           } else {
-            // For local path, you might want to upload first or handle differently.
-            // Here just save the local path temporarily.
-            await prefs.setString('userImg', imagePath.value);
+            // Convert local image to server URL if upload succeeds
+            final fileName = imagePath.value.split("/").last;
+            final uploadedUrl = 'https://jdapi.youthadda.co/uploads/$fileName';
+            await prefs.setString('userImg', uploadedUrl);
           }
         }
 

@@ -73,31 +73,42 @@ class AccountView extends GetView<AccountController> {
                                 //     },
                                 //   );
                                 // }),
-
                                 Obx(() {
-                          final controller = Get.find<ProviderEditProfileController>();
-                          final localImagePath = controller.selectedImagePath.value;
-                          final serverImageUrl = controller.imagePath.value;
+                                  final controller = Get.find<EditProfileController>();
+                                 // final localImagePath = controller.selectedImagePath.value;
+                                  final serverImageUrl = controller.imagePath.value;
 
-                          ImageProvider imageProvider;
+                                 // print("🧾 Local Image Path: $localImagePath");
+                                  print("🌐 Server Image URL: $serverImageUrl");
 
-                          if (localImagePath.isNotEmpty && File(localImagePath).existsSync()) {
-                          imageProvider = FileImage(File(localImagePath));
-                          } else if (serverImageUrl.isNotEmpty) {
-                          imageProvider = NetworkImage(serverImageUrl);
-                          } else {
-                          imageProvider = const AssetImage('assets/images/account.png');
-                          }
+                                  ImageProvider imageProvider;
 
-                          return CircleAvatar(
-                          radius: 40,
-                          backgroundImage: imageProvider,
-                          );
-                          }),
+                                  // if (localImagePath.isNotEmpty && File(localImagePath).existsSync()) {
+                                  //   imageProvider = FileImage(File(localImagePath));
+                                  // } else
+                                    if (serverImageUrl.isNotEmpty &&
+                                      (serverImageUrl.startsWith('http') || serverImageUrl.startsWith('https'))) {
+                                    imageProvider = NetworkImage(serverImageUrl);
+                                  } else {
+                                    imageProvider = const AssetImage('assets/images/account.png');
+                                  }
+
+                                  return CircleAvatar(
+                                    radius: 40,
+                                    backgroundColor: Colors.grey.shade200,
+                                    backgroundImage: imageProvider,
+                                    onBackgroundImageError: (exception, stackTrace) {
+                                      print("❌ Image loading error: $exception");
+                                    },
+                                  );
+                                }),
 
 
 
-                          Padding(
+
+
+
+                                Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8.0,
                                     vertical: 10,
@@ -153,20 +164,22 @@ class AccountView extends GetView<AccountController> {
                     ),
                     SizedBox(height: 20),
                     InkWell(
-    onTap: () async {
-      final prefs =
-      await SharedPreferences.getInstance();
-      final userId =
-          prefs.getString('user_id') ?? '';
+                      onTap: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        final userId = prefs.getString('user_id') ?? '';
+                        final mobile = prefs.getString('mobile') ?? '';
 
-      Get.to(
-            () => ProviderProfileView(),
-        arguments: {'userId': userId},
-      );
-    },
+                        Get.to(
+                              () => ProviderProfileView(),
+                          arguments: {
+                            'userId': userId,
+                            'mobile': mobile,
+                            'sp_type': 2,
+                          },
+                        );
+                      },
                       child: Card(
                         child: Container(
-                          // height: 80,
                           width: double.infinity,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
@@ -184,10 +197,7 @@ class AccountView extends GetView<AccountController> {
                                 ),
                                 SizedBox(width: 5),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                    vertical: 3,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3),
                                   child: Text(
                                     'Join as a Service provider',
                                     textAlign: TextAlign.center,
@@ -195,27 +205,28 @@ class AccountView extends GetView<AccountController> {
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w500,
                                       fontSize: 13,
-                                      height: 20 / 13, // line-height = 20px
-                                      letterSpacing: 0.06 * 13, // 6% of font-size = 0.78
+                                      height: 20 / 13,
+                                      letterSpacing: 0.06 * 13,
                                       color: AppColors.orage,
                                     ),
                                   ),
-
                                 ),
                                 Spacer(),
                                 InkWell(
                                   onTap: () async {
-                                    final prefs =
-                                    await SharedPreferences.getInstance();
-                                    final userId =
-                                        prefs.getString('user_id') ?? '';
+                                    final prefs = await SharedPreferences.getInstance();
+                                    final userId = prefs.getString('user_id') ?? '';
+                                    final mobile = prefs.getString('mobile') ?? '';
 
                                     Get.to(
                                           () => ProviderProfileView(),
-                                      arguments: {'userId': userId},
+                                      arguments: {
+                                        'userId': userId,
+                                        'mobile': mobile,
+                                        'sp_type': 2,
+                                      },
                                     );
                                   },
-
                                   child: Icon(
                                     Icons.arrow_forward_ios,
                                     size: 16,
@@ -228,6 +239,7 @@ class AccountView extends GetView<AccountController> {
                         ),
                       ),
                     ),
+
                     SizedBox(height: 20),
                     Card(
                       elevation: 2,

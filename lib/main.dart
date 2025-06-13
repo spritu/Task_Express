@@ -154,34 +154,40 @@ class _SplashScreenState extends State<SplashScreen> {
     final box = GetStorage();
     final isLoggedIn = box.read('isLoggedIn') ?? false;
     final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+    final userId = prefs.getString('userId');
     final isProfileCompleted = prefs.getBool('profileCompleted') ?? false;
 
-    final userId = prefs.getString('userId');
+    print('📦 isLoggedIn: $isLoggedIn');
+    print('📦 isLoggedIn2: $isLoggedIn2');
+    print('🆔 userId: $userId');
+    print('🔑 token: $token');
 
-    print('isLoggedIn: $isLoggedIn');
-    print('isLoggedIn2: $isLoggedIn2');
-    print('userId: $userId');
+    // First-run logic: clear storage
+    // final isFirstRun = prefs.getBool('isFirstRun') ?? true;
+    // if (isFirstRun) {
+    //   await box.erase();        // Clear GetStorage
+    //   await prefs.clear();      // Clear SharedPreferences
+    //   await prefs.setBool('isFirstRun', false); // Mark complete
+    // }
 
-    await Future.delayed(Duration(seconds: 1));
-    final isFirstRun = prefs.getBool('isFirstRun') ?? true;
+    await Future.delayed(Duration(seconds: 1)); // Splash screen delay
 
-    if (isFirstRun) {
-      final box = GetStorage();
-      await box.erase(); // ✅ Clear GetStorage on first launch
-      await prefs.clear(); // ✅ Clear SharedPreferences on first launch
-      await prefs.setBool('isFirstRun', false); // Mark first run done
-    }
-
-    if (isLoggedIn2) {
-      Get.offAllNamed('/bottom2'); //
-    } else if (isLoggedIn || userId != null) {
-      Get.offAllNamed('/bottom');
+    // ✅ Proceed only if token AND userId are valid
+    if (token != null && token.isNotEmpty && userId != null && userId.isNotEmpty) {
+      if (isLoggedIn2) {
+        Get.offAllNamed('/bottom2'); // Service provider flow
+      } else {
+        Get.offAllNamed('/bottom'); // Regular user flow
+      }
     } else {
+      // If token/userId not present, go through splash/login
       startSplashFlow();
     }
   }
+
 
   // void checkInitialFlow() async {
   //   final prefs = await SharedPreferences.getInstance();

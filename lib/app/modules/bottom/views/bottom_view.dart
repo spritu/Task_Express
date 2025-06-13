@@ -156,7 +156,7 @@ final bottomController = Get.put(BottomController());
 Widget _buildBody(int index, bool showRequestPending, String helperName) {
   switch (index) {
     case 0:
-      return const HomeView();
+      return  HomeView();
     case 1:
       bookingController.fetchCurrentBookings();
       return BookingView();
