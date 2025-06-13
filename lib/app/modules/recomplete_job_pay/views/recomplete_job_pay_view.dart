@@ -19,6 +19,7 @@ class RecompleteJobPayView extends GetView<RecompleteJobPayController> {
     final fullname = "$firstName $lastName";
     final userImg = paymentData['bookedFor']['userImg'];
     print("suv:${paymentData['jobStartTime']}");
+    print('rrrrr$firstName$lastName');
 
     Future<void> manageapi(String id) async {
       if (id.isEmpty) {

@@ -202,7 +202,7 @@ class Bottom2Controller extends GetxController {
 
   void connectSocketjobpay() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('userId');
+    String? userId = prefs.getString('userId')?.trim();
     String? firstName = prefs.getString('firstName');
     String? lastName = prefs.getString('lastName');
     print('jobpayprovider : ${userId} ${firstName} ${lastName}');
@@ -228,7 +228,7 @@ class Bottom2Controller extends GetxController {
     socket.connect();
 
     socket.onConnect((_) {
-      print('✅ Connected to socket55 Confirm payment listen');
+      print('✅ Connected to socket55 Confirm payment listen 136');
 
       // final payload = {'receiver': bookedFor.trim()};
       //

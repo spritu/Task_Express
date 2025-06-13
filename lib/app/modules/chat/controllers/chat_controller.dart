@@ -92,7 +92,11 @@ class ChatController extends GetxController {
     if (data != null) {
       receiverId = data['receiverId'] ?? '';
       receiverName.value = data['receiverName'] ?? 'No Name';
-      receiverImage.value = data['userImg'] ?? '';
+      final receiverImgPath = data['receiverImage'] ?? '';
+      receiverImage.value =
+          receiverImgPath.isNotEmpty
+              ? '$baseUrl$receiverImgPath'
+              : ''; // Avoid setting an invalid image URL
       // print('✅ Receiver ID: $receiverId');
       // print('✅ Receiver Name: $receiverName');
       // print('✅ Receiver Image: $receiverImage');

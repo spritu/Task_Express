@@ -79,8 +79,10 @@ class ProviderChatController extends GetxController {
       receiverId = data['receiverId'] ?? '';
       receiverName.value = data['receiverName'] ?? 'No Name';
       final receiverImgPath = data['receiverImage'] ?? '';
-      receiverImage.value = '$baseUrl$receiverImgPath';
-
+      receiverImage.value =
+          receiverImgPath.isNotEmpty
+              ? '$baseUrl$receiverImgPath'
+              : ''; // Avoid setting an invalid image URL
       print('✅ Receiver ID: $receiverId');
       print('✅ Receiver Name: $receiverName');
       print('✅ Receiver Image: $receiverImage');

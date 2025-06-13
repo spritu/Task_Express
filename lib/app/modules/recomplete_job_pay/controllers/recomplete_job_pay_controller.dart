@@ -147,7 +147,7 @@ class RecompleteJobPayController extends GetxController {
     );
 
     request.body = json.encode({
-      "bookingId": bookingId, // ✅ dynamic booking ID
+      "bookingId": bookingId, // dynamic booking ID
       "pay": pay,
     });
 
@@ -161,22 +161,21 @@ class RecompleteJobPayController extends GetxController {
         print('✅ Job closed successfully: $res');
 
         final jsonRes = json.decode(res);
-        final idsend = jsonRes['booking']?['bookedFor']?.toString() ?? '';
+        print('📦 bookingdddd: ${jsonRes['booking']}');
+        print("eeeeeeeee$jsonRes");
+        final idsend =
+            jsonRes['booking']?['bookedFor']?['_id']?.toString() ?? '';
         final firstName =
             jsonRes['booking']?['bookedFor']?['firstName']?.toString() ?? '';
         final lastName =
             jsonRes['booking']?['bookedFor']?['lastName']?.toString() ?? '';
 
-        print("gggggggggg $idsend $firstName $lastName");
+        print("gggggggggg $idsend $firstName$lastName");
 
         payController.clear();
 
-        connectSocketjobpay(
-          idsend,
-          firstName,
-          lastName,
-        ); // ✅ Callback if needed
-        Get.back(); // ✅ Close dialog or popup
+        connectSocketjobpay(idsend, firstName, lastName); // Callback if needed
+        Get.back(); // Close dialog or popup
       } else {
         print('❌ Server error: ${response.statusCode}');
         print(await response.stream.bytesToString());

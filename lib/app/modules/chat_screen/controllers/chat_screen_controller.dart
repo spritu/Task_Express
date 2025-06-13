@@ -103,6 +103,14 @@ class ChatScreenController extends GetxController {
           print(
             "viewallmessagexxxxx: $receiverId   unseenCount: ${item['unseenCount']}",
           );
+          final profilePic = item['profilePic'] ?? '';
+          print("🖼️ Profile Image Path xyzzzz: $profilePic");
+
+          final fullImageUrl =
+              profilePic.isNotEmpty
+                  ? 'https://jdapi.youthadda.co/$profilePic'
+                  : 'No image available';
+          print("🌐 Full Image URL: $fullImageUrl");
 
           final chatItem = ChatItem(
             message: lm?['message'] ?? 'No message',
@@ -110,7 +118,7 @@ class ChatScreenController extends GetxController {
             reciverId: item['receiverId'],
             firstName: item['firstName'] ?? 'N/A',
             lastName: item['lastName'] ?? 'N/A',
-            profilePic: item['profilePic'] ?? '',
+            profilePic: profilePic ?? '',
             isRead: (lm?['viewall']?.toString().toLowerCase() == 'true'),
             unreadCount: unreadCount,
             unredviewNotify: unredviewNotify,

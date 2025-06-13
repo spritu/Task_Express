@@ -124,69 +124,45 @@ class ProviderChatScreenView extends GetView<ProviderChatScreenController> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        // Profile Image
+                                        // Profile Image Widget inside your ListView or wherever you're showing the chat item
                                         Stack(
                                           children: [
                                             ClipRRect(
                                               borderRadius:
-                                                  BorderRadius.circular(25),
-                                              child:
-                                                  chat.profilePic.isNotEmpty
-                                                      ? Image.network(
-                                                        chat.profilePic,
-                                                        width: 50,
-                                                        height: 50,
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder:
-                                                            (
-                                                              context,
-                                                              error,
-                                                              stack,
-                                                            ) => Image.asset(
-                                                              "assets/images/account.png",
-                                                              width: 50,
-                                                              height: 50,
-                                                            ),
-                                                      )
-                                                      : Image.asset(
-                                                        "assets/images/account.png",
-                                                        width: 50,
-                                                        height: 50,
-                                                      ),
-                                            ),
+                                                  BorderRadius.circular(
+                                                    25,
+                                                  ), // round profile pic
+                                              child: Image.network(
+                                                //  If chat.profilePic is not empty, use full URL
+                                                chat.profilePic.isNotEmpty
+                                                    ? (chat.profilePic
+                                                            .startsWith('http')
+                                                        ? chat.profilePic
+                                                        : 'https://jdapi.youthadda.co/${chat.profilePic}')
+                                                    : 'https://jdapi.youthadda.co/invalid.jpg', // dummy fallback to trigger errorBuilder
 
-                                            // if (chat.unreadCount > 0)
-                                            //   Positioned(
-                                            //     right: 0,
-                                            //     top: 0,
-                                            //     child: Container(
-                                            //       padding: const EdgeInsets.all(
-                                            //         4,
-                                            //       ),
-                                            //       decoration: BoxDecoration(
-                                            //         color: Colors.red,
-                                            //         shape: BoxShape.circle,
-                                            //       ),
-                                            //       constraints:
-                                            //           const BoxConstraints(
-                                            //             minWidth: 20,
-                                            //             minHeight: 20,
-                                            //           ),
-                                            //       child: Center(
-                                            //         child: Text(
-                                            //           '${chat.unreadCount}',
-                                            //           style: const TextStyle(
-                                            //             color: Colors.white,
-                                            //             fontSize: 10,
-                                            //             fontWeight:
-                                            //                 FontWeight.bold,
-                                            //           ),
-                                            //         ),
-                                            //       ),
-                                            //     ),
-                                            //   ),
+                                                width: 50,
+                                                height: 50,
+                                                fit: BoxFit.cover,
+
+                                                // If image fails to load, show default asset
+                                                errorBuilder: (
+                                                  context,
+                                                  error,
+                                                  stackTrace,
+                                                ) {
+                                                  return Image.asset(
+                                                    "assets/images/account.png",
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                },
+                                              ),
+                                            ),
                                           ],
                                         ),
+
                                         const SizedBox(width: 12),
 
                                         // Chat Info

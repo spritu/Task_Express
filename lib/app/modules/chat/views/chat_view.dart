@@ -109,14 +109,17 @@ class ChatView extends GetView<ChatController> {
                     final name =
                         isSender ? "You" : controller.receiverName.value;
                     print('object121 ${controller.receiverImage.value}');
-                    final imageUrl =
-                        (isSender
-                                ? controller.user.value?.imageUrl
-                                : controller.receiverImage.value)
-                            ?.trim();
+                    final String imageUrl =
+                        isSender
+                            ? controller.user.value?.imageUrl ?? ''
+                            : controller.receiverImage.value;
+
+                    final bool isValidImageUrl =
+                        Uri.tryParse(imageUrl)?.isAbsolute == true &&
+                        imageUrl.toLowerCase().startsWith('http');
 
                     final ImageProvider displayImage =
-                        (imageUrl != null && imageUrl.isNotEmpty)
+                        isValidImageUrl
                             ? NetworkImage(imageUrl)
                             : const AssetImage('assets/images/account.png');
                     final time =

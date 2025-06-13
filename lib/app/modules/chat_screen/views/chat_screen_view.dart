@@ -121,33 +121,42 @@ class ChatScreenView extends GetView<ChatScreenController> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         // Profile Image
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            25,
-                                          ),
-                                          child:
-                                              chat.profilePic.isNotEmpty
-                                                  ? Image.network(
-                                                    chat.profilePic,
-                                                    width: 50,
-                                                    height: 50,
-                                                    fit: BoxFit.cover,
-                                                    errorBuilder:
-                                                        (
-                                                          context,
-                                                          error,
-                                                          stack,
-                                                        ) => Image.asset(
-                                                          "assets/images/account.png",
-                                                          width: 50,
-                                                          height: 50,
-                                                        ),
-                                                  )
-                                                  : Image.asset(
+                                        Stack(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                    25,
+                                                  ), // round profile pic
+                                              child: Image.network(
+                                                //  If chat.profilePic is not empty, use full URL
+                                                chat.profilePic.isNotEmpty
+                                                    ? (chat.profilePic
+                                                            .startsWith('http')
+                                                        ? chat.profilePic
+                                                        : 'https://jdapi.youthadda.co/${chat.profilePic}')
+                                                    : 'https://jdapi.youthadda.co/invalid.jpg', // dummy fallback to trigger errorBuilder
+
+                                                width: 50,
+                                                height: 50,
+                                                fit: BoxFit.cover,
+
+                                                // If image fails to load, show default asset
+                                                errorBuilder: (
+                                                  context,
+                                                  error,
+                                                  stackTrace,
+                                                ) {
+                                                  return Image.asset(
                                                     "assets/images/account.png",
                                                     width: 50,
                                                     height: 50,
-                                                  ),
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
                                         ),
 
                                         const SizedBox(width: 12),

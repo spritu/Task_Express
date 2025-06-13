@@ -164,13 +164,23 @@ class ProviderChatScreenController extends GetxController {
           print(
             "viewallmessage: $receiverId   unseenCount: ${item['unseenCount']}",
           );
+
+          final profilePic = item['profilePic'] ?? '';
+          print("🖼️ Profile Image Path xyzzzz: $profilePic");
+
+          final fullImageUrl =
+              profilePic.isNotEmpty
+                  ? 'https://jdapi.youthadda.co/$profilePic'
+                  : 'No image available';
+          print("🌐 Full Image URL: $fullImageUrl");
+
           final chatItem = ChatItem(
             message: lm?['message'] ?? 'No message',
             timestamp: lm?['timestamp'] ?? 'No timestamp',
             reciverId: item['receiverId'],
             firstName: item['firstName'] ?? 'N/A',
             lastName: item['lastName'] ?? 'N/A',
-            profilePic: item['profilePic'] ?? '',
+            profilePic: profilePic ?? '',
             isRead: (lm?['viewall']?.toString().toLowerCase() == 'true'),
             unreadCount: unreadCount,
             unredviewNotify: unredviewNotify,

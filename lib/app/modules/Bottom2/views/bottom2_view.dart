@@ -17,7 +17,7 @@ class Bottom2View extends GetView<Bottom2Controller> {
   const Bottom2View({super.key});
   @override
   Widget build(BuildContext context) {
-    Get.put(Bottom2Controller());
+    final bottom2Controller = Get.put(Bottom2Controller());
     final proChatScreenController = Get.put(ProviderChatScreenController());
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -33,6 +33,8 @@ class Bottom2View extends GetView<Bottom2Controller> {
               await bottom2Controller
                   .fetchNotificationsPro(); // Optional refresh
               bottom2Controller.hasUnreadNotifications.value = false;
+              // then mark seen
+
               // Hide red dot
               // Optionally call an API to mark all notifications as read
             }
