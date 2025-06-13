@@ -20,20 +20,26 @@ import '../../tile_fixing_helper/views/tile_fixing_helper_view.dart';
 
 class HomeController extends GetxController {
   // TODO: Implement WorknestController
+  bool isUserProfile = true; // default value
   final TextEditingController plumberController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   RxList<UserModel> usersByCategory = <UserModel>[].obs;
   RxList<CategoryModel> allCategories = <CategoryModel>[].obs;
   RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
   RxList<CategoryModel> fixedChargeHelpers = <CategoryModel>[].obs;
+
   var users = <UserModel>[].obs;
   final houseNo = Rx<String>('');var isLoading = false.obs;
-  final landMark = Rx<String>('');
+  final landMark = Rx<String>('');var skills = ''.obs;
+  var charge = ''.obs;
+
   final addressType = Rx<String>('');
-  final contactNo = Rx<String>('');
+  final contactNo = Rx<String>(''); RxBool canToggleAvailability = true.obs;
+  var isAvailable = false.obs; var firstName = ''.obs;
   final RxList<dynamic> searchResults = <dynamic>[].obs;
   RxBool isFirstFocused = false.obs;
-  FocusNode plumberFocusNode = FocusNode();
+  FocusNode plumberFocusNode = FocusNode();var userType = 0.obs;
+
   FocusNode nameFocusNode = FocusNode();
   bool isFirstActive = true;
   //RxList<Map<String, dynamic>> searchResults = <Map<String, dynamic>>[].obs;
@@ -513,11 +519,46 @@ class HomeController extends GetxController {
       },
     );
   }
+  Future<void> loadUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Basic details
+    userType.value = prefs.getInt('userType') ?? 0;
+    firstName.value = prefs.getString('firstName') ?? '';
+
+    // Raw skill & charge values
+    final skillJson = prefs.getString('skills');
+    charge.value = prefs.getString('charge') ?? '';
+
+    if (skillJson != null && skillJson.isNotEmpty) {
+      try {
+        final skillMap = jsonDecode(skillJson);
+
+        final categoryName = skillMap['categoryId']?['name'] ?? '';
+        final subCategoryName = skillMap['sucategoryId']?['name'] ?? '';
+        final parsedCharge = skillMap['charge']?.toString() ?? '';
+
+        skills.value = "$categoryName - $subCategoryName";
+        charge.value = parsedCharge;
+      } catch (e) {
+        print("❌ Error decoding skills JSON: $e");
+      }
+    }
+
+    // Debug print to confirm what is loaded
+    print("✅ Loaded from SharedPreferencesss:");
+    print("userType: ${userType.value}");
+    print("firstName: ${firstName.value}");
+    print("skills raw json: ${prefs.getString('skills')}");
+    print("skills parsed: ${skills.value}");
+    print("charge: ₹${charge.value}");
+  }
+
 
   @override
   void onInit() {
     fetchCategories();
-
+    loadUserInfo();
     if (Get.arguments?['refreshHome'] == true) {
       fetchAddress();
     }

@@ -1415,9 +1415,8 @@ class ProfessionalPlumberController extends GetxController
                           height: 42,
                           width: 176,
                           child: ElevatedButton(
-                            onPressed: () async {
-                              String serviceId =
-                                  skill['subcategoryId']?.toString() ??
+                            onPressed: () async {String serviceId =
+                                skill['subcategoryId']?.toString() ??
                                       skill['categoryId'].toString();
                               Navigator.pop(context);
                               await bookServiceProvider([serviceId]);
@@ -1444,54 +1443,24 @@ class ProfessionalPlumberController extends GetxController
                                     fontWeight: FontWeight.w500,
                                     fontFamily: "poppins",
                                     color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                                  ),),],),),),
                         const SizedBox(height: 16),
-                        SizedBox(
-                          height: 42,
-                          width: 176,
+                        SizedBox(height: 42, width: 176,
                           child: ElevatedButton(
                             onPressed: () => Navigator.pop(context),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                                borderRadius: BorderRadius.circular(8),),),
+                            child: const Row(mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.close,
-                                  color: Color(0xFF114BCA),
-                                  size: 18,
-                                ),
+                                Icon(Icons.close, color: Color(0xFF114BCA), size: 18,),
                                 SizedBox(width: 10),
                                 Text(
-                                  "No",
-                                  style: TextStyle(
-                                    fontSize: 12,
+                                  "No", style: TextStyle(fontSize: 12,
                                     fontWeight: FontWeight.w500,
-                                    fontFamily: "poppins",
-                                    color: Color(0xFF114BCA),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
+                                    fontFamily: "poppins", color: Color(0xFF114BCA),
+                                  ),),],),),),],),),],),),),);
       },
     );
   }

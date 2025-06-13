@@ -38,16 +38,12 @@ class AccountController extends GetxController {
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String? image = prefs.getString('image') ?? '';
-    if (image.isNotEmpty && !image.startsWith('http')) {
-      image = 'https://jdapi.youthadda.co/$image';
-    }
-    imagePath.value = image;
+
     firstName.value = prefs.getString('firstName') ?? '';
     lastName.value = prefs.getString('lastName') ?? '';
     mobileNumber.value = prefs.getString('mobileNumber') ?? '';
 
-    print("🖼️ Loaded image path: ${imagePath.value}");
+
   }
 
 
@@ -79,11 +75,12 @@ class AccountController extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     firstName.value = prefs.getString('firstName') ?? '';
     lastName.value = prefs.getString('lastName') ?? '';
-    imagePath.value = prefs.getString('userImg') ?? '';// ✅ Load image URL
-    print("👤 Loaded: $firstName $lastName, 📸 Image: ${imagePath.value}");
-    print("👤Loaded from SharedPreferences: $firstName $lastName");
-
+    imagePath.value = prefs.getString('userImg') ?? '';  // ✅ Load saved image URL
+   // selectedImagePath.value = ''; // Reset local image
+    print("👤 Loaded user: $firstName $lastName, Image: ${imagePath.value}");
   }
+
+
   @override
   void onReady() {
     super.onReady();

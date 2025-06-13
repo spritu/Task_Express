@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_switch/flutter_switch.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:worknest/colors.dart';
@@ -18,7 +19,13 @@ import '../controllers/home_controller.dart';
 import 'package:http/http.dart' as http;
 
 class HomeView extends GetView<HomeController> {
-  const HomeView({super.key});
+
+  const HomeView({Key? key}) : super(key: key);
+
+  // HomeView({ Key? key,
+  //    this.isUserProfile,
+  //    this.onToggle,
+  //  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -109,32 +116,6 @@ class HomeView extends GetView<HomeController> {
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.orage,),),],),
                             SizedBox(height: 20),
-                            // TextField(
-                            //   controller: controller.searchController,
-                            //   onChanged: (value) {
-                            //     if (value.isEmpty) {
-                            //       controller.searchResults.clear();
-                            //       FocusScope.of(context).unfocus();
-                            //       return;
-                            //     }
-                            //
-                            //     if (bottomController.authController.isLoggedIn.value) {
-                            //       controller.fetchServiceProviders(value);
-                            //     }
-                            //   },
-                            //   decoration: InputDecoration(
-                            //     prefixIcon: Icon(Icons.search,size: 24,),
-                            //     hintText: "Search for ‘Plumber’",
-                            //     isDense: true,hintStyle: TextStyle(fontSize: 12,fontWeight: FontWeight.w400,color: Color(0xff9B9999)),
-                            //     contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                            //     border: OutlineInputBorder(
-                            //       borderRadius: BorderRadius.circular(25),
-                            //       borderSide: BorderSide.none,
-                            //     ),
-                            //     filled: true,
-                            //     fillColor: Colors.white,
-                            //   ),
-                            // ),
                             Obx(() => Row(
                               children: [
                                 AnimatedContainer(
@@ -287,7 +268,164 @@ class HomeView extends GetView<HomeController> {
                               );
                             }),
 
+                            Obx(() => controller.userType.value == 2
+                                ? Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              color: const Color(0xFFEAF0FF),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // Left side
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        RichText(
+                                          text: TextSpan(
+                                            style: const TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black,
+                                            ),
+                                            children: [
+                                              TextSpan(
+                                                text: 'Hello ${controller.firstName.value}\n',
+                                              ),
+                                              TextSpan(
+                                                text: "You're ",
+                                                style: TextStyle(
+                                                  color: Colors.grey[600],
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                              const TextSpan(
+                                                text: 'Online',
+                                                style: TextStyle(
+                                                  color: Color(0xFFFF9900),
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.location_on, size: 20),
+                                            const SizedBox(width: 4),
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: const [
+                                                    Text(
+                                                      'Address',
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    Icon(Icons.keyboard_arrow_down, size: 16),
+                                                  ],
+                                                ),
+                                                Obx(() => Text(
+                                                  controller.landMark.value.isNotEmpty
+                                                      ? '${controller.houseNo.value} ${controller.landMark.value}'
+                                                      : "Fetching location..",
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 12,
+                                                    color: Colors.black54,
+                                                  ),
+                                                )),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
 
+                                    // Right side toggle
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: 48,
+                                          width: 120,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(14),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Row(
+                                              children: [
+                                                const Text(
+                                                  'User\nProfile',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                Obx(() => IgnorePointer(
+                                                  ignoring:
+                                                  !controller.canToggleAvailability.value,
+                                                  child: FlutterSwitch(
+                                                    width: 53.0,
+                                                    height: 26.18,
+                                                    toggleSize: 23.0,
+                                                    value: controller.isAvailable.value,
+                                                    borderRadius: 20.0,
+                                                    activeColor: const Color(0xff114BCA),
+                                                    inactiveColor: Colors.grey.shade400,
+                                                    toggleColor: Colors.white,
+                                                    padding: 1.0,
+                                                    onToggle: (val) {
+                                                      controller.isAvailable.value = val;
+
+                                                      if (val) {
+                                                        // navigate to bottom2
+                                                        Get.toNamed('/bottom2', arguments: {
+                                                          'firstName': controller.firstName.value,
+                                                          'houseNo': controller.houseNo.value,
+                                                          'landMark': controller.landMark.value,
+                                                          'skills': controller.skills.value,
+                                                          'charge': controller.charge.value,
+                                                        });
+                                                      }
+                                                    },
+                                                  ),
+                                                )),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        const Text(
+                                          'Service profile or User profile',
+                                          style: TextStyle(
+                                            fontSize: 9,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                                : const SizedBox.shrink())
 
 
 

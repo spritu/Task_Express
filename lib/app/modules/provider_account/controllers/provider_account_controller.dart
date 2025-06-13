@@ -204,6 +204,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     selectedSubCategoryName.value = prefs.getString('subCategory') ?? ''; // <- fixed key
     charge.value = prefs.getString('charge') ?? '';
     isLoading.value = false;
+    final args = Get.arguments;
 
 
     String rawImg = prefs.getString('userImg') ?? '';
