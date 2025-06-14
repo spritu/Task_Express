@@ -1025,7 +1025,34 @@ class ProviderProfileController extends GetxController {
       Get.snackbar('Error', 'Could not register. Check your internet connection.');
     }
   }
+  Future<void> _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    userType.value = prefs.getInt('userType') ?? 0;
+    firstName.value = prefs.getString('firstName') ?? '';
+    lastName.value = prefs.getString('lastName') ?? '';
+    mobileNumber = prefs.getString('mobileNumber') ?? '';
+    gender.value = prefs.getString('gender') ?? '';
+    dob.value = prefs.getString('dob') ?? '';
+    email.value = prefs.getString('email') ?? '';
+    city.value = prefs.getString('city') ?? '';
+    state.value = prefs.getString('state') ?? '';
+    referralCode.value = prefs.getString('referralCode') ?? '';
+    pinCode.value = prefs.getString('pinCode') ?? '';
+
+    // ✅ Debug prints — copy this block as-is:
+    print('🔑 Loaded userType: ${userType.value}');
+    print('👤 Loaded firstName: ${firstName.value}');
+    print('👤 Loaded lastName: ${lastName.value}');
+    print('📱 Loaded mobileNumber: ${mobileNumber}');
+    print('⚧️ Loaded gender: ${gender.value}');
+    print('🎂 Loaded dob: ${dob.value}');
+    print('📧 Loaded email: ${email.value}');
+    print('🏙️ Loaded city: ${city.value}');
+    print('🏞️ Loaded state: ${state.value}');
+    print('📌 Loaded pinCode: ${pinCode.value}');
+    print('🏷️ Loaded referralCode: ${referralCode.value}');
+  }
 
 
 
@@ -1046,7 +1073,7 @@ class ProviderProfileController extends GetxController {
     super.onInit();
     loadUserId();
     fetchCategories();
-
+    _loadUserData();
     final args = Get.arguments as Map<String, dynamic>? ?? {};
 
     firstName.value = args['firstName'] ?? '';
