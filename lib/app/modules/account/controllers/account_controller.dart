@@ -11,8 +11,8 @@ class AccountController extends GetxController {
   var firstName = ''.obs;
   var lastName = ''.obs;
   var email = ''.obs;
-  var gender = ''.obs;
-  var dob = ''.obs; var city = ''.obs;
+  var gender = ''.obs;  var state = ''.obs;var referralCode = ''.obs;
+  var dob = ''.obs; var city = ''.obs;var pinCode = ''.obs;
  // var imagePath = ''.obs;
   var userType = 0.obs;
 
@@ -49,10 +49,24 @@ class AccountController extends GetxController {
     dob.value = prefs.getString('dob') ?? '';
     email.value = prefs.getString('email') ?? '';
     city.value = prefs.getString('city') ?? '';
+    state.value = prefs.getString('state') ?? '';
+    referralCode.value = prefs.getString('referralCode') ?? '';
+    pinCode.value = prefs.getString('pinCode') ?? '';
 
-
-
+    // ✅ Debug prints — copy this block as-is:
+    print('🔑 Loaded userType: ${userType.value}');
+    print('👤 Loaded firstName: ${firstName.value}');
+    print('👤 Loaded lastName: ${lastName.value}');
+    print('📱 Loaded mobileNumber: ${mobileNumber.value}');
+    print('⚧️ Loaded gender: ${gender.value}');
+    print('🎂 Loaded dob: ${dob.value}');
+    print('📧 Loaded email: ${email.value}');
+    print('🏙️ Loaded city: ${city.value}');
+    print('🏞️ Loaded state: ${state.value}');
+    print('📌 Loaded pinCode: ${pinCode.value}');
+    print('🏷️ Loaded referralCode: ${referralCode.value}');
   }
+
 
 
   Future<void> logout() async {

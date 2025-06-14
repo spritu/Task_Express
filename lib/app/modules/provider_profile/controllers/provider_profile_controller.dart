@@ -870,7 +870,7 @@ class ProviderProfileController extends GetxController {
 
 
   Future<void> registerServiceProvider() async {
-    if (!validateFields()) return;
+    // if (!validateFields()) return;
 
     final prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
@@ -898,7 +898,7 @@ class ProviderProfileController extends GetxController {
 
     List<Map<String, dynamic>> skills = [skillData];
 
-    // Add form fields
+    // Add all fields
     request.fields.addAll({
       '_id': userId,
       'userType': '2',
@@ -917,11 +917,12 @@ class ProviderProfileController extends GetxController {
       'experience': selectedWorkExperience.value.replaceAll(RegExp(r'[^0-9]'), ''),
     });
 
+    // Optional fields
     if (selectedSubCategoryId.value.isNotEmpty) {
       request.fields['subcategoryId'] = selectedSubCategoryId.value;
     }
 
-    // ✅ Upload image if available
+    // ✅ Image upload
     if (imagePath.value.isNotEmpty && await File(imagePath.value).exists()) {
       request.files.add(await http.MultipartFile.fromPath('userImg', imagePath.value));
     } else {
@@ -935,24 +936,47 @@ class ProviderProfileController extends GetxController {
       if (streamed.statusCode == 200 || streamed.statusCode == 201) {
         final jsonRes = json.decode(body);
         print('✅ JSON Response: $jsonRes');
-        final token = jsonRes['token'] ?? ''; // ✅ FIXED LINE
-        // 🔸 Extract and build image URL
-        final rawImg = jsonRes['userImg'] ?? '';
+
+        final box = GetStorage();
+        box.remove('isLoggedIn');
+        box.write('isLoggedIn2', true);
+
+        final message = jsonRes['msg'] ?? 'Service provider registered';
+        Get.snackbar('Success', message);
+
+        final userData = jsonRes['data'] ?? jsonRes['user'] ?? jsonRes;
+        print("👀 userData: $userData");
+
+        // ✅ Extract image from response
+        String rawImg = userData?['userImg'] ?? '';
         String finalImage = '';
         if (rawImg.isNotEmpty) {
-          finalImage = rawImg.startsWith('http')
-              ? rawImg
-              : 'https://jdapi.youthadda.co/$rawImg';
+          if (rawImg.startsWith('http') || rawImg.startsWith('/data')) {
+            finalImage = rawImg;
+          } else {
+            finalImage = 'https://jdapi.youthadda.co/$rawImg';
+          }
+        } else {
+          // Fallback to uploaded image path
+          finalImage = imagePath.value;
         }
 
-        // ✅ Save image to reactive var and SharedPreferences
-        if (finalImage.isNotEmpty) {
-          imagePath.value = finalImage;
-          await prefs.setString('userImg', finalImage);
-          print("✅ Final image used and saved: $finalImage");
+        // ✅ Extract token from response
+        String token = jsonRes['token'] ?? '';
+
+        // ✅ Save to reactive var + prefs
+        imagePath.value = finalImage;
+        await prefs.setString('image', finalImage);
+        print("✅ Final image saved: $finalImage");
+
+        if (token.isNotEmpty) {
+          await prefs.setString('token', token);
+          print("✅ Token saved to SharedPreferences: $token");
+        } else {
+          print("⚠️ No token received in response.");
         }
-        // 🔸 Save all other user data
-        await prefs.setString('token', token); // ✅ SAVE TOKEN HERE
+
+        // 🔸 Save other data
         await prefs.setString('categoryId', selectedCategoryId.value);
         await prefs.setString('category', selectedCategoryName.value);
         await prefs.setString('subCategory', selectedSubCategoryName.value);
@@ -970,17 +994,23 @@ class ProviderProfileController extends GetxController {
         await prefs.setString('aadharNo', aadharNo.text);
         await prefs.setString('charge', chargesController.text);
 
+        print("✅ All user data saved to SharedPreferences");
         await prefs.reload();
 
-        // 🔐 Login state (reset old one, mark new)
-        final box = GetStorage();
+        // Clear old login flag & set new one
         box.remove('isLoggedIn');
         box.write('isLoggedIn2', true);
 
-        Get.snackbar('Success', jsonRes['msg'] ?? 'Service provider registered');
         clearFields();
 
-        Get.to(() => ProviderLocationView());
+        // ✅ Navigate and pass latest image
+        Get.to(
+              () => ProviderLocationView(),
+          arguments: {
+            'imagePath': imagePath.value,
+            // aur bhi arguments yaha bhej sakte ho if needed
+          },
+        );
       } else {
         print('❌ ${streamed.statusCode}: $body');
         try {
@@ -996,145 +1026,9 @@ class ProviderProfileController extends GetxController {
     }
   }
 
-//   Future<void> registerServiceProvider() async {
-//     if (!validateFields()) return;
-//
-//         final prefs = await SharedPreferences.getInstance();
-//     String? userId = prefs.getString('userId');
-//
-//
-//     if (userId == null || userId.isEmpty) {
-//       Get.snackbar('Error', 'User ID not found. Please verify OTP again.');
-//       return;
-//     }
-//
-//     mobileNumber = prefs.getString('mobileNumber');
-//
-//     final request = http.MultipartRequest(
-//       'POST',
-//       Uri.parse('https://jdapi.youthadda.co/user/serviceproviderregister'),
-//     );
-//
-//     // Prepare skill JSON
-//     Map<String, dynamic> skillData = {
-//       "categoryId": selectedCategoryId.value,
-//       "charge": chargesController.text,
-//     };
-//     if (selectedSubCategoryId.value.isNotEmpty) {
-//       skillData["sucategoryId"] = selectedSubCategoryId.value;
-//     }
-//
-//     List<Map<String, dynamic>> skills = [skillData];
-//
-//     // Add all fields
-//     request.fields.addAll({
-//       '_id': userId,
-//       'userType': '2',
-//       'firstName': firstName.value,
-//       'lastName': lastName.value,
-//       'gender': gender.value,
-//       'dateOfBirth': dateOfBirth.value,
-//       'email': email.value,
-//       'phone': mobileNumber.toString(),
-//       'city': city.value,
-//       'pinCode': pinCode.value,
-//       'state': state.value,
-//       'referralCode': referralCode.value,
-//       'skills': jsonEncode(skills),
-//       'aadharNo': aadharNo.text,
-//       'experience': selectedWorkExperience.value.replaceAll(
-//           RegExp(r'[^0-9]'), ''),
-//     });
-//
-//     // Optional fields
-//     if (selectedSubCategoryId.value.isNotEmpty) {
-//       request.fields['subcategoryId'] = selectedSubCategoryId.value;
-//     }
-//
-//     // ✅ Image upload
-//     if (imagePath.value.isNotEmpty && await File(imagePath.value).exists()) {
-//       request.files.add(await http.MultipartFile.fromPath('userImg', imagePath.value));
-//     } else {
-//       print('⚠️ Skipping image upload: No image selected or file not found.');
-//     }
-//
-//     try {
-//       final streamed = await request.send();
-//       final body = await streamed.stream.bytesToString();
-//
-//       if (streamed.statusCode == 200 || streamed.statusCode == 201) {
-//                 final jsonRes = json.decode(body);
-//         print('✅ JSON Response: $jsonRes');
-//
-//         final box = GetStorage();
-//         box.remove('isLoggedIn');
-//         box.write('isLoggedIn2', true);
-//         final message = jsonRes['msg'] ?? 'Service provider registered';
-//         Get.snackbar('Success', message);
-//                 final rawImg = jsonRes?['userImg'] ?? '';
-//                 String finalImage = '';
-//
-//                 if (rawImg.isNotEmpty) {
-//                   finalImage = rawImg.startsWith('http')
-//                       ? rawImg
-//                       : 'https://jdapi.youthadda.co/$rawImg';
-//                 }
-//
-// // Save using a consistent key like 'image'
-//         await prefs.setString('image', finalImage);
-//
-//         print("🖼️ Final User Image URL: $finalImage");
-//
-// // ✅ Save to reactive var + prefs
-//         imagePath.value = finalImage;
-//         await prefs.setString('image', finalImage);
-//
-//         print("✅ Final image used and saved: $finalImage");
-//
-//
-//                 // 🔸 Save required data to SharedPreferences
-//         await prefs.setString('categoryId', selectedCategoryId.value);
-//         await prefs.setString('category', selectedCategoryName.value);
-//         await prefs.setString('subCategory', selectedSubCategoryName.value); // ✅ fixed
-//         await prefs.setString('firstName', firstName.value);
-//         await prefs.setString('lastName', lastName.value);
-//         await prefs.setString('profession', selectedProfession.value);
-//         await prefs.setString('gender', gender.value);
-//         await prefs.setString('dob', dateOfBirth.value);
-//         await prefs.setString('email', email.value);
-//         await prefs.setString('mobile', mobileNumber!);
-//         await prefs.setString('city', city.value);
-//         await prefs.setString('pinCode', pinCode.value);
-//         await prefs.setString('state', state.value);
-//         await prefs.setString('referralCode', referralCode.value);
-//         await prefs.setString('aadharNo', aadharNo.text);
-//         await prefs.setString('charge', chargesController.text);
-//         await prefs.setString('userImg', jsonRes?['userImg'] ?? '');
-//
-//         // Confirm
-//         print("✅ Image saved to SharedPreferencessss: ${prefs.getString('image')}");
-//         await prefs.reload();
-//
-//        // final accountController = Get.find<ProviderAccountController>();
-//        // await accountController.loadUserInfo();
-//        // await accountController.loadMobileNumber();
-//
-//         clearFields();
-//         Get.to(() => ProviderLocationView());
-//       } else {
-//         print('❌ ${streamed.statusCode}: $body');
-//         try {
-//           final error = json.decode(body);
-//           Get.snackbar('Error', error['msg'] ?? 'Something went wrong.');
-//         } catch (_) {
-//           Get.snackbar('Error', 'Server returned ${streamed.statusCode}');
-//         }
-//       }
-//     } catch (e) {
-//       print('❗ Exception: $e');
-//       Get.snackbar('Error', 'Could not register. Check your internet connection.');
-//     }
-//   }
+
+
+
 
   Future<String> _getUserIdFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
@@ -1151,14 +1045,10 @@ class ProviderProfileController extends GetxController {
   void onInit() {
     super.onInit();
     loadUserId();
-
-    firstNameController.text = firstName.value;
     fetchCategories();
-    final args = Get.arguments as Map<String, dynamic>? ?? {};
-    gender.value = args['gender'] ?? '';
 
-    // ✅ text field bhi fill karo agar hai
-    genderController.text = gender.value;
+    final args = Get.arguments as Map<String, dynamic>? ?? {};
+
     firstName.value = args['firstName'] ?? '';
     lastName.value = args['lastName'] ?? '';
     email.value = args['email'] ?? '';
@@ -1166,15 +1056,13 @@ class ProviderProfileController extends GetxController {
     dob.value = args['dob'] ?? '';
     state.value = args['state'] ?? '';
     city.value = args['city'] ?? '';
-    pinCode.value = args['pinCode'] ?? '';
-    referralCode.value = args['referralCode'] ?? '';
+    pinCode.value = args['pinCode']?.toString() ?? '';
+    referralCode.value = args['referralCode']?.toString() ?? '';
     mobile.value = args['mobile'] ?? '';
     userType.value = args['userType'] ?? 0;
     imagePath.value = args['imagePath'] ?? '';
-    dob.value = args['dob'] ?? '';
-    dobController.text = dob.value;
- imagePath.value = args['imagePath'] ?? '';
-    // Fill text controllers
+
+    // Sync text controllers
     firstNameController.text = firstName.value;
     lastNameController.text = lastName.value;
     emailController.text = email.value;
@@ -1186,7 +1074,10 @@ class ProviderProfileController extends GetxController {
     referralCodeController.text = referralCode.value;
     mobileController.text = mobile.value;
 
+    print('✅ Loaded args: $args');
+    print('✅ Image path: ${imagePath.value}');
   }
+
 
   @override
   void onClose() {

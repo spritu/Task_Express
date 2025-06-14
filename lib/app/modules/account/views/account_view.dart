@@ -182,6 +182,9 @@ class AccountView extends GetView<AccountController> {
                             'city':controller.city.value,
                             'userType': controller.userType.value,
                             'imagePath': controller.imagePath.value,
+                            'state':controller.state.value,
+                            'pinCode':controller.referralCode.value,
+                            'referralCode':controller.referralCode.value,
                             'sp_type': 2, // hardcoded as you did before
                           };
 
