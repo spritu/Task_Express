@@ -563,7 +563,7 @@ class ProviderProfileController extends GetxController {
   var subCategories = <SubCategory>[].obs;
   final selectedCategoryId = ''.obs;
   final firstName = ''.obs;
- // final firstName = ''.obs;
+  // final firstName = ''.obs;
   final lastName = ''.obs;
   final email = ''.obs;
   final mobile = ''.obs;
@@ -578,7 +578,7 @@ class ProviderProfileController extends GetxController {
   //final firstNameController = TextEditingController();
   final selectedCategoryIds = <String>[].obs;
   final TextEditingController chargesController = TextEditingController();
- // var imagePath = ''.obs;
+  // var imagePath = ''.obs;
   var filteredSubCategories = <SubCategory>[].obs;
   var selectedSubCategoryId = ''.obs;
   final isCategoryLoading = false.obs;
@@ -757,7 +757,7 @@ class ProviderProfileController extends GetxController {
   final state = ''.obs;
   final referralCode = ''.obs;
   var selectedWorkExperience = "".obs;
- // final RxString imagePath = ''.obs;
+  // final RxString imagePath = ''.obs;
   final ImagePicker _picker = ImagePicker();
   RxString selectedCity = ''.obs;
 
@@ -866,7 +866,7 @@ class ProviderProfileController extends GetxController {
     state.value = '';
     referralCode.value = '';
   }
-   String? mobileNumber;
+  String? mobileNumber;
 
 
   Future<void> registerServiceProvider() async {

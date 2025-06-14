@@ -411,8 +411,7 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                                   ),
                                 ],
                               ),
-                              Text("Category: $categoryName"),
-                              Text("Subcategory: $subcategoryName"),
+                             
                             ],
                           ),
                         ),

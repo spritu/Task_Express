@@ -35,22 +35,16 @@ class ChatView extends GetView<ChatController> {
           onPressed: () => Get.back(),
         ),
         titleSpacing: 0, //
-        title: Obx(
-          () => Row(
+        title: Obx(() => Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
+            children: [Text(
                 "Chat with ${controller.receiverName.value}",
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   fontFamily: "poppins",
-                ),
-              ),
-
-              Row(
-                children: [
-                  InkWell(
+                ),),
+              Row(children: [InkWell(
                     onTap: () {
                       Get.to(UserHelpView());
                     },
@@ -71,9 +65,11 @@ class ChatView extends GetView<ChatController> {
                           // Get arguments passed from previous screen
                           final Map<String, dynamic> data = Get.arguments ?? {};
                           final phoneNumber = data['phoneNumber'] ?? '';
-
+print("phone:$phoneNumber");
                           if (phoneNumber.isNotEmpty) {
-                            controller.makePhoneCall(phoneNumber);
+                            controller.makePhoneCall(
+                              phoneNumber,
+                            );
                           } else {
                             // Get.snackbar(
                             //   'Error',
@@ -100,10 +96,8 @@ class ChatView extends GetView<ChatController> {
         decoration: BoxDecoration(color: Color(0xFFAEC6F9)),
         child: Column(
           children: [
-            Expanded(
-              child: Obx(() {
-                final messages = controller.messages;
-                return ListView.builder(
+            Expanded(child: Obx(() {
+                final messages = controller.messages;return ListView.builder(
                   reverse: true,
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
@@ -141,11 +135,7 @@ class ChatView extends GetView<ChatController> {
                           horizontal: 10,
                           vertical: 4,
                         ),
-                        child: _buildMessageBubble(
-                          context: context,
-                          isSender: isSender,
-                          name: name,
-                          message: msg.text,
+                        child: _buildMessageBubble(context: context, isSender: isSender, name: name, message: msg.text,
                           time: time,
                           imageUrl: displayImage,
                           isRead: isRead,
@@ -236,7 +226,7 @@ class ChatView extends GetView<ChatController> {
                       child: Text(
                         'Are you satisfied with this conversation?',
                         style: TextStyle(
-                          fontSize: 10,
+                         fontSize: 10,
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w500,
                           color: Colors.black87,
@@ -245,31 +235,49 @@ class ChatView extends GetView<ChatController> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        final professionalPlumberController = Get.put(
-                          ProfessionalPlumberController(),
-                        );
-                        final name = professionalPlumberController.name.value;
-                        final imageUrl =
-                            professionalPlumberController.imageUrl.value;
-                        final experience =
-                            professionalPlumberController.experience;
-                        final phone = professionalPlumberController.phone;
-                        final userId = professionalPlumberController.userId;
-                        final skills = professionalPlumberController.skills;
-                        print("rrrrrrrrr:$name");
+                        // ✅ Put the ProfessionalPlumberController (if not already)
+                        Get.put(ProfessionalPlumberController());
 
-                        // controller.showAfterCallSheet(
-                        //   name: controller.receiverName,
-                        //   imageUrl: controller.receiverImage,
-                        //   userId: controller.receiverId,
-                        // );
+                        // ✅ Get the last called user from your main controller
+                        final user = controller.lastCalledUser.value;
+
+                        // ✅ Also get any passed arguments (example: phoneNumber)
+                        final Map<String, dynamic> data = Get.arguments ?? {};
+                        final phoneNumber = data['phoneNumber'] ?? '';
+
+                        // ✅ Extract required user fields safely
+                        final name = "${user['firstName'] ?? ''} ${user['lastName'] ?? ''}".trim();
+                        final imageUrl = user['userImg'] ?? '';
+                        final experience = "${user['expiresAt'] ?? '0'} year Experience";
+                        final userId = user['_id']?.toString() ?? '';
+
+                        // ✅ Extract skills as list of maps
+                        final List<Map<String, dynamic>> skills =
+                            (user['skills'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+
+                        // ✅ Debug prints
+                        print("🟢 Bottom sheet will open with:");
+                        print("Name: $name");
+                        print("Image URL: $imageUrl");
+                        print("Experience: $experience");
+                        print("Phone Number (from arguments): $phoneNumber");
+                        print("User ID: $userId");
+                        print("Skills: ${skills.map((e) => e.toString()).toList()}");
+
+                        // ✅ Call your custom bottom sheet method with these details
+                        controller.showAfterCallSheet(
+                          Get.context!,
+                          name: name,
+                          imageUrl: imageUrl,
+                          experience: experience,
+                          phone: phoneNumber,
+                          userId: userId,
+                          skills: skills,
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.blue,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -284,6 +292,8 @@ class ChatView extends GetView<ChatController> {
                         ),
                       ),
                     ),
+
+
                   ],
                 ),
               ),

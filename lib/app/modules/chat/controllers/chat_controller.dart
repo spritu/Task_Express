@@ -20,7 +20,20 @@ late ChatScreenController chatScreenController = Get.put(
   ChatScreenController(),
 );
 
-class ChatController extends GetxController {
+class ChatController extends GetxController  with WidgetsBindingObserver{
+  final RxMap<String, dynamic> lastCalledUser = <String, dynamic>{}.obs;
+
+  final categories = <Map<String, dynamic>>[].obs; // API se loaded
+
+  var helperName = ''.obs;
+  final RxString bookedBy = ''.obs;
+  final RxString bookedFor = ''.obs;
+  var showRequestPending = false.obs;
+  var workers = <Map<String, dynamic>>[].obs;
+  var bookingData = {}.obs;
+
+
+  Map<String, dynamic>? selectedUser;
   final RxList<types.Message> messages = <types.Message>[].obs;
   final Rxn<types.User> user = Rxn<types.User>();
   final RxBool isInitialized = false.obs;
@@ -50,7 +63,7 @@ class ChatController extends GetxController {
     super.onInit();
     initializeChat();
     markAllAsSeen();
-    // connectSocketAllMessage();
+    WidgetsBinding.instance.addObserver(this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       messages.refresh();
@@ -361,20 +374,15 @@ class ChatController extends GetxController {
       print("⚠️ Error deleting message: $e");
     }
   }
-
   void makePhoneCall(String phoneNumber) async {
-    final Uri url = Uri(scheme: 'tel', path: phoneNumber);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
+    final Uri callUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(callUri)) {
+    //  shouldShowSheetAfterCall = true;
+      await launchUrl(callUri);
     } else {
-      // Get.snackbar(
-      //   'Error',
-      //   'Could not launch phone dialer',
-      //   snackPosition: SnackPosition.BOTTOM,
-      // );
+      Get.snackbar('Error', 'Could not launch phone call');
     }
   }
-
   void connectSocket() {
     if (user.value == null) return;
     socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
@@ -518,11 +526,7 @@ class ChatController extends GetxController {
     super.onClose();
   }
 
-  var helperName = ''.obs;
-  final RxString bookedBy = ''.obs;
-  final RxString bookedFor = ''.obs;
-  var showRequestPending = false.obs;
-  var bookingData = {}.obs;
+
 
   Future<void> bookServiceProvider({
     required String bookedFor,
