@@ -41,6 +41,31 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
           // List of worker(s)
           Expanded(child: ListView.builder(itemCount: dataList.length, itemBuilder: (context, index) {
                 final worker = dataList[index];
+                final skills = worker['skills'] as List? ?? [];
+                Map<String, dynamic> skill = {};
+                if (skills.isNotEmpty) {
+                  skill = skills.first;
+                }
+
+                final allCategories = controller.categories;
+
+                String categoryName = '';
+                String subcategoryName = '';
+
+                if (skill.isNotEmpty) {
+                  final match = allCategories.firstWhere(
+                        (cat) => cat['_id'] == skill['categoryId'],
+                    orElse: () => {},
+                  );
+                  categoryName = match['categoryName'] ?? '';
+
+                  final subMatch = allCategories.firstWhere(
+                        (cat) => cat['_id'] == skill['subcategoryId'],
+                    orElse: () => {},
+                  );
+                  subcategoryName = subMatch['subcategoryName'] ?? '';
+                }
+
                 final charge = worker['skills'] != null && worker['skills'].isNotEmpty
                         ? worker['skills'][0]['charge'].toString()
                         : 0;
@@ -213,4 +238,5 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
                                             fontWeight: FontWeight.w500,
                                             fontFamily: "poppins",
                                             color: Colors.white,
-                                          ),),),),),],),],),),],),),);},),),],),);}}
+                                          ),),),),),],), Text("Category: $categoryName"),
+                              Text("Subcategory: $subcategoryName"),],),),],),),);},),),],),);}}

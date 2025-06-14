@@ -268,12 +268,14 @@ import 'package:uuid/uuid.dart';
 
 class ProviderHomeController extends GetxController {
   RxBool isAvailable2 = false.obs;
-
+  final houseNo = Rx<String>('');var isLoading = false.obs;
+  final landMark = Rx<String>('');var skills = ''.obs;
+  var charge = ''.obs;
   var firstName = ''.obs;
   var lastName = ''.obs;
   var userId = ''.obs;
   var imagePath = ''.obs;
-  var isLoading = false.obs;
+
   var bookingDataList = <Map<String, dynamic>>[].obs;
   var DataList = <Map<String, dynamic>>[].obs;
   final RxList<types.Message> messages = <types.Message>[].obs;

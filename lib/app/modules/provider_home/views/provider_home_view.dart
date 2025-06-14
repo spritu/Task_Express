@@ -1293,7 +1293,7 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Text(
-                                  "Service\n Profile",
+                                  "User\n Profile",
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -1310,9 +1310,21 @@ class ProviderHomeView extends GetView<ProviderHomeController> {
                                     activeColor: Colors.orange,
                                     inactiveColor: Colors.grey.shade400,
                                     padding: 1.0,
-                                    onToggle: (val) {
-                                      controller.isServiceProfile.value = val;
-                                    },
+                                      onToggle: (val) async {
+                                        if (val) {
+                                          await Get.toNamed('/bottom', arguments: {
+                                            'firstName': controller.firstName.value,
+                                            'houseNo': controller.houseNo.value,
+                                            'landMark': controller.landMark.value,
+                                            'skills': controller.skills.value,
+                                            'charge': controller.charge.value,
+                                          });
+
+                                          // Always reset to OFF
+                                          controller.isAvailable.value = false;
+                                        }
+                                      }
+
                                   ),
                                 ),
                               ],

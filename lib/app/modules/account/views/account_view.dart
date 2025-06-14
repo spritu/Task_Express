@@ -46,6 +46,7 @@ class AccountView extends GetView<AccountController> {
                       ),
                     ),
                     SizedBox(height: 20),
+
                     InkWell(onTap: (){
                       Get.to(EditProfileView());
                     },
@@ -102,12 +103,6 @@ class AccountView extends GetView<AccountController> {
                                     },
                                   );
                                 }),
-
-
-
-
-
-
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8.0,
@@ -163,82 +158,115 @@ class AccountView extends GetView<AccountController> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    InkWell(
-                      onTap: () async {
-                        final prefs = await SharedPreferences.getInstance();
-                        final userId = prefs.getString('user_id') ?? '';
-                        final mobile = prefs.getString('mobile') ?? '';
+                    Obx(() {
+                      final userType = controller.userType.value;
+                      print("🔑 Current userType: $userType");
 
-                        Get.to(
-                              () => ProviderProfileView(),
-                          arguments: {
+                      if (userType != 3) {
+                        return SizedBox();
+                      }
+
+                      return InkWell(
+                        onTap: () async {
+                          final prefs = await SharedPreferences.getInstance();
+                          final userId = prefs.getString('user_id') ?? '';
+                          final mobile = prefs.getString('mobile') ?? '';
+
+                          // ✅ Full user data map
+                          final Map<String, dynamic> userData = {
                             'userId': userId,
                             'mobile': mobile,
-                            'sp_type': 2,
-                          },
-                        );
-                      },
-                      child: Card(
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14),
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  "assets/images/service_provider.png",
-                                  color: AppColors.orage,
-                                  height: 20,
-                                  width: 20,
-                                ),
-                                SizedBox(width: 5),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3),
-                                  child: Text(
-                                    'Join as a Service provider',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 13,
-                                      height: 20 / 13,
-                                      letterSpacing: 0.06 * 13,
+                            'firstName': controller.firstName.value,
+                            'lastName': controller.lastName.value,
+                            'email': controller.email.value,
+                            'city':controller.city.value,
+                            'userType': controller.userType.value,
+                            'imagePath': controller.imagePath.value,
+                            'sp_type': 2, // hardcoded as you did before
+                          };
+
+                          print("📦 Navigating with: $userData");
+
+                          Get.to(
+                                () => ProviderProfileView(),
+                            arguments: userData,
+                          );
+                        },
+                        child: Card(
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14),
+                              child: Row(
+                                children: [
+                                  Image.asset(
+                                    "assets/images/service_provider.png",
+                                    color: AppColors.orage,
+                                    height: 20,
+                                    width: 20,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3),
+                                    child: Text(
+                                      'Join as a Service provider',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13,
+                                        height: 20 / 13,
+                                        letterSpacing: 0.06 * 13,
+                                        color: AppColors.orage,
+                                      ),
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  InkWell(
+                                    onTap: () async {
+                                      final prefs = await SharedPreferences.getInstance();
+                                      final userId = prefs.getString('user_id') ?? '';
+                                      final mobile = prefs.getString('mobile') ?? '';
+
+                                      final Map<String, dynamic> userData = {
+                                        'userId': userId,
+                                        'mobile': mobile,
+                                        'firstName': controller.firstName.value,
+                                        'lastName': controller.lastName.value,
+                                        'email': controller.email.value,
+                                        'userType': controller.userType.value,
+                                        'imagePath': controller.imagePath.value,
+                                        'gender': controller.gender.value,
+                                        'dob':controller.dob.value,
+                                        'sp_type': 2,
+                                      };
+
+                                      print("📦 Navigating with: $userData");
+
+                                      Get.to(
+                                            () => ProviderProfileView(),
+                                        arguments: userData,
+                                      );
+                                    },
+                                    child: Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 16,
                                       color: AppColors.orage,
                                     ),
                                   ),
-                                ),
-                                Spacer(),
-                                InkWell(
-                                  onTap: () async {
-                                    final prefs = await SharedPreferences.getInstance();
-                                    final userId = prefs.getString('user_id') ?? '';
-                                    final mobile = prefs.getString('mobile') ?? '';
-
-                                    Get.to(
-                                          () => ProviderProfileView(),
-                                      arguments: {
-                                        'userId': userId,
-                                        'mobile': mobile,
-                                        'sp_type': 2,
-                                      },
-                                    );
-                                  },
-                                  child: Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 16,
-                                    color: AppColors.orage,
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    }),
+
+
 
                     SizedBox(height: 20),
                     Card(
@@ -329,7 +357,20 @@ class AccountView extends GetView<AccountController> {
                     SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                     InkWell(
                       onTap: () {
-                        controller.logout();
+                        Get.defaultDialog(
+                          title: "Confirmation",
+                          middleText: "Are you sure you want to logout?",
+                          textCancel: "No",
+                          textConfirm: "Yes",
+                          confirmTextColor: Colors.white,
+                          onConfirm: () {
+                            Get.back(); // Close dialog
+                            controller.logout(); // Call logout
+                          },
+                          onCancel: () {
+                            Get.back(); // Close dialog
+                          },
+                        );
                       },
                       child: Container(
                         height: 28,
@@ -351,7 +392,8 @@ class AccountView extends GetView<AccountController> {
                           ),
                         ),
                       ),
-                    ),
+                    )
+
                   ],
                 ),
               ),

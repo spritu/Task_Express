@@ -520,7 +520,20 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                     SizedBox(height: 30),
                     InkWell(
                       onTap: () {
-                        controller.logout();
+                        Get.defaultDialog(
+                          title: "Confirmation",
+                          middleText: "Are you sure you want to logout?",
+                          textCancel: "No",
+                          textConfirm: "Yes",
+                          confirmTextColor: Colors.white,
+                          onConfirm: () {
+                            Get.back(); // Dialog band karo
+                            controller.logout(); // Logout call karo
+                          },
+                          onCancel: () {
+                            Get.back(); // Sirf dialog band karo
+                          },
+                        );
                       },
                       child: Container(
                         height: 28,
@@ -542,7 +555,8 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                           ),
                         ),
                       ),
-                    ),
+                    )
+
                   ],
                 ),
               ),

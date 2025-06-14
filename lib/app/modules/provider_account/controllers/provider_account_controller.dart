@@ -13,7 +13,7 @@ import '../../provider_editProfile/controllers/provider_edit_profile_controller.
 class ProviderAccountController extends GetxController with WidgetsBindingObserver {
   //TODO: Implement ProviderAccountController
   var imagePath = ''.obs;
-  var firstName = ''.obs;
+
   var lastName = ''.obs;
   var mobileNumber = ''.obs;
   RxString userId = ''.obs;
@@ -22,7 +22,8 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   var spType = ''.obs;
   // RxList<ServiceModel> userSkills = <ServiceModel>[].obs;
 
-
+  final firstName = ''.obs;
+  final firstNameController = TextEditingController();
   var selectedCategoryName = ''.obs;
   var selectedSubCategoryName = ''.obs;
   var charge = ''.obs;
@@ -449,6 +450,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     super.onInit();loadUserData();
     fetchCategories();
     //_loadUserData();
+    firstNameController.text = firstName.value;
     chargeController.text = charge.value;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller = Get.find<ProviderEditProfileController>();
