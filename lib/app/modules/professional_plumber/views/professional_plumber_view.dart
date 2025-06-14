@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -16,12 +15,12 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
   ProfessionalPlumberView({super.key});
   @override
   Widget build(BuildContext context) {
-
     Get.put(ProfessionalPlumberController());
     final arguments = Get.arguments as Map<String, dynamic>;
     final List users = arguments['users'];
     final String title = arguments['title'] ?? 'Professionals';
-    final int avail = arguments['avail'] ?? 0;  final String catId = arguments['catId'] ?? ''; // 🟢 Use this for sorting
+    final int avail = arguments['avail'] ?? 0;
+    final String catId = arguments['catId'] ?? ''; // 🟢 Use this for sorting
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(
@@ -64,312 +63,367 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   padding: const EdgeInsets.only(left: 20),
                   child: Text("Fh-289, Vijay nagar, Indore"),
                 ),
-
               ],
             ),
-          ),SizedBox(height: 10),Container(
+          ),
+          SizedBox(height: 10),
+          Container(
             width: MediaQuery.of(context).size.width,
             height: 52,
-            margin: const EdgeInsets.only( left: 16,right: 16),
+            margin: const EdgeInsets.only(left: 16, right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
-              color: const Color(0x0D323232), // #3232320D = black with 5% opacity
+              color: const Color(
+                0x0D323232,
+              ), // #3232320D = black with 5% opacity
               borderRadius: BorderRadius.circular(10),
             ),
-            child:  Obx(() => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                buildToggleButton("charge", "Search by Charge",catId),
-                buildToggleButton("distance", "Search by Distance",catId),
-              ],
-            )),
+            child: Obx(
+              () => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  buildToggleButton("charge", "Search by Charge", catId),
+                  buildToggleButton("distance", "Search by Distance", catId),
+                ],
+              ),
+            ),
           ),
 
           const SizedBox(height: 10),
           // List of workers
           Expanded(
-            child: Obx(
-                    () { if (controller.isLoading.value) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                return
-                  ListView.builder(itemCount: controller.users.length,
-                    itemBuilder: (context, index) {
-                    final user = controller.users[index];
-                    final imagePath = user['userImg'] ?? '';
-                      final imageUrl = imagePath.isNotEmpty
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return Center(child: CircularProgressIndicator());
+              }
+              return ListView.builder(
+                itemCount: controller.users.length,
+                itemBuilder: (context, index) {
+                  final user = controller.users[index];
+                  final imagePath = user['userImg'] ?? '';
+                  final imageUrl =
+                      imagePath.isNotEmpty
                           ? 'https://jdapi.youthadda.co/$imagePath'
                           : '';
-                      String rawDistance = user['distance'] ?? "0.00 km";
-                      String distanceOnly = rawDistance.replaceAll(" km", "");
+                  String rawDistance = user['distance'] ?? "0.00 km";
+                  String distanceOnly = rawDistance.replaceAll(" km", "");
 
-                      double? distanceDouble = double.tryParse(distanceOnly);
-                      String finalDistance = distanceDouble != null
+                  double? distanceDouble = double.tryParse(distanceOnly);
+                  String finalDistance =
+                      distanceDouble != null
                           ? "${distanceDouble.toStringAsFixed(2)} km"
                           : "N/A";
 
-                      final int avail = user["avail"] ?? 0;
-                      print("Opening bottom sheet for ${user['firstName']}");
-                      final coords = user['location']?['coordinates'];
-                    int matchedCharge = 0;
-                    if (user['matchedCharge'] != null) {
-                      matchedCharge = int.tryParse(user['matchedCharge'].toString()) ?? 0;
-                    } else if (user['skills'] != null && user['skills'].isNotEmpty) {
-                      matchedCharge = int.tryParse(user['skills'][0]['charge'].toString()) ?? 0;
-                    }
+                  final int avail = user["avail"] ?? 0;
+                  print("Opening bottom sheet for ${user['firstName']}");
+                  final coords = user['location']?['coordinates'];
+                  int matchedCharge = 0;
+                  if (user['matchedCharge'] != null) {
+                    matchedCharge =
+                        int.tryParse(user['matchedCharge'].toString()) ?? 0;
+                  } else if (user['skills'] != null &&
+                      user['skills'].isNotEmpty) {
+                    matchedCharge =
+                        int.tryParse(user['skills'][0]['charge'].toString()) ??
+                        0;
+                  }
 
-                    return InkWell(
-                        onTap: () async {
-                          Get.to(
-                                () => ProfessionalProfileView(),
-                            arguments: {
-                              'name': user['firstName'],
-                              'image': user['userImg'],
-                              'experience': user['experience'],
-                              'phone': user['phone'],
-                              'id': user['_id'],
-                              'skills': user['skills'] ?? [],
-                              'averageRating': user['averageRating'],
-                              'reviews': user['reviews'] ?? [],
-                              'avail': user['avail'],
-
-                            },);}, child: Container(
-                          width: MediaQuery
-                              .of(context)
-                              .size
-                              .width,
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 7,
-                          ),
-                          decoration: BoxDecoration(
+                  return InkWell(
+                    onTap: () async {
+                      Get.to(
+                        () => ProfessionalProfileView(),
+                        arguments: {
+                          'name': user['firstName'],
+                          'image': user['userImg'],
+                          'experience': user['experience'],
+                          'phone': user['phone'],
+                          'id': user['_id'],
+                          'skills': user['skills'] ?? [],
+                          'averageRating': user['averageRating'],
+                          'reviews': user['reviews'] ?? [],
+                          'avail': user['avail'],
+                        },
+                      );
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Card(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [Card(color: Colors.white, child: Padding(padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    children: [
-                                      SizedBox(height: 80,
-                                        width: 80,
-                                        child: Image.network(
-                                          imageUrl,
-                                          height: 80,
-                                          width: 80,
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    height: 80,
+                                    width: 80,
+                                    child: Image.network(
+                                      imageUrl,
+                                      height: 80,
+                                      width: 80,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (
+                                        context,
+                                        error,
+                                        stackTrace,
+                                      ) {
+                                        return Image.asset(
+                                          'assets/images/person.jpeg',
                                           fit: BoxFit.cover,
-                                          errorBuilder: (context, error,
-                                              stackTrace) {
-                                            return Image.asset(
-                                              'assets/images/person.jpeg',
-                                              fit: BoxFit.cover,
-                                            );},),),
-                                      Row(children: [const Icon(
-                                            Icons.star,
-                                            color: Colors.amber,
-                                            size: 16,), Text(
-                                        user['averageRating']
-                                                ?.toString() ?? '0',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w400,
-                                              fontFamily: "poppins",
-                                              color: Colors.grey[800],),),],),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                        size: 16,
+                                      ),
                                       Text(
-                                        "${user['experience'] ??
-                                            0} year Experience",
-                                        style: const TextStyle(
-                                          color: Color(0xff7C7C7C),
-                                          fontSize: 10,
-                                          fontFamily: "poppins",
+                                        user['averageRating']?.toString() ??
+                                            '0',
+                                        style: TextStyle(
+                                          fontSize: 11,
                                           fontWeight: FontWeight.w400,
-                                        ),),],),),),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment
-                                      .start,
+                                          fontFamily: "poppins",
+                                          color: Colors.grey[800],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    "${user['experience'] ?? 0} year Experience",
+                                    style: const TextStyle(
+                                      color: Color(0xff7C7C7C),
+                                      fontSize: 10,
+                                      fontFamily: "poppins",
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [Column(crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text("${user['firstName'] ??
-                                                  'No'} ${user['lastName'] ?? 'Name'}",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 14,
-                                                fontFamily: "poppins",
-                                                color: AppColors.textColor,),),
-                                            SizedBox(height: 3),
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment
-                                                  .start,
-                                              crossAxisAlignment:
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${user['firstName'] ?? 'No'} ${user['lastName'] ?? 'Name'}",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            fontFamily: "poppins",
+                                            color: AppColors.textColor,
+                                          ),
+                                        ),
+                                        SizedBox(height: 3),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
                                               CrossAxisAlignment.start,
-                                              children: [
-                                                avail == 1
-                                                    ? Row(
+                                          children: [
+                                            avail == 1
+                                                ? Row(
                                                   children: [
-                                                    Icon(Icons.check_circle,
-                                                        color: Colors.green,
-                                                        size: 16),
+                                                    Icon(
+                                                      Icons.check_circle,
+                                                      color: Colors.green,
+                                                      size: 16,
+                                                    ),
                                                     SizedBox(width: 4),
                                                     Text(
                                                       "Available",
                                                       style: TextStyle(
                                                         fontSize: 12,
                                                         fontFamily: "poppins",
-                                                        fontWeight: FontWeight
-                                                            .w500,
+                                                        fontWeight:
+                                                            FontWeight.w500,
                                                         color: Color(
-                                                            0xff11AD0E),
+                                                          0xff11AD0E,
+                                                        ),
                                                       ),
                                                     ),
                                                   ],
                                                 )
-                                                    : Row(
+                                                : Row(
                                                   children: [
-                                                    Icon(Icons.cancel,
-                                                        color: Colors.red,
-                                                        size: 16),
+                                                    Icon(
+                                                      Icons.cancel,
+                                                      color: Colors.red,
+                                                      size: 16,
+                                                    ),
                                                     SizedBox(width: 4),
                                                     Text(
                                                       "Not Available",
                                                       style: TextStyle(
                                                         fontSize: 12,
                                                         fontFamily: "poppins",
-                                                        fontWeight: FontWeight
-                                                            .w500,
+                                                        fontWeight:
+                                                            FontWeight.w500,
                                                         color: Colors.red,
                                                       ),
                                                     ),
-                                                  ],),
-                                              ],),
-                                          ],),
-                                        const Spacer(),
-                                        TextButton(
-                                          onPressed: () {
-                                            // Passing only relevant data to navigate to the profile view
-                                            Get.to(
-                                                  () =>
-                                                  ProfessionalProfileView(),
-                                              arguments: {
-                                                'name': user['firstName'],
-                                                'image': user['userImg'],
-                                                'experience': user['experience'],
-                                                'phone': user['phone'],
-                                                'id': user['_id'],
-                                                'skills': user['skills'] ??
-                                                    [],
-                                                'averageRating': user['averageRating'],
-                                                'reviews': user['reviews'] ??
-                                                    [],
-                                                'avail': user['avail'],
-                                              },);
-                                          },
-                                          child: Container(
-                                            height: 24,
-                                            width: 54,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius
-                                                  .circular(
-                                                10,
-                                              ),
-                                              color: Color(0xff114BCA),
-                                            ),
-                                            child: Center(
-                                              child: const Text(
-                                                "Details",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 7,
-                                                  fontFamily: "poppins",
-                                                  fontWeight: FontWeight.w400,
-                                                ),),),),),
-                                      ],),
-                                    SizedBox(height: 4),
-                                    Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .only(top: 3,),
-                                                  child: Icon(
-                                                    Icons.location_on,
-                                                    size: 14,
-                                                    color: Colors.grey,
-                                                  ),
+                                                  ],
                                                 ),
-                                                Text(finalDistance,
-                                                  // ✅ Use calculated distance
-                                                  // user['distance'] != null && user['distance'] != 'N/A'
-                                                  //     ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
-                                                  //     : 'N/A',
-                                                  style: TextStyle(
-                                                      fontSize: 12),
-                                                )
-                                              ],
-                                            ),
-                                            SizedBox(height: 3),
                                           ],
                                         ),
-                                        Card(
-                                          color: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius
-                                                .circular(40),
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    TextButton(
+                                      onPressed: () {
+                                        // Passing only relevant data to navigate to the profile view
+                                        Get.to(
+                                          () => ProfessionalProfileView(),
+                                          arguments: {
+                                            'name': user['firstName'],
+                                            'image': user['userImg'],
+                                            'experience': user['experience'],
+                                            'phone': user['phone'],
+                                            'id': user['_id'],
+                                            'skills': user['skills'] ?? [],
+                                            'averageRating':
+                                                user['averageRating'],
+                                            'reviews': user['reviews'] ?? [],
+                                            'avail': user['avail'],
+                                          },
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 24,
+                                        width: 54,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
                                           ),
-                                          elevation: 2,
-                                          child: Padding(
-                                            padding: const EdgeInsets
-                                                .symmetric(
-                                              vertical: 4.0,
-                                              horizontal: 4.0,
+                                          color: Color(0xff114BCA),
+                                        ),
+                                        child: Center(
+                                          child: const Text(
+                                            "Details",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 7,
+                                              fontFamily: "poppins",
+                                              fontWeight: FontWeight.w400,
                                             ),
-                                            child: RichText(
-                                              text: TextSpan(
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.orange,
-                                                  fontFamily: 'Poppins',
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 3,
+                                              ),
+                                              child: Icon(
+                                                Icons.location_on,
+                                                size: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            Text(
+                                              finalDistance,
+                                              // ✅ Use calculated distance
+                                              // user['distance'] != null && user['distance'] != 'N/A'
+                                              //     ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
+                                              //     : 'N/A',
+                                              style: TextStyle(fontSize: 12),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 3),
+                                      ],
+                                    ),
+                                    Card(
+                                      color: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(40),
+                                      ),
+                                      elevation: 2,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 4.0,
+                                          horizontal: 4.0,
+                                        ),
+                                        child: RichText(
+                                          text: TextSpan(
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.orange,
+                                              fontFamily: 'Poppins',
+                                            ),
+                                            children: [
+                                              TextSpan(
+                                                text: "Charge: ",
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: AppColors.orage,
+                                                  fontWeight: FontWeight.w400,
                                                 ),
-                                                children: [
-                                                  TextSpan(
-                                                    text: "Charge: ",
-                                                    style: TextStyle(
-                                                      fontSize: 10,
-                                                      color: AppColors.orage,
-                                                      fontWeight: FontWeight
-                                                          .w400,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: "₹ $matchedCharge/day",
-                                                    style: TextStyle(
-                                                      fontSize: 11,
-                                                      color: AppColors.orage,
-                                                      fontWeight: FontWeight
-                                                          .w700,
-                                                    ),),
-                                                ],),),),),
-                                      ],),
-                                    const SizedBox(height: 8),
-                                    Row(children: [
-                                      Expanded(child: SizedBox(
-                                        height: 24, width: 110,
+                                              ),
+                                              TextSpan(
+                                                text: "₹ $matchedCharge/day",
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: AppColors.orage,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: SizedBox(
+                                        height: 24,
+                                        width: 110,
                                         child: ElevatedButton(
                                           onPressed: () async {
                                             final phoneNumber =
@@ -378,99 +432,113 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                               controller.selectedUsers =
                                                   users; // Store full list
                                               controller
-                                                  .selectedIndexAfterCall =
+                                                      .selectedIndexAfterCall =
                                                   index; // Store selected index
-                                              controller.selectedTitle =
-                                                  title;
+                                              controller.selectedTitle = title;
                                               controller
-                                                  .shouldShowSheetAfterCall =
-                                              true; // Trigger sheet on resume
+                                                      .shouldShowSheetAfterCall =
+                                                  true; // Trigger sheet on resume
                                               controller.makePhoneCall(
-                                                  phoneNumber);
+                                                phoneNumber,
+                                              );
                                             } else {
                                               Get.snackbar(
                                                 'Error',
                                                 'Phone number not available',
                                                 snackPosition:
-                                                SnackPosition.BOTTOM,
+                                                    SnackPosition.BOTTOM,
                                                 backgroundColor: Colors.red,
                                                 colorText: Colors.white,
                                               );
                                             }
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: Color(
-                                                0xff114BCA),
+                                            backgroundColor: Color(0xff114BCA),
                                           ),
                                           child: const Text(
-                                            "Call", style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 12,
-                                            color: AppColors.white,
-                                            fontFamily: "poppins",
-                                          ),),),),),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: SizedBox(
-                                          height: 24,
-                                          width: 100,
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              final receiverId = user['_id']
-                                                  .toString();
-                                              final receiverName = '${user['firstName'] ??
-                                                  ''} ${user['lastName'] ??
-                                                  ''}'.trim();
-                                              final receiverImage = user['userImg'] ??
-                                                  '';
-                                              final phoneNumber = user['phone'] ??
-                                                  '';
-
-                                              if (receiverId.isNotEmpty) {
-                                                Get.to(
-                                                  ChatView(),
-                                                  arguments: {
-                                                    'receiverId': receiverId,
-                                                    'receiverName': receiverName
-                                                        .isNotEmpty
-                                                        ? receiverName
-                                                        : 'No Name',
-                                                    'receiverImage': receiverImage,
-                                                    'phoneNumber': phoneNumber,
-                                                  },);
-                                              } else {
-                                                Get.snackbar(
-                                                  'Error',
-                                                  'Receiver ID not available',
-                                                  snackPosition: SnackPosition
-                                                      .BOTTOM,
-                                                  backgroundColor: Colors.red,
-                                                  colorText: Colors.white,
-                                                );
-                                              }
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: const Color(
-                                                  0xff114BCA),
+                                            "Call",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              color: AppColors.white,
+                                              fontFamily: "poppins",
                                             ),
-                                            child: const Text(
-                                              "Chat",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 12,
-                                                color: AppColors.white,
-                                                fontFamily: "poppins",
-                                              ),
-                                            ),
-                                          ),),),
-                                    ],
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                    SizedBox(height: 10),
-                                  ],),),
-                            ],),),);
-                    },);
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: SizedBox(
+                                        height: 24,
+                                        width: 100,
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            final receiverId =
+                                                user['_id'].toString();
+                                            final receiverName =
+                                                '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'
+                                                    .trim();
+                                            final receiverImage =
+                                                user['userImg'] ?? '';
+                                            final phoneNumber =
+                                                user['phone'] ?? '';
 
-                } ),
+                                            if (receiverId.isNotEmpty) {
+                                              Get.to(
+                                                ChatView(),
+                                                arguments: {
+                                                  'receiverId': receiverId,
+                                                  'receiverName':
+                                                      receiverName.isNotEmpty
+                                                          ? receiverName
+                                                          : 'No Name',
+                                                  'receiverImage':
+                                                      receiverImage,
+                                                  'phoneNumber': phoneNumber,
+                                                },
+                                              );
+                                            } else {
+                                              Get.snackbar(
+                                                'Error',
+                                                'Receiver ID not available',
+                                                snackPosition:
+                                                    SnackPosition.BOTTOM,
+                                                backgroundColor: Colors.red,
+                                                colorText: Colors.white,
+                                              );
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(
+                                              0xff114BCA,
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            "Chat",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              color: AppColors.white,
+                                              fontFamily: "poppins",
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            }),
           ),
         ],
       ),
@@ -478,15 +546,15 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
   }
 
   Widget showAfterCallSheet(
-      BuildContext context, {
-        required String name,
-        required String imageUrl,
-        required String experience,
-        required String phone,
-        required String userId,
-        required String title,
-        required List<Map<String, dynamic>> skills, // Pass dynamic skills
-      }) {
+    BuildContext context, {
+    required String name,
+    required String imageUrl,
+    required String experience,
+    required String phone,
+    required String userId,
+    required String title,
+    required List<Map<String, dynamic>> skills, // Pass dynamic skills
+  }) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.only(left: 8, right: 8),
@@ -515,12 +583,12 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   CircleAvatar(
                     radius: 40,
                     backgroundImage:
-                    imageUrl.isNotEmpty
-                        ? NetworkImage(
-                      'https://jdapi.youthadda.co/$imageUrl',
-                    )
-                        : const AssetImage('assets/images/account.png')
-                    as ImageProvider,
+                        imageUrl.isNotEmpty
+                            ? NetworkImage(
+                              'https://jdapi.youthadda.co/$imageUrl',
+                            )
+                            : const AssetImage('assets/images/account.png')
+                                as ImageProvider,
                   ),
                   const SizedBox(width: 10),
                   Text(
@@ -552,13 +620,13 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   padding: const EdgeInsets.only(bottom: 12),
                   child: professionRow(
                     title:
-                    (skill['subcategoryName'] != null &&
-                        skill['subcategoryName'].toString().isNotEmpty)
-                        ? skill['subcategoryName']
-                        : (skill['categoryName'] != null &&
-                        skill['categoryName'].toString().isNotEmpty)
-                        ? skill['categoryName']
-                        : 'Service',
+                        (skill['subcategoryName'] != null &&
+                                skill['subcategoryName'].toString().isNotEmpty)
+                            ? skill['subcategoryName']
+                            : (skill['categoryName'] != null &&
+                                skill['categoryName'].toString().isNotEmpty)
+                            ? skill['categoryName']
+                            : 'Service',
 
                     price: "₹ ${skill['charge'].toString()}",
                     onBookNow: () {
@@ -700,16 +768,16 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
   }
 
   void showAreUSureSheet(
-      BuildContext context, {
-        required String name,
-        required String imageUrl,
-        required String experience,
-        required String phone,
-        required String userId,
-        required String title,
-        required Map<String, dynamic> skill,
-        required Future<void> Function(List<String> serviceIds) bookServiceProvider,
-      }) {
+    BuildContext context, {
+    required String name,
+    required String imageUrl,
+    required String experience,
+    required String phone,
+    required String userId,
+    required String title,
+    required Map<String, dynamic> skill,
+    required Future<void> Function(List<String> serviceIds) bookServiceProvider,
+  }) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -739,12 +807,12 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   CircleAvatar(
                     radius: 40,
                     backgroundImage:
-                    imageUrl.isNotEmpty
-                        ? NetworkImage(
-                      'https://jdapi.youthadda.co/$imageUrl',
-                    )
-                        : const AssetImage('assets/images/account.png')
-                    as ImageProvider,
+                        imageUrl.isNotEmpty
+                            ? NetworkImage(
+                              'https://jdapi.youthadda.co/$imageUrl',
+                            )
+                            : const AssetImage('assets/images/account.png')
+                                as ImageProvider,
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -767,7 +835,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                     ),
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           "Are you sure you want to continue with this booking?",
                           style: TextStyle(
                             fontSize: 12,
@@ -784,7 +852,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                             onPressed: () async {
                               String serviceId =
                                   skill['subcategoryId']?.toString() ??
-                                      skill['categoryId'].toString();
+                                  skill['categoryId'].toString();
                               Navigator.pop(context);
                               await bookServiceProvider([serviceId]);
                             },
@@ -860,7 +928,9 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
         );
       },
     );
-  }Widget buildToggleButton(String value, String label, String catId) {
+  }
+
+  Widget buildToggleButton(String value, String label, String catId) {
     bool isSelected = controller.selected.value == value;
 
     return GestureDetector(
@@ -945,8 +1015,4 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
       ),
     );
   }
-
-
-
-
 }

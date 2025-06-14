@@ -116,85 +116,183 @@ class HomeView extends GetView<HomeController> {
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.orage,),),],),
                             SizedBox(height: 20),
-                            Obx(() => Row(
-                              children: [
-                                AnimatedContainer(
-                                  duration: Duration(milliseconds: 300),
-                                  width: controller.isFirstFocused.value ? 190 : 120,
-                                  child: TextField(
-                                    onChanged: (value) {
-                                    if (value.isEmpty) {
-                                      controller.searchResults.clear();
-                                      FocusScope.of(context).unfocus();
-                                      return;
-                                    }
+                            // Obx(() => Row(
+                            //   children: [
+                            //     AnimatedContainer(
+                            //       duration: Duration(milliseconds: 300),
+                            //       width: controller.isFirstFocused.value ? 190 : 120,
+                            //       child: TextField(
+                            //         onChanged: (value) {
+                            //         if (value.isEmpty) {
+                            //           controller.searchResults.clear();
+                            //           FocusScope.of(context).unfocus();
+                            //           return;
+                            //         }
+                            //
+                            //         if (bottomController.authController.isLoggedIn.value) {
+                            //           controller.fetchServiceProviders(value);
+                            //         }
+                            //       },
+                            //         controller: controller.plumberController,
+                            //         focusNode: controller.plumberFocusNode,
+                            //         decoration: InputDecoration(
+                            //           prefixIcon: controller.isFirstFocused.value
+                            //               ? Icon(Icons.search, size: 20)
+                            //               : null,
+                            //           hintText: "Search for Category",
+                            //           hintStyle: TextStyle(
+                            //             fontSize: 12,
+                            //             fontWeight: FontWeight.w400,
+                            //             color: Color(0xff9B9999),
+                            //           ),
+                            //           contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                            //           border: OutlineInputBorder(
+                            //             borderRadius: BorderRadius.circular(25),
+                            //             borderSide: BorderSide.none,
+                            //           ),
+                            //           filled: true,
+                            //           fillColor: Colors.white,
+                            //         ),
+                            //       ),
+                            //     ),
+                            //     SizedBox(width: 10),
+                            //     AnimatedContainer(
+                            //       duration: Duration(milliseconds: 300),
+                            //       width: controller.isFirstFocused.value ? 120 : 190,
+                            //       child: TextField(
+                            //         controller: controller.nameController,
+                            //         focusNode: controller.nameFocusNode,
+                            //         onChanged: (value) {
+                            //           print("Search changed: $value");
+                            //           if (value.isEmpty) {
+                            //             controller.searchResults.clear();
+                            //             FocusScope.of(context).unfocus();
+                            //             return;
+                            //           }
+                            //
+                            //           if (bottomController.authController.isLoggedIn.value) {
+                            //             print("Calling fetchUsersByName");
+                            //             controller.fetchUsersByName();
+                            //           }
+                            //         },
+                            //
+                            //         decoration: InputDecoration(
+                            //           prefixIcon: !controller.isFirstFocused.value ? Icon(Icons.search, size: 20) : null,
+                            //           hintText: "Search by Name",
+                            //           hintStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xff9B9999)),
+                            //           contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                            //           border: OutlineInputBorder(
+                            //             borderRadius: BorderRadius.circular(25),
+                            //             borderSide: BorderSide.none,
+                            //           ),
+                            //           filled: true,
+                            //           fillColor: Colors.white,
+                            //         ),
+                            //       ),
+                            //     ),
+                            //
+                            //   ],
+                            //
+                            //
+                            // ),),
+                            Obx(() {
+                              final screenWidth = MediaQuery.of(context).size.width;
 
-                                    if (bottomController.authController.isLoggedIn.value) {
-                                      controller.fetchServiceProviders(value);
-                                    }
-                                  },
-                                    controller: controller.plumberController,
-                                    focusNode: controller.plumberFocusNode,
-                                    decoration: InputDecoration(
-                                      prefixIcon: controller.isFirstFocused.value
-                                          ? Icon(Icons.search, size: 20)
-                                          : null,
-                                      hintText: "Search for Category",
-                                      hintStyle: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xff9B9999),
+                              // Calculate total available width with safe horizontal padding
+                              final availableWidth = screenWidth - 32; // 16px left + 16px right padding
+
+                              final firstWidth = controller.isFirstFocused.value
+                                  ? availableWidth * 0.52
+                                  : availableWidth * 0.35;
+
+                              final secondWidth = controller.isFirstFocused.value
+                                  ? availableWidth * 0.35
+                                  : availableWidth * 0.52;
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Row(
+                                  children: [
+                                    AnimatedContainer(
+                                      duration: const Duration(milliseconds: 300),
+                                      width: firstWidth,
+                                      child: TextField(
+                                        onChanged: (value) {
+                                          if (value.isEmpty) {
+                                            controller.searchResults.clear();
+                                            FocusScope.of(context).unfocus();
+                                            return;
+                                          }
+                                          if (bottomController.authController.isLoggedIn.value) {
+                                            controller.fetchServiceProviders(value);
+                                          }
+                                        },
+                                        controller: controller.plumberController,
+                                        focusNode: controller.plumberFocusNode,
+                                        decoration: InputDecoration(
+                                          prefixIcon: controller.isFirstFocused.value
+                                              ? const Icon(Icons.search, size: 20)
+                                              : null,
+                                          hintText: "Search for Category",
+                                          hintStyle: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                            color: Color(0xff9B9999),
+                                          ),
+                                          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(25),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                        ),
                                       ),
-                                      contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(25),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      filled: true,
-                                      fillColor: Colors.white,
                                     ),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                AnimatedContainer(
-                                  duration: Duration(milliseconds: 300),
-                                  width: controller.isFirstFocused.value ? 120 : 190,
-                                  child: TextField(
-                                    controller: controller.nameController,
-                                    focusNode: controller.nameFocusNode,
-                                    onChanged: (value) {
-                                      print("Search changed: $value");
-                                      if (value.isEmpty) {
-                                        controller.searchResults.clear();
-                                        FocusScope.of(context).unfocus();
-                                        return;
-                                      }
-
-                                      if (bottomController.authController.isLoggedIn.value) {
-                                        print("Calling fetchUsersByName");
-                                        controller.fetchUsersByName();
-                                      }
-                                    },
-
-                                    decoration: InputDecoration(
-                                      prefixIcon: !controller.isFirstFocused.value ? Icon(Icons.search, size: 20) : null,
-                                      hintText: "Search by Name",
-                                      hintStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Color(0xff9B9999)),
-                                      contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(25),
-                                        borderSide: BorderSide.none,
+                                    const SizedBox(width: 10),
+                                    AnimatedContainer(
+                                      duration: const Duration(milliseconds: 300),
+                                      width: secondWidth,
+                                      child: TextField(
+                                        controller: controller.nameController,
+                                        focusNode: controller.nameFocusNode,
+                                        onChanged: (value) {
+                                          if (value.isEmpty) {
+                                            controller.searchResults.clear();
+                                            FocusScope.of(context).unfocus();
+                                            return;
+                                          }
+                                          if (bottomController.authController.isLoggedIn.value) {
+                                            controller.fetchUsersByName();
+                                          }
+                                        },
+                                        decoration: InputDecoration(
+                                          prefixIcon: !controller.isFirstFocused.value
+                                              ? const Icon(Icons.search, size: 20)
+                                              : null,
+                                          hintText: "Search by Name",
+                                          hintStyle: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                            color: Color(0xff9B9999),
+                                          ),
+                                          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(25),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                        ),
                                       ),
-                                      filled: true,
-                                      fillColor: Colors.white,
                                     ),
-                                  ),
+                                  ],
                                 ),
+                              );
+                            }),
 
-                              ],
 
 
-                            ),),
                             SizedBox(height: 10),
                             Obx(() {
                               if (controller.searchResults.isEmpty) return const SizedBox();

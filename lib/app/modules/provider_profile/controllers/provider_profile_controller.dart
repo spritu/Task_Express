@@ -563,7 +563,7 @@ class ProviderProfileController extends GetxController {
   var subCategories = <SubCategory>[].obs;
   final selectedCategoryId = ''.obs;
   final firstName = ''.obs;
- // final firstName = ''.obs;
+  // final firstName = ''.obs;
   final lastName = ''.obs;
   final email = ''.obs;
   final mobile = ''.obs;
@@ -578,7 +578,7 @@ class ProviderProfileController extends GetxController {
   //final firstNameController = TextEditingController();
   final selectedCategoryIds = <String>[].obs;
   final TextEditingController chargesController = TextEditingController();
- // var imagePath = ''.obs;
+  // var imagePath = ''.obs;
   var filteredSubCategories = <SubCategory>[].obs;
   var selectedSubCategoryId = ''.obs;
   final isCategoryLoading = false.obs;
@@ -757,7 +757,7 @@ class ProviderProfileController extends GetxController {
   final state = ''.obs;
   final referralCode = ''.obs;
   var selectedWorkExperience = "".obs;
- // final RxString imagePath = ''.obs;
+  // final RxString imagePath = ''.obs;
   final ImagePicker _picker = ImagePicker();
   RxString selectedCity = ''.obs;
 
@@ -866,7 +866,7 @@ class ProviderProfileController extends GetxController {
     state.value = '';
     referralCode.value = '';
   }
-   String? mobileNumber;
+  String? mobileNumber;
 
 
   Future<void> registerServiceProvider() async {
@@ -1025,34 +1025,7 @@ class ProviderProfileController extends GetxController {
       Get.snackbar('Error', 'Could not register. Check your internet connection.');
     }
   }
-  Future<void> _loadUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    userType.value = prefs.getInt('userType') ?? 0;
-    firstName.value = prefs.getString('firstName') ?? '';
-    lastName.value = prefs.getString('lastName') ?? '';
-    mobileNumber = prefs.getString('mobileNumber') ?? '';
-    gender.value = prefs.getString('gender') ?? '';
-    dob.value = prefs.getString('dob') ?? '';
-    email.value = prefs.getString('email') ?? '';
-    city.value = prefs.getString('city') ?? '';
-    state.value = prefs.getString('state') ?? '';
-    referralCode.value = prefs.getString('referralCode') ?? '';
-    pinCode.value = prefs.getString('pinCode') ?? '';
-
-    // ✅ Debug prints — copy this block as-is:
-    print('🔑 Loaded userType: ${userType.value}');
-    print('👤 Loaded firstName: ${firstName.value}');
-    print('👤 Loaded lastName: ${lastName.value}');
-    print('📱 Loaded mobileNumber: ${mobileNumber}');
-    print('⚧️ Loaded gender: ${gender.value}');
-    print('🎂 Loaded dob: ${dob.value}');
-    print('📧 Loaded email: ${email.value}');
-    print('🏙️ Loaded city: ${city.value}');
-    print('🏞️ Loaded state: ${state.value}');
-    print('📌 Loaded pinCode: ${pinCode.value}');
-    print('🏷️ Loaded referralCode: ${referralCode.value}');
-  }
 
 
 
@@ -1073,7 +1046,7 @@ class ProviderProfileController extends GetxController {
     super.onInit();
     loadUserId();
     fetchCategories();
-    _loadUserData();
+
     final args = Get.arguments as Map<String, dynamic>? ?? {};
 
     firstName.value = args['firstName'] ?? '';
