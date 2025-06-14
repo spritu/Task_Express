@@ -8,10 +8,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LocationController extends GetxController {
   var currentAddress = ''.obs;
   var currentPosition = Rxn<Position>();
-
+  var imagePath = ''.obs;
   @override
   void onInit() {
     super.onInit();
+    final args = Get.arguments as Map<String, dynamic>? ?? {};
+    imagePath.value = args['imagePath'] ?? '';
+
+    print('✅ Loaded image path in next screen: ${imagePath.value}');
     determinePosition();
     _loadUserData();
   }

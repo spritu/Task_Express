@@ -156,19 +156,29 @@ class SignUpController extends GetxController {
         }
         await prefs.setInt('userType', userType);
 
-        await prefs.setString('image', finalImage);
+    //    await prefs.setString('image', finalImage);
         await prefs.setString('token', token); // ✅ SAVE TOKEN HERE
         await prefs.setString('userId', userData['_id'] ?? '');
         await prefs.setString('firstName', userData['firstName'] ?? '');
         await prefs.setString('lastName', userData['lastName'] ?? '');
         await prefs.setString('dob', userData['dateOfBirth'] ?? '');
         await prefs.setString('email', userData['email'] ?? '');
-        await prefs.setString('city', userData['city'] ?? '');
+
         await prefs.setString('gender', userData['gender'] ?? '');
         await prefs.setString('userImg', rawImg.toString());
+
+        await prefs.setString('city', userData['city'] ?? '');
+        await prefs.setString('state', userData['state'] ?? '');
+        await prefs.setString('pinCode', userData['pinCode']?.toString() ?? '');
+        await prefs.setString('referralCode', userData['referralCode']?.toString() ?? '');
         print("✅ userType: $userType");
         print("✅ Token saved: $token");
         print("✅ Image saved: $finalImage");
+        // ✅ Confirm
+        print('✅ SAVED city: ${prefs.getString('city')}');
+        print('✅ SAVED state: ${prefs.getString('state')}');
+        print('✅ SAVED pinCode: ${prefs.getString('pinCode')}');
+        print('✅ SAVED referralCode: ${prefs.getString('referralCode')}');
 
         clearFields();
         Get.to(() => LocationView());

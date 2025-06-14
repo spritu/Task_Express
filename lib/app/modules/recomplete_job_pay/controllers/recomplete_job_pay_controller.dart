@@ -171,6 +171,7 @@ class RecompleteJobPayController extends GetxController {
             jsonRes['booking']?['bookedFor']?['lastName']?.toString() ?? '';
 
         print("gggggggggg $idsend $firstName$lastName");
+        isUserPopupShown.value = false;
 
         payController.clear();
 

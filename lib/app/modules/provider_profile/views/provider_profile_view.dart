@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../colors.dart';
+import '../../account/controllers/account_controller.dart';
 import '../../provider_location/views/provider_location_view.dart';
 import '../controllers/provider_profile_controller.dart';
 
@@ -11,68 +12,47 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
 
   @override
   Widget build(BuildContext context) {
-
+    Get.put(AccountController());
   Get.put(
       ProviderProfileController(),
     );
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(gradient: AppColors.appGradient2),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Form(
-              key: controller.formKey, // ✅ Important
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 10),
+      body: Container(decoration: BoxDecoration(gradient: AppColors.appGradient2),
+        child: SafeArea(child: SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Form(key: controller.formKey, // ✅ Important
+              child: Column(crossAxisAlignment: CrossAxisAlignment.center,
+                children: [const SizedBox(height: 10),
                   Text("Your Profile", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
                   const SizedBox(height: 20),
-                  Obx(() {
-                    final path = controller.imagePath.value;
-
-                    ImageProvider imageProvider;
-
-                    if (path.isNotEmpty) {
-                      if (path.startsWith('http')) {
+                  Obx(() {final path = controller.imagePath.value;
+                    ImageProvider? imageProvider;
+                    if (path.isNotEmpty) {if (path.startsWith('http')) {
+                        // Full URL -> load directly
                         imageProvider = NetworkImage(path);
-                      } else {
+                      } else if (path.contains('/storage/') || path.contains('/data/')) {
+                        // Local storage file path -> load as FileImage
                         imageProvider = FileImage(File(path));
+                      } else if (path.endsWith('.jpg') || path.endsWith('.png')) {
+                        // Relative server path -> prepend your domain
+                        imageProvider = NetworkImage('https://jdapi.youthadda.co/$path');
+                      } else {
+                        // Fallback
+                        imageProvider = const AssetImage('assets/images/account.png');
                       }
                     } else {
                       imageProvider = const AssetImage('assets/images/account.png');
-                    }
-
-                    return Stack(
+                    }return Stack(
                       alignment: Alignment.bottomRight,
                       children: [
-                        CircleAvatar(
-                          radius: 45,
+                        CircleAvatar(radius: 45,
                           backgroundColor: Colors.white,
-                          backgroundImage: imageProvider,
-                          child: path.isEmpty
-                              ? const Icon(Icons.person, size: 60, color: Colors.grey)
-                              : null,
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 4,
-                          child: InkWell(
-                            onTap: () => _showImagePicker(context, controller),
+                          backgroundImage: imageProvider,),
+                        Positioned(bottom: 0, right: 4,
+                          child: InkWell(onTap: () => _showImagePicker(context, controller),
                             child: const CircleAvatar(
                               radius: 16,
                               backgroundColor: Colors.white,
-                              child: Icon(Icons.edit, size: 16, color: Colors.black),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  }),
-
-
-
+                              child: Icon(Icons.edit, size: 16, color: Colors.black),),),),],);}),
                   buildTextField(
                     "First Name",
                     "Enter first name",
@@ -80,21 +60,12 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'First Name is required';
-                      }
-                      return null;
-                    },
-                    onChanged: (val) => controller.firstName.value = val,
-                  ),
-
+                      }return null;},
+                    onChanged: (val) => controller.firstName.value = val,),
                   const SizedBox(height: 12),
-                  buildTextField(
-                    "Last Name",
-                    "Enter last name",
+                  buildTextField("Last Name", "Enter last name",
                     controller: controller.lastNameController,
-                    onChanged: (val) => controller.lastName.value = val,
-                  ),
-
-
+                    onChanged: (val) => controller.lastName.value = val,),
                   SizedBox(height: 12),
                   Align(
                     alignment: Alignment.centerLeft,
@@ -104,15 +75,12 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                   Obx(() => Row(
                     children: ["Female", "Male", "Other"].map((e) {
                       final isSelected = controller.gender.value == e;
-                      return Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                      return Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               backgroundColor: isSelected ? AppColors.orage : Colors.white,
                               side: BorderSide(color: isSelected ? AppColors.orage : Colors.black26),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),),
                             onPressed: () {
                               controller.gender.value = e;
                               controller.genderController.text = e; // ✅ keep text in sync
@@ -121,16 +89,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                               e,
                               style: TextStyle(
                                 color: isSelected ? Colors.white : Colors.black,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  )),
-
-
+                                fontWeight: FontWeight.w600,),),),),);}).toList(),)),
                   const SizedBox(height: 20),
                   // Gender selection (No validation needed for now)
                   buildTextField(
@@ -141,12 +100,10 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                     controller: controller.dobController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Date of Birth is required';
-                      }
+                        return 'Date of Birth is required';}
                       return null;
                     },
-                    onChanged: (val) => controller.dob.value = val, // ✅ keep obs in sync
-                  ),
+                    onChanged: (val) => controller.dob.value = val,),
                   const SizedBox(height: 12),
                   buildTextField("Email", controller:  controller.emailController,
                     "Enter email",
@@ -154,51 +111,36 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                       if (value == null || value.isEmpty) {
                         return 'Email is required';
                       } else if (!GetUtils.isEmail(value)) {
-                        return 'Enter a valid email';
-                      }
+                        return 'Enter a valid email';}
                       return null;
                     },
                     keyboardType: TextInputType.emailAddress,
                     onChanged: (val) => controller.email.value = val,
                   ),  const SizedBox(height: 12),
                   buildDropdown(
-                    "State",
-                    controller.stateCityMap.keys.toList(),
+                    "State", controller.stateCityMap.keys.toList(),
                     controller.state,
                     validator: (val) => val?.isEmpty ?? true ? 'State is required' : null,
-                    onChanged: controller.onStateChanged, // 👈 triggers city reset
-                  ),
+                    onChanged: controller.onStateChanged,),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [Expanded(
-                        child: Obx(() => buildDropdown(
-                          "City",
-                          controller.citiesForSelectedState,
+                  Row(children: [Expanded(child: Obx(() => buildDropdown(
+                          "City", controller.citiesForSelectedState,
                           controller.city,
-                          validator: (val) => val?.isEmpty ?? true ? 'City is required' : null,
-                        )),
-                      ),
+                          validator: (val) => val?.isEmpty ?? true ? 'City is required' : null,)),),
                       const SizedBox(width: 10),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 3,
-                        child: buildTextField(
-                          "Pin Code",controller:  controller.firstNameController,
-                          "Enter pin code",
+                        child: buildTextField("Pin Code",controller:  controller.pinCodeController,"Enter pin code",
                           keyboardType: TextInputType.number,
                           onChanged: (val) => controller.pinCode.value = val,
                         //  validator: (val) => val?.isEmpty ?? true ? 'Pin code is required' : null,
                         ),),],),
                   const SizedBox(height: 12),
-                  buildTextField(controller:  controller.firstNameController,
+                  buildTextField(controller:  controller.referralCodeController,
                     "Referral Code",
                     "Enter referral code",
                     keyboardType: TextInputType.number,
-                    // validator: (value) {
-                    //   return null; // optional
-                    // },
                     onChanged: (val) => controller.referralCode.value = val,),
-                  // Category, Profession, Work Experience dropdowns
-                  // You can add validation on them too if needed
                   const SizedBox(height: 12),
                   Container(
                     height: MediaQuery.of(context).size.height*0.5,
@@ -206,95 +148,55 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                     padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: Color(0xFFFEEDDD),
-                    ),
+                      color: Color(0xFFFEEDDD),),
                     child: Column(mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 10),
+                        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [SizedBox(height: 10),
                             // ── Profession Dropdown ──
                             Obx(() => Column(crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Profession",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: "poppins",
-                                    color: AppColors.textColor,
-                                  ),), Container(
-                                  height: 42,
-                                  decoration: BoxDecoration(
+                              children: [Text("Profession",
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,
+                                    fontFamily: "poppins", color: AppColors.textColor,
+                                  ),), Container(height: 42, decoration: BoxDecoration(
                                     color: const Color(0xFFF4F8FF),
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: Colors.black26),
-                                  ),
+                                    border: Border.all(color: Colors.black26),),
                                   padding: const EdgeInsets.symmetric(horizontal: 16),
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton<String>(
-                                      isExpanded: true,
-                                      value: controller.selectedProfession.value.isNotEmpty
+                                      isExpanded: true, value: controller.selectedProfession.value.isNotEmpty
                                           ? controller.selectedProfession.value : null,
-                                      hint: Text(
-                                        "Select your Profession",
-                                        style: TextStyle(color: Color(0xff333333), fontSize: 12),
-                                      ),
+                                      hint: Text("Select your Profession", style: TextStyle(color: Color(0xff333333), fontSize: 12),),
                                       icon: const Icon(Icons.keyboard_arrow_down),
                                       items: controller.serviceTypes.map((e) {
-                                        return DropdownMenuItem<String>(
-                                          value: e['title'],
-                                          child: Text(e['title']!),
-                                        );
-                                      }).toList(),
+                                        return DropdownMenuItem<String>(value: e['title'], child: Text(e['title']!),);}).toList(),
                                       onChanged: (v) {
-                                        if (v != null) controller.setSelectedProfession(v);
-                                      },),),),
+                                        if (v != null) controller.setSelectedProfession(v);},),),),
                                 if (!controller.isProfessionValid.value)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 4, left: 8),
-                                    child: Text(
-                                      "Profession is required",
-                                      style: TextStyle(color: Colors.red, fontSize: 11),
-                                    ),
-                                  ),
-                              ],
-                            )),
+                                    child: Text("Profession is required", style: TextStyle(color: Colors.red, fontSize: 11),),),],)),
                             // ── Category Dropdown ──
                             Obx(() {
                               final cats = controller.categories;
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    "Category",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      fontFamily: "poppins",
-                                      color: AppColors.textColor,
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 42,
-                                    decoration: BoxDecoration(
+                                children: [const SizedBox(height: 8),
+                                  Text("Category", style: TextStyle(fontSize: 14,
+                                      fontWeight: FontWeight.w400, fontFamily: "poppins", color: AppColors.textColor,),),
+                                  Container(height: 42, decoration: BoxDecoration(
                                       color: const Color(0xFFF4F8FF),
                                       borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.black26),
-                                    ),
+                                      border: Border.all(color: Colors.black26),),
                                     padding: const EdgeInsets.symmetric(horizontal: 16),
                                     child: DropdownButtonHideUnderline(
                                       child: DropdownButton<String>(
-                                        isExpanded: true,
-                                        value: controller.selectedCategoryId.value.isNotEmpty
+                                        isExpanded: true, value: controller.selectedCategoryId.value.isNotEmpty
                                             ? controller.selectedCategoryId.value
                                             : null,
                                         hint: const Text(
-                                          "Select a category",
-                                          style: TextStyle(color: Color(0xff333333), fontSize: 12),
-                                        ),
+                                          "Select a category", style: TextStyle(color: Color(0xff333333), fontSize: 12),),
                                         icon: const Icon(Icons.keyboard_arrow_down),
                                         items: cats.map((cat) {
                                           return DropdownMenuItem<String>(
@@ -306,36 +208,20 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                           if (id != null) {
                                             controller.setSelectedCategoryById(id);
                                             controller.fetchSubCategories(id); // Fetch subcategories when category is selected
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }),
+                                          }},),),),],);}),
                             // ── Subcategory Dropdown ──
-                            Obx(() {
-                              return Column(
+                            Obx(() {return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 16),
-                                  const Text(
-                                    "Subcategory",
-                                    style: TextStyle(
-                                      fontSize: 14,
+                                children: [const SizedBox(height: 16), const Text(
+                                    "Subcategory", style: TextStyle(fontSize: 14,
                                       fontWeight: FontWeight.w400,
                                       fontFamily: "poppins",
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 42,
+                                      color: Colors.black,),),
+                                  Container(height: 42,
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFF4F8FF),
                                       borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.black26),
-                                    ),
+                                      border: Border.all(color: Colors.black26),),
                                     padding: const EdgeInsets.symmetric(horizontal: 16),
                                     child: DropdownButtonHideUnderline(
                                       child: DropdownButton<String>(
@@ -343,38 +229,19 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                         value: controller.selectedSubCategoryId.value.isNotEmpty
                                             ? controller.selectedSubCategoryId.value
                                             : null,
-                                        hint: const Text(
-                                          "Select a subcategory",
-                                          style: TextStyle(color: Color(0xff333333), fontSize: 12),
-                                        ),
+                                        hint: const Text("Select a subcategory", style: TextStyle(color: Color(0xff333333), fontSize: 12),),
                                         icon: const Icon(Icons.keyboard_arrow_down),
                                         items: controller.subCategories.map((sub) {
                                           return DropdownMenuItem<String>(
                                             value: sub.id,
-                                            child: Text(sub.name),
-                                          );
-                                        }).toList(),
+                                            child: Text(sub.name),);}).toList(),
                               onChanged: (id) {
                               if (id != null) {
                               controller.selectedSubCategoryId.value = id;
-
                               final selectedSub = controller.subCategories.firstWhere(
-                              (sub) => sub.id == id,
-                              orElse: () => SubCategory(id: '', name: ''),
-                              );
-
+                              (sub) => sub.id == id, orElse: () => SubCategory(id: '', name: ''),);
                               controller.selectedSubCategoryName.value = selectedSub.name;
-                              }
-                              },
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }),
-
-                          ],
-                        ),
+                              }},),),),],);}),],),
                         Obx(() {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,14 +250,10 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                 "Work Experience",
                                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,fontFamily: "poppins",color: AppColors.textColor),
                               ),
-
-                              Container(
-                                height: 42,
-                                decoration: BoxDecoration(
+                              Container(height: 42, decoration: BoxDecoration(
                                   color: const Color(0xFFF4F8FF),
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.black26),
-                                ),
+                                  border: Border.all(color: Colors.black26),),
                                 padding: const EdgeInsets.symmetric(horizontal: 16),
                                 child: DropdownButtonHideUnderline(
                                   child: DropdownButton<String>(
@@ -403,23 +266,12 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                     items: controller.workExperienceList.map((exp) {
                                       return DropdownMenuItem<String>(
                                         value: exp,
-                                        child: Text(exp),
-                                      );
-                                    }).toList(),
+                                        child: Text(exp),);}).toList(),
                                     onChanged: (value) {
                                       if (value != null) {
                                         controller.setSelectedWorkExperience(value);
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        }),SizedBox(height: 5),
-                        Text(
-                          "Charges",
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,fontFamily: "poppins",color: AppColors.textColor),
+                                      }},),),),],);}),SizedBox(height: 5),
+                        Text("Charges", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400,fontFamily: "poppins",color: AppColors.textColor),
                         ),
                         TextField(
                           controller: controller.chargesController,
@@ -442,159 +294,82 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                             ),
                           ),
                           style: TextStyle(fontSize: 14),
-                        ),
-
-
-                      ],
-                    ),
-                  ),
-                  // Aadhaar field
-                  // TextFormField(
-                  //   controller: controller.aadharNo,
-                  //   validator: (value) {
-                  //     if (value == null || value.isEmpty) {
-                  //       return 'Aadhaar Number is required';
-                  //     } else if (value.length != 12) {
-                  //       return 'Aadhaar must be 12 digits';
-                  //     }
-                  //     return null;
-                  //   },
-                  //   decoration: InputDecoration(
-                  //     hintText: "Enter Aadhaar number",
-                  //     filled: true,
-                  //     fillColor: Color(0xFFF4F7FC),
-                  //     border: OutlineInputBorder(
-                  //       borderRadius: BorderRadius.circular(8),
-                  //     ),
-                  //   ),
-                  //   keyboardType: TextInputType.number,
-                  // ),
+                        ),],),),
                   Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 2,
-                    child: Container(
+                    elevation: 2, child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.white,
-                      ),
+                        borderRadius: BorderRadius.circular(12), color: Colors.white,),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Aadhaar Verification",
-                            style: TextStyle(
-                              fontSize: 14,
+                          const Text("Aadhaar Verification", style: TextStyle(fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              fontFamily: "poppins",
-                            ),
-                          ),
+                              fontFamily: "poppins",),),
                           const SizedBox(height: 8),
                           Card(
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Color(0xFFF4F7FC),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Color(0xFF000000)),
-                              ),
+                                border: Border.all(color: Color(0xFF000000)),),
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
+                                horizontal: 12,),
                               child: TextField( keyboardType: TextInputType.number,
                                 controller: controller.aadharNo,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
+                                decoration: InputDecoration(border: InputBorder.none,
                                   hintText: "Enter Aadhaar number",
                                   hintStyle: TextStyle(
                                     fontFamily: "poppins",
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ), const SizedBox(height: 16),
-                          Center(
-                            child: Card(
-                              child: Container(
-                                height: 36,
-                                width: 81,
+                                    fontSize: 14, color: Colors.grey[600],
+                                  ),),),),), const SizedBox(height: 16),
+                          Center(child: Card(
+                              child: Container(height: 36, width: 81,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
+                                  boxShadow: [BoxShadow(
                                       color: Color(0xFFD1D1D1),
                                       blurRadius: 6.7,
-                                      offset: Offset(0, 4),
-                                    ),
-                                  ],
+                                      offset: Offset(0, 4),),],
                                   border: Border.all(color: Colors.grey.shade300),
                                 ),
                                 child: TextButton(
                                   onPressed: () {
-                                    ShowmodelAdhar(context);
-                                  },
+                                    ShowmodelAdhar(context);},
                                   child: const Text(
                                     "Get OTP",
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500,
+                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500,
                                       color: Color(0xFFF67C0A),
                                       fontFamily: "poppins",
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                                    ),),),),),),],),),),
                   const SizedBox(height: 30),
-
                   // Proceed Button
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.6,
+                  Container(width: MediaQuery.of(context).size.width * 0.6,
                     height: 56,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       gradient: const LinearGradient(
-                        colors: [Color(0xFFF67C0A), Color(0xFFF67C0A)],
-                      ),
+                        colors: [Color(0xFFF67C0A), Color(0xFFF67C0A)],),
                       boxShadow: [
                         BoxShadow(
                           color: Color(0xFFF67C0A),
                           blurRadius: 3,
                           offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
+                        ),],),
                     child: TextButton(
                       onPressed: () {
                         if (controller.formKey.currentState!.validate()) {
                         //  controller.submitForm();
                           controller.registerServiceProvider();
                         //  Get.to(() => ProviderLocationView());
-                        }
-                      },
-                      child: const Text(
-                        "Proceed",
+                        }},
+                      child: const Text("Proceed",
                         style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+                      ),),), const SizedBox(height: 30),],),),),),),);
   }
 
   Widget buildTextField(
@@ -669,29 +444,21 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
           style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
         ),
         const SizedBox(height: 8),
-
-        // ✅ Wrap in Obx to reactively update value + items
         Obx(() => DropdownButtonFormField<String>(
-          // ✅ If selectedValue is not in items, fallback to null
           value: items.contains(selectedValue.value) && selectedValue.value.isNotEmpty
               ? selectedValue.value
               : null,
-
           icon: const Icon(Icons.keyboard_arrow_down),
-
           onChanged: (value) {
             if (value != null) {
               selectedValue.value = value;
               if (onChanged != null) onChanged(value);
             }
           },
-
           items: items
               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
               .toList(),
-
           validator: validator,
-
           decoration: InputDecoration(
             hintText: hint ?? "Select",
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
@@ -715,6 +482,8 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
       ],
     );
   }
+
+
 
 
 
