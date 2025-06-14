@@ -179,7 +179,7 @@ class HomeController extends GetxController {
         } else {
           print("➡ Navigating to ServiceproView with catId: $catId");
 
-          Get.to(() => ServiceproView(), arguments: {
+          Get.to(() => PlasteringHelperView(), arguments: {
             'users': results,
             'catId': catId,
             'subCatId': subCatId,

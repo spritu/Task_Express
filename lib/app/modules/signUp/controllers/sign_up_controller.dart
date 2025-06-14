@@ -146,6 +146,7 @@ class SignUpController extends GetxController {
         final userData = decodedResponse['data'] ?? {};
         final rawImg = userData['userImg'] ?? '';
         final token = decodedResponse['token'] ?? ''; // ✅ FIXED LINE
+        final userType = decodedResponse['userType'] ?? 0;
 
         String finalImage = '';
         if (rawImg != null && rawImg.toString().isNotEmpty) {
@@ -153,6 +154,7 @@ class SignUpController extends GetxController {
               ? rawImg
               : 'https://jdapi.youthadda.co/$rawImg';
         }
+        await prefs.setInt('userType', userType);
 
         await prefs.setString('image', finalImage);
         await prefs.setString('token', token); // ✅ SAVE TOKEN HERE
@@ -161,9 +163,10 @@ class SignUpController extends GetxController {
         await prefs.setString('lastName', userData['lastName'] ?? '');
         await prefs.setString('dob', userData['dateOfBirth'] ?? '');
         await prefs.setString('email', userData['email'] ?? '');
+        await prefs.setString('city', userData['city'] ?? '');
         await prefs.setString('gender', userData['gender'] ?? '');
         await prefs.setString('userImg', rawImg.toString());
-
+        print("✅ userType: $userType");
         print("✅ Token saved: $token");
         print("✅ Image saved: $finalImage");
 

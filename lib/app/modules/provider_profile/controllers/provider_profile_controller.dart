@@ -562,9 +562,23 @@ class ProviderProfileController extends GetxController {
   //TODO: Implement ProviderProfileController
   var subCategories = <SubCategory>[].obs;
   final selectedCategoryId = ''.obs;
+  final firstName = ''.obs;
+ // final firstName = ''.obs;
+  final lastName = ''.obs;
+  final email = ''.obs;
+  final mobile = ''.obs;
+  final userType = 0.obs;
+  final imagePath = ''.obs;
+
+  final gender = ''.obs;
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final emailController = TextEditingController();
+  final mobileController = TextEditingController();
+  //final firstNameController = TextEditingController();
   final selectedCategoryIds = <String>[].obs;
   final TextEditingController chargesController = TextEditingController();
-  var imagePath = ''.obs;
+ // var imagePath = ''.obs;
   var filteredSubCategories = <SubCategory>[].obs;
   var selectedSubCategoryId = ''.obs;
   final isCategoryLoading = false.obs;
@@ -714,6 +728,7 @@ class ProviderProfileController extends GetxController {
   //   filteredSubCategories.value = subCategories.where((sub) => selectedIds.contains(sub.categoryId)).toList();
   // }
 
+  final genderController = TextEditingController();
   void setSelectedCategory(String cat) {
     selectedCategory.value = cat;
   }
@@ -729,13 +744,13 @@ class ProviderProfileController extends GetxController {
   final categoryList = <String>[].obs;
   final isProfessionValid = true.obs;
   final TextEditingController aadharNo = TextEditingController();
-  final firstName = ''.obs;
+
   final formKey = GlobalKey<FormState>();
   TextEditingController categoryTextController = TextEditingController();
-  final lastName = ''.obs;
-  final gender = ''.obs;
+  //final lastName = ''.obs;
+
   final dateOfBirth = ''.obs;
-  final email = ''.obs;
+  //final email = ''.obs;
   final city = ''.obs;
 
   final pinCode = ''.obs;
@@ -852,6 +867,8 @@ class ProviderProfileController extends GetxController {
     referralCode.value = '';
   }
    String? mobileNumber;
+
+
   Future<void> registerServiceProvider() async {
     if (!validateFields()) return;
 
@@ -1124,12 +1141,50 @@ class ProviderProfileController extends GetxController {
     return prefs.getString('userId') ?? '';
   }
 
+  final dob = ''.obs; // ✅ reactive dob
+
+  final stateController = TextEditingController();
+  final cityController = TextEditingController();
+  final pinCodeController = TextEditingController();
+  final referralCodeController = TextEditingController();
   @override
   void onInit() {
     super.onInit();
     loadUserId();
 
+    firstNameController.text = firstName.value;
     fetchCategories();
+    final args = Get.arguments as Map<String, dynamic>? ?? {};
+    gender.value = args['gender'] ?? '';
+
+    // ✅ text field bhi fill karo agar hai
+    genderController.text = gender.value;
+    firstName.value = args['firstName'] ?? '';
+    lastName.value = args['lastName'] ?? '';
+    email.value = args['email'] ?? '';
+    gender.value = args['gender'] ?? '';
+    dob.value = args['dob'] ?? '';
+    state.value = args['state'] ?? '';
+    city.value = args['city'] ?? '';
+    pinCode.value = args['pinCode'] ?? '';
+    referralCode.value = args['referralCode'] ?? '';
+    mobile.value = args['mobile'] ?? '';
+    userType.value = args['userType'] ?? 0;
+    imagePath.value = args['imagePath'] ?? '';
+    dob.value = args['dob'] ?? '';
+    dobController.text = dob.value;
+ imagePath.value = args['imagePath'] ?? '';
+    // Fill text controllers
+    firstNameController.text = firstName.value;
+    lastNameController.text = lastName.value;
+    emailController.text = email.value;
+    genderController.text = gender.value;
+    dobController.text = dob.value;
+    stateController.text = state.value;
+    cityController.text = city.value;
+    pinCodeController.text = pinCode.value;
+    referralCodeController.text = referralCode.value;
+    mobileController.text = mobile.value;
 
   }
 
@@ -1137,7 +1192,10 @@ class ProviderProfileController extends GetxController {
   void onClose() {
     //  dobController.dispose();
     // categoryTextController.dispose();
-
+    firstNameController.dispose();
+    lastNameController.dispose();
+    emailController.dispose();
+    mobileController.dispose();
     super.onClose();
   }
 }

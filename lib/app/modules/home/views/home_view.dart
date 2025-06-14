@@ -240,7 +240,7 @@ class HomeView extends GetView<HomeController> {
                                           if (userData != null && userData is Map<String, dynamic>) {
                                             controller.searchResults.clear();
                                             FocusScope.of(context).unfocus();
-                                            Get.to(() => PlasteringHelperView(), arguments: userData)?.then((_) {
+                                            Get.to(() => PlasteringHelperView(), arguments: userData,)?.then((_) {
                                               controller.nameController.clear();
                                             });
                                           } else {
@@ -368,7 +368,7 @@ class HomeView extends GetView<HomeController> {
                                             child: Row(
                                               children: [
                                                 const Text(
-                                                  'User\nProfile',
+                                                  'Service\nProfile',
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                     fontFamily: 'Poppins',
@@ -381,7 +381,7 @@ class HomeView extends GetView<HomeController> {
                                                   ignoring:
                                                   !controller.canToggleAvailability.value,
                                                   child: FlutterSwitch(
-                                                    width: 53.0,
+                                                    width: 48.0,
                                                     height: 26.18,
                                                     toggleSize: 23.0,
                                                     value: controller.isAvailable.value,
@@ -390,20 +390,21 @@ class HomeView extends GetView<HomeController> {
                                                     inactiveColor: Colors.grey.shade400,
                                                     toggleColor: Colors.white,
                                                     padding: 1.0,
-                                                    onToggle: (val) {
-                                                      controller.isAvailable.value = val;
+                                                      onToggle: (val) async {
+                                                        if (val) {
+                                                          await Get.toNamed('/bottom2', arguments: {
+                                                            'firstName': controller.firstName.value,
+                                                            'houseNo': controller.houseNo.value,
+                                                            'landMark': controller.landMark.value,
+                                                            'skills': controller.skills.value,
+                                                            'charge': controller.charge.value,
+                                                          });
 
-                                                      if (val) {
-                                                        // navigate to bottom2
-                                                        Get.toNamed('/bottom2', arguments: {
-                                                          'firstName': controller.firstName.value,
-                                                          'houseNo': controller.houseNo.value,
-                                                          'landMark': controller.landMark.value,
-                                                          'skills': controller.skills.value,
-                                                          'charge': controller.charge.value,
-                                                        });
+                                                          // Always reset to OFF
+                                                          controller.isAvailable.value = false;
+                                                        }
                                                       }
-                                                    },
+
                                                   ),
                                                 )),
                                               ],

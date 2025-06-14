@@ -11,6 +11,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
 
   @override
   Widget build(BuildContext context) {
+
   Get.put(
       ProviderProfileController(),
     );
@@ -26,44 +27,56 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 10),
-                  Text(
-                    "Your Profile",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
+                  Text("Your Profile", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
                   const SizedBox(height: 20),
+                  Obx(() {
+                    final path = controller.imagePath.value;
 
-                  Obx(() => Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      controller.imagePath.value.isNotEmpty
-                          ? CircleAvatar(
-                        radius: 45,
-                        backgroundImage: FileImage(File(controller.imagePath.value)),
-                      )
-                          : const CircleAvatar(
-                        radius: 45,
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.person, size: 60, color: Colors.grey),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 4,
-                        child: InkWell(
-                          onTap: () => _showImagePicker(context, controller),
-                          child: const CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Colors.white,
-                            child: Icon(Icons.edit, size: 16, color: Colors.black),
+                    ImageProvider imageProvider;
+
+                    if (path.isNotEmpty) {
+                      if (path.startsWith('http')) {
+                        imageProvider = NetworkImage(path);
+                      } else {
+                        imageProvider = FileImage(File(path));
+                      }
+                    } else {
+                      imageProvider = const AssetImage('assets/images/account.png');
+                    }
+
+                    return Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        CircleAvatar(
+                          radius: 45,
+                          backgroundColor: Colors.white,
+                          backgroundImage: imageProvider,
+                          child: path.isEmpty
+                              ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                              : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 4,
+                          child: InkWell(
+                            onTap: () => _showImagePicker(context, controller),
+                            child: const CircleAvatar(
+                              radius: 16,
+                              backgroundColor: Colors.white,
+                              child: Icon(Icons.edit, size: 16, color: Colors.black),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  )),
+                      ],
+                    );
+                  }),
+
 
 
                   buildTextField(
                     "First Name",
                     "Enter first name",
+                    controller: controller.firstNameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'First Name is required';
@@ -72,55 +85,59 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                     },
                     onChanged: (val) => controller.firstName.value = val,
                   ),
-                  const SizedBox(height: 12),
 
+                  const SizedBox(height: 12),
                   buildTextField(
                     "Last Name",
                     "Enter last name",
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Last Name is required';
-                      }
-                      return null;
-                    },
+                    controller: controller.lastNameController,
                     onChanged: (val) => controller.lastName.value = val,
-                  ),SizedBox(height: 12),
+                  ),
+
+
+                  SizedBox(height: 12),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text("Gender", style: TextStyle(fontSize: 12)),
                   ),
                   // const SizedBox(height: 10),
-                  Obx(
-                        () => Row(
-                      children: ["Female", "Male", "Other"].map((e) {
-                        final isSelected = controller.gender.value == e;
-                        return Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                backgroundColor: isSelected ? AppColors.orage : Colors.white,
-                                side: BorderSide(color: isSelected ? AppColors.orage : Colors.black26),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              ),
-                              onPressed: () => controller.gender.value = e,
-                              child: Text(
-                                e,
-                                style: TextStyle(color: isSelected ? Colors.white : Colors.black, fontWeight: FontWeight.w600),
+                  Obx(() => Row(
+                    children: ["Female", "Male", "Other"].map((e) {
+                      final isSelected = controller.gender.value == e;
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: isSelected ? AppColors.orage : Colors.white,
+                              side: BorderSide(color: isSelected ? AppColors.orage : Colors.black26),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            onPressed: () {
+                              controller.gender.value = e;
+                              controller.genderController.text = e; // ✅ keep text in sync
+                            },
+                            child: Text(
+                              e,
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : Colors.black,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
+                        ),
+                      );
+                    }).toList(),
+                  )),
+
+
                   const SizedBox(height: 20),
                   // Gender selection (No validation needed for now)
                   buildTextField(
                     "Date Of Birth",
                     "DD/MM/YYYY",
                     icon: Icons.calendar_month,
-                    isDate: true,
+                    isDate: true, // ✅ triggers DatePicker
                     controller: controller.dobController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -128,12 +145,10 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                       }
                       return null;
                     },
-                    onChanged: (val) => controller.dateOfBirth.value = val,
+                    onChanged: (val) => controller.dob.value = val, // ✅ keep obs in sync
                   ),
                   const SizedBox(height: 12),
-
-                  buildTextField(
-                    "Email",
+                  buildTextField("Email", controller:  controller.emailController,
                     "Enter email",
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -146,7 +161,6 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                     keyboardType: TextInputType.emailAddress,
                     onChanged: (val) => controller.email.value = val,
                   ),  const SizedBox(height: 12),
-
                   buildDropdown(
                     "State",
                     controller.stateCityMap.keys.toList(),
@@ -156,8 +170,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                   ),
                   const SizedBox(height: 12),
                   Row(
-                    children: [
-                      Expanded(
+                    children: [Expanded(
                         child: Obx(() => buildDropdown(
                           "City",
                           controller.citiesForSelectedState,
@@ -169,26 +182,21 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 3,
                         child: buildTextField(
-                          "Pin Code",
+                          "Pin Code",controller:  controller.firstNameController,
                           "Enter pin code",
                           keyboardType: TextInputType.number,
                           onChanged: (val) => controller.pinCode.value = val,
                         //  validator: (val) => val?.isEmpty ?? true ? 'Pin code is required' : null,
-                        ),
-                      ),
-                    ],
-                  ),
+                        ),),],),
                   const SizedBox(height: 12),
-                  buildTextField(
+                  buildTextField(controller:  controller.firstNameController,
                     "Referral Code",
                     "Enter referral code",
                     keyboardType: TextInputType.number,
                     // validator: (value) {
                     //   return null; // optional
                     // },
-                    onChanged: (val) => controller.referralCode.value = val,
-                  ),
-
+                    onChanged: (val) => controller.referralCode.value = val,),
                   // Category, Profession, Work Experience dropdowns
                   // You can add validation on them too if needed
                   const SizedBox(height: 12),
@@ -207,21 +215,16 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: 10),
-
                             // ── Profession Dropdown ──
-                            Obx(() => Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Obx(() => Column(crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "Profession",
+                                Text("Profession",
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w400,
                                     fontFamily: "poppins",
                                     color: AppColors.textColor,
-                                  ),
-                                ),
-                                Container(
+                                  ),), Container(
                                   height: 42,
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFF4F8FF),
@@ -233,8 +236,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                     child: DropdownButton<String>(
                                       isExpanded: true,
                                       value: controller.selectedProfession.value.isNotEmpty
-                                          ? controller.selectedProfession.value
-                                          : null,
+                                          ? controller.selectedProfession.value : null,
                                       hint: Text(
                                         "Select your Profession",
                                         style: TextStyle(color: Color(0xff333333), fontSize: 12),
@@ -248,10 +250,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                       }).toList(),
                                       onChanged: (v) {
                                         if (v != null) controller.setSelectedProfession(v);
-                                      },
-                                    ),
-                                  ),
-                                ),
+                                      },),),),
                                 if (!controller.isProfessionValid.value)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 4, left: 8),
@@ -262,12 +261,9 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
                                   ),
                               ],
                             )),
-
-
                             // ── Category Dropdown ──
                             Obx(() {
                               final cats = controller.categories;
-
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -605,11 +601,11 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
       String label,
       String hint, {
         IconData? icon,
+        required TextEditingController controller, // ✅ REQUIRED
         Function(String)? onChanged,
         bool isDate = false,
-        TextEditingController? controller,
         TextInputType? keyboardType,
-        String? Function(String?)? validator, // <<=== ADD this line
+        String? Function(String?)? validator,
       }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -620,13 +616,10 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
         ),
         const SizedBox(height: 8),
         TextFormField(
-          // <<=== TextFormField instead of TextField
           controller: controller,
           readOnly: isDate,
           validator: validator,
-          // <<=== ADD validator here
-          onTap:
-          isDate
+          onTap: isDate
               ? () async {
             DateTime? pickedDate = await showDatePicker(
               context: Get.context!,
@@ -637,7 +630,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
             if (pickedDate != null) {
               String formattedDate =
                   "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
-              controller?.text = formattedDate;
+              controller.text = formattedDate;
               if (onChanged != null) {
                 onChanged(formattedDate);
               }
@@ -659,24 +652,46 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
     );
   }
 
-  Widget buildDropdown(String label, List<String> items, RxString selectedValue,
-      {String? hint, String? Function(String?)? validator, void Function(String)? onChanged}) {
+
+  Widget buildDropdown(
+      String label,
+      List<String> items,
+      RxString selectedValue, {
+        String? hint,
+        String? Function(String?)? validator,
+        void Function(String)? onChanged,
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+        ),
         const SizedBox(height: 8),
+
+        // ✅ Wrap in Obx to reactively update value + items
         Obx(() => DropdownButtonFormField<String>(
-          value: selectedValue.value.isNotEmpty ? selectedValue.value : null,
+          // ✅ If selectedValue is not in items, fallback to null
+          value: items.contains(selectedValue.value) && selectedValue.value.isNotEmpty
+              ? selectedValue.value
+              : null,
+
           icon: const Icon(Icons.keyboard_arrow_down),
+
           onChanged: (value) {
             if (value != null) {
               selectedValue.value = value;
               if (onChanged != null) onChanged(value);
             }
           },
-          items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+
+          items: items
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+
           validator: validator,
+
           decoration: InputDecoration(
             hintText: hint ?? "Select",
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
@@ -700,6 +715,7 @@ class ProviderProfileView extends GetView<ProviderProfileController> {
       ],
     );
   }
+
 
 
   Widget stateDropdown(

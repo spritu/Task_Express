@@ -16,6 +16,7 @@ class PlasteringHelperController extends GetxController   with WidgetsBindingObs
 // ✅ Put at the top inside your controller class:
   final RxMap<String, dynamic> lastCalledUser = <String, dynamic>{}.obs;
 
+  final categories = <Map<String, dynamic>>[].obs; // API se loaded
 
 
   @override

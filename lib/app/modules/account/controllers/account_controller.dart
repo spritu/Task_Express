@@ -10,8 +10,11 @@ class AccountController extends GetxController {
   var count = 0.obs;
   var firstName = ''.obs;
   var lastName = ''.obs;
+  var email = ''.obs;
+  var gender = ''.obs;
+  var dob = ''.obs; var city = ''.obs;
  // var imagePath = ''.obs;
-
+  var userType = 0.obs;
 
 
   final RxString imagePath = ''.obs;
@@ -38,10 +41,15 @@ class AccountController extends GetxController {
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-
+    userType.value = prefs.getInt('userType') ?? 0;
     firstName.value = prefs.getString('firstName') ?? '';
     lastName.value = prefs.getString('lastName') ?? '';
     mobileNumber.value = prefs.getString('mobileNumber') ?? '';
+    gender.value = prefs.getString('gender') ?? '';
+    dob.value = prefs.getString('dob') ?? '';
+    email.value = prefs.getString('email') ?? '';
+    city.value = prefs.getString('city') ?? '';
+
 
 
   }
