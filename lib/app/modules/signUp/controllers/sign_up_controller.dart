@@ -146,7 +146,7 @@ class SignUpController extends GetxController {
         final userData = decodedResponse['data'] ?? {};
         final rawImg = userData['userImg'] ?? '';
         final token = decodedResponse['token'] ?? ''; // ✅ FIXED LINE
-        final userType = decodedResponse['userType'] ?? 0;
+        final userType = userData['userType'] ?? 0;
 
         String finalImage = '';
         if (rawImg != null && rawImg.toString().isNotEmpty) {
