@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'package:worknest/app/modules/provider_ChatScreen/controllers/provider_chat_screen_controller.dart';
 
@@ -49,6 +50,19 @@ class ProviderChatController extends GetxController {
   @override
   void onReady() {
     super.onReady();
+  }
+
+  void makePhoneCall(String phoneNumber) async {
+    final Uri url = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      // Get.snackbar(
+      //   'Error',
+      //   'Could not launch phone dialer',
+      //   snackPosition: SnackPosition.BOTTOM,
+      // );
+    }
   }
 
   Future<void> initializeChat() async {
@@ -100,64 +114,6 @@ class ProviderChatController extends GetxController {
     fetchChatHistory();
     isInitialized.value = true;
   }
-
-  // void connectSocketAllMessage() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String? userId = prefs.getString('userId');
-  //   String? firstName = prefs.getString('firstName');
-  //   String? lastName = prefs.getString('lastName');
-  //
-  //   print("AllMessage provider  :$userId $firstName $lastName");
-  //
-  //   if (userId == null) {
-  //     print(" User ID or BookedFor missing AllMessage");
-  //     return;
-  //   }
-  //
-  //   print('🔌 Connecting socket for user AllMessage: $userId');
-  //
-  //   socket = IO.io("https://jdapi.youthadda.co", <String, dynamic>{
-  //     'transports': ['websocket'],
-  //     'autoConnect': false,
-  //     'forceNew': true,
-  //     'auth': {
-  //       'user': {'_id': userId, 'firstName': firstName, 'lastName': lastName},
-  //     },
-  //   });
-  //
-  //   socket.connect();
-  //
-  //   socket.onConnect((_) {
-  //     print(' Connected to socket AllMessage provider');
-  //   });
-  //
-  //   socket.onDisconnect((_) {
-  //     print(' Disconnected from socket AllMessage');
-  //   });
-  //
-  //   socket.onConnectError((err) {
-  //     print(' Connect Error: $err');
-  //   });
-  //
-  //   socket.onError((err) {
-  //     print(' Socket Error: $err');
-  //   });
-  //
-  //   ///Listen to notifications messages
-  //
-  //   socket.on('chatScreenActive', (data) {
-  //     print(' Received chatScreenActive message: $data');
-  //     // fetchChatHistory();
-  //     final msg = types.TextMessage(
-  //       id: data['_id'] ?? const Uuid().v4(),
-  //       text: data['message'] ?? '',
-  //       author: types.User(id: data['senderId'] ?? 'unknown'),
-  //       createdAt: DateTime.now().millisecondsSinceEpoch,
-  //     );
-  //
-  //     messages.insert(0, msg);
-  //   });
-  // }
 
   /// view all messages
   Future<void> fetchAllMessages() async {
@@ -280,30 +236,6 @@ class ProviderChatController extends GetxController {
       print("⚠️ Error deleting message: $e");
     }
   }
-
-  // Future<void> deleteMessage(String messageId) async {
-  //   var headers = {'Content-Type': 'application/json'};
-  //   var request = http.Request(
-  //     'POST',
-  //     Uri.parse('https://jdapi.youthadda.co/deleteMessage'),
-  //   );
-  //
-  //   request.body = json.encode({"messageId": messageId});
-  //   request.headers.addAll(headers);
-  //
-  //   try {
-  //     http.StreamedResponse response = await request.send();
-  //
-  //     if (response.statusCode == 200) {
-  //       final result = await response.stream.bytesToString();
-  //       print("✅ Message deleted: $result");
-  //     } else {
-  //       print("❌ Failed to delete: ${response.reasonPhrase}");
-  //     }
-  //   } catch (e) {
-  //     print("⚠️ Error deleting message: $e");
-  //   }
-  // }
 
   void connectSocket() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

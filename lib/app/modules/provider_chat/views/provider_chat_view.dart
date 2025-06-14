@@ -7,7 +7,9 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:get/get.dart';
 
 import '../../../../colors.dart';
+import '../../HelpSupport/views/help_support_view.dart';
 import '../../booking/controllers/booking_controller.dart';
+import '../../user_help/views/user_help_view.dart';
 import '../controllers/provider_chat_controller.dart';
 
 class ProviderChatView extends GetView<ProviderChatController> {
@@ -41,7 +43,7 @@ class ProviderChatView extends GetView<ProviderChatController> {
                 children: [
                   InkWell(
                     onTap: () {
-                      // Get.to(UserHelpView());
+                      Get.to(HelpSupportView());
                     },
                     child: Icon(Icons.info_outline),
                   ),
@@ -60,9 +62,10 @@ class ProviderChatView extends GetView<ProviderChatController> {
                           // Get arguments passed from previous screen
                           final Map<String, dynamic> data = Get.arguments ?? {};
                           final phoneNumber = data['phoneNumber'] ?? '';
+                          print("xxxxxgggggg:$phoneNumber");
 
                           if (phoneNumber.isNotEmpty) {
-                            //  controller.makePhoneCall(phoneNumber);
+                            controller.makePhoneCall(phoneNumber);
                           } else {
                             // Get.snackbar(
                             //   'Error',
