@@ -104,6 +104,7 @@ class ConfirmPaymentRecivedController extends GetxController {
         if (!isPopupShown.value) {
           selectedPayment.value = pendingPayments.first;
           isPopupShown.value = true; // ✅ Set flag
+          print('sesessss:$selectedPayment');
           showConfirmPopup(selectedPayment.value);
         }
       } else {
@@ -162,6 +163,7 @@ class ConfirmPaymentRecivedController extends GetxController {
   }
 
   void connectSocketCancel() async {
+    final bookingId = selectedPayment['_id'];
     final userId = selectedPayment['bookedBy']['_id'];
     final firstName = selectedPayment['bookedBy']['firstName'];
     final lastName = selectedPayment['bookedBy']['lastName'];
@@ -188,7 +190,10 @@ class ConfirmPaymentRecivedController extends GetxController {
     socket.onConnect((_) {
       print('Connected to socket cancelby sp');
 
-      final payload = {'receiver': userId.trim()};
+      final payload = {
+        'receiver': userId.trim(),
+        'bookingId': bookingId.trim(),
+      };
 
       print('📤 Emitting paybyuserconfirm payload55: $payload');
       socket.emit('paybyuserconfirm', payload);
