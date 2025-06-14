@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:worknest/app/modules/home/controllers/home_controller.dart';
+import 'package:worknest/app/modules/plastering_helper/controllers/plastering_helper_controller.dart';
 
 import '../../../../colors.dart';
 import '../../HelpSupport/views/help_support_view.dart';
@@ -20,6 +23,7 @@ class ChatView extends GetView<ChatController> {
   Widget build(BuildContext context) {
     final TextEditingController messageController = TextEditingController();
     final BottomController navController = Get.find();
+    final homeController = Get.put(PlasteringHelperController());
 
     Get.put(ChatController());
     return Scaffold(
@@ -30,7 +34,7 @@ class ChatView extends GetView<ChatController> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Get.back(),
         ),
-        titleSpacing: 0, // 👈 This removes space between back icon and title
+        titleSpacing: 0, //
         title: Obx(
           () => Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -241,18 +245,28 @@ class ChatView extends GetView<ChatController> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        // final callSheetController = Get.find<ProfessionalPlumberController>();
-                        //
-                        // // Set selectedUsers, selectedIndexAfterCall, selectedTitle here if needed
-                        // // Or make sure these values are already set previously
-                        //
-                        // callSheetController.shouldShowSheetAfterCall.value = true;
+                        final professionalPlumberController = Get.put(
+                          ProfessionalPlumberController(),
+                        );
+                        final name = professionalPlumberController.name.value;
+                        final imageUrl =
+                            professionalPlumberController.imageUrl.value;
+                        final experience =
+                            professionalPlumberController.experience;
+                        final phone = professionalPlumberController.phone;
+                        final userId = professionalPlumberController.userId;
+                        final skills = professionalPlumberController.skills;
+                        print("rrrrrrrrr:$name");
 
-                        // Book Now logic here
+                        // controller.showAfterCallSheet(
+                        //   name: controller.receiverName,
+                        //   imageUrl: controller.receiverImage,
+                        //   userId: controller.receiverId,
+                        // );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.blue,
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 8,
                         ),
@@ -277,7 +291,7 @@ class ChatView extends GetView<ChatController> {
 
             /// Message Input
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               color: Colors.grey[100],
               child: Row(
                 children: [
@@ -286,16 +300,19 @@ class ChatView extends GetView<ChatController> {
                   //   onPressed: controller.handleImagePick,
                   // ),
                   Expanded(
-                    child: TextField(
-                      controller: messageController,
-                      decoration: const InputDecoration(
-                        hintText: 'Type a message...',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: TextField(
+                        controller: messageController,
+                        decoration: const InputDecoration(
+                          hintText: 'Type a message...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                         ),
                       ),
                     ),
@@ -315,6 +332,8 @@ class ChatView extends GetView<ChatController> {
                 ],
               ),
             ),
+
+            SizedBox(height: 25),
 
             /// Book Now Section
           ],
