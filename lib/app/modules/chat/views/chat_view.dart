@@ -24,7 +24,7 @@ class ChatView extends GetView<ChatController> {
     final TextEditingController messageController = TextEditingController();
     final BottomController navController = Get.find();
     final homeController = Get.put(PlasteringHelperController());
-
+    Get.put(ProfessionalPlumberController());
     Get.put(ChatController());
     return Scaffold(
       appBar: AppBar(
@@ -62,26 +62,34 @@ class ChatView extends GetView<ChatController> {
                     children: [
                       InkWell(
                         onTap: () {
-                          // Get arguments passed from previous screen
-                          final Map<String, dynamic> data = Get.arguments ?? {};
-                          final phoneNumber = data['phoneNumber'] ?? '';
-print("phone:$phoneNumber");
-                          if (phoneNumber.isNotEmpty) {
-                            controller.makePhoneCall(
-                              phoneNumber,
-                            );
+                          // 👇 Safe cast
+                          final controllerPhoneNumber = '${controller.phoneNumber ?? ''}';
+
+                          final args = Get.arguments ?? {};
+                          final argPhoneNumber = '${args['phone'] ?? args['phoneNumber'] ?? ''}';
+
+                          final phoneNumberToCall = controllerPhoneNumber.isNotEmpty
+                              ? controllerPhoneNumber
+                              : argPhoneNumber;
+
+                          print("📞 Phone to Call: $phoneNumberToCall");
+
+                          if (phoneNumberToCall.isNotEmpty) {
+                            controller.makePhoneCall(phoneNumberToCall);
                           } else {
-                            // Get.snackbar(
-                            //   'Error',
-                            //   'Phone number not available',
-                            //   snackPosition: SnackPosition.BOTTOM,
-                            //   backgroundColor: Colors.red,
-                            //   colorText: Colors.white,
-                            // );
+                            Get.snackbar(
+                              'Error',
+                              'Phone number not available',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
                           }
                         },
                         child: Icon(Icons.call),
                       ),
+
+
                       SizedBox(width: 5),
                     ],
                   ),

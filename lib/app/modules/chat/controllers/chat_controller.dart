@@ -33,6 +33,10 @@ class ChatController extends GetxController  with WidgetsBindingObserver{
   var bookingData = {}.obs;
 
 
+  RxString catId = ''.obs;
+  RxString subCatId = ''.obs;
+  RxString charge = ''.obs;
+  RxString receiverPhoneNumber = ''.obs;
   Map<String, dynamic>? selectedUser;
   final RxList<types.Message> messages = <types.Message>[].obs;
   final Rxn<types.User> user = Rxn<types.User>();
@@ -62,14 +66,26 @@ class ChatController extends GetxController  with WidgetsBindingObserver{
   void onInit() {
     super.onInit();
     initializeChat();
+    final args = Get.arguments;
+    print('✅ Full arguments: $args');
+
+    receiverId = args['receiverId'] ?? '';
+    receiverName.value = args['receiverName'] ?? '';
+    receiverImage.value = args['receiverImage'] ?? '';
+    catId.value = args['catId']?.toString() ?? '';
+    subCatId.value = args['subCatId']?.toString() ?? '';
+    charge.value = args['charge']?.toString() ?? '';
+    receiverPhoneNumber.value = args['phone'] ?? '';
     markAllAsSeen();
+    final Map<String, dynamic> data = Get.arguments ?? {};
+    final phoneNumber = data['phoneNumber'] ?? '';
     WidgetsBinding.instance.addObserver(this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       messages.refresh();
     });
 
-    final args = Get.arguments ?? {};
+
     receiverImage.value = args['receiverImage'] ?? '';
     print("🟢 RECEIVER IMAGE: ${receiverImage.value}");
 

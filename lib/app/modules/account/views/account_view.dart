@@ -11,6 +11,7 @@ import '../../edit_profile/controllers/edit_profile_controller.dart';
 import '../../edit_profile/views/edit_profile_view.dart';
 import '../../provider_editProfile/controllers/provider_edit_profile_controller.dart';
 import '../../provider_profile/views/provider_profile_view.dart';
+import '../../provider_signup/views/provider_signup_view.dart';
 import '../controllers/account_controller.dart';
 
 class AccountView extends GetView<AccountController> {
@@ -62,32 +63,14 @@ class AccountView extends GetView<AccountController> {
                             padding: EdgeInsets.all(8.0),
                             child: Row(
                               children: [
-                                // Obx(() {
-                                //   final imageUrl = controller.imagePath.value;
-                                //   return CircleAvatar(
-                                //     radius: 40,
-                                //     backgroundImage: imageUrl.isNotEmpty
-                                //         ? NetworkImage(imageUrl)
-                                //         : const AssetImage('assets/images/account.png') as ImageProvider,
-                                //     onBackgroundImageError: (_, __) {
-                                //       print("❌ Image failed to load.");
-                                //     },
-                                //   );
-                                // }),
                                 Obx(() {
                                   final controller = Get.find<EditProfileController>();
-                                 // final localImagePath = controller.selectedImagePath.value;
                                   final serverImageUrl = controller.imagePath.value;
 
-                                 // print("🧾 Local Image Path: $localImagePath");
                                   print("🌐 Server Image URL: $serverImageUrl");
 
                                   ImageProvider imageProvider;
-
-                                  // if (localImagePath.isNotEmpty && File(localImagePath).existsSync()) {
-                                  //   imageProvider = FileImage(File(localImagePath));
-                                  // } else
-                                    if (serverImageUrl.isNotEmpty &&
+                                  if (serverImageUrl.isNotEmpty &&
                                       (serverImageUrl.startsWith('http') || serverImageUrl.startsWith('https'))) {
                                     imageProvider = NetworkImage(serverImageUrl);
                                   } else {
@@ -103,6 +86,36 @@ class AccountView extends GetView<AccountController> {
                                     },
                                   );
                                 }),
+
+                                // Obx(() {
+                                //   final controller = Get.find<EditProfileController>();
+                                //  // final localImagePath = controller.selectedImagePath.value;
+                                //   final serverImageUrl = controller.imagePath.value;
+                                //
+                                //  // print("🧾 Local Image Path: $localImagePath");
+                                //   print("🌐 Server Image URL: $serverImageUrl");
+                                //
+                                //   ImageProvider imageProvider;
+                                //
+                                //   // if (localImagePath.isNotEmpty && File(localImagePath).existsSync()) {
+                                //   //   imageProvider = FileImage(File(localImagePath));
+                                //   // } else
+                                //     if (serverImageUrl.isNotEmpty &&
+                                //       (serverImageUrl.startsWith('http') || serverImageUrl.startsWith('https'))) {
+                                //     imageProvider = NetworkImage(serverImageUrl);
+                                //   } else {
+                                //     imageProvider = const AssetImage('assets/images/account.png');
+                                //   }
+                                //
+                                //   return CircleAvatar(
+                                //     radius: 40,
+                                //     backgroundColor: Colors.grey.shade200,
+                                //     backgroundImage: imageProvider,
+                                //     onBackgroundImageError: (exception, stackTrace) {
+                                //       print("❌ Image loading error: $exception");
+                                //     },
+                                //   );
+                                // }),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 8.0,
@@ -171,7 +184,13 @@ class AccountView extends GetView<AccountController> {
                           final prefs = await SharedPreferences.getInstance();
                           final userId = prefs.getString('user_id') ?? '';
                           final mobile = prefs.getString('mobile') ?? '';
+                          final gender = controller.gender.value.isNotEmpty
+                              ? controller.gender.value
+                              : prefs.getString('gender') ?? '';
 
+                          final dob = controller.dob.value.isNotEmpty
+                              ? controller.dob.value
+                              : prefs.getString('dob') ?? '';
                           // ✅ Full user data map
                           final Map<String, dynamic> userData = {
                             'userId': userId,
@@ -180,6 +199,8 @@ class AccountView extends GetView<AccountController> {
                             'lastName': controller.lastName.value,
                             'email': controller.email.value,
                             'city':controller.city.value,
+                            'gender': gender,
+                            'dob': dob,
                             'userType': controller.userType.value,
                             'imagePath': controller.imagePath.value,
                             'state':controller.state.value,
@@ -191,7 +212,7 @@ class AccountView extends GetView<AccountController> {
                           print("📦 Navigating with: $userData");
 
                           Get.to(
-                                () => ProviderProfileView(),
+                                () => ProviderSignupView(),
                             arguments: userData,
                           );
                         },
@@ -229,39 +250,50 @@ class AccountView extends GetView<AccountController> {
                                     ),
                                   ),
                                   Spacer(),
-                                  InkWell(
-                                    onTap: () async {
-                                      final prefs = await SharedPreferences.getInstance();
-                                      final userId = prefs.getString('user_id') ?? '';
-                                      final mobile = prefs.getString('mobile') ?? '';
+                              InkWell(
+                                onTap: () async {
+                                  final prefs = await SharedPreferences.getInstance();
+                                  final userId = prefs.getString('user_id') ?? '';
+                                  final mobile = prefs.getString('mobile') ?? '';
 
-                                      final Map<String, dynamic> userData = {
-                                        'userId': userId,
-                                        'mobile': mobile,
-                                        'firstName': controller.firstName.value,
-                                        'lastName': controller.lastName.value,
-                                        'email': controller.email.value,
-                                        'userType': controller.userType.value,
-                                        'imagePath': controller.imagePath.value,
-                                        'gender': controller.gender.value,
-                                        'dob':controller.dob.value,
-                                        'sp_type': 2,
-                                      };
+                                  // ✅ Safer fallback: check controller, else prefs
+                                  final gender = controller.gender.value.isNotEmpty
+                                      ? controller.gender.value
+                                      : prefs.getString('gender') ?? '';
 
-                                      print("📦 Navigating with: $userData");
+                                  final dob = controller.dob.value.isNotEmpty
+                                      ? controller.dob.value
+                                      : prefs.getString('dob') ?? '';
 
-                                      Get.to(
-                                            () => ProviderProfileView(),
-                                        arguments: userData,
-                                      );
-                                    },
-                                    child: Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: 16,
-                                      color: AppColors.orage,
-                                    ),
-                                  ),
-                                ],
+                                  final Map<String, dynamic> userData = {
+                                    'userId': userId,
+                                    'mobile': mobile,
+                                    'firstName': controller.firstName.value,
+                                    'lastName': controller.lastName.value,
+                                    'email': controller.email.value,
+                                    'userType': controller.userType.value,
+                                    'imagePath': controller.imagePath.value,
+                                    'gender': gender,
+                                    'dob': dob,
+                                    'sp_type': 2,
+                                  };
+
+                                  print("📦 FINAL userData: $userData");
+
+                                  Get.to(
+                                        () => ProviderSignupView(),
+                                    arguments: userData,
+                                  );
+                                },
+                                child: Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 16,
+                                  color: AppColors.orage,
+                                ),
+                              )
+
+
+                              ],
                               ),
                             ),
                           ),

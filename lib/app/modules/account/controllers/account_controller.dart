@@ -15,7 +15,7 @@ class AccountController extends GetxController {
   var dob = ''.obs; var city = ''.obs;var pinCode = ''.obs;
  // var imagePath = ''.obs;
   var userType = 0.obs;
-
+  RxString profileImageUrl = ''.obs; // ✅ FINAL single source of truth
 
   final RxString imagePath = ''.obs;
 
@@ -24,9 +24,11 @@ class AccountController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadMobileNumber(); update();
+
+    loadMobileNumber(); update();loadProfileImage();
     //loadProfileImage();
     _loadUserData();loadUserInfo();
+
   }
 
 
@@ -47,6 +49,7 @@ class AccountController extends GetxController {
     mobileNumber.value = prefs.getString('mobileNumber') ?? '';
     gender.value = prefs.getString('gender') ?? '';
     dob.value = prefs.getString('dob') ?? '';
+
     email.value = prefs.getString('email') ?? '';
     city.value = prefs.getString('city') ?? '';
     state.value = prefs.getString('state') ?? '';
@@ -93,6 +96,12 @@ class AccountController extends GetxController {
     print("📱 Loaded mobile number: $number");
   }
 
+  Future<void> loadProfileImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedImageUrl = prefs.getString('image') ?? '';
+    imagePath.value = storedImageUrl;
+    print("✅ Loaded imagePath from SharedPreferences: $storedImageUrl");
+  }
   Future<void> loadUserInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     firstName.value = prefs.getString('firstName') ?? '';

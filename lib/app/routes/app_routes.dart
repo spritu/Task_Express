@@ -66,6 +66,7 @@ abstract class Routes {
   static const CONFIRM_PAYMENT_RECIVED = _Paths.CONFIRM_PAYMENT_RECIVED;
   static const RECOMPLETE_JOB_PAY = _Paths.RECOMPLETE_JOB_PAY;
   static const NAME_DETAIL = _Paths.NAME_DETAIL;
+  static const PROVIDER_SIGNUP = _Paths.PROVIDER_SIGNUP;
 }
 
 abstract class _Paths {
@@ -133,4 +134,5 @@ abstract class _Paths {
   static const CONFIRM_PAYMENT_RECIVED = '/confirm-payment-recived';
   static const RECOMPLETE_JOB_PAY = '/recomplete-job-pay';
   static const NAME_DETAIL = '/name-detail';
+  static const PROVIDER_SIGNUP = '/provider-signup';
 }

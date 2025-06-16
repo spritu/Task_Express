@@ -55,26 +55,18 @@ class ProviderChatView extends GetView<ProviderChatController> {
                   SizedBox(width: 5),
                   Row(
                     children: [
-                      InkWell(
-                        onTap: () {
-                          // Get arguments passed from previous screen
-                          final Map<String, dynamic> data = Get.arguments ?? {};
-                          final phoneNumber = data['phoneNumber'] ?? '';
+                         InkWell(
+                          onTap: () {
+                            final args = Get.arguments;
+                            print('✅ Full arguments: $args');
+                            // ✅ Correct phone number
+                            controller.receiverPhoneNumber.value = args['phone'] ?? '';
+                            final phoneNumber = controller.receiverPhoneNumber.value;
 
-                          if (phoneNumber.isNotEmpty) {
-                            //  controller.makePhoneCall(phoneNumber);
-                          } else {
-                            // Get.snackbar(
-                            //   'Error',
-                            //   'Phone number not available',
-                            //   snackPosition: SnackPosition.BOTTOM,
-                            //   backgroundColor: Colors.red,
-                            //   colorText: Colors.white,
-                            // );
-                          }
-                        },
-                        child: Icon(Icons.call),
-                      ),
+                              controller.makePhoneCall(phoneNumber);
+                              },
+                          child: const Icon(Icons.call),
+                        ),
                       SizedBox(width: 5),
                     ],
                   ),

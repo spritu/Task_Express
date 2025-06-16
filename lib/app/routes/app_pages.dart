@@ -98,6 +98,8 @@ import '../modules/provider_profile/bindings/provider_profile_binding.dart';
 import '../modules/provider_profile/views/provider_profile_view.dart';
 import '../modules/provider_setting/bindings/provider_setting_binding.dart';
 import '../modules/provider_setting/views/provider_setting_view.dart';
+import '../modules/provider_signup/bindings/provider_signup_binding.dart';
+import '../modules/provider_signup/views/provider_signup_view.dart';
 import '../modules/recomplete_job_pay/bindings/recomplete_job_pay_binding.dart';
 import '../modules/recomplete_job_pay/views/recomplete_job_pay_view.dart';
 import '../modules/road_construction_helper/bindings/road_construction_helper_binding.dart';
@@ -133,7 +135,7 @@ class AppPages {
   static final routes = [
     GetPage(
       name: _Paths.HOME,
-      page: () =>  HomeView(),
+      page: () => HomeView(),
       binding: HomeBinding(),
     ),
     GetPage(
@@ -274,7 +276,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.SERVICE_COMPLETED,
-      page: () =>  ServiceCompletedView(),
+      page: () => ServiceCompletedView(),
       binding: ServiceCompletedBinding(),
     ),
     GetPage(
@@ -427,6 +429,11 @@ class AppPages {
       name: _Paths.NAME_DETAIL,
       page: () => const NameDetailView(),
       binding: NameDetailBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROVIDER_SIGNUP,
+      page: () => const ProviderSignupView(),
+      binding: ProviderSignupBinding(),
     ),
   ];
 }

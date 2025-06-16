@@ -25,7 +25,7 @@ class JobsView extends GetView<JobsController> {
         return false;
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFFFF5ED),
+        backgroundColor: AppColors.white,
         appBar: AppBar(
           title: Text(
             'Jobs',
@@ -304,7 +304,8 @@ class JobsView extends GetView<JobsController> {
                   print(
                     'pastBookings length: ${proController.pastBookings.length}',
                   );
-                  return ListView.builder(
+                  return proController.pastBookings.isNotEmpty
+                      ? ListView.builder(
                     shrinkWrap: true,
                     padding: const EdgeInsets.symmetric(horizontal: 0),
                     physics: const BouncingScrollPhysics(),
@@ -312,43 +313,36 @@ class JobsView extends GetView<JobsController> {
                     itemBuilder: (context, index) {
                       final job = proController.pastBookings[index];
                       print('jobssss:$job');
+
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         print('jobssss: $job');
                       });
 
-                      // Extract service name
                       final fullName =
                           "${job['bookedBy']['firstName']} ${job['bookedBy']['lastName']}";
 
-                      // Extract amount
                       final amount = job['pay']?.toString() ?? '0';
+
                       final servicejob =
-                          (job['bookServices'] != null &&
-                                  job['bookServices'] is List &&
-                                  job['bookServices'].isNotEmpty)
-                              ? job['bookServices'][0]['name'] ??
-                                  'Unknown Service'
-                              : 'Unknown Service';
+                      (job['bookServices'] != null &&
+                          job['bookServices'] is List &&
+                          job['bookServices'].isNotEmpty)
+                          ? job['bookServices'][0]['name'] ?? 'Unknown Service'
+                          : 'Unknown Service';
 
-                      // Extract and format date
-                      final jobStartTime =
-                          job['jobStartTime']?.toString() ?? '';
-                      final dateOnly =
-                          jobStartTime.contains('T')
-                              ? jobStartTime.split('T')[0]
-                              : jobStartTime;
-                      final formattedDate = formatDate(
-                        dateOnly,
-                      ); // You should define this function.
+                      final jobStartTime = job['jobStartTime']?.toString() ?? '';
+                      final dateOnly = jobStartTime.contains('T')
+                          ? jobStartTime.split('T')[0]
+                          : jobStartTime;
+                      final formattedDate = formatDate(dateOnly);
 
-                      // Extract user location
                       final user = job['bookedBy'] as Map<String, dynamic>?;
                       final location = user?['city']?.toString() ?? 'Unknown';
 
-                      // Static status info
                       const status = "Completed";
                       const statusColor = Colors.green;
                       const icon = Icons.check_circle;
+
                       return _buildPastJob(
                         job: job,
                         name: fullName,
@@ -361,7 +355,22 @@ class JobsView extends GetView<JobsController> {
                         icon: icon,
                       );
                     },
+                  )
+                      : const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Text(
+                        "No Past Bookings",
+                        style: TextStyle(
+                          fontFamily: "poppins",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ),
                   );
+
                 }),
               ],
             ),

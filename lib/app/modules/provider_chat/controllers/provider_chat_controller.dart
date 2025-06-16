@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'package:worknest/app/modules/provider_ChatScreen/controllers/provider_chat_screen_controller.dart';
 
@@ -21,6 +22,9 @@ class ProviderChatController extends GetxController {
   RxString userId = ' '.obs;
   RxString userImg = ''.obs;
   RxString receiverName = ''.obs;
+  final arguments = Get.arguments;
+  RxString receiverPhoneNumber = ''.obs;
+
   RxString receiverImage = ''.obs;
   var firstName = ''.obs;
   var lastName = ''.obs;
@@ -34,8 +38,25 @@ class ProviderChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+
+    final args = Get.arguments;
+    print('✅ Full arguments: $args');
+
+    // ✅ Correct phone number
+    receiverPhoneNumber.value = args['phone'] ?? '';
+
+    print('✅ Loaded phone in controller: ${receiverPhoneNumber.value}');
+    print('✅ receiverId: ${args['receiverId']}');
+    print('✅ receiverName: ${args['receiverName']}');
+    print('✅ receiverImage: ${args['receiverImage']}');
+    print('✅ catId: ${args['categoryId']}');
+    print('✅ subCatId: ${args['subCatId']}');
+    print('✅ charge: ${args['charge']}');
+    print('✅ phoneNumber: ${args['phone']}');
     initializeChat();
 
+    receiverPhoneNumber.value = args['receiverPhoneNumber'] ?? '';
     // ✅ Mark messages as read after UI has rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
       fetchAllMessages();
@@ -50,7 +71,15 @@ class ProviderChatController extends GetxController {
   void onReady() {
     super.onReady();
   }
-
+  void makePhoneCall(String phoneNumber) async {
+    final Uri callUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(callUri)) {
+      //  shouldShowSheetAfterCall = true;
+      await launchUrl(callUri);
+    } else {
+      Get.snackbar('Error', 'Could not launch phone call');
+    }
+  }
   Future<void> initializeChat() async {
     // Retrieve userId from SharedPreferences
     final prefs = await SharedPreferences.getInstance();

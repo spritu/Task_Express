@@ -9,6 +9,7 @@ import '../../account/controllers/account_controller.dart';
 class EditProfileController extends GetxController {
   RxString imagePath = ''.obs;
   final ImagePicker _picker = ImagePicker();
+  RxString profileImageUrl = ''.obs; // ✅ FINAL single source of truth
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController genderController = TextEditingController();
@@ -17,9 +18,13 @@ class EditProfileController extends GetxController {
   var userData = {}.obs;
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
     loadUserInfo();getUserData();
+    final prefs = await SharedPreferences.getInstance();
+    profileImageUrl.value = prefs.getString('profileImage') ?? '';
+
+    print("✅ Initial Profile Image URL: ${profileImageUrl.value}");
   }
 
   void toggleEdit(RxBool fieldEditable) {
