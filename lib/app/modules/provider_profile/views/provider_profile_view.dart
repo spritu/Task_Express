@@ -8,7 +8,7 @@ import '../../provider_location/views/provider_location_view.dart';
 import '../controllers/provider_profile_controller.dart';
 
 class ProviderProfileView extends GetView<ProviderProfileController> {
-  const ProviderProfileView({super.key});
+  const ProviderProfileView({super.key,});
 
   @override
   Widget build(BuildContext context) {

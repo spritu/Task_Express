@@ -50,6 +50,7 @@ import 'auth_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GetStorage.init();
   // SharedPreferences prefs = await SharedPreferences.getInstance();// <-- ADD THIS
   final box = GetStorage();

@@ -45,13 +45,13 @@ class ProviderChatView extends GetView<ProviderChatController> {
                     },
                     child: Icon(Icons.info_outline),
                   ),
-                  SizedBox(width: 5),
-                  InkWell(
-                    onTap: () {
-                      // navController.changeTab(3);
-                    },
-                    child: Icon(Icons.person),
-                  ),
+                  //SizedBox(width: 5),
+                  // InkWell(
+                  //   onTap: () {
+                  //     // navController.changeTab(3);
+                  //   },
+                  //   child: Icon(Icons.person),
+                  // ),
                   SizedBox(width: 5),
                   Row(
                     children: [

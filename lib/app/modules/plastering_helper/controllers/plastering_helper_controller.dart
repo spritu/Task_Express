@@ -16,18 +16,56 @@ class PlasteringHelperController extends GetxController   with WidgetsBindingObs
   final RxMap<String, dynamic> lastCalledUser = <String, dynamic>{}.obs;
 
   final categories = <Map<String, dynamic>>[].obs; // API se loaded
-
+  final Map<String, String> categoryNameById = {};
 
   @override
   void onInit() {
-    super.onInit();
+    super.onInit();fetchCategories();
     WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void onReady() {
   }
+  Future<void> fetchCategories() async {
+    try {
+      var request = http.Request(
+        'GET',
+        Uri.parse('https://jdapi.youthadda.co/category/getCategory'),
+      );
 
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        final res = await response.stream.bytesToString();
+        final jsonResponse = jsonDecode(res);
+        final data = jsonResponse['data'];
+
+        if (data != null && data is List) {
+          categoryNameById.clear();
+
+          for (var category in data) {
+            final catId = category['_id'];
+            final catName = category['name'];
+            categoryNameById[catId] = catName;
+            print('Mapped: catId=$catId | catName=$catName');
+
+            final subcategories = category['subcategories'] ?? [];
+            for (var sub in subcategories) {
+              final subId = sub['_id'];
+              final subName = sub['name'];
+              categoryNameById[subId] = subName;
+              print('Mapped: subId=$subId | subName=$subName');
+            }
+          }
+        }
+      } else {
+        print('API Error: ${response.statusCode} ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('fetchCategories error: $e');
+    }
+  }
   @override
   void onClose() {
     super.onClose();
@@ -205,6 +243,8 @@ class PlasteringHelperController extends GetxController   with WidgetsBindingObs
         required String userId,
         required List<Map<String, dynamic>> skills,
       }) {
+    final categoryController = Get.find<PlasteringHelperController>();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -268,8 +308,12 @@ class PlasteringHelperController extends GetxController   with WidgetsBindingObs
                     ),
                   ),
                   const SizedBox(height: 20),
+
+                  // ✅ UPDATED: Use map for name fallback
                   ...skills.map((skill) {
                     String title = '';
+
+                    // Try skill-provided name first
                     if (skill['subcategoryName'] != null &&
                         skill['subcategoryName'].toString().isNotEmpty) {
                       title = skill['subcategoryName'];
@@ -277,8 +321,19 @@ class PlasteringHelperController extends GetxController   with WidgetsBindingObs
                         skill['categoryName'].toString().isNotEmpty) {
                       title = skill['categoryName'];
                     } else {
-                      title = 'Service';
+                      // Fallback: resolve from map
+                      final subId = skill['subcategoryId']?.toString();
+                      final catId = skill['categoryId']?.toString();
+                      if (subId != null && subId.isNotEmpty) {
+                        title = categoryController.categoryNameById[subId] ?? '';
+                      }
+                      if (title.isEmpty && catId != null && catId.isNotEmpty) {
+                        title = categoryController.categoryNameById[catId] ?? '';
+                      }
                     }
+
+                    // Final fallback
+                    if (title.isEmpty) title = 'Service';
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
@@ -304,6 +359,7 @@ class PlasteringHelperController extends GetxController   with WidgetsBindingObs
                       ),
                     );
                   }).toList(),
+
                   const SizedBox(height: 20),
                   const Text(
                     "Not Satisfied? Let’s help you find someone else",
@@ -347,6 +403,7 @@ class PlasteringHelperController extends GetxController   with WidgetsBindingObs
       },
     );
   }
+
 
   Widget professionRow({
     required String title,

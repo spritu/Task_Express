@@ -12,6 +12,9 @@ import '../../HelpSupport/views/help_support_view.dart';
 import '../../account/views/account_view.dart';
 import '../../bottom/controllers/bottom_controller.dart';
 import '../../professional_plumber/controllers/professional_plumber_controller.dart';
+import '../../professional_profile/views/professional_profile_view.dart';
+import '../../provider_account/controllers/provider_account_controller.dart' show ProviderAccountController;
+import '../../provider_account/views/provider_account_view.dart';
 import '../../user_help/views/user_help_view.dart';
 import '../controllers/chat_controller.dart';
 
@@ -21,6 +24,7 @@ class ChatView extends GetView<ChatController> {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(ProviderAccountController());
     final TextEditingController messageController = TextEditingController();
     final BottomController navController = Get.find();
     final homeController = Get.put(PlasteringHelperController());
@@ -51,13 +55,55 @@ class ChatView extends GetView<ChatController> {
                     child: Icon(Icons.info_outline),
                   ),
                   SizedBox(width: 10),
-                  InkWell(
-                    onTap: () {
-                      // navController.changeTab(3);
-                    },
-                    child: Icon(Icons.person),
-                  ),
-                  SizedBox(width: 10),
+          InkWell(
+            onTap: () async {
+              // Suppose this is the ID of the user you are chatting with
+              final receiverId = controller.receiverId; // or pass it directly
+
+              print("🔑 Fetching receiver profile for id: $receiverId");
+
+              final receiverDetail = await controller.fetchReceiverDetail();
+
+              if (receiverDetail != null) {
+                final name = "${receiverDetail['firstName'] ?? ''} ${receiverDetail['lastName'] ?? ''}".trim();
+                final imageUrl = receiverDetail['userImg'] ?? '';
+                final experience = "${receiverDetail['experience'] ?? 0} year Experience";
+                final phone = receiverDetail['phone'] ?? '';
+                final userId = receiverDetail['_id'] ?? '';
+
+                final skills = (receiverDetail['skills'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+
+                print('✅ Going to ProviderAccountView with:');
+                print('Name: $name');
+                print('ID: $userId');
+
+                Get.to(
+                      () => ProfessionalProfileView(),
+                  arguments: {
+                    'name': receiverDetail['firstName'],
+                    'image': receiverDetail['userImg'],
+                    'experience': receiverDetail['experience'],
+                    'phone': receiverDetail['phone'],
+                    'id': receiverDetail['_id'],
+                    'skills': receiverDetail['skills'] ?? [],
+                    'averageRating':
+                    receiverDetail['averageRating'],
+                    'reviews': receiverDetail['reviews'] ?? [],
+                    'avail': receiverDetail['avail'],
+                  },
+                );
+              } else {
+                Get.snackbar("Error", "Failed to fetch receiver details");
+              }
+            },
+            child: const Icon(Icons.person),
+          ),
+
+
+
+
+
+          SizedBox(width: 10),
                   Row(
                     children: [
                       InkWell(
@@ -88,18 +134,10 @@ class ChatView extends GetView<ChatController> {
                         },
                         child: Icon(Icons.call),
                       ),
-
-
                       SizedBox(width: 5),
                     ],
                   ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-
+                ],),],),),),
       body: Container(
         decoration: BoxDecoration(color: Color(0xFFAEC6F9)),
         child: Column(
@@ -241,47 +279,52 @@ class ChatView extends GetView<ChatController> {
                         ),
                       ),
                     ),
+
+    /// 👉 This is your ELEVATED BUTTON inside your widget:
                     ElevatedButton(
-                      onPressed: () {
-                        // ✅ Put the ProfessionalPlumberController (if not already)
+                      onPressed: () async {
+                        // Make sure the controller is available
                         Get.put(ProfessionalPlumberController());
 
-                        // ✅ Get the last called user from your main controller
-                        final user = controller.lastCalledUser.value;
+                        final receiverId = controller.receiverId;
+                        print("🔑 Fetching receiver detail for id: $receiverId");
 
-                        // ✅ Also get any passed arguments (example: phoneNumber)
-                        final Map<String, dynamic> data = Get.arguments ?? {};
-                        final phoneNumber = data['phoneNumber'] ?? '';
+                        final receiverDetail = await controller.fetchReceiverDetail();
 
-                        // ✅ Extract required user fields safely
-                        final name = "${user['firstName'] ?? ''} ${user['lastName'] ?? ''}".trim();
-                        final imageUrl = user['userImg'] ?? '';
-                        final experience = "${user['expiresAt'] ?? '0'} year Experience";
-                        final userId = user['_id']?.toString() ?? '';
+                        if (receiverDetail != null) {
+                          // Update controller (optional)
+                          controller.receiverUserMap = receiverDetail;
 
-                        // ✅ Extract skills as list of maps
-                        final List<Map<String, dynamic>> skills =
-                            (user['skills'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+                          final name = "${receiverDetail['firstName'] ?? ''} ${receiverDetail['lastName'] ?? ''}".trim();
+                          final imageUrl = receiverDetail['userImg'] ?? '';
+                          final experience = "${receiverDetail['experience'] ?? 0} year Experience";
+                          final phone = receiverDetail['phone'] ?? '';
+                          final userId = receiverDetail['_id'] ?? '';
 
-                        // ✅ Debug prints
-                        print("🟢 Bottom sheet will open with:");
-                        print("Name: $name");
-                        print("Image URL: $imageUrl");
-                        print("Experience: $experience");
-                        print("Phone Number (from arguments): $phoneNumber");
-                        print("User ID: $userId");
-                        print("Skills: ${skills.map((e) => e.toString()).toList()}");
+                          final skills = (receiverDetail['skills'] as List?)?.cast<Map<String, dynamic>>() ?? [];
 
-                        // ✅ Call your custom bottom sheet method with these details
-                        controller.showAfterCallSheet(
-                          Get.context!,
-                          name: name,
-                          imageUrl: imageUrl,
-                          experience: experience,
-                          phone: phoneNumber,
-                          userId: userId,
-                          skills: skills,
-                        );
+                          // ✅ Show BottomSheet with fallback skill logic handled inside
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                            ),
+                            builder: (_) => controller.showAfterCallSheet(
+                              context,
+                              name: name,
+                              imageUrl: imageUrl,
+                              experience: experience,
+                              phone: phone,
+                              userId: userId,
+
+                              skills: skills,
+
+                            ),
+                          );
+                        } else {
+                          Get.snackbar('Error', 'User not found.');
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.blue,
@@ -302,7 +345,10 @@ class ChatView extends GetView<ChatController> {
                     ),
 
 
-                  ],
+
+
+
+    ],
                 ),
               ),
             ),
@@ -350,9 +396,7 @@ class ChatView extends GetView<ChatController> {
                 ],
               ),
             ),
-
             SizedBox(height: 25),
-
             /// Book Now Section
           ],
         ),
