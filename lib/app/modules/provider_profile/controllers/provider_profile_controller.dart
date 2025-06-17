@@ -562,23 +562,9 @@ class ProviderProfileController extends GetxController {
   //TODO: Implement ProviderProfileController
   var subCategories = <SubCategory>[].obs;
   final selectedCategoryId = ''.obs;
-  final firstName = ''.obs;
-  // final firstName = ''.obs;
-  final lastName = ''.obs;
-  final email = ''.obs;
-  final mobile = ''.obs;
-  final userType = 0.obs;
-  final imagePath = ''.obs;
-
-  final gender = ''.obs;
-  final firstNameController = TextEditingController();
-  final lastNameController = TextEditingController();
-  final emailController = TextEditingController();
-  final mobileController = TextEditingController();
-  //final firstNameController = TextEditingController();
   final selectedCategoryIds = <String>[].obs;
   final TextEditingController chargesController = TextEditingController();
-  // var imagePath = ''.obs;
+  var imagePath = ''.obs;
   var filteredSubCategories = <SubCategory>[].obs;
   var selectedSubCategoryId = ''.obs;
   final isCategoryLoading = false.obs;
@@ -728,7 +714,6 @@ class ProviderProfileController extends GetxController {
   //   filteredSubCategories.value = subCategories.where((sub) => selectedIds.contains(sub.categoryId)).toList();
   // }
 
-  final genderController = TextEditingController();
   void setSelectedCategory(String cat) {
     selectedCategory.value = cat;
   }
@@ -744,13 +729,13 @@ class ProviderProfileController extends GetxController {
   final categoryList = <String>[].obs;
   final isProfessionValid = true.obs;
   final TextEditingController aadharNo = TextEditingController();
-
+  final firstName = ''.obs;
   final formKey = GlobalKey<FormState>();
   TextEditingController categoryTextController = TextEditingController();
-  //final lastName = ''.obs;
-
+  final lastName = ''.obs;
+  final gender = ''.obs;
   final dateOfBirth = ''.obs;
-  //final email = ''.obs;
+  final email = ''.obs;
   final city = ''.obs;
 
   final pinCode = ''.obs;
@@ -867,10 +852,9 @@ class ProviderProfileController extends GetxController {
     referralCode.value = '';
   }
   String? mobileNumber;
-
-
   Future<void> registerServiceProvider() async {
-    // if (!validateFields()) return;
+    // If you want, uncomment this:
+     if (!validateFields()) return;
 
     final prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('userId');
@@ -942,32 +926,36 @@ class ProviderProfileController extends GetxController {
         box.write('isLoggedIn2', true);
 
         final message = jsonRes['msg'] ?? 'Service provider registered';
-        Get.snackbar('Success', message);
 
         final userData = jsonRes['data'] ?? jsonRes['user'] ?? jsonRes;
         print("👀 userData: $userData");
 
-        // ✅ Extract image from response
+        // ✅ Handle image properly
+        String localImagePath = imagePath.value; // keep local path separate
         String rawImg = userData?['userImg'] ?? '';
-        String finalImage = '';
+        String serverImageUrl = '';
+
+        print("📸 Raw image from API: $rawImg");
+
         if (rawImg.isNotEmpty) {
           if (rawImg.startsWith('http') || rawImg.startsWith('/data')) {
-            finalImage = rawImg;
+            serverImageUrl = rawImg;
           } else {
-            finalImage = 'https://jdapi.youthadda.co/$rawImg';
+            serverImageUrl = 'https://jdapi.youthadda.co/$rawImg';
           }
         } else {
-          // Fallback to uploaded image path
-          finalImage = imagePath.value;
+          // fallback: use uploaded local path if API returned none
+          serverImageUrl = localImagePath;
         }
 
-        // ✅ Extract token from response
+        print("✅ Final server image URL: $serverImageUrl");
+
+        // ✅ Extract token
         String token = jsonRes['token'] ?? '';
 
-        // ✅ Save to reactive var + prefs
-        imagePath.value = finalImage;
-        await prefs.setString('image', finalImage);
-        print("✅ Final image saved: $finalImage");
+        // ✅ Save only SERVER URL to SharedPreferences
+        await prefs.setString('userImg', serverImageUrl);
+        print("✅ Image saved to prefs: $serverImageUrl");
 
         if (token.isNotEmpty) {
           await prefs.setString('token', token);
@@ -997,20 +985,11 @@ class ProviderProfileController extends GetxController {
         print("✅ All user data saved to SharedPreferences");
         await prefs.reload();
 
-        // Clear old login flag & set new one
-        box.remove('isLoggedIn');
-        box.write('isLoggedIn2', true);
-
+        // ✅ Clear local state if needed
         clearFields();
 
-        // ✅ Navigate and pass latest image
-        Get.to(
-              () => ProviderLocationView(),
-          arguments: {
-            'imagePath': imagePath.value,
-            // aur bhi arguments yaha bhej sakte ho if needed
-          },
-        );
+        // ✅ Navigate and pass SERVER IMAGE URL
+        Get.to(() => ProviderLocationView(), arguments: serverImageUrl);
       } else {
         print('❌ ${streamed.statusCode}: $body');
         try {
@@ -1026,67 +1005,198 @@ class ProviderProfileController extends GetxController {
     }
   }
 
+//   Future<void> registerServiceProvider() async {
+//     if (!validateFields()) return;
+//
+//     final prefs = await SharedPreferences.getInstance();
+//     String? userId = prefs.getString('userId');
+//
+//     if (userId == null || userId.isEmpty) {
+//       Get.snackbar('Error', 'User ID not found. Please verify OTP again.');
+//       return;
+//     }
+//     mobileNumber = prefs.getString('mobileNumber');
+//
+//
+//     final request = http.MultipartRequest(
+//       'POST',
+//       Uri.parse('https://jdapi.youthadda.co/user/serviceproviderregister'),
+//     );
+//
+//     print('📤 Sending registration data:');
+//     print('userId: $userId');
+//     print('First Name: ${firstName.value}');
+//     print('Last Name: ${lastName.value}');
+//     print('Gender: ${gender.value}');
+//     print('DOB: ${dateOfBirth.value}');
+//     print('Email: ${email.value}');
+//     print('Phone: ${mobileNumber}');
+//     print('City: ${city.value}');
+//     print('Pin Code: ${pinCode.value}');
+//     print('State: ${state.value}');
+//     print('Referral Code: ${referralCode.value}');
+//     print('CategoryId: ${selectedCategoryId.value}');
+//     print('SubcategoryId: ${selectedSubCategoryId.value}');
+//     print('Charge: ${chargesController.text}');
+//     print('Aadhar No: ${aadharNo.text}');
+//
+//     // ✅ Construct skills JSON
+//     Map<String, dynamic> skillData = {
+//       "categoryId": selectedCategoryId.value,
+//       "charge": chargesController.text,
+//     };
+//
+//     if (selectedSubCategoryId.value.isNotEmpty) {
+//       skillData["sucategoryId"] = selectedSubCategoryId.value;
+//     }
+//
+//     List<Map<String, dynamic>> skills = [skillData];
+//     print('Skills JSON: $skills');
+//
+//     // 🔸 Add all required fields
+//     request.fields.addAll({
+//       '_id': userId,
+//       'userType': '2',
+//       'firstName': firstName.value,
+//       'lastName': lastName.value,
+//       'gender': gender.value,
+//       'dateOfBirth': dateOfBirth.value,
+//       'email': email.value,
+//       'phone': mobileNumber.toString(),
+//       'city': city.value,
+//       'pinCode': pinCode.value,
+//       'state': state.value,
+//       'referralCode': referralCode.value,
+//       'skills': jsonEncode(skills),
+//       'aadharNo': aadharNo.text,
+//       'experience': selectedWorkExperience.value.replaceAll(RegExp(r'[^0-9]'), ''),
+//
+//     });
+//
+//     // ✅ Optional subcategory fields in SharedPreferences
+//     if (selectedSubCategoryId.value.isNotEmpty) {
+//       request.fields['subcategoryId'] = selectedSubCategoryId.value;
+//       await prefs.setString('subcategoryId', selectedSubCategoryId.value);
+//       await prefs.setString('subcategory', selectedSubCategoryName.value);
+//       print("✅ Subcategory ID: ${selectedSubCategoryId.value}");
+//       print("✅ Subcategory Name: ${selectedSubCategoryName.value}");
+//     }
+//
+//     // 🔸 Add image if exists
+//     if (imagePath.value.isNotEmpty) {
+//       File imageFile = File(imagePath.value);
+//
+//       if (await imageFile.exists()) {
+//         request.files.add(
+//           await http.MultipartFile.fromPath('Img', imagePath.value),
+//         );
+//
+//         final bytes = await imageFile.readAsBytes();
+//         final base64Image = base64Encode(bytes);
+//
+//         await prefs.setString('userImgBase64', base64Image);
+//         await prefs.setString('userImg', imagePath.value);
+//         print('✅ Image saved to SharedPreferences');
+//       } else {
+//         print('❗ Image file not found: ${imagePath.value}');
+//       }
+//     }
+//
+//     try {
+//       final streamed = await request.send();
+//       final body = await streamed.stream.bytesToString();
+//
+//       print('🔄 Raw Response Body: $body');
+//
+//       if (streamed.statusCode == 200 || streamed.statusCode == 201) {
+//         final jsonRes = json.decode(body);
+//         print('✅ JSON Response: $jsonRes');
+//
+//         final box = GetStorage();
+//         box.remove('isLoggedIn');
+//         box.write('isLoggedIn2', true);
+//         final message = jsonRes['msg'] ?? 'Service provider registered';
+//         Get.snackbar('Success', message);
+//         final userData = jsonRes['data'] ?? jsonRes['user'] ?? jsonRes;
+//         final rawImg = userData?['userImg'] ?? '';
+//         String finalImage = '';
+//
+//         if (rawImg.isNotEmpty) {
+//           finalImage = rawImg.startsWith('http')
+//               ? rawImg
+//               : 'https://jdapi.youthadda.co/$rawImg';
+//         }
+//
+// // Save using a consistent key like 'image'
+//         await prefs.setString('image', finalImage);
+//
+//         print("🖼️ Final User Image URL: $finalImage");
+//         // 🔸 Save required data to SharedPreferences
+//         await prefs.setString('categoryId', selectedCategoryId.value);
+//         await prefs.setString('category', selectedCategoryName.value);
+//         await prefs.setString('firstName', firstName.value);
+//         await prefs.setString('lastName', lastName.value);
+//         await prefs.setString('profession', selectedProfession.value);
+//         await prefs.setString('gender', gender.value);
+//         await prefs.setString('dob', dateOfBirth.value);
+//         await prefs.setString('email', email.value);
+//         await prefs.setString('mobile', mobileNumber!);
+//         await prefs.setString('city', city.value);
+//         await prefs.setString('pinCode', pinCode.value);
+//         await prefs.setString('state', state.value);
+//         await prefs.setString('referralCode', referralCode.value);
+//         await prefs.setString('aadharNo', aadharNo.text);
+//         await prefs.setString('charge', chargesController.text);
+//         await prefs.setString('image', finalImage);
+//
+//         // Confirm
+//         print("✅ Image saved to SharedPreferences: ${prefs.getString('image')}");
+//         await prefs.reload();
+//
+//        // final accountController = Get.find<ProviderAccountController>();
+//        // await accountController.loadUserInfo();
+//        // await accountController.loadMobileNumber();
+//
+//         clearFields();
+//         Get.to(() => ProviderLocationView());
+//       } else {
+//         print('❌ ${streamed.statusCode}: $body');
+//         try {
+//           final error = json.decode(body);
+//           Get.snackbar('Error', error['msg'] ?? 'Something went wrong.');
+//         } catch (_) {
+//           Get.snackbar('Error', 'Server returned ${streamed.statusCode}');
+//         }
+//       }
+//     } catch (e) {
+//       print('❗ Exception: $e');
+//       Get.snackbar('Error', 'Could not register. Check your internet connection.');
+//     }
+//   }
 
 
 
 
+  // helper to load your stored userId
   Future<String> _getUserIdFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('userId') ?? '';
   }
 
-  final dob = ''.obs; // ✅ reactive dob
-
-  final stateController = TextEditingController();
-  final cityController = TextEditingController();
-  final pinCodeController = TextEditingController();
-  final referralCodeController = TextEditingController();
   @override
   void onInit() {
     super.onInit();
     loadUserId();
+
     fetchCategories();
 
-    final args = Get.arguments as Map<String, dynamic>? ?? {};
-
-    firstName.value = args['firstName'] ?? '';
-    lastName.value = args['lastName'] ?? '';
-    email.value = args['email'] ?? '';
-    gender.value = args['gender'] ?? '';
-    dob.value = args['dob'] ?? '';
-    state.value = args['state'] ?? '';
-    city.value = args['city'] ?? '';
-    pinCode.value = args['pinCode']?.toString() ?? '';
-    referralCode.value = args['referralCode']?.toString() ?? '';
-    mobile.value = args['mobile'] ?? '';
-    userType.value = args['userType'] ?? 0;
-    imagePath.value = args['imagePath'] ?? '';
-
-    // Sync text controllers
-    firstNameController.text = firstName.value;
-    lastNameController.text = lastName.value;
-    emailController.text = email.value;
-    genderController.text = gender.value;
-    dobController.text = dob.value;
-    stateController.text = state.value;
-    cityController.text = city.value;
-    pinCodeController.text = pinCode.value;
-    referralCodeController.text = referralCode.value;
-    mobileController.text = mobile.value;
-
-    print('✅ Loaded args: $args');
-    print('✅ Image path: ${imagePath.value}');
   }
-
 
   @override
   void onClose() {
     //  dobController.dispose();
     // categoryTextController.dispose();
-    firstNameController.dispose();
-    lastNameController.dispose();
-    emailController.dispose();
-    mobileController.dispose();
+
     super.onClose();
   }
 }

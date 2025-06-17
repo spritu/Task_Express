@@ -234,7 +234,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (mounted && userId == null) {
       Get.offAll(
-        () => JoinView(),
+            () => JoinView(),
       ); // Show JoinView only if user never logged in
     }
   }
@@ -271,17 +271,17 @@ class _SplashScreenState extends State<SplashScreen> {
                   Row(
                     children: List.generate(
                       2,
-                      (index) => AnimatedContainer(
+                          (index) => AnimatedContainer(
                         duration: Duration(milliseconds: 300),
                         margin: EdgeInsets.symmetric(horizontal: 5),
                         height: 10,
                         width: 10,
                         decoration: BoxDecoration(
                           color:
-                              (_currentPage == 1 && index == 0) ||
-                                      (_currentPage == 2 && index == 1)
-                                  ? Color(0xff235CD7)
-                                  : Colors.grey,
+                          (_currentPage == 1 && index == 0) ||
+                              (_currentPage == 2 && index == 1)
+                              ? Color(0xff235CD7)
+                              : Colors.grey,
                           shape: BoxShape.circle,
                         ),
                       ),

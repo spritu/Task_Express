@@ -193,173 +193,178 @@ class BookingView extends GetView<BookingController> {
                                         //
                                         // return SizedBox(height: 300,
                                         // child:
-                                    ListView.builder(
-                                      itemCount: controller.userList.length,
-                                      shrinkWrap: true,
-                                      itemBuilder: (context, index) {
-                                        final UserModel item = controller.userList[index]; // ✅ No casting to Map
+                                        controller.userList.isNotEmpty
+                                            ? ListView.builder(
+                                          itemCount: controller.userList.length,
+                                          shrinkWrap: true,
+                                          physics: const NeverScrollableScrollPhysics(), // if inside a Column
+                                          itemBuilder: (context, index) {
+                                            final UserModel item = controller.userList[index];
 
-                                        final userImg = item.userImg ?? '';
-                                        final firstName = item.bookedFor['firstName'] ?? '';
-                                        final lastName = item.bookedFor['lastName'] ?? '';
-                                        final spType = item.spType;
-                                        final jobStartTime = item.jobStartTime;
+                                            final userImg = item.userImg ?? '';
+                                            final firstName = item.bookedFor['firstName'] ?? '';
+                                            final lastName = item.bookedFor['lastName'] ?? '';
+                                            final spType = item.spType;
+                                            final jobStartTime = item.jobStartTime;
 
-                                        print("Image URL: https://jdapi.youthadda.co/$userImg");
-
-                                        return Card(
-                                          color: AppColors.white,
-                                          child: Container(
-                                            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            return Card(
+                                              color: AppColors.white,
+                                              child: Container(
+                                                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                                                child: Column(
                                                   children: [
-                                                    /// Left Section
-                                                    Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
-                                                        /// Name Row
-                                                        Row(
+                                                        // Left section — same as your code
+                                                        Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
                                                           children: [
-                                                            CircleAvatar(
-                                                              radius: 25,
-                                                              backgroundImage: userImg.isNotEmpty
-                                                                  ? NetworkImage("https://jdapi.youthadda.co/$userImg")
-                                                                  : const AssetImage("assets/images/account.png") as ImageProvider,
-                                                              onBackgroundImageError: (_, __) {
-                                                                debugPrint("Error loading image for user: $userImg");
-                                                              },
-                                                            ),
-                                                            const SizedBox(width: 4),
-                                                            Column(
-                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                            Row(
                                                               children: [
-                                                                Text(
-                                                                  "$firstName $lastName",
-                                                                  style: const TextStyle(
-                                                                    fontFamily: "poppins",
-                                                                    fontSize: 14,
-                                                                    fontWeight: FontWeight.w500,
-                                                                  ),
+                                                                CircleAvatar(
+                                                                  radius: 25,
+                                                                  backgroundImage: userImg.isNotEmpty
+                                                                      ? NetworkImage("https://jdapi.youthadda.co/$userImg")
+                                                                      : const AssetImage("assets/images/account.png") as ImageProvider,
                                                                 ),
-                                                                const SizedBox(height: 3),
-                                                                Text(
-                                                                  spType == '2' ? "Fixed Charge Helper" : "Visiting Professional",
-                                                                  style: TextStyle(
-                                                                    fontFamily: "poppins",
-                                                                    fontSize: 12,
-                                                                    fontWeight: FontWeight.w400,
-                                                                    color: Colors.grey.shade600,
-                                                                  ),
+                                                                const SizedBox(width: 4),
+                                                                Column(
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  children: [
+                                                                    Text(
+                                                                      "$firstName $lastName",
+                                                                      style: const TextStyle(
+                                                                        fontFamily: "poppins",
+                                                                        fontSize: 14,
+                                                                        fontWeight: FontWeight.w500,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(height: 3),
+                                                                    Text(
+                                                                      spType == '2' ? "Fixed Charge Helper" : "Visiting Professional",
+                                                                      style: TextStyle(
+                                                                        fontFamily: "poppins",
+                                                                        fontSize: 12,
+                                                                        fontWeight: FontWeight.w400,
+                                                                        color: Colors.grey.shade600,
+                                                                      ),
+                                                                    ),
+                                                                  ],
                                                                 ),
                                                               ],
                                                             ),
+                                                            const SizedBox(height: 8),
+                                                            RichText(
+                                                              text: TextSpan(
+                                                                children: [
+                                                                  const TextSpan(
+                                                                    text: 'Booked: ',
+                                                                    style: TextStyle(
+                                                                      fontFamily: 'Poppins',
+                                                                      fontWeight: FontWeight.w400,
+                                                                      fontSize: 11,
+                                                                      color: Colors.black,
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: formatDate(jobStartTime),
+                                                                    style: const TextStyle(
+                                                                      fontFamily: 'Poppins',
+                                                                      fontWeight: FontWeight.w500,
+                                                                      fontSize: 14,
+                                                                      color: Colors.black,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ],
                                                         ),
-                                                        const SizedBox(height: 8),
-
-                                                        /// Booked Time
-                                                        RichText(
-                                                          text: TextSpan(
-                                                            children: [
-                                                              const TextSpan(
-                                                                text: 'Booked: ',
-                                                                style: TextStyle(
-                                                                  fontFamily: 'Poppins',
-                                                                  fontWeight: FontWeight.w400,
-                                                                  fontSize: 11,
-                                                                  color: Colors.black,
+                                                        // Right section — same
+                                                        Column(
+                                                          children: [
+                                                            SizedBox(
+                                                              height: 32,
+                                                              width: 85,
+                                                              child: ElevatedButton(
+                                                                onPressed: () {
+                                                                  // Re-Book action
+                                                                },
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.white,
+                                                                  elevation: 0,
+                                                                  side: const BorderSide(color: Colors.black),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                  ),
+                                                                  padding: EdgeInsets.zero,
+                                                                ),
+                                                                child: const Text(
+                                                                  "Re-Book",
+                                                                  style: TextStyle(
+                                                                    fontSize: 12,
+                                                                    fontFamily: "poppins",
+                                                                    fontWeight: FontWeight.w500,
+                                                                    color: Colors.black,
+                                                                  ),
                                                                 ),
                                                               ),
-                                                              TextSpan(
-                                                                text: formatDate(jobStartTime),
-                                                                style: const TextStyle(
-                                                                  fontFamily: 'Poppins',
-                                                                  fontWeight: FontWeight.w500,
-                                                                  fontSize: 14,
-                                                                  color: Colors.black,
+                                                            ),
+                                                            const SizedBox(height: 10),
+                                                            SizedBox(
+                                                              height: 32,
+                                                              width: 85,
+                                                              child: ElevatedButton(
+                                                                onPressed: () {
+                                                                  Get.to(Rating(), arguments: item);
+                                                                },
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.white,
+                                                                  elevation: 0,
+                                                                  side: const BorderSide(color: Color(0xFF114BCA)),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                  ),
+                                                                  padding: EdgeInsets.zero,
+                                                                ),
+                                                                child: const Text(
+                                                                  "Rate Service ",
+                                                                  style: TextStyle(
+                                                                    fontSize: 12,
+                                                                    fontFamily: "poppins",
+                                                                    fontWeight: FontWeight.w500,
+                                                                    color: Color(0xFF114BCA),
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ],
-                                                          ),
+                                                            ),
+                                                          ],
                                                         ),
                                                       ],
                                                     ),
-
-                                                    /// Right Section - Buttons
-                                                    Column(
-                                                      children: [
-                                                        SizedBox(
-                                                          height: 32,
-                                                          width: 85,
-                                                          child: ElevatedButton(
-                                                            onPressed: () {
-                                                              // Re-Book action
-                                                            },
-                                                            style: ElevatedButton.styleFrom(
-                                                              backgroundColor: Colors.white,
-                                                              elevation: 0,
-                                                              side: const BorderSide(color: Colors.black),
-                                                              shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.circular(8),
-                                                              ),
-                                                              padding: EdgeInsets.zero,
-                                                            ),
-                                                            child: const Text(
-                                                              "Re-Book",
-                                                              style: TextStyle(
-                                                                fontSize: 12,
-                                                                fontFamily: "poppins",
-                                                                fontWeight: FontWeight.w500,
-                                                                color: Colors.black,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        const SizedBox(height: 10),
-                                                        SizedBox(
-                                                          height: 32,
-                                                          width: 85,
-                                                          child: ElevatedButton(
-                                                            onPressed: () {
-                                                              Get.to(Rating(), arguments: item); // ✅ Send UserModel
-                                                            },
-                                                            style: ElevatedButton.styleFrom(
-                                                              backgroundColor: Colors.white,
-                                                              elevation: 0,
-                                                              side: const BorderSide(color: Color(0xFF114BCA)),
-                                                              shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.circular(8),
-                                                              ),
-                                                              padding: EdgeInsets.zero,
-                                                            ),
-                                                            child: const Text(
-                                                              "Rate Service ",
-                                                              style: TextStyle(
-                                                                fontSize: 12,
-                                                                fontFamily: "poppins",
-                                                                fontWeight: FontWeight.w500,
-                                                                color: Color(0xFF114BCA),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
+                                                    const SizedBox(height: 5),
                                                   ],
                                                 ),
-                                                const SizedBox(height: 5),
-                                              ],
+                                              ),
+                                            );
+                                          },
+                                        )
+                                            : const Center(
+                                          child: Text(
+                                            "No Past Bookings",
+                                            style: TextStyle(
+                                              fontFamily: "poppins",
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black54,
                                             ),
                                           ),
-                                        );
-                                      },
-                                    ),
+                                        ),
 
 
-                                    ],
+
+                                      ],
                                     ),
                                   ),
                                 ),

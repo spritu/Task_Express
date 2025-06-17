@@ -8,7 +8,7 @@ import '../controllers/professional_profile_controller.dart';
 
 class ProfessionalProfileView extends GetView<ProfessionalProfileController> {
 
-  const ProfessionalProfileView({super.key});
+  const ProfessionalProfileView({super.key,});
 
   @override
   Widget build(BuildContext context) {
@@ -456,7 +456,42 @@ final String distanceText = distance != null ? '$distance km away' : 'Distance n
                           ),
                         ),
               onPressed: () {
-                Get.to(ChatView());
+
+                  final receiverId =
+                  arguments['_id'].toString();
+                  final receiverName =
+                  '${arguments['name'] ?? ''} }'
+                      .trim();
+                  final receiverImage =
+                      arguments['userImg'] ?? '';
+                  final phoneNumber =
+                      arguments['phone'] ?? '';
+
+                  if (receiverId.isNotEmpty) {
+                    Get.to(
+                      ChatView(),
+                      arguments: {
+                        'receiverId': receiverId,
+                        'receiverName':
+                        receiverName.isNotEmpty
+                            ? receiverName
+                            : 'No Name',
+                        'receiverImage':
+                        receiverImage,
+                        'phoneNumber': phoneNumber,
+                      },
+                    );
+                  } else {
+                    Get.snackbar(
+                      'Error',
+                      'Receiver ID not available',
+                      snackPosition:
+                      SnackPosition.BOTTOM,
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                    );
+                  }
+
                        },
                         child: const Text("Chat"),
                       ),

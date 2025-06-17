@@ -4,6 +4,7 @@ import '../modules/AboutTaskexpress/bindings/about_taskexpress_binding.dart';
 import '../modules/AboutTaskexpress/views/about_taskexpress_view.dart';
 import '../modules/Activejob_screen/bindings/activejob_screen_binding.dart';
 import '../modules/Activejob_screen/views/activejob_screen_view.dart';
+import '../modules/AddressScreen/bindings/address_screen_binding.dart';
 import '../modules/AddressScreen/views/address_screen_view.dart';
 import '../modules/BookingCancelled/bindings/booking_cancelled_binding.dart';
 import '../modules/BookingCancelled/views/booking_cancelled_view.dart';
@@ -35,7 +36,6 @@ import '../modules/account/bindings/account_binding.dart';
 import '../modules/account/views/account_view.dart';
 import '../modules/add_address/bindings/add_address_binding.dart';
 import '../modules/add_address/views/add_address_view.dart';
-
 import '../modules/booking/bindings/booking_binding.dart';
 import '../modules/booking/views/booking_view.dart';
 import '../modules/bottom/bindings/bottom_binding.dart';
@@ -98,6 +98,8 @@ import '../modules/provider_profile/bindings/provider_profile_binding.dart';
 import '../modules/provider_profile/views/provider_profile_view.dart';
 import '../modules/provider_setting/bindings/provider_setting_binding.dart';
 import '../modules/provider_setting/views/provider_setting_view.dart';
+import '../modules/provider_signup/bindings/provider_signup_binding.dart';
+import '../modules/provider_signup/views/provider_signup_view.dart';
 import '../modules/recomplete_job_pay/bindings/recomplete_job_pay_binding.dart';
 import '../modules/recomplete_job_pay/views/recomplete_job_pay_view.dart';
 import '../modules/road_construction_helper/bindings/road_construction_helper_binding.dart';
@@ -131,7 +133,11 @@ class AppPages {
   static const INITIAL = Routes.HOME;
 
   static final routes = [
-    GetPage(name: _Paths.HOME, page: () => HomeView(), binding: HomeBinding()),
+    GetPage(
+      name: _Paths.HOME,
+      page: () => HomeView(),
+      binding: HomeBinding(),
+    ),
     GetPage(
       name: _Paths.BOTTOM,
       page: () => const BottomView(),
@@ -423,6 +429,11 @@ class AppPages {
       name: _Paths.NAME_DETAIL,
       page: () => const NameDetailView(),
       binding: NameDetailBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROVIDER_SIGNUP,
+      page: () => const ProviderSignupView(),
+      binding: ProviderSignupBinding(),
     ),
   ];
 }

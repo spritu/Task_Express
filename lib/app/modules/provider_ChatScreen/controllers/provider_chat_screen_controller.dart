@@ -21,6 +21,13 @@ class ChatItem {
   final String profilePic;
   late final bool isRead;
   late final int unreadCount;
+  late final int unredviewNotify;
+
+  // ✅ Add these fields
+  final String phone;
+  final String catId;
+  final String subCatId;
+  final String charge;
 
   ChatItem({
     required this.message,
@@ -31,7 +38,11 @@ class ChatItem {
     required this.profilePic,
     this.isRead = true,
     this.unreadCount = 0,
-    required unredviewNotify,
+    this.unredviewNotify = 0,
+    required this.phone,
+    required this.catId,
+    required this.subCatId,
+    required this.charge,
   });
 }
 
@@ -133,6 +144,69 @@ class ProviderChatScreenController extends GetxController {
     });
   }
 
+  // Future<void> fetchLastMessages() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final userId = prefs.getString('userId');
+  //   if (userId == null || userId.isEmpty) return;
+  //
+  //   final url = Uri.parse(
+  //     'https://jdapi.youthadda.co/conversationlastmessages?userId=$userId',
+  //   );
+  //
+  //   try {
+  //     final response = await http.get(url);
+  //     if (response.statusCode == 200) {
+  //       final Map<String, dynamic> responseData = json.decode(response.body);
+  //       final List<dynamic> jsonData = responseData['data'];
+  //       print('chsttttttt: $jsonData');
+  //
+  //       chats.clear();
+  //       bool unreadFound = false;
+  //       bool unreadNotify = false;
+  //
+  //       for (var item in jsonData) {
+  //         final lm = item['lastMessage'];
+  //         receiverId.value = item['receiverId'];
+  //         final unreadCount = item['unseenCount'] ?? 0;
+  //         final unredviewNotify = item['unseenChatNotificationCount'] ?? 0;
+  //         if (unreadCount > 0) unreadFound = true;
+  //         if (unredviewNotify > 0) unreadNotify = true;
+  //
+  //         print(
+  //           "viewallmessage: $receiverId   unseenCount: ${item['unseenCount']}",
+  //         );
+  //
+  //         final profilePic = item['profilePic'] ?? '';
+  //         print("🖼️ Profile Image Path xyzzzz: $profilePic");
+  //
+  //         final fullImageUrl =
+  //             profilePic.isNotEmpty
+  //                 ? 'https://jdapi.youthadda.co/$profilePic'
+  //                 : 'No image available';
+  //         print("🌐 Full Image URL: $fullImageUrl");
+  //
+  //         final chatItem = ChatItem(
+  //           message: lm?['message'] ?? 'No message',
+  //           timestamp: lm?['timestamp'] ?? 'No timestamp',
+  //           reciverId: item['receiverId'],
+  //           firstName: item['firstName'] ?? 'N/A',
+  //           lastName: item['lastName'] ?? 'N/A',
+  //           profilePic: profilePic ?? '',
+  //           isRead: (lm?['viewall']?.toString().toLowerCase() == 'true'),
+  //           unreadCount: unreadCount,
+  //           unredviewNotify: unredviewNotify,
+  //         );
+  //         chats.add(chatItem);
+  //         // hasUnreadMessages.value = unreadFound;
+  //         // hasUnreadnotify.value = unreadNotify;
+  //       }
+  //       hasUnreadMessages.value = unreadFound;
+  //       hasUnreadnotify.value = unreadNotify;
+  //     }
+  //   } catch (e) {
+  //     print("Exception: $e");
+  //   }
+  // }
   Future<void> fetchLastMessages() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
@@ -156,23 +230,22 @@ class ProviderChatScreenController extends GetxController {
         for (var item in jsonData) {
           final lm = item['lastMessage'];
           receiverId.value = item['receiverId'];
+
           final unreadCount = item['unseenCount'] ?? 0;
           final unredviewNotify = item['unseenChatNotificationCount'] ?? 0;
           if (unreadCount > 0) unreadFound = true;
           if (unredviewNotify > 0) unreadNotify = true;
 
-          print(
-            "viewallmessage: $receiverId   unseenCount: ${item['unseenCount']}",
-          );
-
           final profilePic = item['profilePic'] ?? '';
-          print("🖼️ Profile Image Path xyzzzz: $profilePic");
+          final fullImageUrl = profilePic.isNotEmpty
+              ? 'https://jdapi.youthadda.co/$profilePic'
+              : 'No image available';
 
-          final fullImageUrl =
-              profilePic.isNotEmpty
-                  ? 'https://jdapi.youthadda.co/$profilePic'
-                  : 'No image available';
-          print("🌐 Full Image URL: $fullImageUrl");
+          // ✅ Extract new fields
+          final phone = item['phone']?.toString() ?? '';
+          final catId = item['catId']?.toString() ?? '';
+          final subCatId = item['subCatId']?.toString() ?? '';
+          final charge = item['charge']?.toString() ?? '';
 
           final chatItem = ChatItem(
             message: lm?['message'] ?? 'No message',
@@ -180,15 +253,27 @@ class ProviderChatScreenController extends GetxController {
             reciverId: item['receiverId'],
             firstName: item['firstName'] ?? 'N/A',
             lastName: item['lastName'] ?? 'N/A',
-            profilePic: profilePic ?? '',
+            profilePic: profilePic,
             isRead: (lm?['viewall']?.toString().toLowerCase() == 'true'),
             unreadCount: unreadCount,
             unredviewNotify: unredviewNotify,
+
+            // ✅ Pass new fields here
+            phone: phone,
+            catId: catId,
+            subCatId: subCatId,
+            charge: charge,
           );
+
           chats.add(chatItem);
-          // hasUnreadMessages.value = unreadFound;
-          // hasUnreadnotify.value = unreadNotify;
+
+          print('🔑 ChatItem Created:');
+          print('  📞 phone: $phone');
+          print('  🏷️ catId: $catId');
+          print('  📌 subCatId: $subCatId');
+          print('  💰 charge: $charge');
         }
+
         hasUnreadMessages.value = unreadFound;
         hasUnreadnotify.value = unreadNotify;
       }
@@ -211,6 +296,12 @@ class ProviderChatScreenController extends GetxController {
         isRead: true,
         unreadCount: 0,
         unredviewNotify: 0,
+
+        // ✅ Add kiye gaye naye fields:
+        catId: chat.catId,
+        subCatId: chat.subCatId,
+        charge: chat.charge,
+        phone: chat.phone,
       );
       chats.refresh();
     }

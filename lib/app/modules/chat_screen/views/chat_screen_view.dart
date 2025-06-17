@@ -64,10 +64,15 @@ class ChatScreenView extends GetView<ChatScreenController> {
                                 Get.to(
                                   ChatView(),
                                   arguments: {
+
                                     'receiverId': chat.reciverId,
                                     'receiverName':
                                         '${chat.firstName} ${chat.lastName}',
                                     'receiverImage': chat.profilePic,
+                                    'catId': chat.catId,
+                                    'subCatId': chat.subCatId,
+                                    'charge': chat.charge,
+                                    'phone': chat.phone,
                                   },
                                 )?.then((_) async {
                                   await controller.markChatAsRead(

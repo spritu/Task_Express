@@ -7,9 +7,7 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:get/get.dart';
 
 import '../../../../colors.dart';
-import '../../HelpSupport/views/help_support_view.dart';
 import '../../booking/controllers/booking_controller.dart';
-import '../../user_help/views/user_help_view.dart';
 import '../controllers/provider_chat_controller.dart';
 
 class ProviderChatView extends GetView<ProviderChatController> {
@@ -43,41 +41,32 @@ class ProviderChatView extends GetView<ProviderChatController> {
                 children: [
                   InkWell(
                     onTap: () {
-                      Get.to(HelpSupportView());
+                      // Get.to(UserHelpView());
                     },
                     child: Icon(Icons.info_outline),
                   ),
-                  SizedBox(width: 5),
-                  InkWell(
-                    onTap: () {
-                      // navController.changeTab(3);
-                    },
-                    child: Icon(Icons.person),
-                  ),
+                  //SizedBox(width: 5),
+                  // InkWell(
+                  //   onTap: () {
+                  //     // navController.changeTab(3);
+                  //   },
+                  //   child: Icon(Icons.person),
+                  // ),
                   SizedBox(width: 5),
                   Row(
                     children: [
-                      InkWell(
-                        onTap: () {
-                          // Get arguments passed from previous screen
-                          final Map<String, dynamic> data = Get.arguments ?? {};
-                          final phoneNumber = data['phoneNumber'] ?? '';
-                          print("xxxxxgggggg:$phoneNumber");
+                         InkWell(
+                          onTap: () {
+                            final args = Get.arguments;
+                            print('✅ Full arguments: $args');
+                            // ✅ Correct phone number
+                            controller.receiverPhoneNumber.value = args['phone'] ?? '';
+                            final phoneNumber = controller.receiverPhoneNumber.value;
 
-                          if (phoneNumber.isNotEmpty) {
-                            controller.makePhoneCall(phoneNumber);
-                          } else {
-                            // Get.snackbar(
-                            //   'Error',
-                            //   'Phone number not available',
-                            //   snackPosition: SnackPosition.BOTTOM,
-                            //   backgroundColor: Colors.red,
-                            //   colorText: Colors.white,
-                            // );
-                          }
-                        },
-                        child: Icon(Icons.call),
-                      ),
+                              controller.makePhoneCall(phoneNumber);
+                              },
+                          child: const Icon(Icons.call),
+                        ),
                       SizedBox(width: 5),
                     ],
                   ),

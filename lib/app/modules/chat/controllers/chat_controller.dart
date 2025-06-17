@@ -24,15 +24,19 @@ class ChatController extends GetxController  with WidgetsBindingObserver{
   final RxMap<String, dynamic> lastCalledUser = <String, dynamic>{}.obs;
 
   final categories = <Map<String, dynamic>>[].obs; // API se loaded
-
+  final Map<String, String> categoryNameById = {};
   var helperName = ''.obs;
   final RxString bookedBy = ''.obs;
   final RxString bookedFor = ''.obs;
   var showRequestPending = false.obs;
   var workers = <Map<String, dynamic>>[].obs;
   var bookingData = {}.obs;
+  Map<String, dynamic>? receiverUserMap;
 
-
+  RxString catId = ''.obs;
+  RxString subCatId = ''.obs;
+  RxString charge = ''.obs;
+  RxString receiverPhoneNumber = ''.obs;
   Map<String, dynamic>? selectedUser;
   final RxList<types.Message> messages = <types.Message>[].obs;
   final Rxn<types.User> user = Rxn<types.User>();
@@ -57,19 +61,77 @@ class ChatController extends GetxController  with WidgetsBindingObserver{
   }
 
   late IO.Socket socket;
+  Future<void> fetchCategories() async {
+    try {
+      var request = http.Request('GET', Uri.parse('https://jdapi.youthadda.co/category/getCategory'));
+      http.StreamedResponse response = await request.send();
+
+      if (response.statusCode == 200) {
+        final res = await response.stream.bytesToString();
+        final jsonResponse = jsonDecode(res);
+
+        print('API raw response: $jsonResponse');
+
+        final data = jsonResponse['data'];
+        if (data != null && data is List) {
+          categoryNameById.clear(); // optional: clear old data
+          for (var category in data) {
+            final categoryId = category['_id'];
+            final categoryName = category['name']; // ✅ FIXED
+            categoryNameById[categoryId] = categoryName;
+            print('Mapped: categoryId=$categoryId | categoryName=$categoryName');
+
+            final subcategories = category['subcategories'] ?? [];
+            for (var sub in subcategories) {
+              final subId = sub['_id'];
+              final subName = sub['name']; // ✅ FIXED
+              categoryNameById[subId] = subName;
+              print('Mapped: subId=$subId | subName=$subName');
+            }
+          }
+        }
+      } else {
+        print('API Error: ${response.statusCode} ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('fetchCategories error: $e');
+    }
+  }
 
   @override
   void onInit() {
     super.onInit();
-    initializeChat();
+    initializeChat();fetchCategories();
+    final args = Get.arguments;
+    print('✅ Full arguments: $args');
+    if (args != null && args.containsKey('receiver')) {
+      final receiver = args['receiver'];
+
+      // ✅ 2️⃣ Store everything properly:
+      receiverUserMap = receiver;
+      receiverId = receiver['_id'].toString();
+      receiverName.value = "${receiver['firstName']} ${receiver['lastName']}";
+      receiverImage.value = receiver['userImg'] ?? '';
+
+      print("✅ Receiver loaded in chat: $receiverName / $receiverImage");
+    }
+    receiverId = args['receiverId'] ?? '';
+    receiverName.value = args['receiverName'] ?? '';
+    receiverImage.value = args['receiverImage'] ?? '';
+    catId.value = args['catId']?.toString() ?? '';
+    subCatId.value = args['subCatId']?.toString() ?? '';
+    charge.value = args['charge']?.toString() ?? '';
+    receiverPhoneNumber.value = args['phone'] ?? '';
     markAllAsSeen();
+    final Map<String, dynamic> data = Get.arguments ?? {};
+    final phoneNumber = data['phoneNumber'] ?? '';
     WidgetsBinding.instance.addObserver(this);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       messages.refresh();
     });
 
-    final args = Get.arguments ?? {};
+
     receiverImage.value = args['receiverImage'] ?? '';
     print("🟢 RECEIVER IMAGE: ${receiverImage.value}");
 
@@ -261,6 +323,57 @@ class ChatController extends GetxController  with WidgetsBindingObserver{
   //     messages.insert(0, msg);
   //   });
   // }
+  Future<Map<String, dynamic>?> fetchReceiverDetail() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId2 = prefs.getString('userId'); // ✅ This should not be null
+    print("🔑 Receiver ID from prefs: $receiverId");
+
+    if (receiverId == null || receiverId.isEmpty) {
+      print("❌ Receiver ID is null or empty");
+      return null;
+    }
+
+    final url = Uri.parse(
+      'https://jdapi.youthadda.co/user/getuser?userId=$userId2',
+    );
+
+    print("🌐 Calling API: $url");
+
+    final response = await http.get(url);
+
+    print("📩 Response body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+
+      final List<dynamic> userList = decoded['msg'] ?? [];
+
+      if (userList.isEmpty) {
+        print("❌ No users returned in msg[]");
+        return null;
+      }
+
+      // ✅ Find the user with matching _id
+      final user = userList.firstWhere(
+            (u) => u['_id'] == receiverId,
+        orElse: () => null,
+      );
+
+      if (user != null) {
+        print("✅ Found receiver user: $user");
+        return Map<String, dynamic>.from(user);
+      } else {
+        print("❌ No user in list matches ID $receiverId");
+        return null;
+      }
+    } else {
+      print("❌ API error: ${response.statusCode}");
+      return null;
+    }
+  }
+
+
+
 
   Future<void> fetchAllMessages() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -380,7 +493,7 @@ class ChatController extends GetxController  with WidgetsBindingObserver{
     //  shouldShowSheetAfterCall = true;
       await launchUrl(callUri);
     } else {
-      Get.snackbar('Error', 'Could not launch phone call');
+    //  Get.snackbar('Error', 'Could not launch phone call');
     }
   }
   void connectSocket() {
@@ -538,7 +651,7 @@ class ChatController extends GetxController  with WidgetsBindingObserver{
       String? userId2 = prefs.getString('userId'); // ✅ This should not be null
 
       if (userId2 == null) {
-        Get.snackbar("Error", "User ID not found in local storage.");
+       // Get.snackbar("Error", "User ID not found in local storage.");
         return;
       }
       var headers = {'Content-Type': 'application/json'};
@@ -574,168 +687,184 @@ class ChatController extends GetxController  with WidgetsBindingObserver{
         // connectSocket();
         Get.to(() => BottomView());
       } else {
-        Get.snackbar('Booking Failed', 'Please try again later.');
+       // Get.snackbar('Booking Failed', 'Please try again later.');
       }
     } catch (e) {
       print("❌ Exception in booking: $e");
-      Get.snackbar('Error', 'Something went wrong: $e');
+     // Get.snackbar('Error', 'Something went wrong: $e');
     }
   }
 
-  void showAfterCallSheet(
-    BuildContext context, {
-    required String name,
-    required String imageUrl,
-    required String experience,
-    required String phone,
-    required String userId,
-    required List<Map<String, dynamic>> skills,
-  }) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom,
-          ),
-          child: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: GestureDetector(
-                      onTap: () => Navigator.pop(ctx),
-                      child: const Icon(Icons.close),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage:
-                            imageUrl.isNotEmpty
-                                ? NetworkImage(
-                                  'https://jdapi.youthadda.co/$imageUrl',
-                                )
-                                : const AssetImage('assets/images/account.png')
-                                    as ImageProvider,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF114BCA),
-                            fontFamily: "poppins",
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "If this conversation with $name meets your expectations, book now:",
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: "poppins",
-                      color: Color(0xFF4F4F4F),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ...skills.map((skill) {
-                    String title = '';
-                    if (skill['subcategoryName'] != null &&
-                        skill['subcategoryName'].toString().isNotEmpty) {
-                      title = skill['subcategoryName'];
-                    } else if (skill['categoryName'] != null &&
-                        skill['categoryName'].toString().isNotEmpty) {
-                      title = skill['categoryName'];
-                    } else {
-                      title = 'Service';
-                    }
 
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: professionRow(
-                        title: title,
-                        price: "₹ ${skill['charge'] ?? '0'}",
-                        onBookNow: () {
-                          showAreYouSureSheet(
-                            context,
-                            name: name,
-                            imageUrl: imageUrl,
-                            skill: skill,
-                            userId: userId,
-                            onConfirm: (serviceIds) async {
-                              await bookServiceProvider(
-                                bookedFor: userId,
-                                serviceIds: serviceIds,
-                                selectedHelperName: name,
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    );
-                  }).toList(),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Not Satisfied? Let’s help you find someone else",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: "poppins",
-                      color: Color(0xFF4F4F4F),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 34,
-                    width: 119,
-                    child: ElevatedButton.icon(
-                      onPressed: () => Navigator.pop(ctx),
-                      icon: const Icon(Icons.close, color: Color(0xFF114BCA)),
-                      label: const Text(
-                        "Cancel",
-                        style: TextStyle(
-                          color: Color(0xFF114BCA),
-                          fontFamily: "poppins",
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: const BorderSide(color: Color(0xFF114BCA)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
+  /// ✅ 2️⃣ showAfterCallSheet WITH fallback skill logic
+
+  Widget showAfterCallSheet(
+      BuildContext context, {
+        required String name,
+        required String imageUrl,
+        required String experience,
+        required String phone,
+        required String userId,
+        required List<Map<String, dynamic>> skills,
+      }) {
+    final categoryController = Get.find<ChatController>();
+
+    final effectiveSkills = skills.isNotEmpty
+        ? skills
+        : [
+      {
+        'categoryName': 'General Service',
+        'subcategoryName': '',
+        'charge': 30,
+        'categoryId': '',
+      }
+    ];
+
+    return SingleChildScrollView(
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Align(
+              alignment: Alignment.topRight,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: const Icon(Icons.close, size: 24),
               ),
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 40,
+                  backgroundImage: imageUrl.isNotEmpty
+                      ? NetworkImage('https://jdapi.youthadda.co/$imageUrl')
+                      : const AssetImage('assets/images/account.png')
+                  as ImageProvider,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "poppins",
+                      color: Color(0xFF114BCA),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Text(
+              "If this conversation with $name meets your expectations, book now:",
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF4F4F4F),
+                fontFamily: "poppins",
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            ...effectiveSkills.map((skill) {
+              final catId = skill['categoryId']?.toString() ?? '';
+              final subCatId = skill['subcategoryId']?.toString() ?? '';
+
+              final catName = categoryController.categoryNameById[catId];
+              final subCatName = categoryController.categoryNameById[subCatId];
+
+              /// 🟢 PRINT to debug:
+              print('----> Skill: '
+                  'catId=${catId} | subCatId=${subCatId} | '
+                  'catName=${categoryController.categoryNameById[catId]} | '
+                  'subCatName=${categoryController.categoryNameById[subCatId]}');
+
+              final serviceTitle = subCatName?.isNotEmpty == true
+                  ? subCatName
+                  : (catName?.isNotEmpty == true ? catName : 'Service');
+
+              final price = "₹ ${skill['charge'] ?? 0}";
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: professionRow(
+                  title: serviceTitle ?? 'Service',
+                  price: price,
+                  onBookNow: () {
+                    showAreYouSureSheet(
+                      context,
+                      name: name,
+                      imageUrl: imageUrl,
+                      skill: skill,
+                      userId: userId,
+                      onConfirm: (serviceIds) async {
+                        await bookServiceProvider(
+                          bookedFor: userId,
+                          serviceIds: serviceIds,
+                          selectedHelperName: name,
+                        );
+                      },
+                    );
+                  },
+                ),
+              );
+            }).toList(),
+
+            const SizedBox(height: 20),
+
+            const Text(
+              "Not Satisfied? Let’s help you find someone else",
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF4F4F4F),
+                fontFamily: "poppins",
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            Center(
+              child: SizedBox(
+                height: 34,
+                width: 120,
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close, color: Color(0xFF114BCA)),
+                  label: const Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Color(0xFF114BCA),
+                      fontFamily: "poppins",
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    side: const BorderSide(color: Color(0xFF114BCA)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
     );
   }
+
 
   Widget professionRow({
     required String title,

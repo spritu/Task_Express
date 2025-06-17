@@ -12,7 +12,9 @@ import '../../provider_editProfile/controllers/provider_edit_profile_controller.
 
 class ProviderAccountController extends GetxController with WidgetsBindingObserver {
   //TODO: Implement ProviderAccountController
+
   var imagePath = ''.obs;
+  var selectedImagePath = ''.obs;
 
   var lastName = ''.obs;
   var mobileNumber = ''.obs;
@@ -20,6 +22,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   var skillList = <Map<String, dynamic>>[].obs;
   var selectedProfessionName = ''.obs;
   var spType = ''.obs;
+
   // RxList<ServiceModel> userSkills = <ServiceModel>[].obs;
 
   final firstName = ''.obs;
@@ -45,15 +48,23 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     lastName.value = prefs.getString('lastName') ?? '';
     mobileNumber.value = prefs.getString('mobile') ?? '';
   }
+
   void addServiceCard() {
-    serviceCards.add(ServiceModel(profession: '', category: '', charge: '', subcategory: '', categoryId: '', subCategoryId: '')); // adds an empty service card
+    serviceCards.add(ServiceModel(profession: '',
+        category: '',
+        charge: '',
+        subcategory: '',
+        categoryId: '',
+        subCategoryId: '')); // adds an empty service card
   }
+
   final RxString selectedProfession = ''.obs;
   RxBool showServiceCard = false.obs;
   RxList<CategoryModel> visitingProfessionals = <CategoryModel>[].obs;
   RxList<CategoryModel> fixedChargeHelpers = <CategoryModel>[].obs;
   bool isEditable = false;
   RxString selectCategory = "".obs;
+
   // var addedServices = <ServiceModel>[].obs; // List to hold added services
   var addedServices = <Service>[].obs;
 
@@ -67,6 +78,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
       charge: "₹500",
     ));
   }
+
   Future<void> loadCompleteUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     firstName.value = prefs.getString('firstName') ?? '';
@@ -78,7 +90,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     selectedSubCategoryName.value = prefs.getString('subcategory') ?? '';
     charge.value = prefs.getString('charge') ?? '';
     userId.value = prefs.getString('userId') ?? '';
-
+    imagePath.value = prefs.getString('userImg') ?? '';
     String? image = prefs.getString('image');
     if (image != null && !image.startsWith('http')) {
       image = 'https://jdapi.youthadda.co/$image';
@@ -90,29 +102,13 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     String? base64Image = prefs.getString('userImgBase64');
     if (base64Image != null && base64Image.isNotEmpty) {
       final bytes = base64Decode(base64Image);
-      final tempFile = await File('${Directory.systemTemp.path}/profile.jpg').writeAsBytes(bytes);
+      final tempFile = await File('${Directory.systemTemp.path}/profile.jpg')
+          .writeAsBytes(bytes);
       imagePath.value = tempFile.path;
     }
 
-    print("✅ Loaded full user data: ${firstName.value} ${lastName.value}, 📱: ${mobileNumber.value}");
-  }
-
-  Future<void> _loadUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    String rawImg = prefs.getString('image') ?? '';
-    String finalImage = '';
-
-    if (rawImg.isNotEmpty) {
-      if (rawImg.startsWith('http') || rawImg.startsWith('/data')) {
-        finalImage = rawImg;
-      } else {
-        finalImage = 'https://jdapi.youthadda.co/$rawImg';
-      }
-    }
-
-    imagePath.value = finalImage;
-    print("🖼️ Loaded image path: $finalImage");
+    print("✅ Loaded full user data: ${firstName.value} ${lastName
+        .value}, 📱: ${mobileNumber.value}");
   }
 
 
@@ -120,7 +116,8 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
   TextEditingController chargeController = TextEditingController();
   RxString selectSubCategory = "".obs;
 
-  RxString selectCharge = "₹ ".obs;RxString selectCharge1 = "₹ ".obs;
+  RxString selectCharge = "₹ ".obs;
+  RxString selectCharge1 = "₹ ".obs;
 
   final count = 0.obs;
   var selectedCategoryId = ''.obs;
@@ -175,6 +172,7 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
 
 
   var isLoading = true.obs;
+
   String get spTypeLabel {
     switch (spType.value) {
       case '1':
@@ -185,30 +183,23 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
         return 'Unknown';
     }
   }
+
   Future<void> loadUserInfo1() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
     spType.value = prefs.getString('spType') ?? '';
     print("📥 Loaded spType: ${spType.value}");
 
-    if (spType == "1") {
-      print("🧑 Visiting Professional");
-    } else if (spType == "2") {
-      print("🛠️ Fixed Charge Helper");
-    } else {
-      print("❌ spType not found or invalid");
-    }
     selectedProfessionName.value = prefs.getString('profession') ?? '';
-    print("🧾 selectedProfessionName: ${selectedProfessionName.value}");
     userId.value = prefs.getString('userId') ?? '';
-    selectedProfessionName.value = prefs.getString('profession') ?? '';
     selectedCategoryName.value = prefs.getString('category') ?? '';
-    selectedSubCategoryName.value = prefs.getString('subCategory') ?? ''; // <- fixed key
+    selectedSubCategoryName.value = prefs.getString('subCategory') ?? '';
     charge.value = prefs.getString('charge') ?? '';
-    isLoading.value = false;
-    final args = Get.arguments;
 
+    // ✅ Correct key here:
+    String rawImg = prefs.getString('image') ?? '';
+    print("✅ Raw image from prefs: $rawImg");
 
-    String rawImg = prefs.getString('userImg') ?? '';
     String finalImage = '';
 
     if (rawImg.isNotEmpty) {
@@ -220,14 +211,26 @@ class ProviderAccountController extends GetxController with WidgetsBindingObserv
     }
 
     imagePath.value = finalImage;
+    imagePath.refresh();
+
+    print("🖼️ Final imagePath in controller: $finalImage");
+
+    isLoading.value = false;
+
+
+  imagePath.value = finalImage;
     print("🖼️ Loaded image path: $finalImage");
-    imagePath.refresh(); // ⬅️ Important!
+    imagePath.refresh();
+
+    isLoading.value = false;
+
     print("🔄 Loaded User Info:");
     print("🧑‍💼 Profession: ${selectedProfessionName.value}");
     print("📂 Category: ${selectedCategoryName.value}");
     print("📁 Subcategory: ${selectedSubCategoryName.value}");
     print("💰 Charge: ${charge.value}");
   }
+
 
 
 

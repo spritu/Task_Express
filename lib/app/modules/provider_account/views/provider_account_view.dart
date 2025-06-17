@@ -64,11 +64,12 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                               children: [
                                 Obx(() {
                                   final controller = Get.find<ProviderEditProfileController>();
+
                                   final localImagePath = controller.selectedImagePath.value;
                                   final serverImageUrl = controller.imagePath.value;
 
-                                  print("🧪 localImagePath: $localImagePath");
-                                  print("🧪 serverImageUrl: $serverImageUrl");
+                                  print("🧪 LOCAL: $localImagePath");
+                                  print("🧪 SERVER: $serverImageUrl");
 
                                   ImageProvider imageProvider;
 
@@ -83,14 +84,8 @@ class ProviderAccountView extends GetView<ProviderAccountController> {
                                   return CircleAvatar(
                                     radius: 40,
                                     backgroundImage: imageProvider,
-                                    onBackgroundImageError: (_, __) =>
-                                        print("❌ Failed to load image: $serverImageUrl"),
                                   );
                                 }),
-
-
-
-
 
 
 

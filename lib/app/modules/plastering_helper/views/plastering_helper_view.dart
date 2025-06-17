@@ -12,7 +12,7 @@ class PlasteringHelperView extends GetView<PlasteringHelperController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(PlasteringHelperController());
+    Get.put(PlasteringHelperController(), permanent: true);
     // Wrap single worker in a list
     final List<Map<String, dynamic>> dataList = [userList];
     return Scaffold(

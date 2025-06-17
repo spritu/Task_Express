@@ -8,7 +8,7 @@ class BricklayingHelperView extends GetView<BricklayingHelperController> {
   const BricklayingHelperView({super.key});
   @override
   Widget build(BuildContext context) {
-    Get.put(BricklayingHelperController());
+    Get.put(BricklayingHelperController(), permanent: true);
     return Scaffold(
       backgroundColor: const Color(0xFFD9E4FC),
       appBar: AppBar(
