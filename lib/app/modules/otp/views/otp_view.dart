@@ -12,15 +12,13 @@ class OtpView extends GetView<OtpController> {
   Widget build(BuildContext context) {
     Get.put(OtpController());
     return Scaffold(
-      body: Container(height: MediaQuery.of(context).size.height,
+      body: Container(
+        height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.center,
-            colors: [
-              Color(0xFF87AAF6),
-              Colors.white,
-            ],
+            colors: [Color(0xFF87AAF6), Colors.white],
           ),
         ),
         child: SafeArea(
@@ -36,20 +34,23 @@ class OtpView extends GetView<OtpController> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
-                      fontFamily: 'Poppins', color: AppColors.textColor,
+                      fontFamily: 'Poppins',
+                      color: AppColors.textColor,
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Obx(() => Text(
-                    'Please enter the 4-digit code sent on\n+91 ${controller.mobileNumber.value}',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black54,
-                      fontFamily: 'Poppins',
+                  Obx(
+                    () => Text(
+                      'Please enter the 4-digit code sent on\n+91 ${controller.mobileNumber.value}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black54,
+                        fontFamily: 'Poppins',
+                      ),
                     ),
-                  )),
+                  ),
 
                   const SizedBox(height: 30),
                   Center(
@@ -62,7 +63,9 @@ class OtpView extends GetView<OtpController> {
                         autoDisposeControllers: false,
                         keyboardType: TextInputType.number,
                         enableActiveFill: true, // enables box background color
-                        cursorColor: Colors.black, // ✅ sets the cursor (blinking line) color
+                        cursorColor:
+                            Colors
+                                .black, // ✅ sets the cursor (blinking line) color
                         pinTheme: PinTheme(
                           shape: PinCodeFieldShape.box,
                           borderRadius: BorderRadius.circular(8),
@@ -85,26 +88,26 @@ class OtpView extends GetView<OtpController> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: controller.resendOtp,
-                    child: const Text(
-                      'Resend',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                        height: 1.0, // 100% line-height
-                        letterSpacing: 0.72, // 6% of 12px = 0.72
-                        color: Color(0xFF114BCA),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height*0.5),
+                  // TextButton(
+                  //   onPressed: controller.sendOtp,
+                  //   child: const Text(
+                  //     'Resend',
+                  //     textAlign: TextAlign.center,
+                  //     style: TextStyle(
+                  //       fontFamily: 'Poppins',
+                  //       fontWeight: FontWeight.w600,
+                  //       fontSize: 12,
+                  //       height: 1.0, // 100% line-height
+                  //       letterSpacing: 0.72, // 6% of 12px = 0.72
+                  //       color: Color(0xFF114BCA),
+                  //     ),
+                  //   ),
+                  // ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.5),
                   ElevatedButton(
                     onPressed: () {
-                     // String enteredOtp = controller.otpController.text.trim();
-            
+                      // String enteredOtp = controller.otpController.text.trim();
+
                       // if (enteredOtp.isEmpty) {
                       //   Get.snackbar(
                       //     'Empty Field',
@@ -126,9 +129,11 @@ class OtpView extends GetView<OtpController> {
                       //   );
                       //   return;
                       // }
-                     // Get.to(() => SignUpView());
-                    //  String otp = controller.otpController.text.trim();
-                      controller.verifyOtp("otp"); // No need to pass mobileNumber // This should handle actual verification and navigation
+                      // Get.to(() => SignUpView());
+                      //  String otp = controller.otpController.text.trim();
+                      controller.verifyOtp(
+                        "otp",
+                      ); // No need to pass mobileNumber // This should handle actual verification and navigation
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF114BCA),
@@ -158,4 +163,3 @@ class OtpView extends GetView<OtpController> {
     );
   }
 }
-

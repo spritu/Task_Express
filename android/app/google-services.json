@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1009931864210",
+    "project_id": "task-express-273db",
+    "storage_bucket": "task-express-273db.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1009931864210:android:2a364e717934af1ff53e4b",
+        "android_client_info": {
+          "package_name": "com.sp.worknest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCakw_jfXQmveyvTfGDNohUK-XLdCh9_68"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

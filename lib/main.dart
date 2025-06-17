@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart'; // <-- ADD THIS
@@ -47,9 +48,11 @@ import 'app/modules/tile_fixing_helper/controllers/tile_fixing_helper_controller
 import 'app/modules/worknest/controllers/worknest_controller.dart';
 import 'app/routes/app_pages.dart';
 import 'auth_controller.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GetStorage.init();
   // SharedPreferences prefs = await SharedPreferences.getInstance();// <-- ADD THIS
   final box = GetStorage();
@@ -64,8 +67,8 @@ void main() async {
 
   if (isFirstRun) {
     final box = GetStorage();
-    await box.erase(); // ✅ Clear GetStorage on first launch
-    await prefs.clear(); // ✅ Clear SharedPreferences on first launch
+    await box.erase(); //  Clear GetStorage on first launch
+    await prefs.clear(); //  Clear SharedPreferences on first launch
     await prefs.setBool('isFirstRun', false); // Mark first run done
   }
 
@@ -74,6 +77,7 @@ void main() async {
   //Get.put(BottomController(),permanent: true);
   // Get.put(HomeController(),permanent: true);
   //Get.put(CancelBookingController(),permanent: true);
+  Get.put(AuthController());
 
   Get.put(PlasteringHelperController(), permanent: true);
   Get.put(BricklayingHelperController(), permanent: true);
@@ -176,7 +180,10 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(Duration(seconds: 1)); // Splash screen delay
 
     // ✅ Proceed only if token AND userId are valid
-    if (token != null && token.isNotEmpty && userId != null && userId.isNotEmpty) {
+    if (token != null &&
+        token.isNotEmpty &&
+        userId != null &&
+        userId.isNotEmpty) {
       if (isLoggedIn2) {
         Get.offAllNamed('/bottom2'); // Service provider flow
       } else {
@@ -187,7 +194,6 @@ class _SplashScreenState extends State<SplashScreen> {
       startSplashFlow();
     }
   }
-
 
   // void checkInitialFlow() async {
   //   final prefs = await SharedPreferences.getInstance();

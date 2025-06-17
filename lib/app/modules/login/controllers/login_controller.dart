@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -24,9 +25,7 @@ class LoginController extends GetxController {
       return;
     }
 
-    final headers = {
-      'Content-Type': 'application/json',
-    };
+    final headers = {'Content-Type': 'application/json'};
 
     final body = json.encode({"phone": phone});
     final url = Uri.parse('https://jdapi.youthadda.co/user/sendotp');
@@ -84,11 +83,11 @@ class LoginController extends GetxController {
         Get.to(() => OtpView());
       } else {
         print("❌ Failed to send OTP: ${response.reasonPhrase}");
-      //  Get.snackbar("Error", "Failed to send OTP: ${response.reasonPhrase}");
+        //  Get.snackbar("Error", "Failed to send OTP: ${response.reasonPhrase}");
       }
     } catch (e) {
       print("❌ Exception: $e");
-   //   Get.snackbar("Error", "Exception occurred while sending OTP");
+      //   Get.snackbar("Error", "Exception occurred while sending OTP");
     }
   }
 
@@ -102,7 +101,10 @@ class LoginController extends GetxController {
   final String productInstanceId = 'YOUR_PRODUCT_INSTANCE_ID';
 
   Future<Map<String, dynamic>> verifyAadhaarCard(
-      String requestId, String aadhaarNumber, String captchaCode) async {
+    String requestId,
+    String aadhaarNumber,
+    String captchaCode,
+  ) async {
     final url = Uri.parse('$baseUrl/$requestId/verify');
 
     final response = await http.post(
@@ -122,7 +124,9 @@ class LoginController extends GetxController {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception('Failed to verify Aadhaar card: ${response.reasonPhrase}');
+      throw Exception(
+        'Failed to verify Aadhaar card: ${response.reasonPhrase}',
+      );
     }
   }
 
@@ -145,7 +149,7 @@ class LoginController extends GetxController {
   @override
   void onClose() {
     super.onClose();
-   mobileController.dispose();
+    mobileController.dispose();
   }
 
   void increment() => count.value++;
