@@ -99,18 +99,21 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                // ✅ 1️⃣ Filter available users
               final availableUsers = controller.users.where((user) => user['avail'] == 1).toList();
 
-              return availableUsers.isEmpty
-                  ? Center(
-                child: Text(
-                  "No user found",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                    fontFamily: "poppins",
+// ✅ 2️⃣ Show "No user found" if none are available
+              if (availableUsers.isEmpty) {
+                return Center(
+                  child: Text(
+                    "No user found",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                      fontFamily: "poppins",
+                    ),
                   ),
-                ),
-              )
-                  : ListView.builder(
+                );
+              }
+              // ✅ 3️⃣ Otherwise, build the ListView ONLY with available users
+              return ListView.builder(
                 itemCount: availableUsers.length,
                 itemBuilder: (context, index) {
                   final user = availableUsers[index];
