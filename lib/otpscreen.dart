@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:http/http.dart' as http;
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:worknest/app/modules/bottom/views/bottom_view.dart';
+
 import 'colors.dart';
 
 class OTPScreen extends StatefulWidget {
@@ -48,21 +52,22 @@ class _OTPScreenState extends State<OTPScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                   Text(
-                      'Please enter the 4-digit code sent',
-                      // ' on\n+91 ${controller.mobileNumber.value}',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black54,
-                        fontFamily: 'Poppins',
-                      ),
+                  Text(
+                    'Please enter the 4-digit code sent',
+                    // ' on\n+91 ${controller.mobileNumber.value}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black54,
+                      fontFamily: 'Poppins',
                     ),
+                  ),
+
                   const SizedBox(height: 30),
                   Center(
                     child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.7,
+                      width: MediaQuery.of(context).size.width * 0.9,
                       child: PinCodeTextField(
                         appContext: context,
                         length: 6,
@@ -149,14 +154,48 @@ class _OTPScreenState extends State<OTPScreen> {
                             );
                         FirebaseAuth.instance
                             .signInWithCredential(credential)
-                            .then((value) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => BottomView(),
-                                ),
-                              );
+                            .then((value) async {
+                              // ✅ Get the ID token
+                              String? idToken = await value.user?.getIdToken();
+                              print('firebasetokan: $idToken');
+
+                              // ✅ Send this token to your backend (via HTTP POST)
+                              if (idToken != null) {
+                                final response = await http.post(
+                                  Uri.parse(
+                                    'https://jdapi.youthadda.co/user/verifyotp',
+                                  ),
+                                  headers: {'Content-Type': 'application/json'},
+                                  body: jsonEncode({'token': idToken}),
+                                );
+
+                                final responseData = jsonDecode(response.body);
+                                print("Server Response: $responseData");
+
+                                // Navigate if successful
+                                if (response.statusCode == 200) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => BottomView(),
+                                    ),
+                                  );
+                                } else {
+                                  // Handle error
+                                  print("Login failed: ${responseData['msg']}");
+                                }
+                              }
                             });
+                        // FirebaseAuth.instance
+                        //     .signInWithCredential(credential)
+                        //     .then((value) {
+                        //       Navigator.push(
+                        //         context,
+                        //         MaterialPageRoute(
+                        //           builder: (context) => BottomView(),
+                        //         ),
+                        //       );
+                        //     });
                       } catch (ex) {
                         log(ex.toString() as num);
                       }
