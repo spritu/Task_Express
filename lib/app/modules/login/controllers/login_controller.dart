@@ -92,7 +92,9 @@ class LoginController extends GetxController {
   }
 
   void openTerms() {
-    print('Terms & Conditions clicked');
+    print(
+      'Terms zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz& Czzzzzzzzzzzzzzzzonditions clicked',
+    );
   }
 
   final String baseUrl = 'https://dg-sandbox.setu.co/api/okyc';

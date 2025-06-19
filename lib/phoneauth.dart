@@ -1,21 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../auth_controller.dart';
-import '../../../../colors.dart';
-import '../../bottom/views/bottom_view.dart';
-import '../../otp/views/otp_view.dart';
-import '../controllers/login_controller.dart';
 
-class LoginView extends GetView<LoginController> {
-  const LoginView({super.key});
+import 'OTPscreen.dart';
+import 'colors.dart';
+
+class PhoneAuth extends StatefulWidget {
+  const PhoneAuth({super.key});
+
+  @override
+  State<PhoneAuth> createState() => _PhoneAuthState();
+}
+
+class _PhoneAuthState extends State<PhoneAuth> {
+  TextEditingController phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    Get.put(LoginController());
-
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SingleChildScrollView(
@@ -36,15 +36,14 @@ class LoginView extends GetView<LoginController> {
                 SizedBox(height: 50),
                 InkWell(
                   onTap: () async {
-                    final authController = Get.find<AuthController>();
-                    // Update GetStorage and observable state
-                    authController.box.write('isLoggedIn', false);
-                    authController.isLoggedIn.value = false;
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    await prefs.clear();
-                    // Navigate to BottomView
-                    Get.to(() => BottomView());
+                    // final authController = Get.find<AuthController>();
+                    // // Update GetStorage and observable state
+                    // authController.box.write('isLoggedIn', false);
+                    // authController.isLoggedIn.value = false;
+                    // SharedPreferences prefs = await SharedPreferences.getInstance();
+                    // await prefs.clear();
+                    // // Navigate to BottomView
+                    // Get.to(() => BottomView());
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -53,14 +52,16 @@ class LoginView extends GetView<LoginController> {
                         "Skip for now",
                         textAlign: TextAlign.center, // text-align: center;
                         style: TextStyle(
-                          fontSize: 12, // font-size: 12px;
-                          fontFamily: "Poppins", // font-family: Poppins;
-                          fontWeight: FontWeight.w500, // font-weight: 500;
-                          height:
-                              20 /
-                              12, // line-height: 20px -> height = lineHeight / fontSize
-                          letterSpacing:
-                              1.2, // letter-spacing: 10% of font-size (12 * 0.10 = 1.2)
+                          fontSize: 12,
+                          // font-size: 12px;
+                          fontFamily: "Poppins",
+                          // font-family: Poppins;
+                          fontWeight: FontWeight.w500,
+                          // font-weight: 500;
+                          height: 20 / 12,
+                          // line-height: 20px -> height = lineHeight / fontSize
+                          letterSpacing: 1.2,
+                          // letter-spacing: 10% of font-size (12 * 0.10 = 1.2)
                           color: AppColors.blue,
                         ),
                       ),
@@ -79,7 +80,8 @@ class LoginView extends GetView<LoginController> {
                           color: Color(0xff114BCA),
                           fontSize: 42,
                           fontWeight: FontWeight.w800,
-                          height: 0.476, // equivalent to 20px line-height
+                          height: 0.476,
+                          // equivalent to 20px line-height
                           letterSpacing: 2.1, // 5% of 42
                         ),
                       ),
@@ -104,11 +106,16 @@ class LoginView extends GetView<LoginController> {
                   'Find Trusted Service Providers\n Instantly!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'Poppins', // font-family: Poppins
-                    fontWeight: FontWeight.w600, // font-weight: 600
-                    fontSize: 14, // font-size: 14px
-                    height: 26 / 14, // line-height: 26px → height factor
-                    letterSpacing: 1.54, // 11% of 14px → 14 * 0.11 = 1.54
+                    fontFamily: 'Poppins',
+                    // font-family: Poppins
+                    fontWeight: FontWeight.w600,
+                    // font-weight: 600
+                    fontSize: 14,
+                    // font-size: 14px
+                    height: 26 / 14,
+                    // line-height: 26px → height factor
+                    letterSpacing: 1.54,
+                    // 11% of 14px → 14 * 0.11 = 1.54
                     color: Color(0xff2D2D2D), // color
                   ),
                 ),
@@ -165,7 +172,7 @@ class LoginView extends GetView<LoginController> {
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                 TextField(
-                  controller: controller.mobileController,
+                  controller: phoneController,
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
                     labelText: 'Mobile Number',
@@ -212,21 +219,40 @@ class LoginView extends GetView<LoginController> {
                 const SizedBox(height: 20),
                 InkWell(
                   onTap: () async {
+                    final phone = "+91${phoneController.text.trim()}";
+
                     await FirebaseAuth.instance.verifyPhoneNumber(
-                      verificationCompleted:
-                          (PhoneAuthCredential credential) {},
-                      verificationFailed: (FirebaseAuthException ex) {},
-                      codeSent: (String verficationid, int? resendtoken) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => OtpView( )),
+                      phoneNumber: phone,
+                      verificationCompleted: (
+                        PhoneAuthCredential credential,
+                      ) async {
+                        // Optional: handle auto verification
+                        await FirebaseAuth.instance.signInWithCredential(
+                          credential,
                         );
                       },
-                      codeAutoRetrievalTimeout: (String verificationid) {},
-                      phoneNumber: controller.mobileController.text.toString(),
+                      verificationFailed: (FirebaseAuthException ex) {
+                        print("Verification failed: ${ex.message}");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Verification failed: ${ex.message}"),
+                          ),
+                        );
+                      },
+                      codeSent: (String verificationId, int? resendToken) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    OTPScreen(verificationid: verificationId),
+                          ),
+                        );
+                      },
+                      codeAutoRetrievalTimeout: (String verificationId) {},
                     );
-                    // controller.sendOtp(); // ✅ Already updated
                   },
+
                   child: Card(
                     child: Container(
                       height: 64,
@@ -266,9 +292,7 @@ class LoginView extends GetView<LoginController> {
                           color: Color(0xff235CD7),
                           fontWeight: FontWeight.bold,
                         ),
-                        recognizer:
-                            TapGestureRecognizer()
-                              ..onTap = controller.openTerms,
+                        //  recognizer: TapGestureRecognizer()..onTap = controller.openTerms,
                       ),
                       const TextSpan(text: ' and '),
                       TextSpan(
@@ -277,9 +301,7 @@ class LoginView extends GetView<LoginController> {
                           color: Color(0xff235CD7),
                           fontWeight: FontWeight.bold,
                         ),
-                        recognizer:
-                            TapGestureRecognizer()
-                              ..onTap = controller.openPrivacy,
+                        //  recognizer: TapGestureRecognizer()..onTap = controller.openPrivacy,
                       ),
                     ],
                   ),
