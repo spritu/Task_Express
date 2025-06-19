@@ -30,11 +30,12 @@ class _OTPScreenState extends State<OTPScreen> {
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     // reload() is not required here for Flutter shared_preferences
-    String? userId = prefs.getString('userId'); // ✅ Correct key
+    String? userId2 = prefs.getString('userId');
     String? token = prefs.getString('token');
     String? email = prefs.getString('email');
 
-    print("🔑 Loaded userId2: $userId");
+    // Use the loaded data as needed
+    print("🔑 Loaded userId: $userId2");
     print("🔑 Loaded token: $token");
     print("🔑 Loaded email: $email");
   }

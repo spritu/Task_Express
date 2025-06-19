@@ -53,7 +53,7 @@ class SignUpController extends GetxController {
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String? userId2 = prefs.getString('userId2');
+    String? userId2 = prefs.getString('userId');
     String? token = prefs.getString('token');
     String? email = prefs.getString('email');
 
