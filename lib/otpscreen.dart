@@ -1,19 +1,17 @@
 import 'dart:convert';
-import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:worknest/app/modules/bottom/views/bottom_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:worknest/app/modules/signUp/views/sign_up_view.dart';
 
 import 'colors.dart';
 
 class OTPScreen extends StatefulWidget {
   String verificationid;
-  // commented codde
+
   OTPScreen({super.key, required this.verificationid});
 
   @override
@@ -22,6 +20,24 @@ class OTPScreen extends StatefulWidget {
 
 class _OTPScreenState extends State<OTPScreen> {
   TextEditingController OtpController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData(); // ✅ use initState instead of onInit
+  }
+
+  Future<void> _loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // reload() is not required here for Flutter shared_preferences
+    String? userId = prefs.getString('userId'); // ✅ Correct key
+    String? token = prefs.getString('token');
+    String? email = prefs.getString('email');
+
+    print("🔑 Loaded userId2: $userId");
+    print("🔑 Loaded token: $token");
+    print("🔑 Loaded email: $email");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +70,7 @@ class _OTPScreenState extends State<OTPScreen> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Please enter the 4-digit code sent',
-                    // ' on\n+91 ${controller.mobileNumber.value}',
+                    'Please enter the 6-digit code sent',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 12,
@@ -64,7 +79,6 @@ class _OTPScreenState extends State<OTPScreen> {
                       fontFamily: 'Poppins',
                     ),
                   ),
-
                   const SizedBox(height: 30),
                   Center(
                     child: SizedBox(
@@ -76,9 +90,7 @@ class _OTPScreenState extends State<OTPScreen> {
                         autoDisposeControllers: false,
                         keyboardType: TextInputType.number,
                         enableActiveFill: true,
-                        // enables box background color
                         cursorColor: Colors.black,
-                        // ✅ sets the cursor (blinking line) color
                         pinTheme: PinTheme(
                           shape: PinCodeFieldShape.box,
                           borderRadius: BorderRadius.circular(8),
@@ -91,122 +103,73 @@ class _OTPScreenState extends State<OTPScreen> {
                           selectedColor: Colors.grey,
                           inactiveColor: Colors.grey,
                         ),
-                        onChanged: (value) {
-                          // handle change
-                        },
-                        onCompleted: (otp) {
-                          //controller.verifyOtp(otp);
-                        },
+                        onChanged: (value) {},
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  // TextButton(
-                  //   onPressed: controller.sendOtp,
-                  //   child: const Text(
-                  //     'Resend',
-                  //     textAlign: TextAlign.center,
-                  //     style: TextStyle(
-                  //       fontFamily: 'Poppins',
-                  //       fontWeight: FontWeight.w600,
-                  //       fontSize: 12,
-                  //       height: 1.0, // 100% line-height
-                  //       letterSpacing: 0.72, // 6% of 12px = 0.72
-                  //       color: Color(0xFF114BCA),
-                  //     ),
-                  //   ),
-                  // ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.5),
+                  const SizedBox(height: 40),
                   ElevatedButton(
                     onPressed: () async {
-                      // String enteredOtp = controller.otpController.text.trim();
-
-                      // if (enteredOtp.isEmpty) {
-                      //   Get.snackbar(
-                      //     'Empty Field',
-                      //     'Please enter the 4-digit OTP code',
-                      //     backgroundColor: Colors.redAccent,
-                      //     colorText: Colors.white,
-                      //     snackPosition: SnackPosition.BOTTOM,
-                      //   );
-                      //   return;
-                      // }
-                      //
-                      // if (enteredOtp.length != 4) {
-                      //   Get.snackbar(
-                      //     'Invalid OTP',
-                      //     'OTP must be exactly 4 digits',
-                      //     backgroundColor: Colors.redAccent,
-                      //     colorText: Colors.white,
-                      //     snackPosition: SnackPosition.BOTTOM,E
-                      //   );
-                      //   return;
-                      // }
-                      // Get.to(() => SignUpView());
-                      //  String otp = controller.otpController.text.trim();
-                      // controller.verifyOtp(
-                      //   "otp",
-                      // ); // No need to pass mobileNumber // This should handle actual verification and navigation
                       try {
                         PhoneAuthCredential credential =
-                            await PhoneAuthProvider.credential(
+                            PhoneAuthProvider.credential(
                               verificationId: widget.verificationid,
-                              smsCode: OtpController.text.toString(),
+                              smsCode: OtpController.text.trim(),
                             );
-                        FirebaseAuth.instance
-                            .signInWithCredential(credential)
-                            .then((value) async {
-                              // ✅ Get the ID token
-                              String? idToken = await value.user?.getIdToken();
-                              print('firebasetokan: $idToken');
+                        final userCredential = await FirebaseAuth.instance
+                            .signInWithCredential(credential);
 
-                              // ✅ FCM Token (for push notifications)
-                              final String? fcmToken =
-                                  await FirebaseMessaging.instance.getToken();
-                              print('FCM Token: $fcmToken');
+                        String? idToken =
+                            await userCredential.user?.getIdToken();
+                        print('Firebase ID Token: $idToken');
+                        // ✅ FCM Token (for push notifications)
+                        final String? fcmToken =
+                            await FirebaseMessaging.instance.getToken();
+                        print('FCM Token: $fcmToken');
+                        if (idToken != null) {
+                          final response = await http.post(
+                            Uri.parse(
+                              'https://jdapi.youthadda.co/user/verifyotp',
+                            ),
+                            headers: {'Content-Type': 'application/json'},
+                            body: jsonEncode({
+                              'token': idToken,
+                              'fcmToken': fcmToken,
+                            }),
+                          );
 
-                              // ✅ Send this token to your backend (via HTTP POST)
-                              if (idToken != null) {
-                                final response = await http.post(
-                                  Uri.parse(
-                                    'https://jdapi.youthadda.co/user/verifyotp',
-                                  ),
-                                  headers: {'Content-Type': 'application/json'},
-                                  body: jsonEncode({
-                                    'token': idToken,
-                                    'fcmToken': fcmToken,
-                                  }),
-                                );
+                          final responseData = jsonDecode(response.body);
+                          print("Server Response: $responseData");
 
-                                final responseData = jsonDecode(response.body);
-                                print("Server Response: $responseData");
+                          if (response.statusCode == 200) {
+                            final userId = responseData['id'].toString();
+                            print("UserID from backend: $userId");
 
-                                // Navigate if successful
-                                if (response.statusCode == 200) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => BottomView(),
-                                    ),
-                                  );
-                                } else {
-                                  // Handle error
-                                  print("Login failed: ${responseData['msg']}");
-                                }
-                              }
-                            });
-                        // FirebaseAuth.instance
-                        //     .signInWithCredential(credential)
-                        //     .then((value) {
-                        //       Navigator.push(
-                        //         context,
-                        //         MaterialPageRoute(
-                        //           builder: (context) => BottomView(),
-                        //         ),
-                        //       );
-                        //     });
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            await prefs.setString('userId', userId);
+
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SignUpView(),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Verification failed: ${responseData['msg'] ?? 'Server error'}",
+                                ),
+                              ),
+                            );
+                          }
+                        }
                       } catch (ex) {
-                        log(ex.toString() as num);
+                        print(ex.toString());
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text("Invalid OTP")));
                       }
                     },
                     style: ElevatedButton.styleFrom(
