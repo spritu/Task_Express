@@ -11,28 +11,27 @@ class JoinView extends GetView<JoinController> {
   @override
   Widget build(BuildContext context) {
     Get.put(JoinController());
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: AppColors.white,
       body: SingleChildScrollView(
-        child: Container(width: MediaQuery.of(context).size.width,
+        child: Container(
+          width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration( gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.center,
-            colors: [
-              Color(0xFF87AAF6),
-              Colors.white,
-            ],
-          ),),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.center,
+              colors: [Color(0xFF87AAF6), Colors.white],
+            ),
+          ),
 
           child: Padding(
-            padding: const EdgeInsets.only(left: 16,right: 16),
+            padding: const EdgeInsets.only(left: 16, right: 16),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-             crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                 SizedBox(
-                   height: 60),
+                SizedBox(height: 60),
                 Image.asset("assets/images/icon.png"),
                 Text.rich(
                   TextSpan(
@@ -84,32 +83,48 @@ class JoinView extends GetView<JoinController> {
                   children: [
                     Image.asset("assets/images/beg.png", height: 19, width: 20),
                     SizedBox(width: 5),
-                    Text('Find work',
-                        style: TextStyle(
-                            fontSize: 15,
-                            color: Color(0xff746E6E),
-                            fontWeight: FontWeight.w400)),
+                    Text(
+                      'Find work',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0xff746E6E),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                     SizedBox(width: 10),
                     Container(height: 16, width: 1, color: Color(0xff746E6E)),
                     SizedBox(width: 10),
-                    Image.asset("assets/images/hired.png",
-                        height: 19, width: 20),
+                    Image.asset(
+                      "assets/images/hired.png",
+                      height: 19,
+                      width: 20,
+                    ),
                     SizedBox(width: 5),
-                    Text('Get Hired',
-                        style: TextStyle(
-                            fontSize: 15,
-                            color: Color(0xff746E6E),
-                            fontWeight: FontWeight.w400)),
+                    Text(
+                      'Get Hired',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0xff746E6E),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                     SizedBox(width: 10),
                     Container(height: 16, width: 1, color: Color(0xff746E6E)),
                     SizedBox(width: 10),
-                    Image.asset("assets/images/grow.png", height: 19, width: 20),
+                    Image.asset(
+                      "assets/images/grow.png",
+                      height: 19,
+                      width: 20,
+                    ),
                     SizedBox(width: 5),
-                    Text('Grow',
-                        style: TextStyle(
-                            fontSize: 15,
-                            color: Color(0xff746E6E),
-                            fontWeight: FontWeight.w400)),
+                    Text(
+                      'Grow',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0xff746E6E),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ],
                 ),
                 // Column(
@@ -251,8 +266,7 @@ class JoinView extends GetView<JoinController> {
                   ],
                 ),
 
-               // SizedBox(height: 20),
-
+                // SizedBox(height: 20),
               ],
             ),
           ),
@@ -260,6 +274,7 @@ class JoinView extends GetView<JoinController> {
       ),
     );
   }
+
   Widget _buildJoinCardWithIcon({
     required IconData icon,
     required String title,
@@ -268,26 +283,29 @@ class JoinView extends GetView<JoinController> {
   }) {
     return Card(
       color: AppColors.white,
-      child: InkWell(onTap: (){
-        Get.to(LoginView());
-      },
+      child: InkWell(
+        onTap: () {
+          Get.to(PhoneAuth());
+        },
         child: Container(
-          width: 128,height: 180,
+          width: 128,
+          height: 180,
           padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
           decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-                colors: [
-                  Color.fromRGBO(255, 255, 255, 0.29), // rgba(255,255,255,0.29)
-                  Color.fromRGBO(17, 75, 202, 0.29),   // rgba(17,75,202,0.29)
-                ],
-              ),
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [
+                Color.fromRGBO(255, 255, 255, 0.29), // rgba(255,255,255,0.29)
+                Color.fromRGBO(17, 75, 202, 0.29), // rgba(17,75,202,0.29)
+              ],
+            ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [SizedBox(height: 20),
+            children: [
+              SizedBox(height: 20),
               Icon(icon, color: color, size: 46),
               const SizedBox(height: 5),
               Text(
@@ -310,7 +328,8 @@ class JoinView extends GetView<JoinController> {
                 style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.w400,
-                  fontSize: 11, height: 20 / 12,
+                  fontSize: 11,
+                  height: 20 / 12,
                   fontFamily: 'Poppins',
                 ),
               ),
@@ -327,31 +346,33 @@ class JoinView extends GetView<JoinController> {
     required String subtitle,
     required Color color,
   }) {
-    return Card(color: AppColors.white,
-      child: InkWell(onTap: (){
-        Get.to(ProviderLoginView());
-      },
+    return Card(
+      color: AppColors.white,
+      child: InkWell(
+        onTap: () {
+          Get.to(ProviderLoginView());
+        },
         child: Container(
-          width: 128,height: 180,
+          width: 128,
+          height: 180,
           padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-          decoration: BoxDecoration(   gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            colors: [
-              Color.fromRGBO(255, 255, 255, 0.29), // rgba(255,255,255,0.29)
-              Color.fromRGBO(246, 124, 10, 0.29),  // rgba(246,124,10,0.29)
-            ],
-          ),
-          //  border: Border.all(color: Colors.black12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [
+                Color.fromRGBO(255, 255, 255, 0.29), // rgba(255,255,255,0.29)
+                Color.fromRGBO(246, 124, 10, 0.29), // rgba(246,124,10,0.29)
+              ],
+            ),
+            //  border: Border.all(color: Colors.black12),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [SizedBox(height: 20),
-              Image.asset(
-                imagePath,
-                height: 46,color: AppColors.orage,
-              ),
+            children: [
+              SizedBox(height: 20),
+              Image.asset(imagePath, height: 46, color: AppColors.orage),
               const SizedBox(height: 5),
               Text(
                 title,
@@ -374,7 +395,8 @@ class JoinView extends GetView<JoinController> {
                   color: Colors.black,
                   fontWeight: FontWeight.w400,
                   fontSize: 11,
-                  fontFamily: 'Poppins', height: 20 / 12,
+                  fontFamily: 'Poppins',
+                  height: 20 / 12,
                 ),
               ),
             ],

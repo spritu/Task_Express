@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,13 +14,13 @@ class LoginView extends GetView<LoginController> {
 
   @override
   Widget build(BuildContext context) {
-  Get.put(LoginController());
+    Get.put(LoginController());
 
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SingleChildScrollView(
         child: Container(
-          decoration:  BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.center,
@@ -28,40 +29,44 @@ class LoginView extends GetView<LoginController> {
           ),
           alignment: Alignment.center,
           child: Padding(
-            padding:  EdgeInsets.only(left: 16, right: 16),
+            padding: EdgeInsets.only(left: 16, right: 16),
             child: Column(
-            //  crossAxisAlignment: CrossAxisAlignment.center,
-
-              children: [SizedBox(height: 50),InkWell(
-                onTap: () async {
-                  final authController = Get.find<AuthController>();
-                  // Update GetStorage and observable state
-                  authController.box.write('isLoggedIn', false);
-                  authController.isLoggedIn.value = false;
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
-                  await prefs.clear();
-                  // Navigate to BottomView
-                  Get.to(() => BottomView());
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Skip for now",
-                      textAlign: TextAlign.center, // text-align: center;
-                      style: TextStyle(
-                        fontSize: 12, // font-size: 12px;
-                        fontFamily: "Poppins", // font-family: Poppins;
-                        fontWeight: FontWeight.w500, // font-weight: 500;
-                        height: 20 / 12, // line-height: 20px -> height = lineHeight / fontSize
-                        letterSpacing: 1.2, // letter-spacing: 10% of font-size (12 * 0.10 = 1.2)
-                        color: AppColors.blue,
+              //  crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 50),
+                InkWell(
+                  onTap: () async {
+                    final authController = Get.find<AuthController>();
+                    // Update GetStorage and observable state
+                    authController.box.write('isLoggedIn', false);
+                    authController.isLoggedIn.value = false;
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    await prefs.clear();
+                    // Navigate to BottomView
+                    Get.to(() => BottomView());
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Skip for now",
+                        textAlign: TextAlign.center, // text-align: center;
+                        style: TextStyle(
+                          fontSize: 12, // font-size: 12px;
+                          fontFamily: "Poppins", // font-family: Poppins;
+                          fontWeight: FontWeight.w500, // font-weight: 500;
+                          height:
+                              20 /
+                              12, // line-height: 20px -> height = lineHeight / fontSize
+                          letterSpacing:
+                              1.2, // letter-spacing: 10% of font-size (12 * 0.10 = 1.2)
+                          color: AppColors.blue,
+                        ),
                       ),
-                    )
-
-                  ],
+                    ],
+                  ),
                 ),
-              ),
 
                 SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                 Text.rich(
@@ -99,12 +104,12 @@ class LoginView extends GetView<LoginController> {
                   'Find Trusted Service Providers\n Instantly!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'Poppins',               // font-family: Poppins
-                    fontWeight: FontWeight.w600,         // font-weight: 600
-                    fontSize: 14,                         // font-size: 14px
-                    height: 26 / 14,                      // line-height: 26px → height factor
-                    letterSpacing: 1.54,                 // 11% of 14px → 14 * 0.11 = 1.54
-                    color: Color(0xff2D2D2D),             // color
+                    fontFamily: 'Poppins', // font-family: Poppins
+                    fontWeight: FontWeight.w600, // font-weight: 600
+                    fontSize: 14, // font-size: 14px
+                    height: 26 / 14, // line-height: 26px → height factor
+                    letterSpacing: 1.54, // 11% of 14px → 14 * 0.11 = 1.54
+                    color: Color(0xff2D2D2D), // color
                   ),
                 ),
 
@@ -114,63 +119,113 @@ class LoginView extends GetView<LoginController> {
                   children: [
                     Image.asset("assets/images/beg.png", height: 19, width: 20),
                     SizedBox(width: 5),
-                    Text('Find work',
-                        style: TextStyle(
-                            fontSize: 15,
-                            color: Color(0xff746E6E),
-                            fontWeight: FontWeight.w400)),
+                    Text(
+                      'Find work',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0xff746E6E),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                     SizedBox(width: 10),
                     Container(height: 16, width: 1, color: Color(0xff746E6E)),
                     SizedBox(width: 10),
-                    Image.asset("assets/images/hired.png",
-                        height: 19, width: 20),
+                    Image.asset(
+                      "assets/images/hired.png",
+                      height: 19,
+                      width: 20,
+                    ),
                     SizedBox(width: 5),
-                    Text('Get Hired',
-                        style: TextStyle(
-                            fontSize: 15,
-                            color: Color(0xff746E6E),
-                            fontWeight: FontWeight.w400)),
+                    Text(
+                      'Get Hired',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0xff746E6E),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                     SizedBox(width: 10),
                     Container(height: 16, width: 1, color: Color(0xff746E6E)),
                     SizedBox(width: 10),
-                    Image.asset("assets/images/grow.png", height: 19, width: 20),
+                    Image.asset(
+                      "assets/images/grow.png",
+                      height: 19,
+                      width: 20,
+                    ),
                     SizedBox(width: 5),
-                    Text('Grow',
-                        style: TextStyle(
-                            fontSize: 15,
-                            color: Color(0xff746E6E),
-                            fontWeight: FontWeight.w400)),
+                    Text(
+                      'Grow',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0xff746E6E),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ],
                 ),
-                 SizedBox(height: MediaQuery.of(context).size.height*0.1),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                 TextField(
                   controller: controller.mobileController,
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
                     labelText: 'Mobile Number',
                     prefixIcon: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                      child: Text("+91", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
+                      child: Text(
+                        "+91",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.blue, width: 1.5),
+                      borderSide: const BorderSide(
+                        color: Colors.blue,
+                        width: 1.5,
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey, width: 1.5),
+                      borderSide: const BorderSide(
+                        color: Colors.grey,
+                        width: 1.5,
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.blue, width: 2),
+                      borderSide: const BorderSide(
+                        color: Colors.blue,
+                        width: 2,
+                      ),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 12,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
                 InkWell(
-                  onTap: () {
-                    controller.sendOtp(); // ✅ Already updated
+                  onTap: () async {
+                    await FirebaseAuth.instance.verifyPhoneNumber(
+                      verificationCompleted:
+                          (PhoneAuthCredential credential) {},
+                      verificationFailed: (FirebaseAuthException ex) {},
+                      codeSent: (String verficationid, int? resendtoken) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => OtpView( )),
+                        );
+                      },
+                      codeAutoRetrievalTimeout: (String verificationid) {},
+                      phoneNumber: controller.mobileController.text.toString(),
+                    );
+                    // controller.sendOtp(); // ✅ Already updated
                   },
                   child: Card(
                     child: Container(
@@ -198,7 +253,11 @@ class LoginView extends GetView<LoginController> {
                 RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    style: const TextStyle(color: Colors.black, fontSize: 14, letterSpacing: 1,),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      letterSpacing: 1,
+                    ),
                     children: [
                       const TextSpan(text: 'By continuing, you agree to our'),
                       TextSpan(
@@ -207,7 +266,9 @@ class LoginView extends GetView<LoginController> {
                           color: Color(0xff235CD7),
                           fontWeight: FontWeight.bold,
                         ),
-                        recognizer: TapGestureRecognizer()..onTap = controller.openTerms,
+                        recognizer:
+                            TapGestureRecognizer()
+                              ..onTap = controller.openTerms,
                       ),
                       const TextSpan(text: ' and '),
                       TextSpan(
@@ -216,7 +277,9 @@ class LoginView extends GetView<LoginController> {
                           color: Color(0xff235CD7),
                           fontWeight: FontWeight.bold,
                         ),
-                        recognizer: TapGestureRecognizer()..onTap = controller.openPrivacy,
+                        recognizer:
+                            TapGestureRecognizer()
+                              ..onTap = controller.openPrivacy,
                       ),
                     ],
                   ),

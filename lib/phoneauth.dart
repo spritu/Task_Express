@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:worknest/otpscreen.dart';
 
+import 'OTPscreen.dart';
 import 'colors.dart';
 
 class PhoneAuth extends StatefulWidget {
@@ -223,21 +223,29 @@ class _PhoneAuthState extends State<PhoneAuth> {
 
                     await FirebaseAuth.instance.verifyPhoneNumber(
                       phoneNumber: phone,
-                      verificationCompleted: (PhoneAuthCredential credential) async {
+                      verificationCompleted: (
+                        PhoneAuthCredential credential,
+                      ) async {
                         // Optional: handle auto verification
-                        await FirebaseAuth.instance.signInWithCredential(credential);
+                        await FirebaseAuth.instance.signInWithCredential(
+                          credential,
+                        );
                       },
                       verificationFailed: (FirebaseAuthException ex) {
                         print("Verification failed: ${ex.message}");
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Verification failed: ${ex.message}")),
+                          SnackBar(
+                            content: Text("Verification failed: ${ex.message}"),
+                          ),
                         );
                       },
                       codeSent: (String verificationId, int? resendToken) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => OTPScreen(verificationid: verificationId),
+                            builder:
+                                (context) =>
+                                    OTPScreen(verificationid: verificationId),
                           ),
                         );
                       },
