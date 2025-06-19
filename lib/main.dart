@@ -79,7 +79,7 @@ void main() async {
   //Get.put(CancelBookingController(),permanent: true);
   Get.put(AuthController());
 
-  Get.put(PlasteringHelperController(), permanent: true);
+
   Get.put(BricklayingHelperController(), permanent: true);
   Get.put(BookingController(), permanent: true);
   Get.put(ScaffoldingHelperController(), permanent: true);
