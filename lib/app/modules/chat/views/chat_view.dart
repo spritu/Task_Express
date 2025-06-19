@@ -62,7 +62,7 @@ class ChatView extends GetView<ChatController> {
 
               print("🔑 Fetching receiver profile for id: $receiverId");
 
-              final receiverDetail = await controller.fetchReceiverDetail();
+              final receiverDetail = await controller.fetchReceiverDetail(receiverId);
 
               if (receiverDetail != null) {
                 final name = "${receiverDetail['firstName'] ?? ''} ${receiverDetail['lastName'] ?? ''}".trim();
@@ -289,7 +289,7 @@ class ChatView extends GetView<ChatController> {
                         final receiverId = controller.receiverId;
                         print("🔑 Fetching receiver detail for id: $receiverId");
 
-                        final receiverDetail = await controller.fetchReceiverDetail();
+                        final receiverDetail = await controller.fetchReceiverDetail(receiverId);
 
                         if (receiverDetail != null) {
                           // Update controller (optional)

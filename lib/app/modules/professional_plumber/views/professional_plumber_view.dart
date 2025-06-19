@@ -96,42 +96,49 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
               if (controller.isLoading.value) {
                 return Center(child: CircularProgressIndicator());
               }
-              return ListView.builder(
-                itemCount: controller.users.length,
+               // ✅ 1️⃣ Filter available users
+              final availableUsers = controller.users.where((user) => user['avail'] == 1).toList();
+
+              return availableUsers.isEmpty
+                  ? Center(
+                child: Text(
+                  "No user found",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                    fontFamily: "poppins",
+                  ),
+                ),
+              )
+                  : ListView.builder(
+                itemCount: availableUsers.length,
                 itemBuilder: (context, index) {
-                  final user = controller.users[index];
+                  final user = availableUsers[index];
                   final imagePath = user['userImg'] ?? '';
-                  final imageUrl =
-                      imagePath.isNotEmpty
-                          ? 'https://jdapi.youthadda.co/$imagePath'
-                          : '';
+                  final imageUrl = imagePath.isNotEmpty
+                      ? 'https://jdapi.youthadda.co/$imagePath'
+                      : '';
                   String rawDistance = user['distance'] ?? "0.00 km";
                   String distanceOnly = rawDistance.replaceAll(" km", "");
-
                   double? distanceDouble = double.tryParse(distanceOnly);
-                  String finalDistance =
-                      distanceDouble != null
-                          ? "${distanceDouble.toStringAsFixed(2)} km"
-                          : "N/A";
-
+                  String finalDistance = distanceDouble != null
+                      ? "${distanceDouble.toStringAsFixed(2)} km"
+                      : "N/A";
                   final int avail = user["avail"] ?? 0;
-                  print("Opening bottom sheet for ${user['firstName']}");
                   final coords = user['location']?['coordinates'];
                   int matchedCharge = 0;
                   if (user['matchedCharge'] != null) {
                     matchedCharge =
                         int.tryParse(user['matchedCharge'].toString()) ?? 0;
-                  } else if (user['skills'] != null &&
-                      user['skills'].isNotEmpty) {
+                  } else if (user['skills'] != null && user['skills'].isNotEmpty) {
                     matchedCharge =
-                        int.tryParse(user['skills'][0]['charge'].toString()) ??
-                        0;
+                        int.tryParse(user['skills'][0]['charge'].toString()) ?? 0;
                   }
 
                   return InkWell(
                     onTap: () async {
                       Get.to(
-                        () => ProfessionalProfileView(),
+                            () => ProfessionalProfileView(),
                         arguments: {
                           'name': user['firstName'],
                           'image': user['userImg'],
@@ -147,10 +154,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width,
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 7,
-                      ),
+                      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
@@ -171,11 +175,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                       height: 80,
                                       width: 80,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (
-                                        context,
-                                        error,
-                                        stackTrace,
-                                      ) {
+                                      errorBuilder: (context, error, stackTrace) {
                                         return Image.asset(
                                           'assets/images/person.jpeg',
                                           fit: BoxFit.cover,
@@ -191,8 +191,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         size: 16,
                                       ),
                                       Text(
-                                        user['averageRating']?.toString() ??
-                                            '0',
+                                        user['averageRating']?.toString() ?? '0',
                                         style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w400,
@@ -225,8 +224,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           "${user['firstName'] ?? 'No'} ${user['lastName'] ?? 'Name'}",
@@ -239,54 +237,48 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         ),
                                         SizedBox(height: 3),
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             avail == 1
                                                 ? Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.check_circle,
-                                                      color: Colors.green,
-                                                      size: 16,
-                                                    ),
-                                                    SizedBox(width: 4),
-                                                    Text(
-                                                      "Available",
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        fontFamily: "poppins",
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Color(
-                                                          0xff11AD0E,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )
-                                                : Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.cancel,
-                                                      color: Colors.red,
-                                                      size: 16,
-                                                    ),
-                                                    SizedBox(width: 4),
-                                                    Text(
-                                                      "Not Available",
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        fontFamily: "poppins",
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Colors.red,
-                                                      ),
-                                                    ),
-                                                  ],
+                                              children: [
+                                                Icon(
+                                                  Icons.check_circle,
+                                                  color: Colors.green,
+                                                  size: 16,
                                                 ),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  "Available",
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontFamily: "poppins",
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Color(0xff11AD0E),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                                : Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.cancel,
+                                                  color: Colors.red,
+                                                  size: 16,
+                                                ),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  "Not Available",
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontFamily: "poppins",
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ],
                                         ),
                                       ],
@@ -294,9 +286,8 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                     const Spacer(),
                                     TextButton(
                                       onPressed: () {
-                                        // Passing only relevant data to navigate to the profile view
                                         Get.to(
-                                          () => ProfessionalProfileView(),
+                                              () => ProfessionalProfileView(),
                                           arguments: {
                                             'name': user['firstName'],
                                             'image': user['userImg'],
@@ -304,8 +295,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                             'phone': user['phone'],
                                             'id': user['_id'],
                                             'skills': user['skills'] ?? [],
-                                            'averageRating':
-                                                user['averageRating'],
+                                            'averageRating': user['averageRating'],
                                             'reviews': user['reviews'] ?? [],
                                             'avail': user['avail'],
                                           },
@@ -315,9 +305,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         height: 24,
                                         width: 54,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
+                                          borderRadius: BorderRadius.circular(10),
                                           color: Color(0xff114BCA),
                                         ),
                                         child: Center(
@@ -337,25 +325,18 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                 ),
                                 SizedBox(height: 4),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.only(
-                                                top: 3,
-                                              ),
+                                              padding: const EdgeInsets.only(top: 3),
                                               child: Icon(
                                                 Icons.location_on,
                                                 size: 14,
@@ -364,10 +345,6 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                             ),
                                             Text(
                                               finalDistance,
-                                              // ✅ Use calculated distance
-                                              // user['distance'] != null && user['distance'] != 'N/A'
-                                              //     ? '${double.tryParse(user['distance'].toString())?.toStringAsFixed(2) ?? 'N/A'} km'
-                                              //     : 'N/A',
                                               style: TextStyle(fontSize: 12),
                                             ),
                                           ],
@@ -383,9 +360,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                       elevation: 2,
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
-                                          vertical: 4.0,
-                                          horizontal: 4.0,
-                                        ),
+                                            vertical: 4.0, horizontal: 4.0),
                                         child: RichText(
                                           text: TextSpan(
                                             style: const TextStyle(
@@ -426,27 +401,14 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         width: 110,
                                         child: ElevatedButton(
                                           onPressed: () async {
-                                            final phoneNumber =
-                                                user['phone'] ?? '';
+                                            final phoneNumber = user['phone'] ?? '';
                                             if (phoneNumber.isNotEmpty) {
-                                              controller.selectedUsers =
-                                                  users; // Store full list
-                                              controller
-                                                      .selectedIndexAfterCall =
-                                                  index; // Store selected index
-                                              controller.selectedTitle = title;
-                                              controller
-                                                      .shouldShowSheetAfterCall =
-                                                  true; // Trigger sheet on resume
-                                              controller.makePhoneCall(
-                                                phoneNumber,
-                                              );
+                                              controller.makePhoneCall(phoneNumber);
                                             } else {
                                               Get.snackbar(
                                                 'Error',
                                                 'Phone number not available',
-                                                snackPosition:
-                                                    SnackPosition.BOTTOM,
+                                                snackPosition: SnackPosition.BOTTOM,
                                                 backgroundColor: Colors.red,
                                                 colorText: Colors.white,
                                               );
@@ -475,26 +437,22 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                         child: ElevatedButton(
                                           onPressed: () {
                                             final receiverId =
-                                                user['_id'].toString();
+                                            user['_id'].toString();
                                             final receiverName =
-                                                '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'
-                                                    .trim();
+                                            '${user['firstName'] ?? ''} ${user['lastName'] ?? ''}'
+                                                .trim();
                                             final receiverImage =
                                                 user['userImg'] ?? '';
-                                            final phoneNumber =
-                                                user['phone'] ?? '';
-
+                                            final phoneNumber = user['phone'] ?? '';
                                             if (receiverId.isNotEmpty) {
                                               Get.to(
                                                 ChatView(),
                                                 arguments: {
                                                   'receiverId': receiverId,
-                                                  'receiverName':
-                                                      receiverName.isNotEmpty
-                                                          ? receiverName
-                                                          : 'No Name',
-                                                  'receiverImage':
-                                                      receiverImage,
+                                                  'receiverName': receiverName.isNotEmpty
+                                                      ? receiverName
+                                                      : 'No Name',
+                                                  'receiverImage': receiverImage,
                                                   'phoneNumber': phoneNumber,
                                                 },
                                               );
@@ -502,17 +460,14 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                                               Get.snackbar(
                                                 'Error',
                                                 'Receiver ID not available',
-                                                snackPosition:
-                                                    SnackPosition.BOTTOM,
+                                                snackPosition: SnackPosition.BOTTOM,
                                                 backgroundColor: Colors.red,
                                                 colorText: Colors.white,
                                               );
                                             }
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(
-                                              0xff114BCA,
-                                            ),
+                                            backgroundColor: const Color(0xff114BCA),
                                           ),
                                           child: const Text(
                                             "Chat",
@@ -538,6 +493,7 @@ class ProfessionalPlumberView extends GetView<ProfessionalPlumberController> {
                   );
                 },
               );
+
             }),
           ),
         ],

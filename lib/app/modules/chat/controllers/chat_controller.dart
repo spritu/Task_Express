@@ -323,47 +323,91 @@ class ChatController extends GetxController  with WidgetsBindingObserver{
   //     messages.insert(0, msg);
   //   });
   // }
-  Future<Map<String, dynamic>?> fetchReceiverDetail() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId2 = prefs.getString('userId'); // ✅ This should not be null
-    print("🔑 Receiver ID from prefs: $receiverId");
+  // Future<Map<String, dynamic>?> fetchReceiverDetail() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? userId2 = prefs.getString('userId'); // ✅ This should not be null
+  //   print("🔑 Receiver ID from prefs: $receiverId");
+  //
+  //   if (receiverId == null || receiverId.isEmpty) {
+  //     print("❌ Receiver ID is null or empty");
+  //     return null;
+  //   }
+  //
+  //   final url = Uri.parse(
+  //     'https://jdapi.youthadda.co/user/getuser?userId=$userId2',
+  //   );
+  //
+  //   print("🌐 Calling API: $url");
+  //
+  //   final response = await http.get(url);
+  //
+  //   print("📩 Response body: ${response.body}");
+  //
+  //   if (response.statusCode == 200) {
+  //     final decoded = json.decode(response.body);
+  //
+  //     final List<dynamic> userList = decoded['msg'] ?? [];
+  //
+  //     if (userList.isEmpty) {
+  //       print("❌ No users returned in msg[]");
+  //       return null;
+  //     }
+  //
+  //     // ✅ Find the user with matching _id
+  //     final user = userList.firstWhere(
+  //           (u) => u['_id'] == receiverId,
+  //       orElse: () => null,
+  //     );
+  //
+  //     if (user != null) {
+  //       print("✅ Found receiver user: $user");
+  //       return Map<String, dynamic>.from(user);
+  //     } else {
+  //       print("❌ No user in list matches ID $receiverId");
+  //       return null;
+  //     }
+  //   } else {
+  //     print("❌ API error: ${response.statusCode}");
+  //     return null;
+  //   }
+  // }
 
-    if (receiverId == null || receiverId.isEmpty) {
-      print("❌ Receiver ID is null or empty");
+
+  Future<Map<String, dynamic>?> fetchReceiverDetail(String receiverId) async {
+    print("🔑 Using receiverId: $receiverId");
+
+    if (receiverId.isEmpty) {
+      print("❌ Receiver ID is empty");
       return null;
     }
 
-    final url = Uri.parse(
-      'https://jdapi.youthadda.co/user/getuser?userId=$userId2',
-    );
+    final url = Uri.parse('https://jdapi.youthadda.co/user/getuserbyid');
+    final headers = {'Content-Type': 'application/json'};
+    final body = json.encode({
+      "_id": receiverId,
+    });
 
     print("🌐 Calling API: $url");
+    print("📤 Request body: $body");
 
-    final response = await http.get(url);
+    final response = await http.post(url, headers: headers, body: body);
 
+    print("📩 Response code: ${response.statusCode}");
     print("📩 Response body: ${response.body}");
 
     if (response.statusCode == 200) {
       final decoded = json.decode(response.body);
 
-      final List<dynamic> userList = decoded['msg'] ?? [];
+      print("📦 Decoded response: $decoded");
 
-      if (userList.isEmpty) {
-        print("❌ No users returned in msg[]");
-        return null;
-      }
-
-      // ✅ Find the user with matching _id
-      final user = userList.firstWhere(
-            (u) => u['_id'] == receiverId,
-        orElse: () => null,
-      );
+      // ✅ Use 'data' instead of 'msg'
+      final user = decoded['data'];
 
       if (user != null) {
         print("✅ Found receiver user: $user");
         return Map<String, dynamic>.from(user);
       } else {
-        print("❌ No user in list matches ID $receiverId");
+        print("❌ No user found in response");
         return null;
       }
     } else {
@@ -371,6 +415,12 @@ class ChatController extends GetxController  with WidgetsBindingObserver{
       return null;
     }
   }
+
+
+
+
+
+
 
 
 
