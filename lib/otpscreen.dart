@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:http/http.dart' as http;
@@ -12,7 +13,7 @@ import 'colors.dart';
 
 class OTPScreen extends StatefulWidget {
   String verificationid;
-
+  // commented codde
   OTPScreen({super.key, required this.verificationid});
 
   @override
@@ -159,6 +160,11 @@ class _OTPScreenState extends State<OTPScreen> {
                               String? idToken = await value.user?.getIdToken();
                               print('firebasetokan: $idToken');
 
+                              // ✅ FCM Token (for push notifications)
+                              final String? fcmToken =
+                                  await FirebaseMessaging.instance.getToken();
+                              print('FCM Token: $fcmToken');
+
                               // ✅ Send this token to your backend (via HTTP POST)
                               if (idToken != null) {
                                 final response = await http.post(
@@ -166,7 +172,10 @@ class _OTPScreenState extends State<OTPScreen> {
                                     'https://jdapi.youthadda.co/user/verifyotp',
                                   ),
                                   headers: {'Content-Type': 'application/json'},
-                                  body: jsonEncode({'token': idToken}),
+                                  body: jsonEncode({
+                                    'token': idToken,
+                                    'fcmToken': fcmToken,
+                                  }),
                                 );
 
                                 final responseData = jsonDecode(response.body);

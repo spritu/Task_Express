@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:get/get.dart';
@@ -162,6 +163,14 @@ class Bottom2Controller extends GetxController {
       print("Exception occurred: $e");
     }
   }
+
+  /// firebase push notification
+  // FirebaseMessaging messaging = FirebaseMessaging.instance;
+  // String? token = await messaging.getToken();
+  // await http.post(
+  // Uri.parse('https://yourapi/saveFcmToken'),
+  // body: jsonEncode({ userId: userId, fcmToken: token }),
+  // );
 
   /// seen chat notification Api
 
