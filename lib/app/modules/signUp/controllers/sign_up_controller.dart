@@ -53,12 +53,23 @@ class SignUpController extends GetxController {
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String? userId2 = prefs.getString('userId');
+
+    String? userId2 = prefs.getString('userId2');
+
+    print("userId2 on other screen: $userId2");
+
     String? token = prefs.getString('token');
     String? email = prefs.getString('email');
 
+    String? firebaseIdToken = prefs.getString('firebaseIdToken');
+    String? fcmToken = prefs.getString('fcmToken');
+
+
+    print('👉 Firebase ID Token: $firebaseIdToken');
+    print('👉 FCM Token: $fcmToken');
+
     // Use the loaded data as needed
-    print("🔑 Loaded userId2: $userId2");
+ //   print("🔑 Loaded userId2: $userId");
     print("🔑 Loaded token: $token");
     print("🔑 Loaded email: $email");
 
@@ -100,7 +111,9 @@ class SignUpController extends GetxController {
   Future<void> registerUser() async {
     final prefs = await SharedPreferences.getInstance();
 
-    String? userId2 = prefs.getString('userId');
+    String? userId2 = prefs.getString('userId2');
+    String? firebaseIdToken = prefs.getString('firebaseIdToken');
+    String? fcmToken = prefs.getString('fcmToken');
     if (userId2 == null || userId2.isEmpty) return;
 
     if (firstName.value.isEmpty || lastName.value.isEmpty || gender.value.isEmpty || dateOfBirth.value.isEmpty || email.value.isEmpty) return;
@@ -109,8 +122,10 @@ class SignUpController extends GetxController {
       'POST',
       Uri.parse('https://jdapi.youthadda.co/user/register'),
     );
-
+    print('✅ Sending request with _id: $userId2');
     request.fields.addAll({
+      // 'firebaseIdToken': firebaseIdToken ?? '',
+      //  'fcmToken': fcmToken ?? '',
       '_id': userId2,
       'firstName': firstName.value,
       'lastName': lastName.value,
@@ -166,7 +181,7 @@ class SignUpController extends GetxController {
 
         await prefs.setString('gender', userData['gender'] ?? '');
         await prefs.setString('userImg', rawImg.toString());
-
+        await prefs.setString('phone', userData['phone'] ?? '');
         await prefs.setString('city', userData['city'] ?? '');
         await prefs.setString('state', userData['state'] ?? '');
         await prefs.setString('pinCode', userData['pinCode']?.toString() ?? '');

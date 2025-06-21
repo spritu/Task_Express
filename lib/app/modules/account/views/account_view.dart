@@ -146,7 +146,7 @@ class AccountView extends GetView<AccountController> {
                                         return Text(
                                           controller.mobileNumber.isEmpty
                                               ? "Mobile number not found"
-                                              : "+91 ${controller.mobileNumber.value}",
+                                              : "${controller.mobileNumber.value}",
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontFamily: "poppins",

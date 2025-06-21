@@ -117,197 +117,197 @@ void main() async {
   );
 }
 
-class SplashScreen extends StatefulWidget {
-  @override
-  _SplashScreenState createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  final PageController _controller = PageController();
-  int _currentPage = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    checkLoginStatus();
+  class SplashScreen extends StatefulWidget {
+    @override
+    _SplashScreenState createState() => _SplashScreenState();
   }
 
-  // void checkLoginStatus() async {
-  //   final box = GetStorage();
-  //   final isLoggedIn = box.read('isLoggedIn') ?? false;
-  //   final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
-  //
-  //   print('isLoggedIn: $isLoggedIn');
-  //   print('isLoggedIn2: $isLoggedIn2');
-  //
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final userId = prefs.getString('userId');
-  //   print('userId: $userId');
-  //
-  //   await Future.delayed(Duration(seconds: 1));
-  //
-  //   if (isLoggedIn || userId != null) {
-  //     Get.offAllNamed('/bottom');
-  //   } else if (isLoggedIn2) {
-  //     Get.offAllNamed('/bottom2');
-  //   } else {
-  //     startSplashFlow();
-  //   }
-  // }
-  void checkLoginStatus() async {
-    final box = GetStorage();
-    final isLoggedIn = box.read('isLoggedIn') ?? false;
-    final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
+  class _SplashScreenState extends State<SplashScreen> {
+    final PageController _controller = PageController();
+    int _currentPage = 0;
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final userId = prefs.getString('userId');
-    final isProfileCompleted = prefs.getBool('profileCompleted') ?? false;
+    @override
+    void initState() {
+      super.initState();
+      checkLoginStatus();
+    }
 
-    print('📦 isLoggedIn: $isLoggedIn');
-    print('📦 isLoggedIn2: $isLoggedIn2');
-    print('🆔 userId: $userId');
-    print('🔑 token: $token');
+    // void checkLoginStatus() async {
+    //   final box = GetStorage();
+    //   final isLoggedIn = box.read('isLoggedIn') ?? false;
+    //   final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
+    //
+    //   print('isLoggedIn: $isLoggedIn');
+    //   print('isLoggedIn2: $isLoggedIn2');
+    //
+    //   final prefs = await SharedPreferences.getInstance();
+    //   final userId = prefs.getString('userId');
+    //   print('userId: $userId');
+    //
+    //   await Future.delayed(Duration(seconds: 1));
+    //
+    //   if (isLoggedIn || userId != null) {
+    //     Get.offAllNamed('/bottom');
+    //   } else if (isLoggedIn2) {
+    //     Get.offAllNamed('/bottom2');
+    //   } else {
+    //     startSplashFlow();
+    //   }
+    // }
+    void checkLoginStatus() async {
+      final box = GetStorage();
+      final isLoggedIn = box.read('isLoggedIn') ?? false;
+      final isLoggedIn2 = box.read('isLoggedIn2') ?? false;
 
-    // First-run logic: clear storage
-    // final isFirstRun = prefs.getBool('isFirstRun') ?? true;
-    // if (isFirstRun) {
-    //   await box.erase();        // Clear GetStorage
-    //   await prefs.clear();      // Clear SharedPreferences
-    //   await prefs.setBool('isFirstRun', false); // Mark complete
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final userId = prefs.getString('userId');
+      final isProfileCompleted = prefs.getBool('profileCompleted') ?? false;
+
+      print('📦 isLoggedIn: $isLoggedIn');
+      print('📦 isLoggedIn2: $isLoggedIn2');
+      print('🆔 userId: $userId');
+      print('🔑 token: $token');
+
+      // First-run logic: clear storage
+      // final isFirstRun = prefs.getBool('isFirstRun') ?? true;
+      // if (isFirstRun) {
+      //   await box.erase();        // Clear GetStorage
+      //   await prefs.clear();      // Clear SharedPreferences
+      //   await prefs.setBool('isFirstRun', false); // Mark complete
+      // }
+
+      await Future.delayed(Duration(seconds: 1)); // Splash screen delay
+
+      // ✅ Proceed only if token AND userId are valid
+      if (token != null &&
+          token.isNotEmpty &&
+          userId != null &&
+          userId.isNotEmpty) {
+        if (isLoggedIn2) {
+          Get.offAllNamed('/bottom2'); // Service provider flow
+        } else {
+          Get.offAllNamed('/bottom'); // Regular user flow
+        }
+      } else {
+        // If token/userId not present, go through splash/login
+        startSplashFlow();
+      }
+    }
+
+    // void checkInitialFlow() async {
+    //   final prefs = await SharedPreferences.getInstance();
+    //   final token = prefs.getString('token');
+    //   final isProfileCompleted = prefs.getBool('profileCompleted') ?? false;
+    //
+    //   if (token != null && token.isNotEmpty) {
+    //     if (isProfileCompleted) {
+    //       Get.offAllNamed('/bottom'); // ✅ Profile completed
+    //     } else {
+    //       Get.offAll(() => SignUpView()); // ✅ Profile not completed
+    //     }
+    //   } else {
+    //     Get.offAll(() => SplashScreen()); // ✅ No token
+    //   }
     // }
 
-    await Future.delayed(Duration(seconds: 1)); // Splash screen delay
-
-    // ✅ Proceed only if token AND userId are valid
-    if (token != null &&
-        token.isNotEmpty &&
-        userId != null &&
-        userId.isNotEmpty) {
-      if (isLoggedIn2) {
-        Get.offAllNamed('/bottom2'); // Service provider flow
-      } else {
-        Get.offAllNamed('/bottom'); // Regular user flow
+    void startSplashFlow() async {
+      await Future.delayed(Duration(seconds: 2));
+      if (_controller.hasClients) {
+        _controller.nextPage(
+          duration: Duration(milliseconds: 500),
+          curve: Curves.ease,
+        );
       }
-    } else {
-      // If token/userId not present, go through splash/login
-      startSplashFlow();
-    }
-  }
 
-  // void checkInitialFlow() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final token = prefs.getString('token');
-  //   final isProfileCompleted = prefs.getBool('profileCompleted') ?? false;
-  //
-  //   if (token != null && token.isNotEmpty) {
-  //     if (isProfileCompleted) {
-  //       Get.offAllNamed('/bottom'); // ✅ Profile completed
-  //     } else {
-  //       Get.offAll(() => SignUpView()); // ✅ Profile not completed
-  //     }
-  //   } else {
-  //     Get.offAll(() => SplashScreen()); // ✅ No token
-  //   }
-  // }
+      await Future.delayed(Duration(seconds: 2));
+      if (_controller.hasClients) {
+        _controller.nextPage(
+          duration: Duration(milliseconds: 500),
+          curve: Curves.ease,
+        );
+      }
 
-  void startSplashFlow() async {
-    await Future.delayed(Duration(seconds: 2));
-    if (_controller.hasClients) {
-      _controller.nextPage(
-        duration: Duration(milliseconds: 500),
-        curve: Curves.ease,
-      );
+      await Future.delayed(Duration(seconds: 2));
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('userId');
+
+      if (mounted && userId == null) {
+        Get.offAll(
+              () => JoinView(),
+        ); // Show JoinView only if user never logged in
+      }
     }
 
-    await Future.delayed(Duration(seconds: 2));
-    if (_controller.hasClients) {
-      _controller.nextPage(
-        duration: Duration(milliseconds: 500),
-        curve: Curves.ease,
-      );
-    }
-
-    await Future.delayed(Duration(seconds: 2));
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
-
-    if (mounted && userId == null) {
-      Get.offAll(
-            () => JoinView(),
-      ); // Show JoinView only if user never logged in
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          PageView(
-            controller: _controller,
-            onPageChanged: (index) {
-              setState(() => _currentPage = index);
-            },
-            children: const [Splash1View(), Splash2View(), Splash3View()],
-          ),
-          if (_currentPage != 0)
-            Positioned(
-              bottom: 20,
-              left: 20,
-              right: 20,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Get.offAll(() => JoinView());
-                    },
-                    child: Text(
-                      "Skip",
-                      style: TextStyle(color: Color(0xff090F47), fontSize: 16),
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        body: Stack(
+          children: [
+            PageView(
+              controller: _controller,
+              onPageChanged: (index) {
+                setState(() => _currentPage = index);
+              },
+              children: const [Splash1View(), Splash2View(), Splash3View()],
+            ),
+            if (_currentPage != 0)
+              Positioned(
+                bottom: 20,
+                left: 20,
+                right: 20,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Get.offAll(() => JoinView());
+                      },
+                      child: Text(
+                        "Skip",
+                        style: TextStyle(color: Color(0xff090F47), fontSize: 16),
+                      ),
                     ),
-                  ),
-                  Row(
-                    children: List.generate(
-                      2,
-                          (index) => AnimatedContainer(
-                        duration: Duration(milliseconds: 300),
-                        margin: EdgeInsets.symmetric(horizontal: 5),
-                        height: 10,
-                        width: 10,
-                        decoration: BoxDecoration(
-                          color:
-                          (_currentPage == 1 && index == 0) ||
-                              (_currentPage == 2 && index == 1)
-                              ? Color(0xff235CD7)
-                              : Colors.grey,
-                          shape: BoxShape.circle,
+                    Row(
+                      children: List.generate(
+                        2,
+                            (index) => AnimatedContainer(
+                          duration: Duration(milliseconds: 300),
+                          margin: EdgeInsets.symmetric(horizontal: 5),
+                          height: 10,
+                          width: 10,
+                          decoration: BoxDecoration(
+                            color:
+                            (_currentPage == 1 && index == 0) ||
+                                (_currentPage == 2 && index == 1)
+                                ? Color(0xff235CD7)
+                                : Colors.grey,
+                            shape: BoxShape.circle,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      if (_currentPage < 2) {
-                        _controller.nextPage(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeIn,
-                        );
-                      } else {
-                        Get.offAll(() => JoinView());
-                      }
-                    },
-                    child: Text(
-                      "Next",
-                      style: TextStyle(color: Color(0xff090F47), fontSize: 16),
+                    TextButton(
+                      onPressed: () {
+                        if (_currentPage < 2) {
+                          _controller.nextPage(
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeIn,
+                          );
+                        } else {
+                          Get.offAll(() => JoinView());
+                        }
+                      },
+                      child: Text(
+                        "Next",
+                        style: TextStyle(color: Color(0xff090F47), fontSize: 16),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    }
   }
-}

@@ -1,7 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'OTPscreen.dart';
+import 'auth_controller.dart';
 import 'colors.dart';
 
 class PhoneAuth extends StatefulWidget {
@@ -218,18 +222,70 @@ class _PhoneAuthState extends State<PhoneAuth> {
                 ),
                 const SizedBox(height: 20),
                 InkWell(
+                  // onTap: () async {
+                  //   final phone = "+91${phoneController.text.trim()}";
+                  //
+                  //   await FirebaseAuth.instance.verifyPhoneNumber(
+                  //     phoneNumber: phone,
+                  //     verificationCompleted: (
+                  //       PhoneAuthCredential credential,
+                  //     ) async {
+                  //       // Optional: handle auto verification
+                  //       await FirebaseAuth.instance.signInWithCredential(
+                  //         credential,
+                  //       );
+                  //     },
+                  //     verificationFailed: (FirebaseAuthException ex) {
+                  //       print("Verification failed: ${ex.message}");
+                  //       ScaffoldMessenger.of(context).showSnackBar(
+                  //         SnackBar(
+                  //           content: Text("Verification failed: ${ex.message}"),
+                  //         ),
+                  //       );
+                  //     },
+                  //     codeSent: (String verificationId, int? resendToken) {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //           builder:
+                  //               (context) =>
+                  //                   OTPScreen(verificationid: verificationId),
+                  //         ),
+                  //       );
+                  //     },
+                  //     codeAutoRetrievalTimeout: (String verificationId) {},
+                  //   );
+                  // },
                   onTap: () async {
                     final phone = "+91${phoneController.text.trim()}";
 
+                    if (phoneController.text.trim().isEmpty || phoneController.text.trim().length != 10) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Please enter a valid 10-digit mobile number"),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // ✅ Save to SharedPreferences
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setString('mobileNumber', phoneController.text.trim()); // save only digits
+                    await prefs.setString('mobileNumber', phone); // optional: save with +91 too
+
+                    print('✅ Phone number saved to SharedPreferences: ${phoneController.text.trim()}');
+                    final authController = Get.find<AuthController>();
+                    authController.isLoggedIn.value = true;
+
+                    phoneController.clear();
+                    // ✅ Show OTP in snackbar
+
+                    // ✅ Continue with Firebase
                     await FirebaseAuth.instance.verifyPhoneNumber(
                       phoneNumber: phone,
-                      verificationCompleted: (
-                        PhoneAuthCredential credential,
-                      ) async {
+                      verificationCompleted: (PhoneAuthCredential credential) async {
                         // Optional: handle auto verification
-                        await FirebaseAuth.instance.signInWithCredential(
-                          credential,
-                        );
+                        await FirebaseAuth.instance.signInWithCredential(credential);
                       },
                       verificationFailed: (FirebaseAuthException ex) {
                         print("Verification failed: ${ex.message}");
@@ -243,9 +299,7 @@ class _PhoneAuthState extends State<PhoneAuth> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    OTPScreen(verificationid: verificationId),
+                            builder: (context) => OTPScreen(verificationid: verificationId),
                           ),
                         );
                       },

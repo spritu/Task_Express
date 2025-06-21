@@ -148,17 +148,17 @@ class OtpController extends GetxController {
         await prefs.setString('userImg', userImg);
 
         // Save profile info
-        await prefs.setString('email', userData?['email'] ?? '');
-        await prefs.setString('firstName', userData?['firstName'] ?? '');
-        await prefs.setString('lastName', userData?['lastName'] ?? '');
-        await prefs.setString('dob', userData?['dateOfBirth'] ?? '');
+        await prefs.setString('email', userData['email'] ?? '');
+        await prefs.setString('firstName', userData['firstName'] ?? '');
+        await prefs.setString('lastName', userData['lastName'] ?? '');
+        await prefs.setString('dob', userData['dateOfBirth'] ?? '');
 
-        await prefs.setString('gender', userData?['gender'] ?? '');
-        await prefs.setString('mobile', userData?['phone'] ?? '');
-        await prefs.setString('city', userData?['city'] ?? '');
-        await prefs.setString('state', userData?['state'] ?? '');
-        await prefs.setString('referralCode', userData?['referralCode']?.toString() ?? '');
-        await prefs.setString('pinCode', userData?['pinCode']?.toString() ?? '');
+        await prefs.setString('gender', userData['gender'] ?? '');
+        await prefs.setString('mobile', userData['phone'] ?? '');
+        await prefs.setString('city', userData['city'] ?? '');
+        await prefs.setString('state', userData['state'] ?? '');
+        await prefs.setString('referralCode', userData['referralCode']?.toString() ?? '');
+        await prefs.setString('pinCode', userData['pinCode']?.toString() ?? '');
         // Save skills ONLY if userType == 2 (Service Provider)
         if (userType == 2) {
           final skills = userData['skills'];
